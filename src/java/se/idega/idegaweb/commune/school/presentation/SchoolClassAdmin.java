@@ -57,6 +57,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 	private int action = 0;
 	private int method = 0;
 	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
+	
+	private boolean multipleSchools = false;
+	private boolean showBunRadioButtons = false;	
 
 	/**
 	 * @see se.idega.idegaweb.commune.school.presentation.SchoolCommuneBlock#init(com.idega.presentation.IWContext)
@@ -121,7 +124,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.add(headerTable, 1, 1);
 
-		headerTable.add(getNavigationTable(true, false), 1, 1);
+		headerTable.add(getNavigationTable(true, multipleSchools, showBunRadioButtons), 1, 1);
 		headerTable.add(getSortTable(), 2, 1);
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
@@ -307,5 +310,20 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
+	}
+	
+	/* Setters */
+	/**
+	 * Turns on/of view of drop down showing providers
+	 */
+	public void setMultipleSchools(boolean multiple) {
+		multipleSchools = multiple;
+	}	
+	/**
+	 * Turns on/off view of radiobuttons for showing BUN administrated shools or not
+	 * @param show
+	 */
+	public void setShowBunRadioButtons(boolean show){
+		showBunRadioButtons = show;		
 	}
 }

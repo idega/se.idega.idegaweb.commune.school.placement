@@ -6,11 +6,14 @@
  */
 package se.idega.idegaweb.commune.school.presentation;
 
+import is.idega.idegaweb.member.business.NoParentFound;
+
 import java.rmi.RemoteException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.accounting.business.AccountingSession;
@@ -21,6 +24,8 @@ import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
+import se.idega.idegaweb.commune.message.business.MessageBusiness;
+
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.provider.business.ProviderSession;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
@@ -36,10 +41,12 @@ import com.idega.block.school.data.SchoolCategory;
 import com.idega.block.school.data.SchoolCategoryHome;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolClassMemberHome;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolStudyPathHome;
 import com.idega.block.school.data.SchoolType;
+import com.idega.block.school.data.SchoolUser;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
@@ -69,8 +76,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/11 21:44:56 $ by $Author: goranb $
- * @version $Revision: 1.35 $
+ * Last modified: $Date: 2003/11/15 18:51:44 $ by $Author: goranb $
+ * @version $Revision: 1.36 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -80,6 +87,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_PUPIL_HEADING = KP + "pupil_heading";
 	private static final String KEY_LATEST_PLACEMENT_HEADING = KP + "latest_placement_heading";
 	private static final String KEY_NEW_PLACEMENT_HEADING = KP + "new_placement_heading";
+	private static final String KEY_STORED_PLACEMENT_HEADING = KP + "stored_placement_heading";
+	private static final String KEY_MSG_OF_NEW_PLACEMENT_HEADING = KP 
+																							+ "message of new placement heading";
 		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
 	private static final String KEY_FIRST_NAME_LABEL = KP + "first_name_label";
@@ -102,12 +112,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_RESOURCE_LABEL = KP + "resource_label";
 	private static final String KEY_COMMUNE_LABEL = KP + "commune_label";
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
-	private static final String KEY_PLACEMENT_PARAGRAPH_LABEL = "placement_paragraph_label";
+	private static final String KEY_PLACEMENT_PARAGRAPH_LABEL = KP + "placement_paragraph_label";
+	private static final String KEY_LATEST_INVOICE_DATE_LABEL = KP + "latest_placement_date_label";
 	private static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = 
 																								KP + "Payment by agreement: ";
 	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "Invoice interval: ";
 	private static final String KEY_PLACEMENT_DATE_LABEL = KP + "placement_date_label";
-
+	private static final String KEY_PARENT_LABEL = KP + "parent_label";
+	private static final String KEY_NEW_PROVIDER_LABEL = KP + "new_provider_label";
+	
 	public static final String KEY_DROPDOWN_CHOSE = KP + "dropdown_chose";
 	public static final String KEY_DROPDOWN_YES = KP + "dropdown_yes";
 	public static final String KEY_DROPDOWN_NO = KP + "dropdown_no";
@@ -117,6 +130,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public static final String KEY_PROVIDER_ADMIN = KP + "provider_admin";
 	public static final String KEY_STORED_MSG_PRFX = KP + "stored_msg_prfx";
 	public static final String KEY_STORED_MSG_ERROR = KP + "stored_msg_error";
+	public static final String KEY_FINISHED_PLACEMENT = KP + "finished_placement";
+	public static final String KEY_FINISHED_PLACEMENT_FOR = KP + "finished_placement_for";
+	public static final String KEY_END_DATE = KP + "end_date";
+	public static final String KEY_NEW_PLACEMENT = KP + "new_placement";
+	public static final String KEY_NEW_PLACEMENT_FOR = KP + "new_placement_for";
+	public static final String KEY_START_DATE = KP + "start_date";
 	
 		// Button keys
 //	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -127,7 +146,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_BUTTON_CONTRACT_HISTORY = KP + "button_contract_history";
 	private static final String KEY_BUTTON_NEW_GROUP = KP + "button_new_group";
 	private static final String KEY_BUTTON_PLACE = KP + "button_place";
-	private static final String KEY_BUTTON_CANCEL = KP + "button_cancel";	
+	private static final String KEY_BUTTON_CANCEL = KP + "button_cancel";
+	private static final String KEY_BUTTON_SEND = KP + "button_send";	
 
 	// Http request parameters  
 	public static final String PARAM_ACTION = "param_action";
@@ -141,20 +161,24 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public static final String PARAM_SCHOOL_YEAR = "param_school_year";
 	public static final String PARAM_SCHOOL_YEAR_CHANGED = "param_school_year_changed";
 	public static final String PARAM_SCHOOL_GROUP = "param_school_group";
-	//private static final String PARAM_STUDY_PATH = "param_study_path";
 	public static final String PARAM_PLACEMENT_DATE = "param_placement_date";
 	public static final String PARAM_RESOURCES = "param_resources";
-	//private static final String PARAM_HIDDEN_SUBMIT_SRC = "param_hidden_submit_src";
 	// PARAM_BACK is used in SearchUserModule
 	public static final String PARAM_BACK = "param_back";
 	public static final String PARAM_PAYMENT_BY_AGREEMENT = "payment_by_agreement";
 	public static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
 	public static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
-	public static final String PARAM_STUDY_PATH = "study_path";
-
+	public static final String PARAM_STUDY_PATH = "param_study_path";
+	public static final String PARAM_MSG_TO_NEW_PROVIDER = "msg_to_new_provider";
+	public static final String PARAM_MSG_TO_PARENT = "msg_to_parent";
+	public static final String PARAM_STORED_PLACEMENT_ID = "stored_placement_id";
+	public static final String PARAM_LATEST_PLACEMENT_ID = "latest_placement_id";
+	public static final String PARAM_LATEST_INVOICE_DATE = "param_latest_invoice_date";
+	
 	// Actions
 	private static final int ACTION_PLACE_PUPIL = 1;	
 	private static final int ACTION_REMOVE_SESSION_CHILD = 2;
+	private static final int ACTION_SEND_MESSAGES = 3;
 	
 	// Presentations
 	private static final int PRESENTATION_SEARCH_FORM = 1;
@@ -227,20 +251,31 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Perform actions according the _action input parameter
 		switch (_action) {
 			case ACTION_PLACE_PUPIL :
+				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(child);
 				storedPlacement = storePlacement(iwc, child);
 				break;
 			case ACTION_REMOVE_SESSION_CHILD :
 				removeSessionChild(iwc);
 				break;
+			case ACTION_SEND_MESSAGES :
+				sendNewPlacementMessages(iwc);
+				break;
 
 		}
 		// Show main page tables		
 		try {
-			setMainTableContent(getSearchTable(iwc));
-			setMainTableContent(getPupilTable(iwc, child));
-			setMainTableContent(getLatestPlacementTable(iwc, child));
-			setMainTableContent(getNewPlacementTable(iwc));
-			prepareCentralPlacementProviderSession(iwc);
+			if (storedPlacement == null) {
+				// Show main form parts
+				setMainTableContent(getSearchTable(iwc));
+				setMainTableContent(getPupilTable(iwc, child));
+				setMainTableContent(getLatestPlacementTable(iwc, child));
+				setMainTableContent(getNewPlacementTable(iwc));
+				prepareCentralPlacementProviderSession(iwc);				
+			} else {
+				// Show message form
+
+				setMainTableContent(getStoredPlacementMsgTable(iwc));
+			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			setMainTableContent(new Text("RemoteException thrown!! Error connecting to EJB's"));
@@ -252,6 +287,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Table getMainTable() {
 		mainTable = new Table();
 		mainTable.setBorder(0);
+		mainTable.setWidth(550);
 		mainTable.setCellpadding(0);
 		mainTable.setCellspacing(0);
 		int col = 1;
@@ -286,15 +322,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 		Image space1 = (Image) transGIF.clone();
 		space1.setWidth(6);
-
-		if (storedPlacement != null) {
-			table.add(space1, col, row);
-			table.add(getStoredPlacementMsg(iwc), col, row);
-			table.setRowHeight(row, "20");
-			table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
-			row++;
-			col = 1;
-		}
 
 		// *** HEADING Search pupil ***
 		table.add(space1, col, row);
@@ -576,6 +603,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setBorder(0);
+		table.setWidth("100%");
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
@@ -759,7 +787,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 				}
 				Integer primaryKey;
 				Iterator loop = rscColl.iterator();
-				while (loop.hasNext()) {
+				// show maximum 4 resources
+				for (int i = 0; loop.hasNext() && i < 4; i++) {
 					col = 2;
 					Resource rsc = (Resource) loop.next();
 					CheckBox cBox = (CheckBox) typeRscBox.clone();
@@ -768,7 +797,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 					cBox.setValue(intPK);
 					boolean isChecked = false;
 					if (rscArr != null) {
-						for (int i = 0; i < rscArr.length; i++) {
+						for (int j = 0; j < rscArr.length; i++) {
 							if (intPK == Integer.parseInt(rscArr[i])) {
 								isChecked = true;
 								break;
@@ -784,6 +813,19 @@ public class CentralPlacementEditor extends CommuneBlock {
 				e.printStackTrace();
 			}
 		}
+		row++;
+		col = 1;
+
+		table.add(transGIF, col, row); // EMPTY SPACE ROW
+		table.setRowHeight(row, "10");
+		row++;
+		col = 1;
+		
+		// Latest invoice date
+		table.add(getSmallHeader(localize(KEY_LATEST_INVOICE_DATE_LABEL, "Latest invoice date")), 
+																																col++, row);
+		table.add(getLatestInvoiceDateInput(iwc), col, row);
+		table.mergeCells(col, row, col+2, row);
 
 		row++;
 		col = 1;		
@@ -808,7 +850,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		rowTable.add(getInvoiceIntervalDropdown(iwc), tmpCol++, tmpRow);
 		// BUTTON Regular payment 
 		rowTable.add(new SubmitButton(
-				iwrb.getLocalizedImageButton(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")),
+				iwrb.getLocalizedImageButton(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment: ")),
 																														tmpCol, tmpRow);
 																											
 		//		PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), tmpCol, tmpRow);
@@ -846,6 +888,121 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 		return table;
 	}
+	
+	/**
+	 * Shows a message of the stored placement after successfull creation.
+	 * @param iwc
+	 * @return
+	 * @throws RemoteException
+	 */
+	public Table getStoredPlacementMsgTable(IWContext iwc) throws RemoteException {
+		// *** Search Table *** START - the uppermost table
+		Table table = new Table(3, 12);
+		table.setBorder(0);
+		table.setCellpadding(0);
+		table.setCellspacing(0);
+		table.setWidth(Table.HUNDRED_PERCENT);
+
+		int col = 1;
+		int row = 1;
+		
+		table.setWidth(col++, row, 10);
+		table.setWidth(col++, row, 30);
+		table.setWidth(col, row, Table.HUNDRED_PERCENT);
+
+		Image space1 = (Image) transGIF.clone();
+		space1.setWidth(6);
+		
+		table.add(space1, col, row);
+		table.setRowHeight(row, "10");
+		row++;
+		
+		// *** HEADING Stored placement ***
+		col = 1;
+		table.add(space1, col, row);
+		col = 2;
+		Text storedTxt = new Text(localize(KEY_STORED_PLACEMENT_HEADING, "Stored placement"));
+		storedTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
+		table.add(storedTxt, col, row);
+		table.mergeCells(col, row, col+1, row);
+		table.setRowHeight(row, "20");
+		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		col = 2;
+		row++;
+		
+		// Empty space row
+		table.add(space1, col, row);
+		table.setRowHeight(row, "10");
+		row++;
+		col = 2;
+
+		// Message stored message
+		table.add(getStoredPlacementMsg(iwc), col, row);
+		table.mergeCells(col, row, col+1, row);
+		table.setRowHeight(row, "20");
+		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		row++;
+		col = 1;
+
+		// Empty space row
+		table.add(space1, col, row);
+		table.setRowHeight(row, "10");
+		row++;
+		col = 2;
+
+
+		// *** HEADING Send message ***
+//		table.add(space1, col, row);
+		table.add(getSmallHeader(localize(KEY_MSG_OF_NEW_PLACEMENT_HEADING, "Send message of new placement to")), col, row);
+		table.mergeCells(col, row, col+1, row);
+		table.setRowHeight(row, "20");
+		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		col = 1;
+		row++;		
+
+		// Empty space row
+		table.add(space1, col, row);
+		table.setRowHeight(row, "10");						
+		col = 2;
+		row++;		
+
+		table.add(new CheckBox(PARAM_MSG_TO_NEW_PROVIDER), col++, row);
+		table.add(getSmallText(localize(KEY_NEW_PROVIDER_LABEL, "New provider")), col--, row);
+		col = 2;
+		row++;		
+
+		table.add(new CheckBox(PARAM_MSG_TO_PARENT), col++, row);
+		table.add(getSmallText(localize(KEY_PARENT_LABEL, "Parent")), col--, row);
+		col = 1;
+		row++;				
+
+		// Empty space row
+		table.add(space1, col, row);
+		table.setRowHeight(row, "10");
+		col = 2;
+		row++;
+		
+		table.add(new HiddenInput(PARAM_STORED_PLACEMENT_ID, 
+												((Integer) storedPlacement.getPrimaryKey()).toString()), 1, 1);
+
+		// BOTTOM BUTTONS
+			// Send
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_SEND, "Send"), 
+								PARAM_ACTION, String.valueOf(ACTION_SEND_MESSAGES)), col, row);
+		table.add(space1, col, row);
+			// Cancel		
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel")), col, row);
+		table.mergeCells(col, row, col+1, row);
+		col = 2;
+		row++;
+
+		// Empty space row
+		table.add(space1, col, row);
+		table.setRowHeight(row, "10");
+	
+		return table;
+	}
+
 
 	/**
 	 * Process the search for a pupil. If the uniqueUserSearchParam is set the User is fetched and put in 
@@ -889,7 +1046,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	private DropdownMenu getSchoolCategoriesDropdown(IWContext iwc) {
 		// Get dropdown for school categories
-		DropdownMenu schoolCats = new DropdownMenu(PARAM_SCHOOL_CATEGORY);
+		DropdownMenu schoolCats = (DropdownMenu) getStyledInterface(
+																		new DropdownMenu(PARAM_SCHOOL_CATEGORY));
 		schoolCats.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		schoolCats.setValueOnChange(PARAM_SCHOOL_CATEGORY_CHANGED, "1");
 		schoolCats.setToSubmit(true);
@@ -913,7 +1071,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	private DropdownMenu getProvidersDropdown(IWContext iwc) {
 		// Get dropdown for providers
-		DropdownMenu providers = new DropdownMenu(PARAM_PROVIDER);
+		DropdownMenu providers = (DropdownMenu) getStyledInterface(
+																					new DropdownMenu(PARAM_PROVIDER));
 		providers.setValueOnChange(PARAM_PROVIDER_CHANGED, "1");
 		providers.setToSubmit(true);
 		providers.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
@@ -948,7 +1107,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 
 	private DropdownMenu getSchoolTypesDropdown(IWContext iwc) {
-		DropdownMenu drop = new DropdownMenu(PARAM_SCHOOL_TYPE);
+		DropdownMenu drop = (DropdownMenu) getStyledInterface(
+																				new DropdownMenu(PARAM_SCHOOL_TYPE));
 		drop.setValueOnChange(PARAM_SCHOOL_TYPE_CHANGED, "1");
 		drop.setToSubmit(true);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
@@ -992,7 +1152,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 
 	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
-		DropdownMenu studyPaths = new DropdownMenu(PARAM_STUDY_PATH);
+		DropdownMenu studyPaths = (DropdownMenu) getStyledInterface(
+																				new DropdownMenu(PARAM_STUDY_PATH));
 		studyPaths.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 
 		if (storedPlacement == null 
@@ -1002,12 +1163,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 				&& !("-1".equals(iwc.getParameter(PARAM_PROVIDER)))				
 				&& iwc.isParameterSet(PARAM_SCHOOL_TYPE) 
 				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE)))) {
-			//String schoolIdStr = iwc.getParameter(PARAM_PROVIDER);
-			//String schTypeIdStr = iwc.getParameter(PARAM_SCHOOL_TYPE);																													
-			//Integer schTypePK = new Integer(schTypeIdStr);
 			try {
-				//School school = getSchoolBusiness(iwc).getSchool(new Integer(schoolIdStr));
-				//Collection coll = getStudyPathHome().findStudyPaths(school, schTypePK);
 				Collection coll = getStudyPathHome().findAllStudyPaths();
 				for (Iterator iter = coll.iterator(); iter.hasNext();) {
 					SchoolStudyPath element = (SchoolStudyPath) iter.next();
@@ -1028,7 +1184,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 
 	private DropdownMenu getSchoolYearsDropdown(IWContext iwc) {
-		DropdownMenu years = new DropdownMenu(PARAM_SCHOOL_YEAR);
+		DropdownMenu years = (DropdownMenu) getStyledInterface(
+																				new DropdownMenu(PARAM_SCHOOL_YEAR));
 		years.setValueOnChange(PARAM_SCHOOL_YEAR_CHANGED, "1");
 		years.setToSubmit(true);
 		years.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
@@ -1073,8 +1230,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 
 	private DropdownMenu getSchoolGroups(IWContext iwc) {
-		DropdownMenu groups = new DropdownMenu(PARAM_SCHOOL_GROUP);
-		//groups.setToSubmit(true);
+		DropdownMenu groups = (DropdownMenu) getStyledInterface(
+																				new DropdownMenu(PARAM_SCHOOL_GROUP));
 		groups.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 			
 		if (storedPlacement == null 
@@ -1113,7 +1270,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 	
 	private DropdownMenu getPaymentByAgreementDropdown(IWContext iwc, String param) {
-		DropdownMenu yesNo = new DropdownMenu(param);
+		DropdownMenu yesNo = (DropdownMenu) getStyledInterface(new DropdownMenu(param));
 		//yesNo.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		yesNo.addMenuElement(KEY_DROPDOWN_NO, localize(KEY_DROPDOWN_NO, "No"));
 		yesNo.addMenuElement(KEY_DROPDOWN_YES, localize(KEY_DROPDOWN_YES, "Yes"));
@@ -1124,8 +1281,20 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return yesNo;
 	}
 	
+	private DateInput getLatestInvoiceDateInput(IWContext iwc) {
+		DateInput dInput = (DateInput) getStyledInterface(new DateInput(PARAM_LATEST_INVOICE_DATE, true));
+		dInput.setToDisplayDayLast(true);
+		if (iwc.isParameterSet(PARAM_LATEST_INVOICE_DATE)) {
+			IWTimestamp paramStamp = new IWTimestamp(iwc.getParameter(PARAM_LATEST_INVOICE_DATE));
+			java.sql.Date paramDate = paramStamp.getDate();
+			dInput.setDate(paramDate);
+		}
+		return dInput;
+	}
+	
 	private DropdownMenu getInvoiceIntervalDropdown(IWContext iwc) {
-		DropdownMenu drop = new DropdownMenu(PARAM_INVOICE_INTERVAL);
+		DropdownMenu drop = (DropdownMenu) getStyledInterface(
+																		new DropdownMenu(PARAM_INVOICE_INTERVAL));
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		try {
 			Collection intervals = getSchoolBusiness(iwc).findAllSchClMemberInvoiceIntervalTypes();
@@ -1146,7 +1315,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 		
 	private TextInput getPlacementParagraphTextInput(IWContext iwc) {
-		TextInput txt = new TextInput(PARAM_PLACEMENT_PARAGRAPH);
+		TextInput txt = (TextInput) getStyledInterface(new TextInput(PARAM_PLACEMENT_PARAGRAPH));
 		txt.setLength(25);
 		if (storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_PARAGRAPH)) {
 			txt.setContent(iwc.getParameter(PARAM_PLACEMENT_PARAGRAPH));
@@ -1154,7 +1323,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return txt;
 	}
 	
-
 	private DateInput getPlacementDateInput(IWContext iwc) {
 		//DateInput dInput = new DateInput(PARAM_PLACEMENT_DATE);
 		DateInput dInput = (DateInput) getStyledInterface(
@@ -1217,21 +1385,25 @@ public class CentralPlacementEditor extends CommuneBlock {
 		if (storedPlacement != null) {
 			SchoolClassMember pl = storedPlacement;
 			buf = new StringBuffer();
-			buf.append(localize(KEY_STORED_MSG_PRFX, "Stored placement: "));
+			//buf.append(localize(KEY_STORED_MSG_PRFX, "Stored placement: "));
 			try {
-				buf.append(getUserBusiness(iwc).getUser(pl.getClassMemberId()).getNameLastFirst());
+				buf.append(getUserBusiness(iwc).getUser(pl.getClassMemberId()).getName());
 				buf.append(", ");
 				SchoolClass schClass = getSchoolBusiness(iwc).getSchoolClassHome().
 																	findByPrimaryKey(new Integer(pl.getSchoolClassId()));
-				buf.append(schClass.getName() + ", ");
 				buf.append(schClass.getSchool().getName() + ", ");
+				buf.append(localize(KEY_SCHOOL_GROUP, "School group") + ": "  
+																										+ schClass.getName() + ", ");
+				buf.append(localize(KEY_SCHOOL_YEAR, "School year") 
+											 + ": " + pl.getSchoolYear().getSchoolYearName() + ", ");
 				IWTimestamp regStamp = new IWTimestamp(pl.getRegisterDate().getTime());
 				buf.append(regStamp.getDateString("yyyy-MM-dd"));							
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			if (!(getResourcesString(iwc, pl).equals("")))
-				buf.append(", " + getResourcesString(iwc, pl));
+			String rscsStr = getResourcesString(iwc, pl);
+			if (!rscsStr.equals(""))
+				buf.append(", " + rscsStr);
 
 		}				
 		txt = new Text(buf.toString());
@@ -1404,6 +1576,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 			childID = ((Integer) child.getPrimaryKey()).intValue();
 		try {
 			mbr = getCentralPlacementBusiness(iwc).storeSchoolClassMember(iwc, childID);			
+			sendEndedPlacementMessageToProvider(iwc);
 		} catch (CentralPlacementException cpe) {
 			errMsgMid = localize(cpe.getKey(), cpe.getDefTrans());
 		} catch (RemoteException re) {
@@ -1418,15 +1591,142 @@ public class CentralPlacementEditor extends CommuneBlock {
 		child = null;
 	}
 	
-/*	protected CentralPlcmntProviderSession getCentralPlacementProviderSession(IWUserContext iwuc) {
-		try {
-			return (CentralPlcmntProviderSession) IBOLookup.getSessionInstance(iwuc, CentralPlcmntProviderSession.class);
+	public void sendEndedPlacementMessageToProvider(IWContext iwc) throws RemoteException {
+		// Update latest placement with removed_date
+		if(latestPl != null) {
+			try {
+				latestPl = getSchoolClassMemberHome().findByPrimaryKey(latestPl.getPrimaryKey());
+			} catch (EJBException e) {
+				e.printStackTrace();
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}			
 		}
-		catch (RemoteException re) {
-			throw new IBORuntimeException(re.getMessage());
+		// Send messages to provider users
+		if (latestPl != null) {
+			
+			Collection users = getSchoolBusiness(iwc).getSchoolUsers(latestPl.getSchoolClass().getSchool());
+			String subject = localize(KEY_FINISHED_PLACEMENT, "Finished placement");
+			String body = null;
+			StringBuffer buf = new StringBuffer("");
+			
+			buf.append(localize(KEY_FINISHED_PLACEMENT_FOR, "Finished placement for")+" "+child.getName());
+			try {
+				buf.append(", "+latestPl.getSchoolClass().getSchool().getName());						
+			} catch (Exception e) {}
+			try {
+				buf.append(", "+latestPl.getSchoolType().getName());					
+			} catch (Exception e) {}
+			try {
+				buf.append(", "+localize(KEY_SCHOOL_YEAR, "school year")+": "+latestPl.getSchoolYear().getName());						
+			} catch (Exception e) {}
+			try {
+				buf.append(", "+localize(KEY_SCHOOL_GROUP, "group")+": "+latestPl.getSchoolClass().getSchoolClassName());						
+			} catch (Exception e) {}
+			try {
+				buf.append(", "+localize(KEY_END_DATE, "End date")+": ");
+				IWTimestamp stamp = new IWTimestamp(latestPl.getRemovedDate());
+				buf.append(stamp.getDateString("yyyy-MM-dd"));
+			} catch (Exception e) {}
+			body = buf.toString();
+			for (Iterator iter = users.iterator(); iter.hasNext();) {
+				SchoolUser providerUser = (SchoolUser) iter.next();
+				User user = providerUser.getUser();
+				System.out.println("CPE End Message to School user: "+user.getNameLastFirst() + " -  id: "
+											+((Integer) user.getPrimaryKey()).toString());
+				getMessageBusiness(iwc).createUserMessage(user, subject, body, false);
+			}
 		}
 	}
-*/
+
+	protected void sendNewPlacementMessages(IWContext iwc) throws RemoteException {
+		if (iwc.isParameterSet(PARAM_STORED_PLACEMENT_ID)) {
+			String pIdStr = iwc.getParameter(PARAM_STORED_PLACEMENT_ID);
+			Integer placementID = new Integer(pIdStr);
+			
+			try {
+				SchoolClassMember placement = getSchoolClassMemberHome().findByPrimaryKey(placementID);
+
+				if (iwc.isParameterSet(PARAM_MSG_TO_PARENT)) {			
+					Collection parents;
+					try {
+						parents = getCommuneUserBusiness(iwc).getMemberFamilyLogic().getParentsFor(child);
+						String subject = localize(KEY_NEW_PLACEMENT, "New placement");
+						String body = null;
+						StringBuffer buf = new StringBuffer("");
+				
+						buf.append(localize(KEY_NEW_PLACEMENT_FOR, "New placement for")+" "+child.getName());
+						try {
+							buf.append(", "+placement.getSchoolClass().getSchool().getName());						
+						} catch (Exception e) {}
+						try {
+							buf.append(", "+placement.getSchoolType().getName());					
+						} catch (Exception e) {}
+						try {
+							buf.append(", "+localize(KEY_SCHOOL_YEAR, "school year")+": "+placement.getSchoolYear().getName());						
+						} catch (Exception e) {}
+						try {
+							buf.append(", "+localize(KEY_SCHOOL_GROUP, "group")+": "+placement.getSchoolClass().getSchoolClassName());						
+						} catch (Exception e) {}
+						try {
+							buf.append(", "+localize(KEY_START_DATE, "Start date")+": ");
+							IWTimestamp stamp = new IWTimestamp(placement.getRegisterDate());
+							buf.append(stamp.getDateString("yyyy-MM-dd"));
+						} catch (Exception e) {}
+						body = buf.toString();
+						for (Iterator iter = parents.iterator(); iter.hasNext();) {
+							User user = (User) iter.next();
+							System.out.println("CPE New Message to Parent: "+user.getNameLastFirst() + " -  id: "
+														+((Integer) user.getPrimaryKey()).toString());
+							getMessageBusiness(iwc).createUserMessage(user, subject, body, false);
+						}
+		
+					} catch (NoParentFound e1) {
+						e1.printStackTrace();
+					} 
+								
+				// Send messages to new provider			
+				}
+				if (iwc.isParameterSet(PARAM_MSG_TO_NEW_PROVIDER)) {
+					Collection users = getSchoolBusiness(iwc).getSchoolUsers(placement.getSchoolClass().getSchool());
+					String subject = localize(KEY_NEW_PLACEMENT, "New placement");
+					String body = null;
+					StringBuffer buf = new StringBuffer("");
+				
+					buf.append(localize(KEY_NEW_PLACEMENT_FOR, "New placement for")+" "+child.getName());
+					try {
+						buf.append(", "+placement.getSchoolClass().getSchool().getName());						
+					} catch (Exception e) {}
+					try {
+						buf.append(", "+placement.getSchoolType().getName());					
+					} catch (Exception e) {}
+					try {
+						buf.append(", "+localize(KEY_SCHOOL_YEAR, "school year")+": "+placement.getSchoolYear().getName());						
+					} catch (Exception e) {}
+					try {
+						buf.append(", "+localize(KEY_SCHOOL_GROUP, "group")+": "+placement.getSchoolClass().getSchoolClassName());						
+					} catch (Exception e) {}
+					try {
+						buf.append(", "+localize(KEY_START_DATE, "Start date")+": ");
+						IWTimestamp stamp = new IWTimestamp(placement.getRegisterDate());
+						buf.append(stamp.getDateString("yyyy-MM-dd"));
+					} catch (Exception e) {}
+					body = buf.toString();
+					for (Iterator iter = users.iterator(); iter.hasNext();) {
+						SchoolUser providerUser = (SchoolUser) iter.next();
+						User user = providerUser.getUser();
+						System.out.println("CPE New Message to School user: "+user.getNameLastFirst() + " -  id: "
+													+((Integer) user.getPrimaryKey()).toString());
+						getMessageBusiness(iwc).createUserMessage(user, subject, body, false);
+					}			
+				}				
+			} catch (FinderException e2) {
+				e2.printStackTrace();
+			}
+		}		
+	}
+
+	
 	protected ProviderSession getCentralPlacementProviderSession(IWUserContext iwuc) {
 		try {
 			return (ProviderSession) IBOLookup.getSessionInstance(iwuc, ProviderSession.class);
@@ -1474,6 +1774,18 @@ public class CentralPlacementEditor extends CommuneBlock {
 	
 	public SchoolStudyPathHome getStudyPathHome() throws java.rmi.RemoteException {
 		return (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+	}
+	
+	public SchoolClassMemberHome getSchoolClassMemberHome() throws RemoteException {
+		return (SchoolClassMemberHome) IDOLookup.getHome(SchoolClassMember.class);
+	}
+
+	private MessageBusiness getMessageBusiness(IWContext iwc) throws RemoteException {
+		return (MessageBusiness) IBOLookup.getServiceInstance(iwc, MessageBusiness.class);
+	}
+
+	public CommuneUserBusiness getCommuneUserBusiness(IWContext iwc) throws RemoteException {
+		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}
 
 

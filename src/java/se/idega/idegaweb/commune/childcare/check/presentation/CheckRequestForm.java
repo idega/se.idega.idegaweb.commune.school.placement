@@ -382,6 +382,7 @@ public class CheckRequestForm extends CommuneBlock {
 		workSituationChoice.addMenuElement(1, localize("check.working", "Working"));
 		workSituationChoice.addMenuElement(2, localize("check.studying", "Studying"));
 		workSituationChoice.addMenuElement(3, localize("check.seeking_work", "Seeking work"));
+		workSituationChoice.addMenuElement(4, localize("check.parental_leave", "Parental leave"));
 
 		String paramWorkSituation = iwc.getParameter(parameterName);
 		if (paramWorkSituation != null) {

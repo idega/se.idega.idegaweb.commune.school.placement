@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.school.business.ClassWriter;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -24,7 +25,9 @@ import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Link;
@@ -37,6 +40,7 @@ import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
+import com.idega.presentation.ui.Window;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.GenericUserComparator;
@@ -208,23 +212,31 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		form.setEventListener(SchoolEventListener.class);
 		form.add(new HiddenInput(PARAMETER_ACTION,String.valueOf(action)));
 
-		Table table = new Table(1, 3);
+		Table table = new Table();
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setWidth(getWidth());
-		table.setHeight(2, "12");
 		form.add(table);
+		int row = 1;
 
 		Table headerTable = new Table(2,1);
 		headerTable.setWidth(Table.HUNDRED_PERCENT);
 		headerTable.setCellpaddingAndCellspacing(0);
 		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.add(headerTable,1,1);
+		table.add(headerTable,1,row++);
+		table.setHeight(row++, "12");
 		
 		headerTable.add(getNavigationTable(true, multibleSchools), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 2, 1);
 
-		table.add(getNewStudentTable(iwc), 1, 3);
+		if (getSession().getSchoolClassID() != -1) {
+			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
+			table.add(getPDFLink(getBundle().getImage("shared/pdf.gif")),1,row);
+			table.add(Text.NON_BREAKING_SPACE, 1, row);
+			table.add(getXLSLink(getBundle().getImage("shared/xls.gif")),1,row++);
+		}
+		
+		table.add(getNewStudentTable(iwc), 1, row);
 
 		add(form);
 	}
@@ -575,8 +587,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setColumns(7);
 		table.setWidth(6,"12");
 		table.setWidth(7,"12");
-
 		int row = 1;
+
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
 		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
@@ -783,6 +795,32 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
 	}
 	
+ public Link getPDFLink(Image image) throws RemoteException {
+    Link link = new Link(image);
+    link.setWindow(getFileWindow());
+    link.addParameter(ClassWriter.prmClassId, getSession().getSchoolClassID());
+    link.addParameter(ClassWriter.prmPrintType,ClassWriter.PDF);
+    link.addParameter(ClassWriter.PRM_WRITABLE_CLASS,IWMainApplication.getEncryptedClassName(ClassWriter.class));
+    return link;
+  }
+
+  public Link getXLSLink(Image image) throws RemoteException {
+    Link link = new Link(image);
+    link.setWindow(getFileWindow());
+    link.addParameter(ClassWriter.prmClassId, getSession().getSchoolClassID());
+    link.addParameter(ClassWriter.prmPrintType,ClassWriter.XLS);
+    link.addParameter(ClassWriter.PRM_WRITABLE_CLASS,IWMainApplication.getEncryptedClassName(ClassWriter.class));
+    return link;
+  }
+
+  public Window getFileWindow(){
+    Window w = new Window(localize("school.class","School class"),"/servlet/MediaServlet");
+    w.setResizable(true);
+    w.setMenubar(true);
+    w.setHeight(400);
+    w.setWidth(500);
+    return w;
+  }
 	
 	
 	/** setters */

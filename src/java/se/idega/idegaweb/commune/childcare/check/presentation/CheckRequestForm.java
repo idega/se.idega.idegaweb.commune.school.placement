@@ -46,6 +46,9 @@ public class CheckRequestForm extends CommuneBlock {
 	private final static String PARAM_WORK_SITUATION_1 = "chk_ws_1";
 	private final static String PARAM_WORK_SITUATION_2 = "chk_ws_2";
 	private final static String PARAM_PROVIDER = "cca_provider";
+	
+	private final static String PARAM_CHILDCARE_THIS = "ccs_childcare_this";
+	private final static String PARAM_CHILDCARE_OTHER = "ccs_childcare_other";
 
 	private boolean isError = false;
 	private String errorMessage = null;
@@ -197,7 +200,7 @@ public class CheckRequestForm extends CommuneBlock {
 				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, Converter.convertToNewUser(iwc.getUser()), "", false, false, false, false, false);
 			
 			if (createChoices()) {
-				SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();
+				/*SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();
 				String date = IWTimestamp.RightNow().toString();
 				if (season != null)
 					date = new IWTimestamp(season.getSchoolSeasonStart()).toString();
@@ -211,6 +214,10 @@ public class CheckRequestForm extends CommuneBlock {
 					providerIDs[a] = providerID;
 				}
 				getChildCareBusiness(iwc).insertApplications(iwc.getCurrentUser(), providerIDs, date, checkID, ((Integer) child.getPrimaryKey()).intValue(), "", "", true);
+				*/
+				String childcareThisSchool = iwc.getParameter(this.PARAM_CHILDCARE_THIS);
+				if (childcareThisSchool != null)
+					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().setChildcarePreferences(((Integer)child.getPrimaryKey()).intValue(), Boolean.valueOf(childcareThisSchool).booleanValue(), iwc.getParameter(PARAM_CHILDCARE_OTHER));
 			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
@@ -243,6 +250,12 @@ public class CheckRequestForm extends CommuneBlock {
 		formTable.add(getChildTable(iwc), 1, row++);
 		formTable.setHeight(row++, 12);
 	
+		if (createChoices()) {
+			formTable.add(getLocalizedHeader("check.child_care", "Child care options"), 1, row++);
+			formTable.add(getChildCareTable(iwc), 1, row++);
+			formTable.setHeight(row++, 12);
+		}
+
 		if (showCheckForm) {
 			if (!createChoices()) {
 				formTable.add(getChildcareTypeTable(iwc), 1, row++);
@@ -260,12 +273,6 @@ public class CheckRequestForm extends CommuneBlock {
 			formTable.setHeight(row++, 12);
 		}
 		
-		if (createChoices()) {
-			formTable.add(getLocalizedHeader("check.choices", "Child care choices"), 1, row++);
-			formTable.add(getProviderTable(iwc), 1, row++);
-			formTable.setHeight(row++, 12);
-		}
-
 		SubmitButton submitButton = (SubmitButton) getButton(new SubmitButton(localize("check.send_request", "Send request")));
 		formTable.add(submitButton, 1, row);
 
@@ -484,6 +491,30 @@ public class CheckRequestForm extends CommuneBlock {
 		catch (java.rmi.RemoteException e) {
 			return null;
 		}
+	}
+	
+	private Table getChildCareTable(IWContext iwc) {
+		Table childcareTable = new Table();
+		childcareTable.setCellpadding(2);
+		childcareTable.setCellspacing(0);
+		childcareTable.setWidth(2, "400");
+		int row = 1;
+		
+		RadioButton childcareThis = getRadioButton(PARAM_CHILDCARE_THIS, "true");
+		childcareThis.setSelected();
+		RadioButton childcareOther = getRadioButton(PARAM_CHILDCARE_THIS, "false");
+		TextArea otherInput = (TextArea) getStyledInterface(new TextArea(PARAM_CHILDCARE_OTHER));
+		otherInput.setWidth(Table.HUNDRED_PERCENT);
+		otherInput.setRows(4);
+		
+		childcareTable.add(childcareThis,1, row);
+		childcareTable.add(getSmallHeader(localize("check.childcare_this_school","Get childcare in chosen school")), 2, row++);
+
+		childcareTable.add(childcareOther,1, row);
+		childcareTable.add(getSmallHeader(localize("check.childcare_other","Get childcare elsewhere, specify") + ":"), 2, row++);
+		childcareTable.add(otherInput, 2, row);
+		
+		return childcareTable;
 	}
 
 	private CheckBusiness getCheckBusiness(IWContext iwc) throws Exception {

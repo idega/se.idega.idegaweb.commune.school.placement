@@ -154,9 +154,9 @@ public class CheckRequestForm extends CommuneBlock {
 		int paramWorkSituation2 = -1;
 		int checkFee = getCheckBusiness(iwc).getCheckFee();
 		int checkAmount = getCheckBusiness(iwc).getCheckAmount();
-		String paramMTMC = iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD);
-		String paramMTFC = iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD);
-		String paramMTP = iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS);
+		String paramMTMC = iwc.isParameterSet(PARAM_MOTHER_TONGUE_MOTHER_CHILD) ? iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD) : "";
+		String paramMTFC = iwc.isParameterSet(PARAM_MOTHER_TONGUE_FATHER_CHILD) ? iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD) : "";
+		String paramMTP = iwc.isParameterSet(PARAM_MOTHER_TONGUE_PARENTS) ? iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS) : "";
 		int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(iwc.getCurrentUser(), ((Integer)child.getPrimaryKey()).intValue());
 		boolean showErrors = true;
 		if (createChoices()) {
@@ -185,7 +185,7 @@ public class CheckRequestForm extends CommuneBlock {
 			this.paramErrorWorkSituation2 = true;
 		}
 
-		if (paramMTMC != null && paramMTMC.trim().equals("")) {
+		/*if (paramMTMC != null && paramMTMC.trim().equals("")) {
 			this.isError = true;
 			this.paramErrorMotherTongueMC = true;
 		}
@@ -196,7 +196,7 @@ public class CheckRequestForm extends CommuneBlock {
 		if (paramMTP != null && paramMTP.trim().equals("")) {
 			this.isError = true;
 			this.paramErrorMotherTongueP = true;
-		}
+		}*/
 		
 		if (showErrors) {
 			if (isError) {
@@ -279,9 +279,9 @@ public class CheckRequestForm extends CommuneBlock {
 			formTable.add(getCustodianTable(iwc), 1, row++);
 			formTable.setHeight(row++, 12);
 	
-			formTable.add(getLocalizedHeader("check.mother_tongue", "Mother tongue"), 1, row++);
+			/*formTable.add(getLocalizedHeader("check.mother_tongue", "Mother tongue"), 1, row++);
 			formTable.add(getMotherTongueTable(iwc), 1, row++);
-			formTable.setHeight(row++, 12);
+			formTable.setHeight(row++, 12);*/
 		}
 		
 		SubmitButton submitButton = (SubmitButton) getButton(new SubmitButton(localize("check.send_request", "Send request")));
@@ -331,7 +331,7 @@ public class CheckRequestForm extends CommuneBlock {
 		
 		while (iter.hasNext()) {
 			SchoolType st = (SchoolType) iter.next();
-			typeChoice.addMenuElement(st.getPrimaryKey().toString(), getSchoolCommuneBusiness(iwc).getLocalizedSchoolType(st));
+			typeChoice.addMenuElement(st.getPrimaryKey().toString(), localize(getSchoolCommuneBusiness(iwc).getLocalizedSchoolTypeKey(st),st.getSchoolTypeName()));
 		}
 		childCareTypeTable.add(typeChoice, 2, row);
 

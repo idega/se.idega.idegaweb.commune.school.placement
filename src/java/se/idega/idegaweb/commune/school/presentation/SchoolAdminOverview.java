@@ -395,14 +395,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		table.add(getNavigationTable(iwc),1,row++);
 		
-		if (_protocol)
+		//if (_protocol)
 			table.add(getSmallHeader(localize("school.replace_reason","Replace reason")+":"),1,row);
-		else
-			table.add(getSmallErrorText(localize("school.replace_reason","Replace reason")+":"),1,row);
+		//else
+			//table.add(getSmallErrorText(localize("school.replace_reason","Replace reason")+":"),1,row);
 		table.add(new Break(),1,row);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REPLACE_MESSAGE));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
-		textArea.setAsNotEmpty(localize("school.must_provide_reason_for_replacement","You must specify a reason for replacement."));
+		//textArea.setAsNotEmpty(localize("school.must_provide_reason_for_replacement","You must specify a reason for replacement."));
 		textArea.keepStatusOnAction(true);
 		textArea.setHeight(4);
 		table.add(textArea,1,row++);
@@ -513,8 +513,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void replace(IWContext iwc) throws RemoteException {
-		if (iwc.isParameterSet(PARAMETER_REPLACE_MESSAGE) && iwc.isParameterSet(PARAMETER_DATE)) {
-			String message = iwc.getParameter(PARAMETER_REPLACE_MESSAGE);
+		if (iwc.isParameterSet(PARAMETER_DATE)) {
+			String message = iwc.isParameterSet(PARAMETER_REPLACE_MESSAGE) ? iwc.getParameter(PARAMETER_REPLACE_MESSAGE) : "";
 			String date = iwc.getParameter(PARAMETER_DATE);
 			
 			IWTimestamp stamp = new IWTimestamp(date);

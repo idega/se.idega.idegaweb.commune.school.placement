@@ -230,14 +230,12 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
-				if (hasSpecialPlacement) {
+				if (hasMoveChoice) {
+					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
+				}	else if (hasSpecialPlacement) {
 					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
-				}
-				else if (hasChoice || hasMoveChoice) {
-					if (hasChoice)
-						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
-					if (hasMoveChoice)
-						table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
+				}	else if (hasChoice) {
+					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				}
 				else {
 					if (row % 2 == 0)

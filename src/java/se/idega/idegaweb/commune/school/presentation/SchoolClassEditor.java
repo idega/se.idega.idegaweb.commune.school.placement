@@ -758,12 +758,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				}
 				
 				boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
-				if (hasChoices[0] && hasChoices[1])
+				if (hasChoices[0] && hasChoices[1]) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
-				else if (hasChoices[0] && !hasChoices[1])
-					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
-				else if (studentMember.getSpeciallyPlaced()) {
+				} else if (studentMember.getSpeciallyPlaced()) {
 					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
+				} else if (hasChoices[0] && !hasChoices[1]) {
+					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				}	else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
@@ -909,11 +909,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
-				} else if (hasChoice) {
-					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				} else if (isSpeciallyPlaced) {
 					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
-				}
+				} else if (hasChoice) {
+					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
+				} 
 				else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());

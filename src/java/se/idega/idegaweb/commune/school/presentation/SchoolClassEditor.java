@@ -75,6 +75,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean searchEnabled = true;
 	private int applicationsPerPage = 10;
 	private boolean showStatistics = true;
+	private boolean showBunRadioButtons = false;
 	
 	private boolean isOngoingSeason = false;
 
@@ -176,11 +177,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.add(headerTable, 1, 1);
 
-		headerTable.add(getNavigationTable(true, multibleSchools), 1, 1);
+		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 2, 1);
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
-    table.add(getApplicationTable(iwc), 1, 5);
+    	table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {
@@ -233,7 +234,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(headerTable, 1, row++);
 		table.setHeight(row++, "12");
 
-		headerTable.add(getNavigationTable(true, multibleSchools), 1, 1);
+		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 2, 1);
 
 		if (getSchoolClassID() != -1) {
@@ -973,5 +974,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 	public void setShowStatistics(boolean show) {
 		this.showStatistics = show;
+	}
+	/**
+	 * Turns on/off view of radiobuttons for showing BUN administrated shools or not
+	 * @param show
+	 */
+	public void setShowBunRadioButtons(boolean show){
+		this.showBunRadioButtons = show;		
 	}
 }

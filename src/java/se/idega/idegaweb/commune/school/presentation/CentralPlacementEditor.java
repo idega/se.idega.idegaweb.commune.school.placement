@@ -7,26 +7,22 @@
 package se.idega.idegaweb.commune.school.presentation;
 
 import is.idega.block.family.business.NoParentFound;
-
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
-
 import javax.ejb.EJBException;
 import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.accounting.business.AccountingSession;
 import se.idega.idegaweb.commune.accounting.childcare.data.ChildCareContract;
+import se.idega.idegaweb.commune.accounting.childcare.data.ChildCareContractHome;
 import se.idega.idegaweb.commune.accounting.extra.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.extra.data.Resource;
 import se.idega.idegaweb.commune.accounting.extra.data.ResourceClassMember;
 import se.idega.idegaweb.commune.accounting.invoice.presentation.RegularPaymentEntriesList;
 import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
-import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
-import se.idega.idegaweb.commune.childcare.presentation.ChildCareChildContracts;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
 import se.idega.idegaweb.commune.provider.business.ProviderSession;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
@@ -35,8 +31,8 @@ import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSessionBean;
+import se.idega.idegaweb.commune.school.business.SchoolConstants;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
-
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolCategory;
@@ -59,6 +55,7 @@ import com.idega.core.localisation.data.ICLanguageHome;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.Commune;
 import com.idega.data.IDOLookup;
+import com.idega.data.IDOLookupException;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
@@ -81,8 +78,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/07 15:25:10 $ by $Author: thomas $
- * @version $Revision: 1.83 $
+ * Last modified: $Date: 2004/10/08 14:45:18 $ by $Author: thomas $
+ * @version $Revision: 1.84 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -650,7 +647,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					// Contract
 					try {
 						ChildCareContract contract =
-							getChildCareBusiness(iwc).getValidContractByChild(
+							getChildCareContractHome().findValidContractByChild(
 							((Integer) child.getPrimaryKey()).intValue());
 						if (contract != null) {
 							table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
@@ -1785,9 +1782,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		linkButton.setWindowToOpen(CentralPlacementChildCareContracts.class);
 		if (child != null) {
 			Integer PK = (Integer) child.getPrimaryKey();
-			linkButton.addParameter(ChildCareChildContracts.PARAMETER_CHILD_ID, PK.intValue());			
+			linkButton.addParameter(SchoolConstants.PARAMETER_CHILD_ID, PK.intValue());			
 		}
-		
 		return linkButton;
 	}
 
@@ -2179,9 +2175,14 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 																								SchoolCommuneBusiness.class);
 	}
 */
-	private ChildCareBusiness getChildCareBusiness(IWContext iwc) throws RemoteException {
-		return (ChildCareBusiness)
-											 IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
+	
+	public ChildCareContractHome getChildCareContractHome() {
+		try {
+			return (ChildCareContractHome) IDOLookup.getHome(ChildCareContract.class);
+		}
+		catch (IDOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
 	}
 
 	private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {

@@ -9,6 +9,7 @@ package se.idega.idegaweb.commune.school.presentation;
 import is.idega.idegaweb.member.business.NoParentFound;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
@@ -77,8 +78,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/03/01 16:25:20 $ by $Author: goranb $
- * @version $Revision: 1.72 $
+ * Last modified: $Date: 2004/03/18 15:08:12 $ by $Author: anders $
+ * @version $Revision: 1.73 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -1599,6 +1600,12 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		int i = 1;
 		for (Iterator iter = coll.iterator(); iter.hasNext();) {
 			ResourceClassMember rscPl = (ResourceClassMember) iter.next();
+			Date endDate = rscPl.getEndDate();
+			if (endDate != null) {
+				if (endDate.before(new Date(System.currentTimeMillis()))) {
+					continue;
+				}
+			}
 			buf.append(rscPl.getResource().getResourceName());
 			if (i < coll.size())
 				buf.append(", ");			

@@ -35,6 +35,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
+import com.idega.util.text.Name;
 
 /**
  * @author WMGOBOM
@@ -478,8 +479,10 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				try {
 					int registratorID = plc.getRegistratorId();
 					User registrator = getUserBusiness(iwc).getUser(registratorID);
-					if (registrator != null)
-						table.add(getSmallText(registrator.getNameLastFirst(false)), col++, row);
+					if (registrator != null) {
+						Name name = new Name(registrator.getFirstName(), registrator.getMiddleName(), registrator.getLastName());
+						table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), false)), col++, row);
+					}
 				} catch (Exception e) {col++;}
 				// Created date
 				try {

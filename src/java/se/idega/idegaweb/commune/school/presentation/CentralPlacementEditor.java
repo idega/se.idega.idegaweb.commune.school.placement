@@ -77,11 +77,12 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/08/27 19:22:53 $ by $Author: joakim $
- * @version $Revision: 1.80 $
+ * Last modified: $Date: 2004/09/15 13:38:57 $ by $Author: laddi $
+ * @version $Revision: 1.81 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -832,7 +833,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);
 		table.add(getSmallHeader(localize(KEY_STUDENT, "Student: ")), col++, row);
 		if (child != null) {
-			table.add(child.getNameLastFirst()+ ",&nbsp;&nbsp;", col, row);
+			Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+			table.add(name.getName(iwc.getApplicationSettings().getDefaultLocale())+ ",&nbsp;&nbsp;", col, row);
 			table.add(child.getPersonalID(), col, row);			
 		}
 		table.mergeCells(col, row, col+2, row);

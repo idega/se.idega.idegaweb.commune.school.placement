@@ -76,6 +76,7 @@ import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.URLUtil;
+import com.idega.util.text.Name;
 import com.idega.util.text.TextSoap;
 
 /**
@@ -388,7 +389,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 			
 			table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
-			table.add(getSmallText(user.getNameLastFirst(true)), 2, row++);
+			Name name = new Name(user.getFirstName(), user.getMiddleName(), user.getLastName());
+			table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row++);
 
 			table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 1, row);
 			table.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())), 2, row++);
@@ -407,7 +409,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 					Iterator iter = parents.iterator();
 					while (iter.hasNext()) {
 						User parent = (User) iter.next();
-						table.add(getSmallText(parent.getNameLastFirst(true)), 2, row);
+						name = new Name(parent.getFirstName(), parent.getMiddleName(), parent.getLastName());
+						table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row);
 						
 						
 						try {
@@ -1344,7 +1347,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 							userTable.add(radio, 1, userRow);
 							userTable.add(Text.getNonBrakingSpace(), 1, userRow);
-							userTable.add(getSmallText(user.getNameLastFirst(true)), 1, userRow);
+							Name name = new Name(user.getFirstName(), user.getMiddleName(), user.getLastName());
+							userTable.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 1, userRow);
 							userTable.add(getSmallText(" ("), 1, userRow);
 							userTable.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale()) + ")"), 1, userRow++);
 						}

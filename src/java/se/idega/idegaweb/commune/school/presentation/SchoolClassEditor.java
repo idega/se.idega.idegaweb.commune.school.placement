@@ -1113,7 +1113,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 	
 	private boolean livesOutsideDefaultCommune(IWContext iwc, User applicant) {
-		boolean showEraseButton = false;
+		boolean showEraseButton = true;
 		try {
 			// Get default Commune primary key
 			CommuneHome cHome = (CommuneHome) IDOLookup.getHome(Commune.class);
@@ -1126,9 +1126,19 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			int homeComID = -1;
 			homeComID = applicantAddr.getCommuneID(); // return -1 if null in db
 			
+			int mainAddrID = -1;
+			if (applicantAddr != null)
+				mainAddrID = ((Integer) applicantAddr.getPrimaryKey()).intValue();
+			
+			
+			logWarning("*** OUTSIDE HOME COMMUNE ***\n" 
+							+ "Applicant:  " + ((Integer) applicantAddr.getPrimaryKey()).intValue() 
+							+ "HomeComPK: " + homeComID + "defComPK: " + defComPK.intValue() 
+							+ "MainAddressID: " + mainAddrID + "\n");
+			
 			// If user doesn't live in default commune - return true
 			if (homeComID != -1 && defComPK.intValue() != homeComID)
-					showEraseButton = true;
+					showEraseButton = false;
 		} catch (Exception e) {}		
 		
 		return showEraseButton;

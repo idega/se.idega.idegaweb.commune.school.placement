@@ -1991,8 +1991,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		// Save the resource placement
 		String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
+		
+		int registratorID = iwc.getCurrentUserId();
 		try {
-			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, _viewAllResources);
+			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, registratorID, _viewAllResources);
 		}
 		catch (ResourceException re) {
 			errMsg = localize(re.getKey(), re.getDefTrans());

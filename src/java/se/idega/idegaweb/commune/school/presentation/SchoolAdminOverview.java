@@ -38,6 +38,7 @@ import com.idega.presentation.text.HorizontalRule;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.CloseButton;
+import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
@@ -81,6 +82,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private static final String PARAMETER_MOVE_MESSAGE = "sch_admin_replace_message";
 	private static final String PARAMETER_PROTOCOL = "sch_admin_protocol";
 	private static final String PARAMETER_SCHOOL_ID ="sch_school_id";
+	private static final String PARAMETER_DATE ="sch_date";
 
 	private int _method = -1;
 	private int _action = -1;
@@ -359,8 +361,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		table.add(getNavigationTable(iwc),1,row++);
 		
+		IWTimestamp stamp = new IWTimestamp();
+		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE, true));
+		input.setStyle("commune_"+STYLENAME_INTERFACE);
+		input.setYearRange(stamp.getYear(), stamp.getYear() - 5);
+		table.add(getSmallHeader(localize("school.replace_date","Replace date")+":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE),1,row);
+		table.add(input,1,row++);
+		
 		if (_protocol)
-			table.add(getSmallText(localize("school.replace_reason","Replace reason")+":"),1,row);
+			table.add(getSmallHeader(localize("school.replace_reason","Replace reason")+":"),1,row);
 		else
 			table.add(getSmallErrorText(localize("school.replace_reason","Replace reason")+":"),1,row);
 		table.add(new Break(),1,row);
@@ -466,7 +475,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String message = iwc.getParameter(PARAMETER_REPLACE_MESSAGE);
 			
 			IWTimestamp stamp = new IWTimestamp();
-			getSchoolCommuneBusiness(iwc).getSchoolClassMemberBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+			getSchoolCommuneBusiness(iwc).getSchoolClassMemberBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
 			if (_choiceID != -1)
 				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().groupPlaceAction(new Integer(_choiceID), iwc.getCurrentUser());
 			
@@ -480,8 +489,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void move(IWContext iwc) throws RemoteException {
-		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE)) {
+		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE) && iwc.isParameterSet(PARAMETER_DATE)) {
 			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
+			String date = iwc.getParameter(PARAMETER_DATE);
+			
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
 			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYear(getSchoolCommuneSession(iwc).getSchoolYearID());
 			int grade = 0;
@@ -498,7 +509,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				ce.printStackTrace();
 			}
 				
-			IWTimestamp stamp = new IWTimestamp();
+			IWTimestamp stamp = new IWTimestamp(date);
 			try {
 				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
 			}

@@ -56,6 +56,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private final static String PARAM_HOURS = "prm_hours";
 	private final static String PARAM_EMPLOYMENT = "prm_unemployed";
 	private final static String PARAM_PLACEMENT_DATE = "prm_plac_date";
+	private final static String PARAM_TERMINATION_DATE = "prm_term_date";
 	private final static String PARAM_PRE_SCHOOL = "prm_pre_school";
 	private final static String PARAM_LAST_REPLY_DATE = "prm_reply_date";
 	private final static String PARAM_EXTRA_CONTRACT = "prm_extra_contract";
@@ -77,6 +78,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private final static String LABEL_HOURS = "child_care.hours_pr_week";
 	private final static String LABEL_EMPLOYMENT = "child_care.no_job";
 	private final static String LABEL_PLACEMENT_DATE = "child_care.placement_date";
+	private final static String LABEL_TERMINATION_DATE = "child_care.termination_date";
 	private final static String LABEL_LAST_REPLY_DATE = "child_care.last_reply_date";
 	private final static String LABEL_EXTRA_CONTRACT = "child_care.extra_contract";
 	private final static String LABEL_EXTRA_CONTRACT_OTHER = "child_care.extra_contract_other";
@@ -136,6 +138,10 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		}
 		
 		IWTimestamp placementDate = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
+		IWTimestamp terminationDate = null;
+		if (iwc.isParameterSet(PARAM_TERMINATION_DATE)) {
+			terminationDate = new IWTimestamp(iwc.getParameter(PARAM_TERMINATION_DATE));
+		}
 		IWTimestamp replyDate = null;
 		if (iwc.isParameterSet(PARAM_LAST_REPLY_DATE))
 			replyDate = new IWTimestamp(iwc.getParameter(PARAM_LAST_REPLY_DATE));
@@ -156,7 +162,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		String errorMessage = null;
 		try {
 			User owner = getBusiness().getUserBusiness().getUser(ownerID);
-			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, null, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), false, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
+			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, terminationDate, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), true, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
 		}
 		catch (RemoteException re) {
 			success = false;
@@ -419,7 +425,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_MESSAGE, "Message")), 3, row);
 		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
-		table.add(extraContractMessage, 3, row);
+		table.add(extraContractMessage, 3, row++);
 		
 		BooleanInput hasExtraContractOther = (BooleanInput) getStyledInterface(new BooleanInput(PARAM_EXTRA_CONTRACT_OTHER));
 		if (_application != null)
@@ -444,6 +450,12 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			placementDate.setDate(_application.getFromDate());
 		table.add(getLocalizedLabel(LABEL_PLACEMENT_DATE,"Placement date"),1,row);
 		table.add(placementDate,3,row++);
+		
+		DateInput terminationDate = (DateInput) getStyledInterface(new DateInput(PARAM_TERMINATION_DATE));
+		terminationDate.keepStatusOnAction(true);
+		terminationDate.setToDisplayDayLast(true);
+		table.add(getLocalizedLabel(LABEL_TERMINATION_DATE,"Termination date"),1,row);
+		table.add(terminationDate,3,row++);
 		
 		if (_application != null) {
 			DateInput replyDate = (DateInput) getStyledInterface(new DateInput(PARAM_LAST_REPLY_DATE));

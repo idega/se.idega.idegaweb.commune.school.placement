@@ -63,8 +63,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/05 12:26:56 $ by $Author: goranb $
- * @version $Revision: 1.33 $
+ * Last modified: $Date: 2003/11/06 18:14:45 $ by $Author: goranb $
+ * @version $Revision: 1.34 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -441,10 +441,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 
 		// *** HEADING Latest placement ***
-		Text currentPlacementTxt =
+		Text latestPlacementTxt =
 			new Text(localize(KEY_LATEST_PLACEMENT_HEADING, "Latest placement"));
-		currentPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
-		table.add(currentPlacementTxt, col, row);
+		latestPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
+		table.add(latestPlacementTxt, col, row);
 		table.setRowHeight(row, "20");
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		table.mergeCells(col, row, col+1, row);	
@@ -651,8 +651,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 																																	++col, row);
 
 		// Provider values		
-		if (iwc.isParameterSet(PARAM_PROVIDER) && !("-1".equals(iwc.getParameter(PARAM_PROVIDER))) 
-								&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) ) {
+		if (storedPlacement == null && iwc.isParameterSet(PARAM_PROVIDER) 
+				&& !("-1".equals(iwc.getParameter(PARAM_PROVIDER))) 
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) ) {
 			School school = getCurrentProvider(iwc);
 			if (school != null) {
 				row--;row--;
@@ -735,7 +736,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Resource
 		table.add(getSmallHeader(localize(KEY_RESOURCE_LABEL, "Resource: ")), col++, row);
 		//  Resource input checkboxes
-		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
+		if (storedPlacement == null 
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED))) 
 				&& iwc.isParameterSet(PARAM_SCHOOL_TYPE) 
@@ -862,7 +864,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	private SearchUserModule getSearchUserModule(IWContext iwc) {
 		SearchUserModule searcher = new SearchUserModule();
-		searcher.setShowMiddleNameInSearch(true);
+		searcher.setShowMiddleNameInSearch(false);
 		searcher.setOwnFormContainer(false);
 		searcher.setUniqueIdentifier(UNIQUE_SUFFIX);
 		searcher.setSkipResultsForOneFound(false);
@@ -870,7 +872,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 		searcher.setButtonStyleName(getStyleName(STYLENAME_INTERFACE_BUTTON));
 		searcher.setPersonalIDLength(12);
 		searcher.setFirstNameLength(15);
-		searcher.setMiddleNameLength(15);
 		searcher.setLastNameLength(20);
 
 		String prmChild = SearchUserModule.getUniqueUserParameterName("child");
@@ -897,7 +898,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 			schoolCats.addMenuElement(
 				(String) highSchool.getPrimaryKey(),
 				localize(highSchool.getLocalizedKey(), "High School"));
-			if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
+			if (storedPlacement == null && iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
 				schoolCats.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_CATEGORY));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -913,7 +914,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		providers.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		try {
 			// Get school category from topmost dropdown
-			if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
+			if (storedPlacement == null && iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
 					&& !("-1".equals(PARAM_SCHOOL_CATEGORY))) {
 				// Get schooltypes in category
 				Collection schTypes =
@@ -946,7 +947,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		drop.setValueOnChange(PARAM_SCHOOL_TYPE_CHANGED, "1");
 		drop.setToSubmit(true);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
+		if (storedPlacement == null 
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
 				&& iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
 				&& !iwc.getParameter(PARAM_SCHOOL_CATEGORY).equals("-1")
 				&& iwc.isParameterSet(PARAM_PROVIDER) 
@@ -988,7 +990,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		DropdownMenu studyPaths = new DropdownMenu(PARAM_STUDY_PATH);
 		studyPaths.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 
-		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
+		if (storedPlacement == null 
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& iwc.isParameterSet(PARAM_PROVIDER) 
 				&& !("-1".equals(iwc.getParameter(PARAM_PROVIDER)))				
@@ -1024,7 +1027,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		years.setValueOnChange(PARAM_SCHOOL_YEAR_CHANGED, "1");
 		years.setToSubmit(true);
 		years.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
+		if (storedPlacement == null 
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& iwc.isParameterSet(PARAM_SCHOOL_TYPE)
 				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE)))
@@ -1068,7 +1072,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//groups.setToSubmit(true);
 		groups.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 			
-		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
+		if (storedPlacement == null 
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED)))
 				&& iwc.isParameterSet(PARAM_PROVIDER) 
@@ -1107,7 +1112,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		yesNo.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		yesNo.addMenuElement(KEY_DROPDOWN_NO, localize(KEY_DROPDOWN_NO, "No"));
 		yesNo.addMenuElement(KEY_DROPDOWN_YES, localize(KEY_DROPDOWN_YES, "Yes"));
-		if (iwc.isParameterSet(PARAM_PAYMENT_BY_AGREEMENT)) {
+		if (storedPlacement == null && iwc.isParameterSet(PARAM_PAYMENT_BY_AGREEMENT)) {
 			yesNo.setSelectedElement(iwc.getParameter(PARAM_PAYMENT_BY_AGREEMENT));
 		}
 		return yesNo;
@@ -1124,7 +1129,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 					drop.addMenuElement(intervalKey, localize(intervalKey, intervalKey));					
 				}
 			}
-			if (iwc.isParameterSet(PARAM_INVOICE_INTERVAL)) {
+			if (storedPlacement == null && iwc.isParameterSet(PARAM_INVOICE_INTERVAL)) {
 				drop.setSelectedElement(iwc.getParameter(PARAM_INVOICE_INTERVAL));		
 			}
 		} catch (RemoteException re) {
@@ -1137,7 +1142,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private TextInput getPlacementParagraphTextInput(IWContext iwc) {
 		TextInput txt = new TextInput(PARAM_PLACEMENT_PARAGRAPH);
 		txt.setLength(25);
-		if (iwc.isParameterSet(PARAM_PLACEMENT_PARAGRAPH)) {
+		if (storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_PARAGRAPH)) {
 			txt.setContent(iwc.getParameter(PARAM_PLACEMENT_PARAGRAPH));
 		}
 		return txt;
@@ -1152,7 +1157,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		today.setAsDate();
 		java.sql.Date todayDate = today.getDate();
 		dInput.setToDisplayDayLast(true);
-		if (iwc.isParameterSet(PARAM_PLACEMENT_DATE)) {
+		if (storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_DATE)) {
 			IWTimestamp placeStamp = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
 			java.sql.Date placeDate = placeStamp.getDate();
 			dInput.setDate(placeDate);

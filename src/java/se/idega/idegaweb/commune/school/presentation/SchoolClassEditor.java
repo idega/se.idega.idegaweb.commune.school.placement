@@ -420,8 +420,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			boolean hasComment = false;
 			boolean showComment = false;
 
-			Iterator iter = applicants.iterator();
-
+			Iterator iter = applicants.iterator();			
+			logWarning("*** OUTSIDE HOMCOM - NoOfApplicants: " + applicants.size());
+			
 			while (iter.hasNext()) {
 				column = 1;
 				choice = (SchoolChoice) iter.next();

@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
+import se.idega.idegaweb.commune.childcare.business.ChildCareConstants;
 import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
@@ -343,7 +344,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				link.setEventListener(ChildCareEventListener.class);
 				link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
 				link.setParameter(getSession().getParameterApplicationID(), application.getPrimaryKey().toString());
-				link.setParameter(getSession().getParameterCaseCode(), getBusiness().getAfterSchoolCareCaseCode());
+				link.setParameter(getSession().getParameterCaseCode(), ChildCareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
 				if (getResponsePage() != null)
 					link.setPage(getResponsePage());
 	
@@ -394,7 +395,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	
 	public void setSearchEnabled(boolean searchEnabled) {
 		if (searchEnabled) {
-			
+			// empty			
 		}
 		//this.searchEnabled = searchEnabled;
 	}

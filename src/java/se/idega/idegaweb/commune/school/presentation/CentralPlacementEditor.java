@@ -20,7 +20,6 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.provider.business.ProviderSession;
-import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
@@ -64,8 +63,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/04 18:09:01 $ by $Author: laddi $
- * @version $Revision: 1.32 $
+ * Last modified: $Date: 2003/11/05 12:26:56 $ by $Author: goranb $
+ * @version $Revision: 1.33 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -501,15 +500,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 					col = 2;
 					// School type
 					try {
-						table.add(getSmallText(latestPl.getSchoolClass().getSchoolType().getName()), col, row);						
+						SchoolType type = latestPl.getSchoolType();
+						if (type != null)
+							table.add(getSmallText(type.getName()), col, row);						
 					} catch (Exception e) {}
 					// BUTTON Pupil overview
 					activatePupilOverviewButton(latestPl);
 					
-					/*table.add(activatePupilOverviewButton(latestPl), 5, row);
-							PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
-					table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
-					*/
 					row++;
 
 					// Placement
@@ -520,8 +517,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 					} catch (Exception e) {}
 					try {
 						// school year
-						buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
-											   + latestPl.getSchoolYear().getName());						
+						SchoolYear theYear = latestPl.getSchoolYear();
+						if (theYear != null)
+							buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
+											   												+ theYear.getName());						
+
 					} catch (Exception e) {}
 					try {
 						// add school group
@@ -1297,12 +1297,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_GROUP, "New  group")));
 		linkButton.setAsImageButton(true);
 		linkButton.setWindowToOpen(CentralPlacementSchoolGroupEditor.class);
-		linkButton.addParameter(SchoolGroupEditor.PARAMETER_ACTION, 
-											String.valueOf(SchoolGroupEditor.ACTION_VIEW));
-		if (iwc.isParameterSet(PARAM_PROVIDER)) {
-			linkButton.addParameter(SchoolGroupEditor.PARAMETER_PROVIDER_ID, 
-													iwc.getParameter(PARAM_PROVIDER));
-		}
+		iwc.getParameter(PARAM_ACTION);
 			
 		//linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		

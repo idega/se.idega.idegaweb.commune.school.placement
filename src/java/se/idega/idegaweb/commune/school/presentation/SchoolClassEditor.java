@@ -196,7 +196,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(getWidth());
 		table.setHeight(2, "12");
 		table.setHeight(4, "6");
-		table.setHeight(6, "12");
+		table.setHeight(6, "18");
 		table.setHeight(8, "6");
 		table.setHeight(10, "12");
 		form.add(table);

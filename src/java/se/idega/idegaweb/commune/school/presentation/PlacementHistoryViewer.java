@@ -12,8 +12,8 @@ import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
-import se.idega.idegaweb.commune.accounting.extra.business.ResourceBusiness;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
+import se.idega.idegaweb.commune.care.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 

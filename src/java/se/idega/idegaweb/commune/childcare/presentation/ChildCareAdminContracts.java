@@ -39,6 +39,7 @@ import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.Name;
 
 /**
  * @author palli
@@ -288,7 +289,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		table.add(getLocalizedHeader(LABEL_CHILD, "Child"), 1, row++);
 		table.add(getLocalizedLabel(LABEL_USER_NAME, "Name"), 1, row);
-		table.add(getSmallText(child.getNameLastFirst(true)), 3, row++);
+		Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+		table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 3, row++);
 		table.add(getLocalizedLabel(LABEL_PERSONAL_ID, "Personal ID"), 1, row);
 		table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), 3, row++);
 		table.add(getLocalizedLabel(LABEL_ADDRESS, "Address"), 1, row);
@@ -336,7 +338,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 				User parent = (User) iter.next();
 
 				table.add(getLocalizedLabel(LABEL_USER_NAME, "Name"), 1, row);
-				table.add(getSmallText(parent.getNameLastFirst(true)), 3, row++);
+				name = new Name(parent.getFirstName(), parent.getMiddleName(), parent.getLastName());
+				table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 3, row++);
 				table.add(getLocalizedLabel(LABEL_PERSONAL_ID, "Personal ID"), 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(parent.getPersonalID(), iwc.getCurrentLocale())), 3, row++);
 				table.add(getLocalizedLabel(LABEL_GETS_BILL, "Gets bill"), 1, row);

@@ -104,7 +104,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public static final String KEY_STORED_MSG_ERROR = KP + "stored_msg_error";
 	
 		// Button keys
-	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
+//	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
 	private static final String KEY_BUTTON_REGULAR_PAYMENT = KP + "button_regular_payment";
 	private static final String KEY_BUTTON_PLACEMENT_HISTORY = KP + "placement_history";
 	private static final String KEY_BUTTON_PUPIL_OVERVIEW = KP + "pupil_overview";
@@ -161,6 +161,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private IWResourceBundle iwrb;
 	private Form form;
 	private Table mainTable;
+	private int mainTableRow;
 	private User child;
 	private String uniqueUserSearchParam;
 	private Address address;
@@ -221,8 +222,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 																											|| storedPlacement != null)) {
 				// show search form
 				setMainTableContent(getSearchTable(iwc));
+				setMainTableContent(getPlacementTable(iwc));
+				
 			} else {
 				// show place pupil form
+				setMainTableContent(getSearchTable(iwc));
 				setMainTableContent(getPlacementTable(iwc));
 			}			
 		} catch (RemoteException e) {
@@ -239,23 +243,23 @@ public class CentralPlacementEditor extends CommuneBlock {
 		mainTable.setCellpadding(0);
 		mainTable.setCellspacing(0);
 		int col = 1;
-		int row = 1;
+		mainTableRow = 1;
 		
 		//  *** WINDOW HEADING ***
 		mainTable.add(
-			getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Central placing of pupil"), col, row);
-		mainTable.setColor(col, row, getHeaderColor());
-		mainTable.setAlignment(col, row, Table.HORIZONTAL_ALIGN_CENTER);
-		mainTable.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_MIDDLE);
-		mainTable.setRowHeight(row, "20");
+			getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Central placing of pupil"), 
+																														col, mainTableRow);
+		mainTable.setColor(col, mainTableRow, getHeaderColor());
+		mainTable.setAlignment(col, mainTableRow, Table.HORIZONTAL_ALIGN_CENTER);
+		mainTable.setRowVerticalAlignment(mainTableRow, Table.VERTICAL_ALIGN_MIDDLE);
+		mainTable.setRowHeight(mainTableRow++, "20");
 
 		return mainTable;
 	}
 
 	private void setMainTableContent(PresentationObject obj) {
 		int col = 1;
-		int row = 2;
-		mainTable.add(obj, col, row);
+		mainTable.add(obj, col, mainTableRow++);
 	}
 
 	public Table getSearchTable(IWContext iwc) throws RemoteException {
@@ -330,9 +334,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 
 		// BUTTON Search new child 
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_SEARCH, "Search"),
+		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_SEARCH, "Search"),
 							PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
-		table.setAlignment(5,row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setAlignment(5,row, Table.HORIZONTAL_ALIGN_RIGHT);*/
 		row++;
 		col = 1;
 		// Personal Id Number

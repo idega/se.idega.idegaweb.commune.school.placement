@@ -171,15 +171,15 @@ public class CheckRequestForm extends CommuneBlock {
 			this.paramErrorWorkSituation2 = true;
 		}
 
-		if (paramMTMC.trim().equals("")) {
+		if (paramMTMC != null && paramMTMC.trim().equals("")) {
 			this.isError = true;
 			this.paramErrorMotherTongueMC = true;
 		}
-		if (paramMTFC.trim().equals("")) {
+		if (paramMTFC != null && paramMTFC.trim().equals("")) {
 			this.isError = true;
 			this.paramErrorMotherTongueFC = true;
 		}
-		if (paramMTP.trim().equals("")) {
+		if (paramMTP != null && paramMTP.trim().equals("")) {
 			this.isError = true;
 			this.paramErrorMotherTongueP = true;
 		}

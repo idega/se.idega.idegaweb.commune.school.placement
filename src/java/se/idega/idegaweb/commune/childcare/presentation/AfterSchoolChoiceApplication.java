@@ -22,6 +22,7 @@ import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.data.SchoolArea;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.business.IBOLookup;
+import com.idega.core.builder.data.ICPage;
 import com.idega.core.location.data.Address;
 import com.idega.data.IDOCreateException;
 import com.idega.idegaweb.IWApplicationContext;
@@ -31,6 +32,7 @@ import com.idega.presentation.Script;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.SubmitButton;
@@ -60,7 +62,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String PARAM_AREA = "ccas_area";
 	private final static String PARAM_PROVIDER = "ccas_provider";
 	private final static String PARAM_MESSAGE = "ccas_message";
-
+	private final static String PARAM_SEND_TO_CHECK = "ccas_send_to_check";
+	
 	private final static String PROVIDERS = "ccas_providers";
 	private final static String NAME = "ccas_name";
 	private final static String PID = "ccas_pid";
@@ -68,7 +71,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String CARE_FROM = "ccas_care_from";
 	private final static String APPLICATION_INSERTED = "ccas_application_ok";
 	private final static String APPLICATION_FAILURE = "ccas_application_failed";
-
+	private final static String SEND_TO_CHECK = "ccas_application_failed";
+	
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
 	private final static String EMAIL_PROVIDER_SUBJECT = "application_received_subject";
@@ -81,6 +85,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	private boolean isAdmin = false;
 	private boolean _useOngoingSeason = false;
+	private boolean _showCheckOption = false;
+	
+	private ICPage _checkPage;
 
 	/**
 	 * @see se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock#init(com.idega.presentation.IWContext)
@@ -206,10 +213,13 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private void submitForm(IWContext iwc) {
 		List choices = null;
 		boolean done = false;
+		boolean sendToCheckPage = false;
+		
 		try {
 			int numberOfChoices = 3;
 			Integer[] providers = new Integer[numberOfChoices];
 			String[] dates = new String[numberOfChoices];
+			sendToCheckPage = iwc.isParameterSet(PARAM_SEND_TO_CHECK);
 
 			for (int i = 0; i < numberOfChoices; i++) {
 				providers[i] = iwc.isParameterSet(PARAM_PROVIDER + "_" + (i + 1)) ? Integer.valueOf(iwc.getParameter(PARAM_PROVIDER + "_" + (i + 1))) : null;
@@ -253,13 +263,26 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		}
 
 		if (done) {
-			if (getResponsePage() != null)
-				iwc.forwardToIBPage(getParentPage(), getResponsePage());
-			else
-				add(new Text(localize(APPLICATION_INSERTED, "Application submitted")));
+			if (sendToCheckPage) {
+				if (getCheckPage() != null) {
+					iwc.forwardToIBPage(getParentPage(), getCheckPage());
+				}
+				else {
+					add(new Text(localize(APPLICATION_INSERTED, "Application submitted")));
+				}
+			}
+			else {
+				if (getResponsePage() != null) {
+					iwc.forwardToIBPage(getParentPage(), getResponsePage());
+				}
+				else {
+					add(new Text(localize(APPLICATION_INSERTED, "Application submitted")));
+				}
+			}
 		}
-		else
+		else {
 			add(new Text(localize(APPLICATION_FAILURE, "Failed to submit application")));
+		}
 	}
 
 	private Table getInputTable(IWContext iwc) throws RemoteException {
@@ -332,6 +355,16 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				inputTable.setHeight(row++, 12);
 			}
 
+			if (_showCheckOption) {
+				CheckBox sendToCheck = getCheckBox(PARAM_SEND_TO_CHECK, "true");
+				inputTable.mergeCells(1, row, inputTable.getColumns(), row);
+				inputTable.add(sendToCheck, 1, row);
+				inputTable.add(Text.getNonBrakingSpace(), 1, row);
+				inputTable.add(getSmallHeader(localize(SEND_TO_CHECK, "Yes, send me to the check application.")), 1, row++);
+				
+				inputTable.setHeight(row++, 6);
+			}
+			
 			TextArea messageArea = (TextArea) getStyledInterface(new TextArea(PARAM_MESSAGE));
 			messageArea.setRows(4);
 			messageArea.setWidth(Table.HUNDRED_PERCENT);
@@ -341,6 +374,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			inputTable.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
 			inputTable.add(getSmallHeader(localize("message", "Message")), 1, row);
 			inputTable.add(messageArea, 3, row++);
+			
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -468,5 +502,26 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	
 	public void setUseOngoingSeason(boolean useOngoingSeason) {
 		_useOngoingSeason = useOngoingSeason;
+	}
+	
+	/**
+	 * @param showCheckOption The showCheckOption to set.
+	 */
+	public void setShowCheckOption(boolean showCheckOption) {
+		this._showCheckOption = showCheckOption;
+	}
+	
+	/**
+	 * @param checkPage The checkPage to set.
+	 */
+	public void setCheckPage(ICPage checkPage) {
+		this._checkPage = checkPage;
+	}
+	
+	/**
+	 * @return Returns the checkPage.
+	 */
+	private ICPage getCheckPage() {
+		return this._checkPage;
 	}
 }

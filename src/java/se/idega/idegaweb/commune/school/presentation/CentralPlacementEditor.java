@@ -80,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/06/08 13:00:10 $ by $Author: gimmi $
- * @version $Revision: 1.75 $
+ * Last modified: $Date: 2004/06/09 15:57:27 $ by $Author: gimmi $
+ * @version $Revision: 1.76 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -573,6 +573,11 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize(KEY_RESOURCES_LABEL, "Resources: ")), col, row);
 		table.setRowHeight(row, rowHeight);
 		row++;
+		col = 1;
+		// Resources
+		table.add(getSmallHeader(localize(KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")), col, row);
+		table.setRowHeight(row, rowHeight);
+		row++;
 		col = 1;		
 		// Contract
 		table.add(getSmallHeader(localize(KEY_CONTRACT_LABEL, "Contract: ")), col, row);
@@ -622,6 +627,14 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 						table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row);
 						table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 					} catch (Exception e) {}
+					
+					row++;
+					
+					// Placement
+					if (latestPl.getPlacementParagraph() != null) {
+						table.add(getSmallText(latestPl.getPlacementParagraph()), col, row);
+						table.mergeCells(col, row, col+2, row);
+					}
 					
 					row++;
 

@@ -72,6 +72,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String KEY_STUDY_PATH = KP + "study_path";
 	private static final String KEY_REGISTRATOR = KP + "registrator";
 	private static final String KEY_REGISTRATION_CREATED_DATE = KP + "registration_created_date";
+	private static final String KEY_PLACEMENT_PARAGRAPH_SHORT = KP + "placement_paragraph_sh";
 	private static final String KEY_NOTES = KP + "notes";
 	
 	
@@ -400,6 +401,8 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_REGISTRATION_CREATED_DATE, "Created date"), col, row);		
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(getLocalizedSmallHeader(KEY_PLACEMENT_PARAGRAPH_SHORT, "Par"), col, row);		
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_NOTES, "Notes"), col, row);		
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(Text.getNonBrakingSpace(), col, row);
@@ -483,6 +486,13 @@ public class PlacementHistoryViewer extends CommuneBlock {
 					String dateStr = getCentralPlacementBusiness(iwc).
 														getDateString(plc.getRegistrationCreatedDate(), "yyyy-MM-dd");
 					table.add(getSmallText(dateStr), col++, row);
+				} catch (Exception e) {col++;}
+				// Placement paragraph
+				try {
+					if (plc.getPlacementParagraph() != null)
+						table.add(getSmallText(plc.getPlacementParagraph()), col++, row);
+					else
+						col++;
 				} catch (Exception e) {col++;}
 				// Notes
 				try {

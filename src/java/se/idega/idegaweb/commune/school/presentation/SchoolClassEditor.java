@@ -18,6 +18,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
 
+import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
@@ -948,7 +949,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
 				StringTokenizer tokens = new StringTokenizer(applications[a], ",");
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), stamp.getTimestamp(), userID);
+
+				//member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), stamp.getTimestamp(), userID);
+				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
+				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID);
+
 				choice = getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(tokens.nextToken()), iwc.getCurrentUser());
 				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
@@ -963,7 +968,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (students != null && students.length > 0) {
 			for (int a = 0; a < students.length; a++) {
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), stamp.getTimestamp(), userID);
+				
+				//member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), stamp.getTimestamp(), userID);
+				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
+				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID);
+
 				if (member != null)
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
 			}
@@ -1008,6 +1017,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private SchoolChoiceHome getSchoolChoiceHome() throws RemoteException {
 		return (SchoolChoiceHome) com.idega.data.IDOLookup.getHome(SchoolChoice.class);	
+	}
+		
+	private SchoolBusiness getSchoolBusiness(IWContext iwc) throws RemoteException {
+		return (SchoolBusiness) IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
 	}
 
 	/** setters */

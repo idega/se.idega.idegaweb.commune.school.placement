@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/12 21:36:53 $ by $Author: laddi $
- * @version $Revision: 1.64 $
+ * Last modified: $Date: 2004/02/18 14:06:24 $ by $Author: goranb $
+ * @version $Revision: 1.65 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -919,13 +919,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		row++;
 		col = 1;
 
-/*		table.add(transGIF, col, row); // EMPTY SPACE ROW
-		table.setRowHeight(row, rowHeight);
-		row++;
-		col = 1;
-*/		
 		// Latest invoice date
-		table.add(getSmallHeader(localize(KEY_LATEST_INVOICE_DATE_LABEL, "Latest invoice date")), 
+		/*table.add(getSmallHeader(localize(KEY_LATEST_INVOICE_DATE_LABEL, "Latest invoice date")), 
 																																col++, row);
 		table.add(getLatestInvoiceDateInput(iwc), col, row);
 		table.mergeCells(col, row, col+2, row);
@@ -933,7 +928,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 		row++;
 		col = 1;
-				
+		*/
+		
 		// START row table
 		Table rowTable = new Table(5, 1);
 		rowTable.setCellpadding(0);

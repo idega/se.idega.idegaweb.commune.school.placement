@@ -24,6 +24,7 @@ import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.User;
+import com.idega.util.PersonalIDFormatter;
 
 /**
  * Title:
@@ -305,6 +306,9 @@ public class CheckRequestForm extends CommuneBlock {
 
 		childTable.add(getSmallHeader(localize("check.name", "Name") + ":"), 1, row);
 		childTable.add(getSmallText(child.getNameLastFirst(true)), 2, row++);
+
+		childTable.add(getSmallHeader(localize("check.personal_id", "Personal ID") + ":"), 1, row);
+		childTable.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), 2, row++);
 
 		Address address = getCheckBusiness(iwc).getUserAddress(child);
 		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(child);

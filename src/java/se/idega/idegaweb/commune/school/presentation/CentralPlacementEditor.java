@@ -93,9 +93,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_DROPDOWN_CHOSE = KP + "dropdown_chose";
 	private static final String KEY_DROPDOWN_YES = KP + "dropdown_yes";
 	private static final String KEY_DROPDOWN_NO = KP + "dropdown_no";
-	private static final String KEY_DROPDOWN_TERM = KP + "dropdown_term";
-	private static final String KEY_DROPDOWN_MONTH = KP + "dropdown_month";
-	private static final String KEY_DROPDOWN_YEAR = KP + "dropdown_year";
 	
 	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
 	//private static final String KEY_BUTTON_BACK = KP + "button_back";
@@ -186,7 +183,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		form = new Form();
 		form.add(getMainTable());
 		parse(iwc);
-
+		
+		// remove warning
+		PARAM_BACK.toString();
+		
 		// Borgman test
 		//String testParam = iwc.getParameter(PARAM_BACK);
 		//String searchCommitted = iwc.getParameter(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX);

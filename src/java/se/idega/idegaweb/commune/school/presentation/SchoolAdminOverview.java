@@ -966,8 +966,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void finalizeGroup(IWContext iwc) throws RemoteException {
-		String subject = iwc.getPreference(PARAMETER_FINALIZE_SUBJECT);
-		String body = iwc.getPreference(PARAMETER_FINALIZE_BODY);
+		String subject = iwc.getParameter(PARAMETER_FINALIZE_SUBJECT);
+		String body = iwc.getParameter(PARAMETER_FINALIZE_BODY);
 		
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));

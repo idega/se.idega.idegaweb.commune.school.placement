@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.ejb.FinderException;
+
+import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
@@ -19,6 +22,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
 
+import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
@@ -27,6 +31,9 @@ import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
+import com.idega.core.location.data.Commune;
+import com.idega.core.location.data.CommuneHome;
+import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -57,13 +64,13 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
 	private final String PARAMETER_SORT = "sch_choice_sort";
 	private final String PARAMETER_SEARCH = "scH_choise_search";
-
 	private final String PARAMETER_CURRENT_APPLICATION_PAGE = "sch_crrap_pg";
-
+	private final String PARAMETER_DELETE_CHOICE_ID = "delete_sch_choice";
 	private final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
 	private final int ACTION_FINALIZE_GROUP = 3;
 	private final int ACTION_DELETE = 4;
+	private final int ACTION_DELETE_SCHOOL_CHOICE = 5;
 
 	private int action = 0;
 	private int method = 0;
@@ -73,6 +80,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private int _previousSchoolClassID = -1;
 	private int _previousSchoolSeasonID = -1;
 	private int _previousSchoolYearID = -1;
+	private int _choiceForDeletion = -1;
 
 	private boolean multibleSchools = false;
 	private boolean showStudentTable = true;
@@ -98,6 +106,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				case ACTION_FINALIZE_GROUP :
 					finalizeGroup();
 					break;
+				case ACTION_DELETE_SCHOOL_CHOICE :
+					deleteSchoolChoice(iwc, _choiceForDeletion);
+					break;
 			}
 
 			switch (action) {
@@ -107,6 +118,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				case ACTION_SAVE :
 					drawNewGroupForm(iwc);
 					break;
+				
 			}
 		}
 		else {
@@ -142,6 +154,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SEARCH))
 			searchString = iwc.getParameter(PARAMETER_SEARCH);
+		
 		/** Fixing String */
 		if (searchString != null && searchString.length() > 0) {
 			try {
@@ -159,6 +172,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				searchString = temp;
 			}catch (NumberFormatException nfe) {}
 		}
+		
+		if (iwc.isParameterSet(PARAMETER_DELETE_CHOICE_ID))
+			_choiceForDeletion = Integer.parseInt(iwc.getParameter(PARAMETER_DELETE_CHOICE_ID));
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
@@ -279,9 +295,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			showLanguage = true;
 		
 		if (showLanguage)
-			table.setColumns(8);
+			//table.setColumns(8);
+			table.setColumns(9);
 		else
-			table.setColumns(7);
+			//table.setColumns(7);
+			table.setColumns(8);
 
 		if (!showStudentTable) {
 			table.setColumns(table.getColumns() - 1);
@@ -372,11 +390,17 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
 		if (showLanguage)
 			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
-		table.add(getSmallHeader(localize("school.created", "Created")), column, row);
+		table.add(getSmallHeader(localize("school.created", "Created")), column++, row);
+		table.add(Text.getNonBrakingSpace(), column, row); // Empty header for erase buttons
 		row++;
 		
 		CheckBox checkBox = new CheckBox();
 		Link link;
+		
+		// Added for SchoolChoice deletion
+		if (getSchoolClassID() == -1)
+			table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
+		table.add(new HiddenInput(PARAMETER_DELETE_CHOICE_ID, "-1"), column, row);
 
 		if (!applicants.isEmpty()) {
 			SchoolChoice choice;
@@ -432,8 +456,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (showComment)
 					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
         
-        table.add(link, column++, row);
-				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
+				table.add(link, column++, row);
+				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column, row);
+				table.setNoWrap(column, row);
+				column++;
 				if (address != null && address.getStreetAddress() != null) {
 					table.add(getSmallText(address.getStreetAddress()), column, row);
 				}
@@ -457,10 +483,25 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.add(getSmallText(localize(choice.getLanguageChoice(),"")), column, row);
 					column++;
 				}
-				table.add(getSmallText(created.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), column++, row);
+				table.add(getSmallText(created.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), column, row);
+				table.setNoWrap(column, row);
+				column++;
 				if (showStudentTable && getSchoolClassID() != -1) {
 					table.setWidth(column, "12");
 					table.add(checkBox, column, row);
+					column++;
+				}
+				if (livesOutsideDefaultCommune(iwc, applicant)) {
+					// Get delete button      
+					Image delImg = getDeleteIcon(localize("delete", "Delete"));
+					int choiceID = ((Integer) choice.getPrimaryKey()).intValue();
+
+					SubmitButton delButt = new SubmitButton(delImg);
+					delButt.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE_SCHOOL_CHOICE));							
+					delButt.setValueOnClick(PARAMETER_DELETE_CHOICE_ID, String.valueOf(choiceID));
+					delButt.setSubmitConfirm(localize("school.confirm_delete_school_choice_msg", 
+																	"Do you really want to erase this school choice?"));
+					table.add(delButt, column, row);
 				}
 				row++;
 			}
@@ -1070,6 +1111,44 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (previousClass != null && !previousClasses.contains(previousClass))
 			_previousSchoolClassID = -1;
 	}
+	
+	private boolean livesOutsideDefaultCommune(IWContext iwc, User applicant) {
+		boolean showEraseButton = false;
+		try {
+			// Get default Commune primary key
+			CommuneHome cHome = (CommuneHome) IDOLookup.getHome(Commune.class);
+			Commune defCom = cHome.findDefaultCommune();
+			Integer defComPK = (Integer) defCom.getPrimaryKey();
+			
+			// Get applicants home Commune primary key
+			Address applicantAddr;
+			applicantAddr = getUserBusiness(iwc).getUsersMainAddress(applicant);
+			int homeComID = -1;
+			homeComID = applicantAddr.getCommuneID(); // return -1 if null in db
+			
+			// If user doesn't live in default commune - return true
+			if (homeComID != -1 && defComPK.intValue() != homeComID)
+					showEraseButton = true;
+		} catch (Exception e) {}		
+		
+		return showEraseButton;
+	}
+	
+	/*
+	 * Delete a school choice by setting it's corresponding case status to deleted(UPPS)
+	 */	
+	private void deleteSchoolChoice(IWContext iwc, int choiceID) throws RemoteException {
+		try {
+			Case theCase = getSchoolChoiceBusiness(iwc).getCase(choiceID);
+			if (theCase != null) {
+				theCase.setStatus(SchoolChoiceBMPBean.CASE_STATUS_CANCELLED);
+				theCase.store();
+			}
+		} catch (FinderException e) {
+			log(e);
+		}
+	}
+
 
 	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
@@ -1083,6 +1162,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		return (SchoolBusiness) IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
 	}
 
+	private SchoolChoiceBusiness getSchoolChoiceBusiness(IWContext iwc) throws RemoteException {
+		return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwc, SchoolChoiceBusiness.class);
+	}
+	
 	/** setters */
 	public void setMultipleSchools(boolean multiple) {
 		this.multibleSchools = multiple;

@@ -222,7 +222,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 						table.add(getSmallText(parent.getNameLastFirst(true)), 2, row);
 						try {
 							Email email = getCommuneUserBusiness(iwc).getUsersMainEmail(parent);
-							if (email != null) {
+							if (email != null && email.getEmailAddress() != null) {
 								table.add(getSmallText(", "), 2, row);
 								Link emailLink = this.getSmallLink(email.getEmailAddress());
 								emailLink.setURL("mailto:"+email.getEmailAddress());

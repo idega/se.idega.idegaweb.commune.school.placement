@@ -15,6 +15,7 @@ import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
+import se.idega.util.PIDChecker;
 
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
@@ -220,22 +221,30 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private Table getApplicationTable(IWContext iwc) throws RemoteException {
 		Table table = new Table();
-		table.setColumns(5);
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		table.setWidth(5,"12");
 		boolean showLanguage = false;
 
 		SchoolYear year = getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		if (year != null && year.getSchoolYearAge() == 12)
 			showLanguage = true;
+			
+		if (showLanguage) {
+			table.setColumns(7);
+			table.setWidth(7,"12");
+		}
+		else {
+			table.setColumns(6);
+			table.setWidth(6,"12");
+		}
 
 		int row = 1;
 		int column = 1;
 		
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
+		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
 		if (showLanguage)
 			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
@@ -247,13 +256,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (year != null) {
 			schoolYearAge = year.getSchoolYearAge() - 1;	
 		}
-//			System.out.println("[SchoolClassEditor] par getSchoolYearID()    = "+iwc.getParameter(session.getParameterSchoolYearID()));
-//			System.out.println("[SchoolClassEditor] par getSchoolSeasonID()  = "+iwc.getParameter(session.getParameterSchoolSeasonID()));
-//			System.out.println("[SchoolClassEditor] schoolYearAge            = "+schoolYearAge);
-//			System.out.println("[SchoolClassEditor] getSchoolYearID()        = "+getSchoolYearID());
-//			System.out.println("[SchoolClassEditor] getSchoolSeasonID()      = "+getSchoolSeasonID());
+
 			List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, searchString));
-//			List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolAndSeasonAndGrade(getSchoolID(), getSchoolSeasonID(), year.getSchoolYearAge() - 1));
 			if (!applicants.isEmpty()) {
 				Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy,iwc.getCurrentLocale(),getUserBusiness(iwc)));
 				SchoolChoice choice;
@@ -294,6 +298,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						
 						table.add(link, column++, row);
 						table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
+						if (PIDChecker.getInstance().isFemale(applicant.getPersonalID()))
+							table.add(getSmallText(localize("school.girl","Girl")),column++,row);
+						else
+							table.add(getSmallText(localize("school.boy","Boy")),column++,row);
+						
 						if (school != null) {
 							String schoolName = school.getName();
 							if (schoolName.length() > 20)
@@ -325,8 +334,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(deselectAll, 1, row);
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setRowColor(1, getHeaderColor());
 		table.setRowColor(row, "#FFFFFF");
 
@@ -338,14 +345,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		table.setColumns(5);
-		table.setWidth(5,"12");
+		table.setColumns(6);
+		table.setWidth(6,"12");
 
 		int row = 1;
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
-		table.add(getSmallHeader(localize("school.address", "Address")), 3, row);
-		table.add(getSmallHeader(localize("school.class", "Class")), 4, row++);
+		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
+		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
+		table.add(getSmallHeader(localize("school.class", "Class")), 5, row++);
 
 		User student;
 		Address address;
@@ -397,11 +405,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
-				if (address != null && address.getStreetAddress() != null)
-					table.add(getSmallText(address.getStreetAddress()), 3, row);
+				if (PIDChecker.getInstance().isFemale(student.getPersonalID()))
+					table.add(getSmallText(localize("school.girl","Girl")),3,row);
+				else
+					table.add(getSmallText(localize("school.boy","Boy")),3,row);
+			if (address != null && address.getStreetAddress() != null)
+					table.add(getSmallText(address.getStreetAddress()), 4, row);
 				if (schoolClass != null)
-					table.add(getSmallText(schoolClass.getName()), 4, row);
-				table.add(checkBox, 5, row++);
+					table.add(getSmallText(schoolClass.getName()), 5, row);
+				table.add(checkBox, 6, row++);
 			}
 		}
 
@@ -418,8 +430,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(deselectAll, 1, row);
 		table.mergeCells(1, row, 5, row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setRowColor(1, getHeaderColor());
 		table.setRowColor(row, "#FFFFFF");
 
@@ -431,17 +441,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		table.setColumns(6);
-		table.setWidth(5,"12");
+		table.setColumns(7);
 		table.setWidth(6,"12");
+		table.setWidth(7,"12");
 
 		int row = 1;
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
-		table.add(getSmallHeader(localize("school.address", "Address")), 3, row);
-		table.add(getSmallHeader(localize("school.class", "Class")), 4, row);
-		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 5, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 5, row++);
+		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
+		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
+		table.add(getSmallHeader(localize("school.class", "Class")), 5, row);
+		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 6, row);
+		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 7, row++);
 
 		User student;
 		Address address;
@@ -476,12 +487,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				table.add(getSmallText(name), 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
+				
+				if (PIDChecker.getInstance().isFemale(student.getPersonalID()))
+					table.add(getSmallText(localize("school.girl","Girl")),3,row);
+				else
+					table.add(getSmallText(localize("school.boy","Boy")),3,row);
+				
 				if (address != null && address.getStreetAddress() != null)
-					table.add(getSmallText(address.getStreetAddress()), 3, row);
+					table.add(getSmallText(address.getStreetAddress()), 4, row);
 				if (schoolClass != null)
-					table.add(getSmallText(schoolClass.getName()), 4, row);
-				table.add(move, 5, row);
-				table.add(delete, 6, row++);
+					table.add(getSmallText(schoolClass.getName()), 5, row);
+				table.add(move, 6, row);
+				table.add(delete, 7, row++);
 			}
 		}
 
@@ -498,8 +515,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(groupReady, 1, row);
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setHorizontalZebraColored(getZebraColor2(), getZebraColor1());
 		table.setRowColor(1, getHeaderColor());
 		table.setRowColor(row, "#FFFFFF");

@@ -632,9 +632,17 @@ public class SchoolAdminOverview extends CommuneBlock {
 			workphone = "";
 		}
         
-		Object[] arguments = { user.getName(), email, workphone };
+		SchoolChoice choice = null;
+		try {
+			choice = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolChoice(_choiceID);
+		}
+		catch (FinderException e) {
+			choice = null;
+		}
+
+		Object[] arguments = { user.getName(), email, workphone, choice.getChild().getNameLastFirst(true), choice.getChosenSchool().getName() };
         
-		String message = MessageFormat.format(localize("school.reject_student_message", "We are sorry that we cannot offer you a place in our school at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2})."), arguments);
+		String message = MessageFormat.format(localize("school.reject_student_message", "We are sorry that we cannot offer {3} a place in {4} at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2})."), arguments);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		textArea.setRows(4);

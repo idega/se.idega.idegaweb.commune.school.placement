@@ -443,10 +443,22 @@ public class SchoolAdminOverview extends CommuneBlock {
 						}
 						try {
 							Phone phone = getCommuneUserBusiness(iwc).getUsersHomePhone(parent);
+							Phone phoneMobile = getCommuneUserBusiness(iwc).getUsersMobilePhone(parent);
+							Phone phoneWork = getCommuneUserBusiness(iwc).getUsersWorkPhone(parent);
 							if (phone != null && phone.getNumber() != null) {
 								table.add(new Break(), 2, row);
 								table.add(getSmallText(localize("school.phone", "Phone") + ": "), 2, row);
 								table.add(getSmallText(phone.getNumber()), 2, row);
+							}
+							if (phoneMobile != null && phoneMobile.getNumber() != null) {
+								table.add(new Break(), 2, row);
+								table.add(getSmallText(localize("school.phone_mobile", "Mobile phone") + ": "), 2, row);
+								table.add(getSmallText(phoneMobile.getNumber()), 2, row);
+							}
+							if (phoneWork != null && phoneWork.getNumber() != null) {
+								table.add(new Break(), 2, row);
+								table.add(getSmallText(localize("school.phone_work", "Work phone") + ": "), 2, row);
+								table.add(getSmallText(phoneWork.getNumber()), 2, row);
 							}
 						}
 						catch (NoPhoneFoundException npf) {

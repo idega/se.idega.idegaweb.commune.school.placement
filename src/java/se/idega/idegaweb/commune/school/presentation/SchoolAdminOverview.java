@@ -142,9 +142,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private static final String PARAMETER_DATE = "sch_date";
 	private static final String PARAMETER_FINALIZE_SUBJECT = "sch_admin_finalize_subject";
 	private static final String PARAMETER_FINALIZE_BODY = "sch_admin_finalize_body";
-    
-    private static final String KEY_SESSION_ATTRIBUTE_RSCTO = "rscTO";
-	
+    	
 	private int _method = -1;
 	private int _action = -1;
     
@@ -153,7 +151,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolID = -1;
 	private int _schoolClassID = -1;
 	private int _schoolYearID = -1;
-    private SchoolAdminOverviewTO _rscTO = new SchoolAdminOverviewTO();  // Transfer object to hold resource params in http session
+	private int _schoolClassMemberID = -1;
     
 	private boolean _protocol = true;
 	//private boolean _move = true;
@@ -512,9 +510,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 			row++;
 			
 			// *** Resources START ***			
-			if (_rscTO != null) {
+			if (_schoolClassMemberID != -1) {
+				table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, 
+														String.valueOf(_schoolClassMemberID)), 1, row);
 	            Integer providerGrpID = getProviderGrpId(iwc);
-	            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMbrIdOrderByRscName(new Integer(_rscTO.getClassMemberID()));
+	            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMbrIdOrderByRscName(new Integer(_schoolClassMemberID));
 	            // Add resource label
 	            table.add(getSmallHeader(localize("school.resources", "Resources")), 1, row);
 	            if (rscColl.size() == 0)
@@ -591,7 +591,7 @@ public class SchoolAdminOverview extends CommuneBlock {
                          schoolClassMember);
             }
             
-            if (_showOnlyOverview) {
+            if (_showOnlyOverview && _schoolClassMemberID != -1) {
                 table.add(resources, 1, row);
                 table.add(Text.getNonBrakingSpace(), 1, row);
             }
@@ -1128,12 +1128,16 @@ public class SchoolAdminOverview extends CommuneBlock {
         table.add(new HiddenInput(PARAMETER_RESOURCE_STARTDATE, ""), 6, 1);
         table.add(new HiddenInput(PARAMETER_RESOURCE_ENDDATE, ""), 6, 1);
         table.setRowHeight(1, "7");
+		
+		// Keep track of SchoolClassMemberID
+		table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, 
+														String.valueOf(_schoolClassMemberID)), 1, 1);
+
         
-        // list resources
+        // list resources	    
         int row = 2;
         Integer providerGrpID = getProviderGrpId(iwc);
-       // Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMemberId(new Integer(_rscTO.getClassMemberID()));
-	   	Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMbrIdOrderByRscName(new Integer(_rscTO.getClassMemberID()));
+	   	Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMbrIdOrderByRscName(new Integer(_schoolClassMemberID));
         SubmitButton finish;
         SubmitButton delete;
         
@@ -1209,6 +1213,11 @@ public class SchoolAdminOverview extends CommuneBlock {
         table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row++);
         table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
         
+		// Keep track of SchoolClassMemberID
+		table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, 
+														String.valueOf(_schoolClassMemberID)), 1, 1);
+
+
         // *** Input fields ***
         if (resourceErrorMsg != null) {
             row = 2;
@@ -1270,6 +1279,11 @@ public class SchoolAdminOverview extends CommuneBlock {
         table.setBorder(0);
         table.setCellpadding(1);
         table.setCellspacing(2);
+
+		// Keep track of SchoolClassMemberID
+		table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, 
+														String.valueOf(_schoolClassMemberID)), 1, 1);
+
         
         // *** Input labels ***
         int row = 1;
@@ -1590,21 +1604,9 @@ public class SchoolAdminOverview extends CommuneBlock {
         
 		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();
         
-        // RESOURCE HANDLING
         if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_MEMBER_ID)) {
-            _rscTO = new SchoolAdminOverviewTO();
-            // populate TO
-            if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_MEMBER_ID))
-                _rscTO.setClassMemberID(Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID)));
-            // put TO in session
-            iwc.setSessionAttribute(KEY_SESSION_ATTRIBUTE_RSCTO, _rscTO);      
-        } else {    
-            // Get rscTO from session
-            _rscTO = (SchoolAdminOverviewTO) iwc.getSessionAttribute(KEY_SESSION_ATTRIBUTE_RSCTO);
-            //_showNoChoices = _rscTO.isShowOnlyOverview();
-        }   
-        
-		/** @todo LAGA... er ekki alveg rett */
+        	_schoolClassMemberID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID));
+        }
 	}
     
 	protected DropdownMenu getSchoolYears(IWContext iwc) throws RemoteException {
@@ -1695,7 +1697,7 @@ public class SchoolAdminOverview extends CommuneBlock {
         
         Integer providerGrpId = getProviderGrpId(iwc);
         int classMemberId = 0;
-        classMemberId = _rscTO.getClassMemberID();
+        classMemberId = _schoolClassMemberID;
         if (providerGrpId != null && classMemberId != 0) {
             rscColl = getResourceBusiness(iwc).getAssignableResourcesForPlacement(providerGrpId, new Integer(classMemberId));
             for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
@@ -1710,19 +1712,17 @@ public class SchoolAdminOverview extends CommuneBlock {
     
     private String saveResource(IWContext iwc) throws RemoteException, FinderException {
         int rscID = -1;
-        int placementID = -1;
         String errMsg = null;
         
         String rscIdStr = iwc.getParameter(PARAMETER_RESOURCE_ID);
         if (rscIdStr != null) 
             rscID = Integer.parseInt(rscIdStr);      
-        placementID = _rscTO.getClassMemberID();
         
         // Save the resource placement
         String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
         String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
         try {        
-            getResourceBusiness(iwc).createResourcePlacement(rscID, placementID, startDateStr, endDateStr);
+            getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr);
         } catch (ResourceException re) {
             errMsg = localize(re.getKey(), re.getDefTrans());
         } catch (DateException de) {

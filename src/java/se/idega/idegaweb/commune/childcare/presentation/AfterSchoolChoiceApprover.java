@@ -294,6 +294,11 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 						if (startdate.isLaterThan(today)){
 							active = true;
 						}
+						else if (startdate.isEarlierThan(today) && member.getRemovedDate() == null){
+							active = true;
+						}
+						else
+							active = false;
 					}
 					else {
 						active =true;

@@ -211,7 +211,7 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 		}
 
 		table.mergeCells(1, row, table.getColumns(), row);
-		table.add(getStatisticsTable(validStatuses), 1, row++);
+		table.add(getStatisticsTable(iwc, validStatuses), 1, row++);
 
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setRowColor(headerRow, getHeaderColor());
@@ -220,19 +220,24 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 		return table;
 	}
 	
-	private PresentationObject getStatisticsTable(String[] validStatuses) {
+	private PresentationObject getStatisticsTable(IWContext iwc, String[] validStatuses) {
 		try {
 			int firstApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1 }, validStatuses, "");
 			int secondApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2 }, validStatuses, "");
 			int thirdApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 3 }, validStatuses, "");
 
+			int unHandledMoves = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getNumberOfUnHandledMoves(getSchoolSeasonID());
+			int handledMoves = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getNumberOfHandledMoves(getSchoolSeasonID());
+			
+
 			String[] allStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED, SchoolChoiceBMPBean.CASE_STATUS_PLACED };
 			String[] handledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED };
-			String[] unhandledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+//			String[] unhandledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+
 			
 			int allApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, allStatuses, "");
 			int handledApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, handledStatuses, "");
-			int unhandledApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, unhandledStatuses, "");
+//			int unhandledApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, unhandledStatuses, "");
 			
 			Table statTable = new Table();
 			int sRow = 1;
@@ -245,9 +250,6 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 			statTable.add(getSmallText(localize("applications_handled", "Handled applications") + ":"), 1, sRow);
 			statTable.add(getSmallText("" + handledApplSize), 2, sRow++);
 
-			statTable.add(getSmallText(localize("applications_unhandled", "Unhandled applications") + ":"), 1, sRow);
-			statTable.add(getSmallText("" + unhandledApplSize), 2, sRow++);
-
 			statTable.add(getSmallText(localize("applications_on_first_choice", "Applcations on first choice") + ":"), 1, sRow);
 			statTable.add(getSmallText("" + firstApplSize), 2, sRow++);
 
@@ -256,6 +258,16 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 
 			statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice") + ":"), 1, sRow);
 			statTable.add(getSmallText("" + thirdApplSize), 2, sRow++);
+
+			statTable.add(getSmallText("&nbsp;"), 1, sRow);
+			statTable.add(getSmallText("&nbsp;"), 2, sRow++);
+
+			statTable.add(getSmallText(localize("moves", "Total moves") + ":"), 1, sRow);
+			statTable.add(getSmallText("" + (unHandledMoves + handledMoves)), 2, sRow++);
+
+			statTable.add(getSmallText(localize("handled_moves", "Handled moves") + ":"), 1, sRow);
+			statTable.add(getSmallText("" + (handledMoves)), 2, sRow++);
+
 
 			return statTable;
 		}

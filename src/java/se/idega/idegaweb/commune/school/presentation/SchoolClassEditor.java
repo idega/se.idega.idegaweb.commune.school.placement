@@ -473,16 +473,20 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				String[] allStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED, SchoolChoiceBMPBean.CASE_STATUS_PLACED };
 				String[] handledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED };
-				String[] unhandledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+//				String[] unhandledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+				
+				int unHandledMoves = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getNumberOfUnHandledMoves(getSchoolSeasonID());
+				int handledMoves = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getNumberOfHandledMoves(getSchoolSeasonID());
 				
 				int allApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, allStatuses, "");
 				int handledApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, handledStatuses, "");
-				int unhandledApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, unhandledStatuses, "");
+//				int unhandledApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] {}, unhandledStatuses, "");
 				
 				Table statTable = new Table();
 				int sRow = 1;
 				statTable.setCellpadding(1);
 				statTable.setCellspacing(0);
+/*
 				statTable.add(getSmallText(localize("applications_all", "All applications") + ":"), 1, sRow);
 				statTable.add(getSmallText("" + allApplSize), 2, sRow);
 				++sRow;
@@ -500,6 +504,32 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				++sRow;
 				statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice") + ":"), 1, sRow);
 				statTable.add(getSmallText("" + thirdApplSize), 2, sRow);
+*/	
+				statTable.add(getSmallText(localize("applications_all", "All applications") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + allApplSize), 2, sRow++);
+				
+				statTable.add(getSmallText(localize("applications_handled", "Handled applications") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + handledApplSize), 2, sRow++);
+				
+				statTable.add(getSmallText(localize("applications_on_first_choice", "Applcations on first choice") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + firstApplSize), 2, sRow++);
+				
+				statTable.add(getSmallText(localize("applications_on_second_choice", "Applcations on second choice") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + secondApplSize), 2, sRow++);
+				
+				statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + thirdApplSize), 2, sRow++);
+				
+				statTable.add(getSmallText("&nbsp;"), 1, sRow);
+				statTable.add(getSmallText("&nbsp;"), 2, sRow++);
+
+				statTable.add(getSmallText(localize("moves", "Total moves") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + (unHandledMoves + handledMoves)), 2, sRow++);
+				
+				statTable.add(getSmallText(localize("handled_moves", "Handled moves") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + (handledMoves)), 2, sRow++);
+	
+	
 	
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(statTable, 1, row);

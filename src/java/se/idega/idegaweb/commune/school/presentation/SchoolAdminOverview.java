@@ -40,6 +40,7 @@ import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.builder.business.BuilderLogic;
 import com.idega.business.IBOLookup;
+import com.idega.core.localisation.data.ICLanguage;
 import com.idega.core.location.data.Address;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
@@ -152,10 +153,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolID = -1;
 	private int _schoolClassID = -1;
 	private int _schoolYearID = -1;
-    //  private int _rsc_studentID = -1;
-    //  private int _rsc_seasonID = -1;
-    //  private int _rsc_classMemberID = -1;
-    //  private String _rsc_choiceStatus = null;
     private SchoolAdminOverviewTO _rscTO = new SchoolAdminOverviewTO();  // Transfer object to hold resource params in http session
     
 	private boolean _protocol = true;
@@ -506,7 +503,14 @@ public class SchoolAdminOverview extends CommuneBlock {
                     row++;
                 }
             }
-
+            
+            // Native language
+            table.add(getSmallHeader(localize("school.native_language", "Native language")), 1, row);
+           	ICLanguage nativeLang = user.getNativeLanguage();
+           	if (nativeLang != null)
+           		table.add(getSmallText(nativeLang.getName()), 2, row);
+			row++;
+			
 			// *** Resources START ***			
 			if (_rscTO != null) {
 	            Integer providerGrpID = getProviderGrpId(iwc);

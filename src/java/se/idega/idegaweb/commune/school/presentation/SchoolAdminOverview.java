@@ -25,6 +25,7 @@ import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
+import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
@@ -96,6 +97,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private boolean _protocol = true;
 	private boolean _move = true;
 
+	private CloseButton close;
+
 
 	
 	/**
@@ -128,6 +131,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Form form = new Form();
 		form.maintainParameter(PARAMETER_USER_ID);
 		form.maintainParameter(PARAMETER_CHOICE_ID);
+		form.setStyleAttribute("height:100%");
 		
 		Table table = new Table(3,5);
 		table.setRowColor(1, "#000000");
@@ -151,8 +155,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Table contentTable = new Table(1,1);
 		contentTable.setCellpadding(10);
 		contentTable.setWidth(Table.HUNDRED_PERCENT);
+		contentTable.setHeight(Table.HUNDRED_PERCENT);
 		table.add(contentTable,2,4);
 		
+    close = (CloseButton) getStyledInterface(new CloseButton(localize("close_window","Close")));
+
 		switch (_method) {
 			case METHOD_OVERVIEW:
 				headerTable.add(getHeader(localize("school.student_overview","Student overview")));
@@ -282,8 +289,9 @@ public class SchoolAdminOverview extends CommuneBlock {
       
       table.setColumnVerticalAlignment(1, Table.VERTICAL_ALIGN_TOP);
       table.mergeCells(1, row, table.getColumns(), row);
+      table.setHeight(row, Table.HUNDRED_PERCENT);
+      table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
       
-      CloseButton close = (CloseButton) getStyledInterface(new CloseButton(localize("close_window","Close")));
       SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace","Replace"),PARAMETER_METHOD,String.valueOf(METHOD_REPLACE)));
       SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject","Reject"),PARAMETER_METHOD,String.valueOf(METHOD_REJECT)));
       SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_METHOD,String.valueOf(METHOD_MOVE)));
@@ -315,6 +323,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Table table = new Table();
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
 		int row = 1;
 		
 		User user = iwc.getCurrentUser();
@@ -345,6 +354,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject","Reject"),PARAMETER_ACTION,String.valueOf(ACTION_REJECT)));
 		table.add(reject,1,row);
+		table.add(Text.NON_BREAKING_SPACE,1,row);
+    table.add(close,1,row);
+    table.setHeight(row, Table.HUNDRED_PERCENT);
+    table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		
 		return table;
 	}
@@ -353,6 +366,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Table table = new Table();
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD,String.valueOf(METHOD_REPLACE)));
 		int row = 1;
 		
@@ -395,6 +409,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		replace.setValueOnClick(PARAMETER_METHOD, "-1");
 		replace.setToEnableWhenChecked(PARAMETER_PROTOCOL);
 		table.add(replace,1,row);
+		table.add(Text.NON_BREAKING_SPACE,1,row);
+    table.add(close,1,row);
+    table.setHeight(row, Table.HUNDRED_PERCENT);
+    table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		
 		return table;
 	}
@@ -403,6 +421,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Table table = new Table();
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD,String.valueOf(METHOD_MOVE)));
 		int row = 1;
 		
@@ -428,6 +447,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_ACTION,String.valueOf(ACTION_MOVE)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.add(move,1,row);
+		table.add(Text.NON_BREAKING_SPACE,1,row);
+    table.add(close,1,row);
+    table.setHeight(row, Table.HUNDRED_PERCENT);
+    table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		
 		return table;
 	}
@@ -436,6 +459,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Table table = new Table();
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD,String.valueOf(METHOD_MOVE_GROUP)));
 		table.add(new HiddenInput(PARAMETER_ACTION,String.valueOf(ACTION_MOVE_GROUP)));
 		int row = 1;
@@ -453,6 +477,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move")));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.add(move,1,row);
+		table.add(Text.NON_BREAKING_SPACE,1,row);
+    table.add(close,1,row);
+    table.setHeight(row, Table.HUNDRED_PERCENT);
+    table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		
 		return table;
 	}
@@ -506,6 +534,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
 			
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
+			int schoolTypeID = -1;
+			try {
+				School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolID));
+				Collection Stypes = school.findRelatedSchoolTypes();
+				if (!Stypes.isEmpty()) {
+					SchoolType schoolType = (SchoolType) Stypes.iterator().next();
+					schoolTypeID = ((Integer) schoolType.getPrimaryKey()).intValue();
+				}
+			}
+			catch (Exception e) {
+				schoolTypeID = -1;
+			}
+
 			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolCommuneSession(iwc).getSchoolYearID()));
 			int grade = getSchoolCommuneBusiness(iwc).getGradeForYear(getSchoolCommuneSession(iwc).getSchoolYearID()) - 1;
 			User student = getUserBusiness(iwc).getUser(_userID);
@@ -520,7 +561,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				
 			IWTimestamp stamp = new IWTimestamp();
 			try {
-				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
+				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
 			}
 			catch (Exception e) {
 				e.printStackTrace();

@@ -1,5 +1,5 @@
 /*
- * $Id: BusinessLaunchButton.java,v 1.1 2004/10/22 11:21:53 thomas Exp $
+ * $Id: BusinessLaunchButton.java,v 1.2 2004/12/07 20:37:26 laddi Exp $
  *
  * Copyright (C) 2002 Idega hf. All Rights Reserved.
  *
@@ -12,8 +12,8 @@ package se.idega.idegaweb.commune.school.placement.presentation;
 
 import java.rmi.RemoteException;
 
+import se.idega.idegaweb.commune.business.NackaFixBusiness;
 import se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -34,7 +34,7 @@ public class BusinessLaunchButton extends ChildCareBlock {
 	
 	protected void control(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(SUBMIT)) {
-			getBusiness(iwc).importLanguageToPlacement();
+			getBusiness(iwc).fixPlacements();
 		}
 		
 		displayForm();			
@@ -42,7 +42,7 @@ public class BusinessLaunchButton extends ChildCareBlock {
 
 	protected void displayForm() {
 		Form form = new Form();
-		SubmitButton button = new SubmitButton(SUBMIT,"Add language to placements");
+		SubmitButton button = new SubmitButton(SUBMIT,"Fix placements");
 		form.add(button);
 		add(form);	
 	}
@@ -51,9 +51,9 @@ public class BusinessLaunchButton extends ChildCareBlock {
 		control(iwc);
 	}
 	
-	private SchoolChoiceBusiness getBusiness(IWContext iwc) {
+	private NackaFixBusiness getBusiness(IWContext iwc) {
 		try {
-			return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwc, SchoolChoiceBusiness.class);
+			return (NackaFixBusiness) IBOLookup.getServiceInstance(iwc, NackaFixBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);

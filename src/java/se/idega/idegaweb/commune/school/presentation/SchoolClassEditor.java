@@ -757,14 +757,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, String.valueOf(getBusiness().getChosenSchoolID((Collection) studentChoices.get(new Integer(studentMember.getClassMemberId())))));
 				}
 				
-				boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
-				if (hasChoices[0] && hasChoices[1]) {
+				//boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
+				boolean hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				boolean hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				
+				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
-				} else if (studentMember.getSpeciallyPlaced()) {
+				}	else if (studentMember.getSpeciallyPlaced()) {
 					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
-				} else if (hasChoices[0] && !hasChoices[1]) {
+				}	else if (hasChoice) {
 					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
-				}	else {
+				}
+				else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
 					else

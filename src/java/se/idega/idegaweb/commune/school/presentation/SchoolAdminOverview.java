@@ -876,7 +876,7 @@ public class SchoolAdminOverview extends CommuneBlock {
             
 			if (body != null) {
 				School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
-				Object[] arguments = { school.getName(), schoolClass.getName() };
+				Object[] arguments = { school.getName(), schoolClass.getName(), new IWTimestamp().getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT) };
 				body = MessageFormat.format(body, arguments);
 			}
 		}

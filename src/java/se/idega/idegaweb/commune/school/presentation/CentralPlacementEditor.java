@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/10 15:41:14 $ by $Author: goranb $
- * @version $Revision: 1.52 $
+ * Last modified: $Date: 2003/12/16 10:54:10 $ by $Author: goranb $
+ * @version $Revision: 1.53 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -607,12 +607,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 					row++;
 					
 					// Contract
-					ChildCareContract contract =
-						getChildCareBusiness(iwc).getValidContractByChild(
+					try {
+						ChildCareContract contract =
+							getChildCareBusiness(iwc).getValidContractByChild(
 							((Integer) child.getPrimaryKey()).intValue());
-					if (contract != null) {
-						table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
-					}
+						if (contract != null) {
+							table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
+						}
+					} catch (Exception e) {}
+					
 					row++;
 					col = 2;
 					// Start date

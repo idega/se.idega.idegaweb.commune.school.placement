@@ -76,10 +76,9 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 /**
- * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/03 18:06:35 $ by $Author: goranb $
- * @version $Revision: 1.49 $
+ * Last modified: $Date: 2003/12/04 10:24:31 $ by $Author: goranb $
+ * @version $Revision: 1.50 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***

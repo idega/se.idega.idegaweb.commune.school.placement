@@ -212,7 +212,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.add(getSearchAndSortTable(), 1, 3);
 
 		table.add(getApplicationTable(iwc), 1, 5);
-		table.add(getLegendTable(), 1, 5);
+		table.add(getLegendTable(true), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {

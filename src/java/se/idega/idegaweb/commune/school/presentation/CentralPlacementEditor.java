@@ -25,6 +25,7 @@ import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
+import se.idega.idegaweb.commune.childcare.presentation.ChildCareChildContracts;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
 
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
@@ -77,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/20 13:00:40 $ by $Author: goranb $
- * @version $Revision: 1.41 $
+ * Last modified: $Date: 2003/11/20 15:00:27 $ by $Author: goranb $
+ * @version $Revision: 1.42 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -517,9 +518,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Contract
 		table.add(getSmallHeader(localize(KEY_CONTRACT_LABEL, "Contract: ")), col, row);
 		// BUTTON Contract history 
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-												KEY_BUTTON_CONTRACT_HISTORY, "Contract history")), 5, row);
-				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+		table.add(getContractHistoryButton(), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
 		col = 1;
@@ -1487,6 +1486,19 @@ public class CentralPlacementEditor extends CommuneBlock {
 		
 		return linkButton;
 	}
+
+	private Link getContractHistoryButton() {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_CONTRACT_HISTORY, "Contract history")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(CentralPlacementChildCareContracts.class);
+		if (child != null) {
+			Integer PK = (Integer) child.getPrimaryKey();
+			linkButton.addParameter(ChildCareChildContracts.PARAMETER_CHILD_ID, PK.intValue());			
+		}
+		
+		return linkButton;
+	}
+
 
 	private Link getRegularPaymentTopButton(IWContext iwc, SchoolClassMember plc) throws RemoteException {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")));

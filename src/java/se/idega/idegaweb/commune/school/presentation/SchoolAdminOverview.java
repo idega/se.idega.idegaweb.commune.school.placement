@@ -63,13 +63,17 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
 	public static final int METHOD_REPLACE = 3;
+	public static final int METHOD_MOVE = 4;
 	
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
+	public static final int ACTION_MOVE = 3;
 	
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
+	private static final String PARAMETER_MOVE_MESSAGE = "sch_admin_replace_message";
 	private static final String PARAMETER_PROTOCOL = "sch_admin_protocol";
+	private static final String PARAMETER_SCHOOL_ID ="sch_school_id";
 
 	private int _method = -1;
 	private int _action = -1;
@@ -80,6 +84,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolYearID = -1;
 	
 	private boolean _protocol = true;
+	private boolean _move = true;
+
 
 	
 	/**
@@ -95,6 +101,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 				break;
 			case ACTION_REPLACE:
 				replace(iwc);
+				break;
+			case ACTION_MOVE:
+				move(iwc);
 				break;
 		}
 		
@@ -143,6 +152,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 				headerTable.add(getHeader(localize("school.student_replacing","Replace student")));
 				contentTable.add(getReplaceForm(iwc));
 				break;
+			case METHOD_MOVE:
+				headerTable.add(getHeader(localize("school.student_move","Move student")));
+				contentTable.add(getMoveForm(iwc));
+				break;
 		}
 		
 		add(form);
@@ -166,7 +179,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			table.add(getSmallHeader(localize("school.address","Address")),1,row);
 			if (address != null)
-				table.add(getSmallText(address.getStreetAddress()),2,row++);
+				table.add(getSmallText(address.getStreetAddress() + ", " + address.getPostalAddress()),2,row++);
 			else
 				row++;
 				
@@ -239,11 +252,17 @@ public class SchoolAdminOverview extends CommuneBlock {
       CloseButton close = (CloseButton) getStyledInterface(new CloseButton(localize("back","Back")));
       SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace","Replace"),PARAMETER_METHOD,String.valueOf(METHOD_REPLACE)));
       SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject","Reject"),PARAMETER_METHOD,String.valueOf(METHOD_REJECT)));
+      SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_METHOD,String.valueOf(METHOD_MOVE)));
       
       table.add(close,1,row);
+      table.add(Text.NON_BREAKING_SPACE,1,row);
       table.add(replace,1,row);
-      if (_choiceID != -1)
+      table.add(Text.NON_BREAKING_SPACE,1,row);
+      if (_choiceID != -1) {
       	table.add(reject,1,row);
+	      table.add(Text.NON_BREAKING_SPACE,1,row);
+      }
+      table.add(move,1,row);
 		}
 		
 		return table;
@@ -301,6 +320,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		CheckBox box = new CheckBox(PARAMETER_PROTOCOL);
 		box.setWidth("12");
 		box.setHeight("12");
+		box.keepStatusOnAction(true);
 		table.add(box,1,row);
 		if (_protocol)
 			table.add(getSmallText(localize("school.protocol_followed","All protocols have been followed")),1,row++);
@@ -318,12 +338,46 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(new Break(),1,row);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REPLACE_MESSAGE));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
+		textArea.keepStatusOnAction(true);
 		textArea.setHeight(4);
 		table.add(textArea,1,row++);
 		
 		SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace","Replace"),PARAMETER_ACTION,String.valueOf(ACTION_REPLACE)));
 		replace.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.add(replace,1,row);
+		
+		return table;
+	}
+	
+	private Table getMoveForm(IWContext iwc) throws RemoteException {
+		Table table = new Table();
+		table.setCellpadding(5);
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.add(new HiddenInput(PARAMETER_METHOD,String.valueOf(METHOD_MOVE)));
+		int row = 1;
+		
+		User user = getUserBusiness(iwc).getUser(_userID);
+		
+		table.add(getSmallHeader(localize("school.move_student_info","You have selected to move student: ")+user.getName()+"."),1,row++);
+		
+		table.add(getSmallHeader(localize("school.new_school","New school")+": "),1,row);
+		table.add(getSchools(iwc),1,row++);
+		
+		table.add(getSmallHeader(localize("school.move_reason_text","The following message will be sent to the new school as the reason for move.")),1,row++);
+		
+		if (_move)
+			table.add(getSmallText(localize("school.move_reason","Move reason")+":"),1,row);
+		else
+			table.add(getSmallErrorText(localize("school.move_reason","Move reason")+":"),1,row);
+		table.add(new Break(),1,row);
+		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_MOVE_MESSAGE));
+		textArea.setWidth(Table.HUNDRED_PERCENT);
+		textArea.setHeight(4);
+		table.add(textArea,1,row++);
+		
+		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_ACTION,String.valueOf(ACTION_MOVE)));
+		move.setValueOnClick(PARAMETER_METHOD, "-1");
+		table.add(move,1,row);
 		
 		return table;
 	}
@@ -354,7 +408,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void replace(IWContext iwc) throws RemoteException {
-		if (iwc.isParameterSet(PARAMETER_PROTOCOL)) {
+		if (iwc.isParameterSet(PARAMETER_PROTOCOL) && iwc.isParameterSet(PARAMETER_REPLACE_MESSAGE)) {
 			String message = iwc.getParameter(PARAMETER_REPLACE_MESSAGE);
 			
 			IWTimestamp stamp = new IWTimestamp();
@@ -368,6 +422,29 @@ public class SchoolAdminOverview extends CommuneBlock {
 		else {
 			_protocol = false;
 			_method = this.METHOD_REPLACE;
+		}
+	}
+
+	private void move(IWContext iwc) throws RemoteException {
+		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE)) {
+			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
+			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
+			int grade = getSchoolCommuneBusiness(iwc).getSchoolYear(getSchoolCommuneSession(iwc).getSchoolYearID()).getSchoolYearAge() + 1;
+			
+			IWTimestamp stamp = new IWTimestamp();
+			try {
+				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			getParentPage().setParentToReload();
+			getParentPage().close();
+		}
+		else {
+			_move = false;
+			_method = this.METHOD_MOVE;
 		}
 	}
 
@@ -451,6 +528,23 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		if ( _schoolClassID != -1 )
 			menu.setSelectedElement(_schoolClassID);
+		
+		return (DropdownMenu) getStyledInterface(menu);	
+	}
+		
+	protected DropdownMenu getSchools(IWContext iwc) throws RemoteException {
+		DropdownMenu menu = new DropdownMenu(PARAMETER_SCHOOL_ID);
+		menu.setToSubmit();
+		menu.keepStatusOnAction(true);
+		
+		Collection classes = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchools();
+		if ( !classes.isEmpty() ) {
+			Iterator iter = classes.iterator();
+			while (iter.hasNext()) {
+				School element = (School) iter.next();
+				menu.addMenuElement(element.getPrimaryKey().toString(), element.getName());
+			}
+		}
 		
 		return (DropdownMenu) getStyledInterface(menu);	
 	}

@@ -9,11 +9,16 @@ import com.idega.presentation.text.*;
 import com.idega.presentation.ui.*;
 import com.idega.user.Converter;
 import com.idega.user.data.*;
+import com.idega.util.IWTimestamp;
+
 import is.idega.idegaweb.member.business.*;
 import java.rmi.*;
 import java.util.*;
+
+import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.check.business.*;
 import se.idega.idegaweb.commune.presentation.*;
+import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
 /**
  * Title:
@@ -40,6 +45,7 @@ public class CheckRequestForm extends CommuneBlock {
 	private final static String PARAM_WORK_SITUATION = "chk_ws_";
 	private final static String PARAM_WORK_SITUATION_1 = "chk_ws_1";
 	private final static String PARAM_WORK_SITUATION_2 = "chk_ws_2";
+	private final static String PARAM_PROVIDER = "cca_provider";
 
 	private boolean isError = false;
 	private String errorMessage = null;
@@ -52,6 +58,9 @@ public class CheckRequestForm extends CommuneBlock {
 
 	private IBPage formResponsePage = null;
 	private User child;
+	
+	private boolean _createChoices = false;
+	private int[] providerIDs = { -1, -1, -1 };
 
 	public CheckRequestForm() {}
 
@@ -80,22 +89,34 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private boolean getUser(IWContext iwc) {
-		if (iwc.isParameterSet(CitizenChildren.getChildIDParameterName())) {
-			try {
-				child = getCheckBusiness(iwc).getUserById(Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
-				return true;
-			} catch (Exception e) {
+		if (!createChoices()) {
+			if (iwc.isParameterSet(CitizenChildren.getChildIDParameterName())) {
+				try {
+					child = getCheckBusiness(iwc).getUserById(Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
+					return true;
+				} catch (Exception e) {
+					return false;
+				}
+			} else if (iwc.isParameterSet(CitizenChildren.getChildSSNParameterName())) {
+				try {
+					child = getCheckBusiness(iwc).getUserByPersonalId(iwc.getParameter(CitizenChildren.getChildSSNParameterName()));
+					return true;
+				} catch (Exception e) {
+					return false;
+				}
+			} else {
 				return false;
 			}
-		} else if (iwc.isParameterSet(CitizenChildren.getChildSSNParameterName())) {
-			try {
-				child = getCheckBusiness(iwc).getUserByPersonalId(iwc.getParameter(CitizenChildren.getChildSSNParameterName()));
-				return true;
-			} catch (Exception e) {
-				return false;
-			}
-		} else {
-			return false;
+		}
+		else {
+			Integer childID = (Integer) iwc.getSessionAttribute(CitizenChildren.getChildIDParameterName());
+				try {
+					child = getCheckBusiness(iwc).getUserById(childID.intValue());
+					return true;
+				}
+				catch (Exception e) {
+					return false;
+				}
 		}
 	}
 
@@ -110,14 +131,6 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private void viewForm(IWContext iwc) throws Exception {
-		add(getChildTable(iwc));
-		add(new Break(2));
-
-		if (this.isError) {
-			add(getErrorText(this.errorMessage));
-			add(new Break(2));
-		}
-
 		add(getForm(iwc));
 	}
 
@@ -130,6 +143,12 @@ public class CheckRequestForm extends CommuneBlock {
 		String paramMTMC = iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD);
 		String paramMTFC = iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD);
 		String paramMTP = iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS);
+		int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(iwc.getCurrentUser(), ((Integer)child.getPrimaryKey()).intValue());
+		boolean showErrors = true;
+		if (createChoices()) {
+			if (checkID != -1)
+				showErrors = false;
+		}
 		
 		try {
 			paramChildCareType = Integer.parseInt(iwc.getParameter(PARAM_CHILD_CARE_TYPE));
@@ -164,14 +183,35 @@ public class CheckRequestForm extends CommuneBlock {
 			this.isError = true;
 			this.paramErrorMotherTongueP = true;
 		}
-		if (isError) {
-			this.errorMessage = localize("check.incomplete_input", "You must fill in the information marked with red text.");
-			viewForm(iwc);
-			return;
+		
+		if (showErrors) {
+			if (isError) {
+				this.errorMessage = localize("check.incomplete_input", "You must fill in the information marked with red text.");
+				viewForm(iwc);
+				return;
+			}
 		}
 
 		try {
-			getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, Converter.convertToNewUser(iwc.getUser()), "", false, false, false, false, false);
+			if (showErrors)
+				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, Converter.convertToNewUser(iwc.getUser()), "", false, false, false, false, false);
+			
+			if (createChoices()) {
+				SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();
+				String[] date = { IWTimestamp.RightNow().toString(), IWTimestamp.RightNow().toString(), IWTimestamp.RightNow().toString() };
+				for (int a = 0; a < 3; a++) {
+					int providerID = iwc.isParameterSet(PARAM_PROVIDER + "_" + (a + 1)) ? Integer.parseInt(iwc.getParameter(PARAM_PROVIDER + "_" + (a + 1))) : -1;
+					if (providerID == -1) {
+						getParentPage().setAlertOnLoad(localize("check.incomplete_providers","Must fill out all providers"));
+						viewForm(iwc);
+						return;
+					}
+					providerIDs[a] = providerID;
+					if (season != null)
+						date[a] = new IWTimestamp(season.getSchoolSeasonStart()).toString();
+				}
+				getChildCareBusiness(iwc).insertApplications(iwc.getCurrentUser(), providerIDs, date, checkID, ((Integer) child.getPrimaryKey()).intValue(), "", "", true);
+			}
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -188,27 +228,45 @@ public class CheckRequestForm extends CommuneBlock {
 		f.add(new HiddenInput(CitizenChildren.getChildIDParameterName(), ((Integer) child.getPrimaryKey()).toString()));
 
 		Table formTable = new Table();
-		formTable.setWidth(600);
+		formTable.setWidth(getWidth());
 		formTable.setCellspacing(0);
-		formTable.setCellpadding(14);
-		formTable.setColor(getBackgroundColor());
+		formTable.setCellpadding(0);
 		int row = 1;
+		boolean showCheckForm = true;
+		if (createChoices()) {
+			int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(iwc.getCurrentUser(), ((Integer)child.getPrimaryKey()).intValue());
+			if (checkID != -1)
+				showCheckForm = false;	
+		}
 
-		formTable.add(getLocalizedHeader("check.request_regarding", "The request regards"), 1, row);
-		formTable.add(new Break(2), 1, row);
-		formTable.add(getChildcareTypeTable(iwc), 1, row++);
+		formTable.add(getLocalizedHeader("check.application_for", "Application for"), 1, row++);
+		formTable.add(getChildTable(iwc), 1, row++);
+		formTable.setHeight(row++, 12);
+	
+		if (showCheckForm) {
+			if (!createChoices()) {
+				formTable.add(getChildcareTypeTable(iwc), 1, row++);
+				formTable.setHeight(row++, 12);
+			}
+			else
+				formTable.add(new HiddenInput(PARAM_CHILD_CARE_TYPE, "3"), 1, row++);
 
-		formTable.add(getLocalizedHeader("check.custodians", "Custodians"), 1, row);
-		formTable.add(new Break(2), 1, row);
-		formTable.add(getCustodianTable(iwc), 1, row++);
+			formTable.add(getLocalizedHeader("check.custodians", "Custodians"), 1, row++);
+			formTable.add(getCustodianTable(iwc), 1, row++);
+			formTable.setHeight(row++, 12);
+	
+			formTable.add(getLocalizedHeader("check.mother_tongue", "Mother tongue"), 1, row++);
+			formTable.add(getMotherTongueTable(iwc), 1, row++);
+			formTable.setHeight(row++, 12);
+		}
+		
+		if (createChoices()) {
+			formTable.add(getLocalizedHeader("check.choices", "Child care choices"), 1, row++);
+			formTable.add(getProviderTable(iwc), 1, row++);
+			formTable.setHeight(row++, 12);
+		}
 
-		formTable.add(getLocalizedHeader("check.mother_tongue", "Mother tongue"), 1, row);
-		formTable.add(new Break(2), 1, row);
-		formTable.add(getMotherTongueTable(iwc), 1, row++);
-
-		SubmitButton submitButton = new SubmitButton(localize("check.send_request", "Send request"));
-		submitButton.setAsImageButton(true);
-		formTable.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		SubmitButton submitButton = (SubmitButton) getButton(new SubmitButton(localize("check.send_request", "Send request")));
 		formTable.add(submitButton, 1, row);
 
 		f.add(formTable);
@@ -217,53 +275,41 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private Table getChildTable(IWContext iwc) throws Exception {
-		Table childTable = new Table(1, 1);
-		childTable.setCellpaddingAndCellspacing(0);
+		Table childTable = new Table();
+		childTable.setCellpadding(2);
+		childTable.setCellspacing(0);
+		childTable.setWidth(1, "170");
+		int row = 1;
 
-		Table nameTable = new Table(2, 2);
-		nameTable.setWidth(400);
-		nameTable.setCellspacing(2);
-		nameTable.setCellpadding(4);
-		nameTable.setColor(1, 1, getBackgroundColor());
-		nameTable.setColor(2, 1, getBackgroundColor());
-		nameTable.add(getLocalizedSmallText("check.last_name", "Last name"), 1, 1);
-		nameTable.add(getLocalizedSmallText("check.first_name", "First name"), 2, 1);
-		nameTable.add(getText(child.getLastName()), 1, 2);
-		nameTable.add(getText(child.getFirstName()), 2, 2);
-		childTable.add(nameTable, 1, 1);
+		childTable.add(getSmallHeader(localize("check.name", "Name") + ":"), 1, row);
+		childTable.add(getSmallText(child.getNameLastFirst(true)), 2, row++);
 
 		Address address = getCheckBusiness(iwc).getUserAddress(child);
 		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(child);
 		if (address != null) {
-			Table addressTable = new Table(2, 2);
-			addressTable.setWidth(400);
-			addressTable.setCellspacing(2);
-			addressTable.setCellpadding(4);
-			addressTable.setColor(1, 1, getBackgroundColor());
-			addressTable.setColor(2, 1, getBackgroundColor());
-			addressTable.add(getLocalizedSmallText("check.street", "Street address"), 1, 1);
-			addressTable.add(getLocalizedSmallText("check.postnumber.city", "Postnumber and city"), 2, 1);
-			addressTable.add(getText(address.getStreetName() + " " + address.getStreetNumber()), 1, 2);
+			childTable.add(getSmallHeader(localize("check.address", "Address") + ":"), 1, row);
+			childTable.add(getSmallText(address.getStreetAddress()), 2, row);
 			if ( code != null )
-				addressTable.add(getText(code.getPostalCode() + " " + code.getName()), 2, 2);
-
-			childTable.setRows(2);
-			childTable.add(addressTable, 1, 2);
+				childTable.add(getSmallText(", " + code.getPostalCode() + " " + code.getName()), 2, row);
 		}
+		row++;
 
 		return childTable;
 	}
-
-	private Table getChildcareTypeTable(IWContext iwc) throws RemoteException {
+	
+	private Table getChildcareTypeTable(IWContext iwc) throws Exception {
 		Table childCareTypeTable = new Table();
-		childCareTypeTable.setWidth("100%");
+		childCareTypeTable.setCellpadding(2);
 		childCareTypeTable.setCellspacing(0);
-		childCareTypeTable.setCellpadding(4);
+		childCareTypeTable.setWidth(1, "170");
+		int row = 1;
 
+		childCareTypeTable.add(getSmallHeader(localize("check.request_regarding", "The request regards") + ":"), 1, row);
+		
 		SchoolTypeBusiness schoolTypeBusiness = (SchoolTypeBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolTypeBusiness.class);
 		Collection childCareTypes = schoolTypeBusiness.findAllSchoolTypesForChildCare();
 
-		DropdownMenu typeChoice = new DropdownMenu(PARAM_CHILD_CARE_TYPE);
+		DropdownMenu typeChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_CHILD_CARE_TYPE));
 		Iterator iter = childCareTypes.iterator();
 		
 		while (iter.hasNext()) {
@@ -278,7 +324,7 @@ public class CheckRequestForm extends CommuneBlock {
 			}
 			typeChoice.addMenuElement(st.getPrimaryKey().toString(), name);
 		}
-		childCareTypeTable.add(typeChoice, 1, 1);
+		childCareTypeTable.add(typeChoice, 2, row);
 
 		if (this.paramErrorChildCateType) {
 			childCareTypeTable.add(getSmallErrorText(localize("check.child_care_type_error", "You must select child care type")), 2, 1);
@@ -289,9 +335,9 @@ public class CheckRequestForm extends CommuneBlock {
 
 	private Table getCustodianTable(IWContext iwc) throws Exception {
 		Table custodianTable = new Table();
-		custodianTable.setWidth("100%");
+		custodianTable.setCellpadding(2);
 		custodianTable.setCellspacing(0);
-		custodianTable.setCellpadding(3);
+		custodianTable.setWidth(1, "170");
 
 		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(child);
 		if (coll != null) {
@@ -301,30 +347,33 @@ public class CheckRequestForm extends CommuneBlock {
 			while (iter.hasNext()) {
 				User parent = (User) iter.next();
 
-				custodianTable.add(getLocalizedSmallText("check.last_and_first_name", "Last and first name"), 1, row);
-				custodianTable.add(getLocalizedSmallText("check.phone_daytime", "Phone daytime"), 2, row);
-				custodianTable.add(getLocalizedSmallText("check.civil_status", "Civil status"), 3, row);
+				custodianTable.add(getLocalizedSmallHeader("check.name", "Last and first name"), 1, row);
+				custodianTable.add(getSmallText(parent.getNameLastFirst(true)), 2, row++);
+				
+				/*
+				custodianTable.add(getLocalizedSmallHeader("check.phone_daytime", "Phone daytime"), 1, row);
+				custodianTable.add(getSmallText(""), 2, row++);
+				*/
+
+				custodianTable.add(getLocalizedSmallHeader("check.civil_status", "Civil status"), 1, row);
+				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) )
+					custodianTable.add(getSmallText(localize("check.married", "Married")), 2, row++);
+				else
+					custodianTable.add(getSmallText(localize("check.un_married", "UnMarried")), 2, row++);
 
 				if ((row == 1 && this.paramErrorWorkSituation1) || (row == 2 && this.paramErrorWorkSituation2))
-					custodianTable.add(getSmallErrorText(localize("check.social_status", "Social status")), 4, row++);
+					custodianTable.add(getSmallErrorText(localize("check.social_status", "Social status")), 1, row);
 				else
-					custodianTable.add(getLocalizedSmallText("check.social_status", "Social status"), 4, row++);
-
-				custodianTable.add(getText(parent.getNameLastFirst()), 1, row);
-				//custodianTable.add(getText("08-633 54 67"), 2, row);
-				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) )
-					custodianTable.add(getLocalizedText("check.married", "Married"), 3, row);
-				else
-					custodianTable.add(getLocalizedText("check.un_married", "UnMarried"), 3,row);
-				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 4, row++);
+					custodianTable.add(getLocalizedSmallHeader("check.social_status", "Social status"), 1, row);
+				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 2, row++);
 
 				if (iter.hasNext()) {
-					row++;
+					custodianTable.setHeight(row++, 6);
 					parentNumber++;
 				}
 			}
 			if ( coll.size() == 1 ) {
-				custodianTable.add(new HiddenInput(PARAM_WORK_SITUATION+"2","-1"),4,row-1);
+				custodianTable.add(new HiddenInput(PARAM_WORK_SITUATION+"2","-1"),2,row-1);
 			}
 		} else {
 			custodianTable.add(getErrorText(localize("child.no_custodians_found", "No custodians found")));
@@ -335,41 +384,69 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private Table getMotherTongueTable(IWContext iwc) {
-		Table motherTongueTable = new Table(3, 2);
-		motherTongueTable.setWidth("100%");
+		Table motherTongueTable = new Table();
+		motherTongueTable.setCellpadding(2);
 		motherTongueTable.setCellspacing(0);
-		motherTongueTable.setCellpadding(4);
+		motherTongueTable.setWidth(1, "170");
+		int row = 1;
 
 		String title = localize("check.mother_child", "Mother - child");
 		if (this.paramErrorMotherTongueMC) {
-			motherTongueTable.add(getSmallErrorText(title), 1, 1);
-		} else {
-			motherTongueTable.add(getSmallText(title), 1, 1);
+			motherTongueTable.add(getSmallErrorText(title), 1, row);
 		}
+		else {
+			motherTongueTable.add(getSmallHeader(title), 1, row);
+		}
+		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_MOTHER_CHILD), 2, row++);
 
 		title = localize("check.father_child", "Father - child");
 		if (this.paramErrorMotherTongueFC) {
-			motherTongueTable.add(getSmallErrorText(title), 2, 1);
-		} else {
-			motherTongueTable.add(getSmallText(title), 2, 1);
+			motherTongueTable.add(getSmallErrorText(title), 1, row);
 		}
+		else {
+			motherTongueTable.add(getSmallHeader(title), 1, row);
+		}
+		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_FATHER_CHILD), 2, row++);
 
 		title = localize("check.parents", "Parents");
 		if (this.paramErrorMotherTongueP) {
-			motherTongueTable.add(getSmallErrorText(title), 3, 1);
-		} else {
-			motherTongueTable.add(getSmallText(title), 3, 1);
+			motherTongueTable.add(getSmallErrorText(title), 1, row);
 		}
-
-		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_MOTHER_CHILD), 1, 2);
-		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_FATHER_CHILD), 2, 2);
-		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_PARENTS), 3, 2);
+		else {
+			motherTongueTable.add(getSmallHeader(title), 1, row);
+		}
+		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_PARENTS), 2, row++);
 
 		return motherTongueTable;
 	}
 
+	private Table getProviderTable(IWContext iwc) throws RemoteException {
+		Table providersTable = new Table();
+		providersTable.setCellpadding(2);
+		providersTable.setCellspacing(0);
+		providersTable.setWidth(1, "170");
+		Collection providers = getProviders(iwc, "CHILDCARE");
+		int row = 1;
+		
+		String provider = localize(PARAM_PROVIDER, "Provider");
+		Text providerText = null;
+
+		for (int i = 1; i < 4; i++) {
+			DropdownMenu providerDrop = getProviderDrop(PARAM_PROVIDER + "_" + i, providers);
+			providerDrop.setAttribute("style", getSmallTextFontStyle());
+			providerText = getSmallHeader(provider + " " + i + ":");
+			providersTable.add(providerText, 1, row);
+			providersTable.add(providerDrop, 2, row++);
+			if (providerIDs[i-1] != -1)
+				providerDrop.setSelectedElement(providerIDs[i-1]);
+		}
+
+		return providersTable;
+	}
+	
 	private TextInput getMotherToungeInput(IWContext iwc, String parameterName) {
 		TextInput input = new TextInput(parameterName);
+		input.setAsNotEmpty(localize(parameterName,parameterName + "- Can not be empty"));
 		String parameterValue = iwc.getParameter(parameterName);
 		if (parameterValue != null) {
 			input.setValue(parameterValue);
@@ -378,7 +455,7 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private DropdownMenu getWorkSituationMenu(IWContext iwc, String parameterName) {
-		DropdownMenu workSituationChoice = new DropdownMenu(parameterName);
+		DropdownMenu workSituationChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(parameterName));
 		workSituationChoice.addMenuElement(1, localize("check.working", "Working"));
 		workSituationChoice.addMenuElement(2, localize("check.studying", "Studying"));
 		workSituationChoice.addMenuElement(3, localize("check.seeking_work", "Seeking work"));
@@ -391,6 +468,24 @@ public class CheckRequestForm extends CommuneBlock {
 		return (DropdownMenu) getStyledInterface(workSituationChoice);
 	}
 
+	private DropdownMenu getProviderDrop(String name, Collection providers) {
+		try {
+			DropdownMenu drp = new DropdownMenu(name);
+			drp.setAsNotEmpty(localize("check.incomplete_providers","Must fill out all providers"), "-1");
+			drp.addMenuElement("-1", localize("cca_provider", "Provider"));
+			Iterator iter = providers.iterator();
+			while (iter.hasNext()) {
+				School provider = (School) iter.next();
+				drp.addMenuElement(provider.getPrimaryKey().toString(), provider.getName());
+			}
+
+			return drp;
+		}
+		catch (java.rmi.RemoteException e) {
+			return null;
+		}
+	}
+
 	private CheckBusiness getCheckBusiness(IWContext iwc) throws Exception {
 		return (CheckBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, CheckBusiness.class);
 	}
@@ -398,4 +493,41 @@ public class CheckRequestForm extends CommuneBlock {
 	private MemberFamilyLogic getMemberFamilyLogic(IWContext iwc) throws Exception {
 		return (MemberFamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, MemberFamilyLogic.class);
 	}
+
+	private ChildCareBusiness getChildCareBusiness(IWContext iwc) throws Exception {
+		return (ChildCareBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
+	}
+
+	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws Exception {
+		return (SchoolCommuneBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
+	}
+
+	private Collection getProviders(IWContext iwc, String category) {
+		try {
+			SchoolBusiness sBuiz = (SchoolBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
+			//@todo Remove hardcoding
+			return sBuiz.findAllSchoolsByType(3);
+		}
+		catch (Exception ex) {
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the createChoices.
+	 * @return boolean
+	 */
+	public boolean createChoices() {
+		return _createChoices;
+	}
+
+	/**
+	 * Sets the createChoices.
+	 * @param createChoices The createChoices to set
+	 */
+	public void setCreateChoices(boolean createChoices) {
+		_createChoices = createChoices;
+	}
+
 }

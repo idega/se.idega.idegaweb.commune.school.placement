@@ -27,11 +27,14 @@ import com.idega.block.school.data.SchoolCategoryHome;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
+import com.idega.block.school.data.SchoolStudyPath;
+import com.idega.block.school.data.SchoolStudyPathHome;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
+import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -112,6 +115,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 	//private static final String KEY_ERROR_PAST_TIME = KP + "error.no_past_dates";
 
 	// Http request parameters  
+	private static final String PARAM_ACTION = "param_action";
+	private static final String PARAM_PRESENTATION = "param_presentation";
+
 	private static final String PARAM_SCHOOL_CATEGORY = "param_school_category";
 	private static final String PARAM_PROVIDER = "param_provider";
 	private static final String PARAM_ACTIVITY = "param_activity";
@@ -121,16 +127,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String PARAM_PLACEMENT_DATE = "param_placement_date";
 	private static final String PARAM_RESOURCES = "param_resources";
 	//private static final String PARAM_HIDDEN_SUBMIT_SRC = "param_hidden_submit_src";
-	private static final String PARAM_ACTION = "param_action";
-	private static final String PARAM_PRESENTATION = "param_presentation";
 	// PARAM_BACK is used in SearchUserModule
 	public static final String PARAM_BACK = "param_back";
 	private static final String PARAM_PAYMENT_BY_AGREEMENT = "payment_by_agreement";
 	private static final String PARAM_PAYMENT_BY_INVOICE = "payment_by_invoice";
 	//private static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
 	private static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
-	private static final String PARAM_PLACE_PUPIL = "place_pupil";
+	private static final String PARAM_PLACE = "place_pupil";
 	private static final String PARAM_CANCEL = "cancel";
+	private static final String PARAM_STUDY_PATH = "study_path";
 
 	// Actions
 	private static final int ACTION_REMOVE_SESSION_CHILD = 1;
@@ -528,6 +533,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		// Study Path input
 		table.add(getSmallHeader(localize(KEY_STUDY_PATH_LABEL, "Study path: ")), col++, row);
+		table.add(getStudyPathsDropdown(iwc), col++, row);
 		row++;
 		col = 1;
 		table.add(transGIF, col, row); // EMPTY SPACE ROW
@@ -587,7 +593,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Invoice interval
 		rowTable.add(getSmallHeader(localize(KEY_INVOICE_INTERVAL_LABEL, "Invoice interval: ")),
 																													tmpCol++, tmpRow);
-		rowTable.add(getInvcIntervalDropdown(PARAM_INVOICE_INTERVAL), tmpCol++, tmpRow);
+		rowTable.add(getInvcIntervalDropdown(), tmpCol++, tmpRow);
 		// BUTTON Regular payment 
 		rowTable.add(new SubmitButton(
 				iwrb.getLocalizedImageButton(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")),
@@ -618,12 +624,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		row++;		
 		// BOTTOM BUTTONS
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-																KEY_BUTTON_PLACE, "Place")), col++, row);
-				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-																KEY_BUTTON_CANCEL, "Cancel")), col++, row);
-				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+			// Place
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_PLACE, "Place"), 
+								PARAM_PLACE, String.valueOf(PRESENTATION_SEARCH_FORM)), col++, row);
+			// Cancel		
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel"),
+								PARAM_CANCEL, String.valueOf(PRESENTATION_SEARCH_FORM)), col++, row);
 
 
 		return table;
@@ -678,13 +684,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 		try {
 			SchoolCategoryHome schCatHome = getSchoolBusiness(iwc).getSchoolCategoryHome();
 			SchoolCategory elementary = schCatHome.findElementarySchoolCategory();
-			SchoolCategory collage = schCatHome.findCollegeCategory();
+			SchoolCategory highSchool = schCatHome.findHighSchoolCategory();
 			schoolCats.addMenuElement(
 				(String) elementary.getPrimaryKey(),
 				localize(elementary.getLocalizedKey(), "Elementary school"));
 			schoolCats.addMenuElement(
-				(String) collage.getPrimaryKey(),
-				localize(collage.getLocalizedKey(), "Collage"));
+				(String) highSchool.getPrimaryKey(),
+				localize(highSchool.getLocalizedKey(), "High School"));
 			if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
 				schoolCats.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_CATEGORY));
 		} catch (Exception e) {
@@ -822,14 +828,38 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return yesNo;
 	}
 	
-	private DropdownMenu getInvcIntervalDropdown(String param) {
-		DropdownMenu drop = new DropdownMenu(param);
+	private DropdownMenu getInvcIntervalDropdown() {
+		DropdownMenu drop = new DropdownMenu(PARAM_INVOICE_INTERVAL);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		drop.addMenuElement(KEY_DROPDOWN_TERM, localize(KEY_DROPDOWN_TERM, "Term"));
 		drop.addMenuElement(KEY_DROPDOWN_MONTH, localize(KEY_DROPDOWN_MONTH, "Month"));
 		drop.addMenuElement(KEY_DROPDOWN_YEAR, localize(KEY_DROPDOWN_YEAR, "Year"));
 		return drop;		
 	}
+	
+	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
+		DropdownMenu studyPath = new DropdownMenu(PARAM_STUDY_PATH);
+		studyPath.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
+
+		String schoolIdStr = iwc.getParameter(PARAM_PROVIDER);
+		String schTypeIdStr = iwc.getParameter(PARAM_ACTIVITY);		
+		if (schoolIdStr != null && schTypeIdStr != null) {
+			Integer schTypePK = new Integer(schTypeIdStr);
+			try {
+				School school = getSchoolBusiness(iwc).getSchool(new Integer(schoolIdStr));
+				Collection coll = getStudyPathHome().findStudyPaths(school, schTypePK);
+				for (Iterator iter = coll.iterator(); iter.hasNext();) {
+					SchoolStudyPath element = (SchoolStudyPath) iter.next();
+					int studyPathID = ((Integer) element.getPrimaryKey()).intValue();
+					studyPath.addMenuElement(studyPathID, element.getCode());
+				}		
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}	
+		return studyPath;
+	}
+	
 
 	private DateInput getPlacementDateInput() {
 		DateInput dInput = new DateInput(PARAM_PLACEMENT_DATE);
@@ -877,6 +907,20 @@ public class CentralPlacementEditor extends CommuneBlock {
 		iwc.getSession().removeAttribute(SESSION_KEY_CHILD);
 		child = null;
 	}
+	
+/*	private SchoolClassMember storePlacement(IWContext iwc, int studentID, int schoolClassID, 
+							Timestamp registerDate, int registrator, String notes) throws RemoteException {
+
+		return getCentralPlacementBusiness(iwc).storeSchoolClassMember(iwc, studentID, schoolClassID, 
+																									registerDate, registrator, notes);																										
+	}*/
+
+/*	private CentralPlacementBusinessBean getCentralPlacementBusiness(IWContext iwc) 
+																										throws RemoteException {
+		return (CentralPlacementBusinessBean) 
+					IBOLookup.getServiceInstance(iwc, CentralPlacementBusinessBean.class);
+	}*/
+
 
 	private CommuneUserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (CommuneUserBusiness) 
@@ -905,5 +949,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {
 		return (ResourceBusiness) IBOLookup.getServiceInstance(iwc, ResourceBusiness.class);
 	}
+	
+	public SchoolStudyPathHome getStudyPathHome() throws java.rmi.RemoteException {
+		return (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+	}
+
 
 }

@@ -6,16 +6,12 @@
  */
 package se.idega.idegaweb.commune.school.presentation;
 
-import is.idega.idegaweb.member.presentation.UserSearcher;
-
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
-import se.idega.idegaweb.commune.accounting.presentation.AccountingBlock;
-import se.idega.idegaweb.commune.accounting.presentation.ApplicationForm;
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
@@ -23,7 +19,6 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareBusinessBean;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
-import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -34,12 +29,10 @@ import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
-import com.idega.core.location.data.Address;
-import com.idega.core.contact.data.Phone;
-import com.idega.idegaweb.IWBundle;
-import com.idega.idegaweb.IWResourceBundle;
 import com.idega.business.IBOLookup;
-
+import com.idega.core.contact.data.Phone;
+import com.idega.core.location.data.Address;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
@@ -49,8 +42,6 @@ import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
-import com.idega.presentation.ui.GenericButton;
-import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
@@ -91,7 +82,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_COMMUNE_LABEL = KP + "commune_label";
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
 	private static final String KEY_PLACEMENT_PARAGRAPH_LABEL = "placement_paragraph_label";
-	private static final String KEY_GROUP_LABEL = KP + "group_label";
+	//private static final String KEY_GROUP_LABEL = KP + "group_label";
 	private static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = 
 																								KP + "Payment by agreement: ";
 	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "Invoice interval: ";
@@ -104,11 +95,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_DROPDOWN_YEAR = KP + "dropdown_year";
 	
 	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
-	private static final String KEY_BUTTON_BACK = KP + "button_back";
+	//private static final String KEY_BUTTON_BACK = KP + "button_back";
 	private static final String KEY_BUTTON_REGULAR_PAYMENT = KP + "button_regular_payment";
 	private static final String KEY_BUTTON_PLACEMENT_HISTORY = KP + "placement_history";
 	private static final String KEY_BUTTON_PUPIL_OVERVIEW = KP + "pupil_overview";
-	private static final String KEY_BUTTON_NEW_PROVIDER = KP + "button_new_provider";
+	//private static final String KEY_BUTTON_NEW_PROVIDER = KP + "button_new_provider";
 	private static final String KEY_BUTTON_CONTRACT_HISTORY = KP + "button_contract_history";
 	private static final String KEY_BUTTON_NEW_GROUP = KP + "button_new_group";	
 
@@ -116,7 +107,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_SCHOOL_GROUP = KP + "school_group";
 
 	//  Keys for error messages
-	private static final String KEY_ERROR_PAST_TIME = KP + "error.no_past_dates";
+	//private static final String KEY_ERROR_PAST_TIME = KP + "error.no_past_dates";
 
 	// Http request parameters  
 	private static final String PARAM_SCHOOL_CATEGORY = "param_school_category";
@@ -124,17 +115,17 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String PARAM_ACTIVITY = "param_activity";
 	private static final String PARAM_SCHOOL_YEAR = "param_school_year";
 	private static final String PARAM_SCHOOL_GROUP = "param_school_group";
-	private static final String PARAM_STUDY_PATH = "param_study_path";
+	//private static final String PARAM_STUDY_PATH = "param_study_path";
 	private static final String PARAM_PLACEMENT_DATE = "param_placement_date";
 	private static final String PARAM_RESOURCES = "param_resources";
-	private static final String PARAM_HIDDEN_SUBMIT_SRC = "param_hidden_submit_src";
+	//private static final String PARAM_HIDDEN_SUBMIT_SRC = "param_hidden_submit_src";
 	private static final String PARAM_ACTION = "param_action";
 	private static final String PARAM_PRESENTATION = "param_presentation";
 	// PARAM_BACK is used in SearchUserModule
 	public static final String PARAM_BACK = "param_back";
 	private static final String PARAM_PAYMENT_BY_AGREEMENT = "payment_by_agreement";
 	private static final String PARAM_PAYMENT_BY_INVOICE = "payment_by_invoice";
-	private static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
+	//private static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
 	private static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
 
 	// Actions
@@ -158,29 +149,28 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	// Instance variables
 	private IWResourceBundle iwrb;
-	private IWBundle iwb;
+	//private IWBundle iwb;
 	private Form form;
 	private Table mainTable;
 	private User child;
 	private String uniqueUserSearchParam;
 	private Address address;
-	private boolean hasChild = false;
-	private ApplicationForm appForm;
+	//private boolean hasChild = false;
+	//private ApplicationForm appForm;
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
-	private String errMsgBottom = null;
+	//private String errMsgBottom = null;
 	// Form status variables
-	private String categoryStatus = "-1";
-	private String providerStatus = "-1";
-	private String activityStatus = "-1";
-	private String yearStatus = "-1";
-	private String groupStatus = "-1";
+	//private String categoryStatus = "-1";
+	//private String providerStatus = "-1";
+	//private String activityStatus = "-1";
+	//private String yearStatus = "-1";
+	//private String groupStatus = "-1";
 
 	private int _action = -1;
 	private int _presentation = -1;
 
 	public void main(IWContext iwc) throws Exception {
-		iwb = getBundle(iwc);
 		iwrb = getResourceBundle(iwc);
 		// Parameter name returning chosen User from SearchUserModule
 		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
@@ -189,21 +179,20 @@ public class CentralPlacementEditor extends CommuneBlock {
 		parse(iwc);
 
 		// Borgman test
-		String testParam = iwc.getParameter(PARAM_BACK);
-		String searchCommitted =
-			iwc.getParameter(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX);
+		//String testParam = iwc.getParameter(PARAM_BACK);
+		//String searchCommitted = iwc.getParameter(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX);
 
-		String first = iwc.getParameter("usrch_search_fname" + UNIQUE_SUFFIX);
-		String middle = iwc.getParameter("usrch_search_mname" + UNIQUE_SUFFIX);
-		String last = iwc.getParameter("usrch_search_lname" + UNIQUE_SUFFIX);
-		String pid = iwc.getParameter("usrch_search_pid" + UNIQUE_SUFFIX);
-		String uID = iwc.getParameter("usrch_user_id_" + UNIQUE_SUFFIX);
-		String uID2 = iwc.getParameter(uniqueUserSearchParam);
+		//String first = iwc.getParameter("usrch_search_fname" + UNIQUE_SUFFIX);
+		//String middle = iwc.getParameter("usrch_search_mname" + UNIQUE_SUFFIX);
+		//String last = iwc.getParameter("usrch_search_lname" + UNIQUE_SUFFIX);
+		//String pid = iwc.getParameter("usrch_search_pid" + UNIQUE_SUFFIX);
+		//String uID = iwc.getParameter("usrch_user_id_" + UNIQUE_SUFFIX);
+		//String uID2 = iwc.getParameter(uniqueUserSearchParam);
 
-		String act = iwc.getParameter(PARAM_ACTION);
-		String pres = iwc.getParameter(PARAM_PRESENTATION);
+		//String act = iwc.getParameter(PARAM_ACTION);
+		//String pres = iwc.getParameter(PARAM_PRESENTATION);
 
-		String uniqueStr = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
+		//String uniqueStr = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
 
 		// Perform actions according the _action input parameter
 		switch (_action) {
@@ -835,11 +824,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		throws RemoteException {
 		try {
 			final SchoolSeason season = getSchoolChoiceBusiness(iwc).getCurrentSeason();
-			int childID = ((Integer) child.getPrimaryKey()).intValue();
+			//int childID = ((Integer) child.getPrimaryKey()).intValue();
 			//final SchoolClassMember placement = 
 			//    getSchoolBusiness(iwc).getSchoolClassMemberHome().findByUserAndSeason(childID, 2);
 			final SchoolClassMember placement =
-				getSchoolBusiness(iwc).getSchoolClassMemberHome().findByUserAndSeason(child, season);
+				getSchoolBusiness(iwc).getSchoolClassMemberHome().findByUserAndSeason(user, season);
 			return (null == placement || null != placement.getRemovedDate()) ? null : placement;
 		} catch (final FinderException e) {
 			return null;
@@ -881,11 +870,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwc, SchoolChoiceBusiness.class);
 	}
 
-	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) 
+	/*private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) 
 																										throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, 
 																								SchoolCommuneBusiness.class);
-	}
+	}*/
 
 	private ChildCareBusinessBean getChildCareBusiness(IWContext iwc) throws RemoteException {
 		return (ChildCareBusinessBean)

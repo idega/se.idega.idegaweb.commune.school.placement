@@ -476,7 +476,7 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private DropdownMenu getProviderDrop(String name, Collection providers) {
-		try {
+//		try {
 			DropdownMenu drp = new DropdownMenu(name);
 			drp.setAsNotEmpty(localize("check.incomplete_providers","Must fill out all providers"), "-1");
 			drp.addMenuElement("-1", localize("cca_provider", "Provider"));
@@ -487,10 +487,10 @@ public class CheckRequestForm extends CommuneBlock {
 			}
 
 			return drp;
-		}
-		catch (java.rmi.RemoteException e) {
-			return null;
-		}
+//		}
+//		catch (java.rmi.RemoteException e) {
+//			return null;
+//		}
 	}
 	
 	private Table getChildCareTable(IWContext iwc) {

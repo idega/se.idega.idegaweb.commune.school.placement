@@ -279,9 +279,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.setColumns(table.getColumns() - 1);
 		}
 
-		String[] validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+		String[] validStatuses = null;
 		//if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
-
+		if (showStatistics) {
+			validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+		}
+		else
+			validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+				
 		List applicants = new ArrayList(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString));
 		int applicantsSize = applicants.size();
 
@@ -345,7 +350,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		Link link;
 
 		if (!applicants.isEmpty()) {
-			Map studentMap = getBusiness().getUserMapFromChoices(applicants);
+			Map studentMap = getBusiness().getUserMapFromChoices(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolQuery(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString));
 			Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			SchoolChoice choice;
 			School school;

@@ -462,9 +462,13 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = applicant.getName();
 
-				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
+				if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR_THIS_SCHOOL);
-				} else {
+				}
+				else if (choice.getChoiceOrder() > 1) {
+					table.setRowColor(row, HAS_REJECTED_FIRST_CHOICE_COLOR);
+				}
+				else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
 					else
@@ -758,7 +762,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				}
 				
 				//boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
-				boolean hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				boolean hasChoice = getBusiness().hasChoicesForSeason(studentMember.getClassMemberId(), getSchoolSeasonID());
 				boolean hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				
 				if (hasMoveChoice) {

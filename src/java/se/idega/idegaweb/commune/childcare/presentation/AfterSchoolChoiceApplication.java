@@ -27,8 +27,6 @@ import com.idega.core.location.data.Address;
 import com.idega.data.IDOCreateException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Page;
-import com.idega.presentation.Script;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Text;

@@ -1551,7 +1551,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private SelectDropdownDouble getDropdown(IWContext iwc) throws RemoteException {
 		SchoolClassDropdownDouble dropdown = new SchoolClassDropdownDouble(getSchoolCommuneSession(iwc).getParameterSchoolYearID(), getSchoolCommuneSession(iwc).getParameterSchoolClassID());
-
+		dropdown.setSelectedValues(String.valueOf(getSchoolCommuneSession(iwc).getSchoolYearID()), String.valueOf(getSchoolCommuneSession(iwc).getSchoolClassID()));
+		
 		try {
 			if (getSchoolCommuneSession(iwc).getSchoolID() != -1) {
 				Collection years = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolYearsInSchool(getSchoolCommuneSession(iwc).getSchoolID());
@@ -1690,7 +1691,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void moveGroup(IWContext iwc) throws RemoteException {
-		getSchoolCommuneBusiness(iwc).moveToGroup(_userID, _schoolClassID, getSchoolCommuneSession(iwc).getSchoolClassID());
+		getSchoolCommuneBusiness(iwc).moveToGroup(_userID, _schoolClassID, getSchoolCommuneSession(iwc).getSchoolClassID(), _schoolYearID);
 		URLUtil URL = new URLUtil(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 		if (!_showNoChoices)
 			URL.addParameter(SchoolClassEditor.PARAMETER_ACTION, SchoolClassEditor.ACTION_SAVE);

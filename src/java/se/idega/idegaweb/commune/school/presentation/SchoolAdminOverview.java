@@ -448,7 +448,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(getSmallErrorText(localize("school.replace_date", "Replace date") + ":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 1, row);
 		table.add(input, 1, row++);
 
-		table.add(getNavigationTable(iwc), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":"), 1, row++);
 
 		//if (_protocol)
 		table.add(getSmallHeader(localize("school.replace_reason", "Replace reason") + ":"), 1, row);
@@ -525,7 +525,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
 
-		table.add(getNavigationTable(iwc), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":"), 1, row++);
 
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -568,14 +568,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
-	protected Table getNavigationTable(IWContext iwc) throws RemoteException {
+	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
 		Table table = new Table(7, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setWidth(2, "8");
 		table.setWidth(5, "8");
 
-		table.add(getSmallHeader(localize("school.replace_to", "Replace to") + ":"), 1, 1);
+		table.add(getSmallHeader(heading), 1, 1);
 		table.add(getSmallHeader(localize("school.year", "Year") + ":" + Text.NON_BREAKING_SPACE), 3, 1);
 		table.add(getSchoolYears(iwc), 4, 1);
 		table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 6, 1);

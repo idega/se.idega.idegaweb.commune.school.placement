@@ -161,7 +161,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolClassID = -1;
 	private int _schoolYearID = -1;
 	private int _schoolClassMemberID = -1;
-
+	
 	private boolean _protocol = true;
 	//private boolean _move = true;
 	private boolean _showOnlyOverview = false;
@@ -1456,21 +1456,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		// *** Native language ***
 		table.add(getSmallHeader(localize("school.native_language", "Native language")), 1, row);
-		table.add(getNativeLanguagesDropdown(iwc), 2, row);
+		table.add(Text.getNonBrakingSpace(6), 1, row);
+		table.add(getNativeLanguagesDropdown(iwc), 1, row);
 		row++;
-		table.add(Text.getNonBrakingSpace(), 1, row);
 		row++;
 		
 		// *** Button row ***
 		SubmitButton setButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.set", "Set"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
 		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_SAVE_NATIVE_LANGUAGE)), 1, row);
 		table.add(setButton, 1, row);
+		
 		table.add(Text.getNonBrakingSpace(), 1, row);
 
 		SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
 		backButton.setValueOnClick(PARAMETER_ACTION, "-1");
 		table.add(backButton, 1, row);
+		
 		table.add(Text.getNonBrakingSpace(), 1, row);
+		
+		if (!_fromCentralPlacementEditor) {
+			table.add(close, 1, row);
+		}
 		
 		row++;
 		// *** Bottom&Right table space ***

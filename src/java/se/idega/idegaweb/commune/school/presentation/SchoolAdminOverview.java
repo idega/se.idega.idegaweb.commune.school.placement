@@ -222,18 +222,29 @@ public class SchoolAdminOverview extends CommuneBlock {
 						User parent = (User) iter.next();
 						table.add(getSmallText(parent.getNameLastFirst(true)), 2, row);
 						try {
+							Phone phone = getCommuneUserBusiness(iwc).getUsersHomePhone(parent);
+							if (phone != null && phone.getNumber() != null) {
+								table.add(new Break(), 2, row);
+								table.add(getSmallText(localize("school.phone","Phone")+": "), 2, row);
+								table.add(getSmallText(phone.getNumber()), 2, row);
+							}
+						}
+						catch (NoPhoneFoundException npf) {
+						}
+						try {
 							Email email = getCommuneUserBusiness(iwc).getUsersMainEmail(parent);
 							if (email != null && email.getEmailAddress() != null) {
-								table.add(getSmallText(", "), 2, row);
 								Link emailLink = this.getSmallLink(email.getEmailAddress());
 								emailLink.setURL("mailto:"+email.getEmailAddress());
+								table.add(new Break(), 2, row);
+								table.add(getSmallText(localize("school.email","E-mail")+": "), 2, row);
 								table.add(emailLink, 2, row);
 							}
 						}
 						catch (NoEmailFoundException nef) {
 						}
 						if (iter.hasNext())
-							table.add(new Break(), 2, row);
+							table.add(new Break(2), 2, row);
 					}
 				}
 				row++;

@@ -153,14 +153,16 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		if (useStyleNames()) {
 			table.setColumns(5);
 		}
-		table.setWidth(6, "12");
+		table.setWidth(table.getColumns(), "12");
 		//table.setWidth(7, "12");
 		int row = 1;
 		int column = 1;
 
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
-		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
+		if (!useStyleNames()) {
+			table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
+		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		table.add(getSmallHeader(localize("school.class", "Class")), column++, row);
 		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), column, row);

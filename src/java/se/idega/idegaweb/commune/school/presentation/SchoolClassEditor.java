@@ -1002,7 +1002,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
-		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
+		if (!useStyleNames()) {
+			table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
+		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), column++, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), column++, row);

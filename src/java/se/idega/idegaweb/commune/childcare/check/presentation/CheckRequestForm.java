@@ -283,6 +283,7 @@ public class CheckRequestForm extends CommuneBlock {
 		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(child);
 		if (coll != null) {
 			int row = 1;
+			int parentNumber = 1;
 			Iterator iter = coll.iterator();
 			while (iter.hasNext()) {
 				User parent = (User) iter.next();
@@ -297,12 +298,16 @@ public class CheckRequestForm extends CommuneBlock {
 					custodianTable.add(getLocalizedSmallText("check.social_status", "Social status"), 4, row++);
 
 				custodianTable.add(getText(parent.getNameLastFirst()), 1, row);
-				custodianTable.add(getText("08-633 54 67"), 2, row);
-				custodianTable.add(getText("Gift"), 3, row);
-				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(row)), 4, row++);
+				//custodianTable.add(getText("08-633 54 67"), 2, row);
+				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) )
+					custodianTable.add(getText("Gift"), 3, row);
+				else
+					custodianTable.add(getText("Ugift"), 3,row);
+				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 4, row++);
 
 				if (iter.hasNext()) {
 					row++;
+					parentNumber++;
 				}
 			}
 		} else {

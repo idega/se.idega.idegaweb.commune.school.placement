@@ -774,7 +774,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(getSmallErrorText(localize("school.replace_date", "Replace date") + ":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 1, row);
 		table.add(input, 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":", false), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":", true), 1, row++);
 
 		//if (_protocol)
 		table.add(getSmallHeader(localize("school.replace_reason", "Replace reason") + ":"), 1, row);

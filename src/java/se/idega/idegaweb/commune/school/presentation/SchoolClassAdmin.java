@@ -145,6 +145,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.setWidth(7, "12");
 		int row = 1;
 		
+		/*
 		Table addTable = new Table(3,1);
 		addTable.setCellpadding(0);
 		addTable.setCellspacing(0);
@@ -162,6 +163,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
 		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		addTable.add(addLinkText, 3, 1);
+		*/
 
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);

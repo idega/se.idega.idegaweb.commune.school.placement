@@ -28,6 +28,7 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.Name;
 
 /**
  * Title:
@@ -257,7 +258,8 @@ public class CheckRequestForm extends CommuneBlock {
 				*/
 				String childcareThisSchool = iwc.getParameter(PARAM_CHILDCARE_THIS);
 				if (childcareThisSchool != null) {
-					Object[] arguments = { child.getNameLastFirst(true) };
+					Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+					Object[] arguments = { name.getName(iwc.getApplicationSettings().getDefaultLocale(), true) };
 					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().setChildcarePreferences(iwc.getCurrentUser(),((Integer)child.getPrimaryKey()).intValue(), Boolean.valueOf(childcareThisSchool).booleanValue(), iwc.getParameter(PARAM_CHILDCARE_OTHER), localize("check.student_childcare_other","Application for childcare outside of chosen school"), MessageFormat.format(localize("check.student_childcare_other_body","The following student has applied for childcare outside of the chosen school"), arguments));
 				}
 			}
@@ -331,7 +333,8 @@ public class CheckRequestForm extends CommuneBlock {
 		int row = 1;
 
 		childTable.add(getSmallHeader(localize("check.name", "Name") + ":"), 1, row);
-		childTable.add(getSmallText(child.getNameLastFirst(true)), 2, row++);
+		Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+		childTable.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row++);
 
 		childTable.add(getSmallHeader(localize("check.personal_id", "Personal ID") + ":"), 1, row);
 		childTable.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), 2, row++);
@@ -407,7 +410,8 @@ public class CheckRequestForm extends CommuneBlock {
 				User parent = (User) iter.next();
 
 				custodianTable.add(getLocalizedSmallHeader("check.name", "Last and first name"), 1, row);
-				custodianTable.add(getSmallText(parent.getNameLastFirst(true)), 2, row++);
+				Name name = new Name(parent.getFirstName(), parent.getMiddleName(), parent.getLastName());
+				custodianTable.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row++);
 				
 				/*
 				custodianTable.add(getLocalizedSmallHeader("check.phone_daytime", "Phone daytime"), 1, row);

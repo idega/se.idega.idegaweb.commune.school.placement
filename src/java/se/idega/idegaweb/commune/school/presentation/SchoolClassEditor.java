@@ -1,6 +1,7 @@
 package se.idega.idegaweb.commune.school.presentation;
 
 import java.rmi.RemoteException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -212,6 +213,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.add(getSearchAndSortTable(), 1, 3);
 
 		table.add(getApplicationTable(iwc), 1, 5);
+
 		table.add(getLegendTable(true), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
@@ -415,6 +417,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
 		table.add(new HiddenInput(PARAMETER_DELETE_CHOICE_ID, "-1"), column, row);
 
+		Date from = null;
+		Date to = null;
+		try {
+			from = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceStartDate().getDate();
+			to = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceEndDate().getDate();
+		} catch (FinderException e) {
+			log(e);
+		}
+
 		if (!applicants.isEmpty()) {
 			SchoolChoice choice;
 			School school;
@@ -467,6 +478,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				}
 				else if (choice.getChoiceOrder() > 1) {
 					table.setRowColor(row, HAS_REJECTED_FIRST_CHOICE_COLOR);
+				}
+				else if (choice.getSchoolChoiceDate().before(from) || choice.getSchoolChoiceDate().after(to)) {
+					table.setRowColor(row, HAS_MOVED_TO_COMMUNE_COLOR);
 				}
 				else {
 					if (row % 2 == 0)
@@ -583,6 +597,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				// getSchoolChoiceHome().getCount(getSchoolID(),
 				// getSchoolSeasonID(), -1, new int[] {}, unhandledStatuses,
 				// "");
+								
+				int allApplSizeNewCitizens = getSchoolChoiceHome().getCountOutsideInterval(getSchoolID(), getSchoolSeasonID(), -1, new int[]{}, allStatuses, "", from, to);
+				int handledApplSizeNewCitizens = getSchoolChoiceHome().getCountOutsideInterval(getSchoolID(), getSchoolSeasonID(), -1, new int[]{}, handledStatuses, "", from, to);
+				int firstApplSizeNewCitizens = getSchoolChoiceHome().getCountOutsideInterval(getSchoolID(), getSchoolSeasonID(), -1, new int[]{1}, validStatuses, "", from, to);
+				int secondApplSizeNewCitizens = getSchoolChoiceHome().getCountOutsideInterval(getSchoolID(), getSchoolSeasonID(), -1, new int[]{2}, validStatuses, "", from, to);
+				int thirdApplSizeNewCitizens = getSchoolChoiceHome().getCountOutsideInterval(getSchoolID(), getSchoolSeasonID(), -1, new int[]{3}, validStatuses, "", from, to);
 
 				Table statTable = new Table();
 				int sRow = 1;
@@ -636,6 +656,27 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				statTable.add(getSmallText(localize("handled_moves", "Handled moves") + ":"), 1, sRow);
 				statTable.add(getSmallText("" + (handledMoves)), 2, sRow++);
+
+				statTable.add(getSmallText("&nbsp;"), 1, sRow);
+				statTable.add(getSmallText("&nbsp;"), 2, sRow++);
+
+				statTable.add(getSmallText(localize("applications_all_new_citizens", "All applications new citizens") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + allApplSizeNewCitizens), 2, sRow++);
+
+				statTable.add(getSmallText(localize("applications_handled_new_citizens", "Handled applications new citizens") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + handledApplSizeNewCitizens), 2, sRow++);
+
+				statTable.add(getSmallText(localize("applications_on_first_choice_new_citizens", "Applications on first choice new citizens") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + firstApplSizeNewCitizens), 2, sRow++);
+
+				statTable.add(getSmallText(localize("applications_on_second_choice_new_citizens", "Applications on second choice new citizens") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + secondApplSizeNewCitizens), 2, sRow++);
+
+				statTable.add(getSmallText(localize("applications_on_third_choice_new_citizens", "Applications on third choice new citizens") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + thirdApplSizeNewCitizens), 2, sRow++);
+				
+				statTable.add(getSmallText("&nbsp;"), 1, sRow);
+				statTable.add(getSmallText("&nbsp;"), 2, sRow++);
 
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(statTable, 1, row);
@@ -1071,7 +1112,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		return table;
 	}
 
-	protected Table getChoiceHeader() throws RemoteException {
+	protected Table getChoiceHeader() {
 		Table table = new Table(2, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -1079,9 +1120,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 
 		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 1);
-		table.add(getSmallHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID(), getBusiness().getGradeForYear(getSchoolYearID()) - 1))), 2, 1);
-		table.add(getSmallHeader(" / "), 2, 1);
-		table.add(getSmallHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID()))), 2, 1);
+//		table.add(getSmallHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID(), getBusiness().getGradeForYear(getSchoolYearID()) - 1))), 2, 1);
+//		table.add(getSmallHeader(" / "), 2, 1);
+//		table.add(getSmallHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID()))), 2, 1);
 
 		return table;
 	}

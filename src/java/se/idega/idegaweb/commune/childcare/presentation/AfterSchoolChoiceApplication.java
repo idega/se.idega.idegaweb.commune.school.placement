@@ -63,6 +63,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String PARAM_MESSAGE = "ccas_message";
 	private final static String PARAM_SEND_TO_CHECK = "ccas_send_to_check";
 	
+	private static final String EARLIESTSTARTDATE_DEFAULT = "The earliest possible placement date is: ";
+	private static final String EARLIESTSTARTDATE_KEY = "ccas_earlyStartDate";
+	
+	
 	private final static String PROVIDERS = "ccas_providers";
 	private final static String NAME = "ccas_name";
 	private final static String PID = "ccas_pid";
@@ -193,8 +197,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			submit.setOnSubmitFunction("checkApplication", getSubmitCheckScript());
 			form.setToDisableOnSubmit(submit, true);
-			
-
+		
 			if (submit.getDisabled()) {
 				row++;
 				table.setHeight(row++, 6);
@@ -362,10 +365,12 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				inputTable.add(dropdown, 3, row++);
 
 				DateInput date = (DateInput) getStyledInterface(new DateInput(PARAM_DATE + "_" + i));
+				//date.setAsNotEmpty(localize(EMPTYSTARTDATE_KEY, EMPTYSTARTDATE_DEFAULT));
+				date.setEarliestPossibleDate(stamp.getDate(), localize(EARLIESTSTARTDATE_KEY, EARLIESTSTARTDATE_DEFAULT) + " " + new IWTimestamp(stamp.getDate()).getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT));
 				if (afterSchoolChoice != null)
 					date.setDate(afterSchoolChoice.getFromDate());
-				else
-					date.setToCurrentDate();
+				//else
+				//	date.setToCurrentDate();
 				if (isAdmin)
 					date.setYearRange(stamp.getYear() - 5, stamp.getYear() + 5);
 				inputTable.add(labelFrom, 1, row);
@@ -430,6 +435,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t var dropOne = ").append("findObj('").append(PARAM_PROVIDER + "_1").append("');");
 		buffer.append("\n\t var dropTwo = ").append("findObj('").append(PARAM_PROVIDER + "_2").append("');");
 		buffer.append("\n\t var dropThree = ").append("findObj('").append(PARAM_PROVIDER + "_3").append("');");
+		
+		buffer.append("\n\t var dateDayOne = ").append("findObj('").append(PARAM_DATE + "_1_day").append("');");
+		buffer.append("\n\t var dateDayTwo = ").append("findObj('").append(PARAM_DATE + "_2_day").append("');");
+		buffer.append("\n\t var dateDayThree = ").append("findObj('").append(PARAM_DATE + "_3_day").append("');");	
 
 		buffer.append("\n\t var one = 0;");
 		buffer.append("\n\t var two = 0;");
@@ -439,10 +448,26 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\n\t if (dropOne.selectedIndex > 0) {\n\t\t one = dropOne.options[dropOne.selectedIndex].value;\n\t\t length++;\n\t }");
 		buffer.append("\n\t if (dropTwo.selectedIndex > 0) {\n\t\t two = dropTwo.options[dropTwo.selectedIndex].value;\n\t\t length++;\n\t }");
 		buffer.append("\n\t if (dropThree.selectedIndex > 0) {\n\t\t three = dropThree.options[dropThree.selectedIndex].value;\n\t\t length++;\n\t }");
-
-		buffer.append("\n\t if(length > 0){");
+		
+		buffer.append("\n\t if(one > 0 && dateDayOne.selectedIndex <= 0){");
+		String message = localize("must_set_date", "Please set the date.");
+		buffer.append("\n\t\t\t alert('").append(message).append("');");
+		buffer.append("\n\t\t\t return false;");
+		buffer.append("\n\t\t }");
+		buffer.append("\n\t else if(two > 0 && dateDayTwo.selectedIndex <= 0){");
+		message = localize("must_set_date", "Please set the date.");
+		buffer.append("\n\t\t\t alert('").append(message).append("');");
+		buffer.append("\n\t\t\t return false;");
+		buffer.append("\n\t\t }");
+		buffer.append("\n\t else if(three > 0 && dateDayThree.selectedIndex <= 0){");
+		message = localize("must_set_date", "Please set the date.");
+		buffer.append("\n\t\t\t alert('").append(message).append("');");
+		buffer.append("\n\t\t\t return false;");
+		buffer.append("\n\t\t }");
+		
+		buffer.append("\n\t if(length > 0){");		
 		buffer.append("\n\t\t if(one > 0 && (one == two || one == three)){");
-		String message = localize("must_not_be_the_same", "Please do not choose the same provider more than once.");
+		message = localize("must_not_be_the_same", "Please do not choose the same provider more than once.");
 		buffer.append("\n\t\t\t alert('").append(message).append("');");
 		buffer.append("\n\t\t\t return false;");
 		buffer.append("\n\t\t }");

@@ -6,7 +6,7 @@
  */
 package se.idega.idegaweb.commune.school.presentation;
 
-import is.idega.idegaweb.member.business.NoParentFound;
+import is.idega.block.family.business.NoParentFound;
 
 import java.rmi.RemoteException;
 import java.sql.Date;
@@ -80,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/08/03 13:24:28 $ by $Author: malin $
- * @version $Revision: 1.79 $
+ * Last modified: $Date: 2004/08/27 19:22:53 $ by $Author: joakim $
+ * @version $Revision: 1.80 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***

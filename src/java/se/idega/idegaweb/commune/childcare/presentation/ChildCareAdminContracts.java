@@ -13,6 +13,7 @@ import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
+import se.idega.idegaweb.commune.school.presentation.CentralPlacementEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementProviderEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementSchoolGroupEditor;
 
@@ -219,6 +220,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	public void showForm(IWContext iwc) {
 		Form form = new Form();
 		form.setEventListener(ChildCareEventListener.class);
+		form.setName(CentralPlacementEditor.FORM_NAME);
 
 		Table table = new Table();
 		table.setCellpadding(2);

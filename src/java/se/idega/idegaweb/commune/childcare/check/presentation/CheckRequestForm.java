@@ -323,9 +323,13 @@ public class CheckRequestForm extends CommuneBlock {
 					parentNumber++;
 				}
 			}
+			if ( coll.size() == 1 ) {
+				custodianTable.add(new HiddenInput(PARAM_WORK_SITUATION+"2","-1"),4,row-1);
+			}
 		} else {
 			custodianTable.add(getErrorText(localize("child.no_custodians_found", "No custodians found")));
 		}
+		
 
 		return custodianTable;
 	}
@@ -370,7 +374,7 @@ public class CheckRequestForm extends CommuneBlock {
 		if (parameterValue != null) {
 			input.setValue(parameterValue);
 		}
-		return input;
+		return (TextInput) getStyledInterface(input);
 	}
 
 	private DropdownMenu getWorkSituationMenu(IWContext iwc, String parameterName) {
@@ -383,7 +387,7 @@ public class CheckRequestForm extends CommuneBlock {
 		if (paramWorkSituation != null) {
 			workSituationChoice.setSelectedElement(paramWorkSituation);
 		}
-		return workSituationChoice;
+		return (DropdownMenu) getStyledInterface(workSituationChoice);
 	}
 
 	private CheckBusiness getCheckBusiness(IWContext iwc) throws Exception {

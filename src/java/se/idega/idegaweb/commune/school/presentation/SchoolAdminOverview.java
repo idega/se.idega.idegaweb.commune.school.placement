@@ -39,6 +39,7 @@ import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
+import com.idega.block.school.presentation.SchoolClassDropdownDouble;
 import com.idega.builder.business.BuilderLogic;
 import com.idega.business.IBOLookup;
 import com.idega.core.contact.data.Email;
@@ -1550,7 +1551,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private SelectDropdownDouble getDropdown(IWContext iwc) throws RemoteException {
-		SelectDropdownDouble dropdown = new SelectDropdownDouble(getSchoolCommuneSession(iwc).getParameterSchoolYearID(), getSchoolCommuneSession(iwc).getParameterSchoolClassID());
+		SchoolClassDropdownDouble dropdown = new SchoolClassDropdownDouble(getSchoolCommuneSession(iwc).getParameterSchoolYearID(), getSchoolCommuneSession(iwc).getParameterSchoolClassID());
 
 		try {
 			if (getSchoolCommuneSession(iwc).getSchoolID() != -1) {

@@ -435,6 +435,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (!_showNoChoices) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
+				String extraChoice = null;
 				String language = null;
 				IWCalendar calendar = null;
 				IWTimestamp placementDate = null;
@@ -460,6 +461,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 									showChangePlacementDate = true;
 								}
 								table.add(this.getSmallHeader(string), 2, row);
+								extraChoice = choice.getExtraChoiceMessage();
 							}
 							else {
 								table.add(getSmallText(string), 2, row);
@@ -500,6 +502,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 				if (message != null) {
 					table.add(getSmallHeader(localize("school.school_choice_message", "Applicant message")), 1, row);
 					table.add(getSmallText(message), 2, row++);
+				}
+				if (extraChoice != null) {
+					table.add(getSmallHeader(localize("school.extra_choice_message", "Extra choice")), 1, row);
+					table.add(getSmallText(extraChoice), 2, row++);
 				}
 			}
 

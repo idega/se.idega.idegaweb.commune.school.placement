@@ -28,9 +28,9 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
-//import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 
 /**
@@ -185,7 +185,14 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		boolean hasMoveChoice = false;
 		boolean hasSpecialPlacement = false;
 		boolean hasComment = false;
+		boolean notStarted = false;
+		boolean hasTerminationDate = false;
 		boolean showComment = false;
+		boolean showNotStarted = false;
+		boolean showHasTermination = false;
+		
+		IWTimestamp stamp = new IWTimestamp();
+		IWTimestamp startDate;
 
 		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 
@@ -203,6 +210,18 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasSpecialPlacement = studentMember.getSpeciallyPlaced();
 				hasComment = studentMember.getNotes() != null;
+				notStarted = false;
+				hasTerminationDate = false;
+				
+				if (studentMember.getRegisterDate() != null) {
+					startDate = new IWTimestamp(studentMember.getRegisterDate());
+					if (startDate.isLaterThan(stamp)) {
+						notStarted = true;
+					}
+				}
+				if (studentMember.getRemovedDate() != null) {
+					hasTerminationDate = true;
+				}
 
 				/*
 				 * delete = new
@@ -248,6 +267,16 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				if (hasComment) {
 					showComment = true;
 					table.add(getSmallErrorText("*"), 1, row);
+				}
+				if (notStarted) {
+					showNotStarted = true;
+					table.add(getSmallErrorText("+"), 1, row);
+				}
+				if (hasTerminationDate) {
+					showHasTermination = true;
+					table.add(getSmallErrorText("&Delta;"), 1, row);
+				}
+				if (hasComment || notStarted || hasTerminationDate) {
 					table.add(getSmallText(Text.NON_BREAKING_SPACE), 1, row);
 				}
 
@@ -280,11 +309,23 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				row++;
 			}
 
-			if (showComment) {
+			if (showComment || showNotStarted || showHasTermination) {
 				table.setHeight(row++, 2);
-				table.mergeCells(1, row, table.getColumns(), row);
-				table.add(getSmallErrorText("* "), 1, row);
-				table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);
+				if (showComment) {
+					table.mergeCells(1, row, table.getColumns(), row);
+					table.add(getSmallErrorText("* "), 1, row);
+					table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);
+				}
+				if (showNotStarted) {
+					table.mergeCells(1, row, table.getColumns(), row);
+					table.add(getSmallErrorText("+ "), 1, row);
+					table.add(getSmallText(localize("school.placement_has_not_started", "Placment has not started yet")), 1, row++);
+				}
+				if (showHasTermination) {
+					table.mergeCells(1, row, table.getColumns(), row);
+					table.add(getSmallErrorText("&Delta; "), 1, row);
+					table.add(getSmallText(localize("school.placement_has_termination_date", "Placment has termination date")), 1, row++);
+				}
 			}
 		}
 

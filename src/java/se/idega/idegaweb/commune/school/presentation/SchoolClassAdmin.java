@@ -212,10 +212,15 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
-				if (row % 2 == 0)
-					table.setRowColor(row, getZebraColor1());
-				else
-					table.setRowColor(row, getZebraColor2());
+				if (getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID())) {
+					table.setRowColor(row, "#FFEAEA");
+				}
+				else {
+					if (row % 2 == 0)
+						table.setRowColor(row, getZebraColor1());
+					else
+						table.setRowColor(row, getZebraColor2());
+				}
 
 				link = (Link) this.getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);

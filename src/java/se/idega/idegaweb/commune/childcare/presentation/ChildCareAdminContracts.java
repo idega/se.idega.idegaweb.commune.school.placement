@@ -153,16 +153,18 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			groupID = -1;
 		}
 		boolean success;
-		
+		String errorMessage = null;
 		try {
 			User owner = getBusiness().getUserBusiness().getUser(ownerID);
 			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, null, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), false, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
 		}
 		catch (RemoteException re) {
 			success = false;
+			errorMessage = localize("child_care.submit_failed", "Submit failed.");
 		}
 		catch (AlreadyCreatedException ace) {
 			success = false;
+			errorMessage = localize("child_care.contract_already_exists", "Active contract already exists for this child.");
 		}
 		
 		if (success) {
@@ -185,7 +187,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			}
 		}
 		else {
-			add(getSmallErrorText(localize("child_care.submit_failed", "Submit failed.")));
+			add(getSmallErrorText(errorMessage));
 			add(new Break(2));
 			showForm(iwc);
 		}

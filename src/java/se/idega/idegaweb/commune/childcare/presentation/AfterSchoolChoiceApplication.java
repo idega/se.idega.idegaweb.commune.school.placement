@@ -160,7 +160,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private void viewForm(IWContext iwc) throws RemoteException {
 		if (child != null) {
 			Form form = new Form();
-			form.setOnSubmit("return checkApplication()");
 			form.maintainParameter(prmChildId);
 
 			Table table = new Table();
@@ -186,19 +185,15 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					submit.setDisabled(true);
 				}
 			}
-
+			submit.setOnSubmitFunction("checkApplication", getSubmitCheckScript());
+			form.setToDisableOnSubmit(submit, true);
+			
 			table.add(submit, 1, row);
 
 			if (submit.getDisabled()) {
 				row++;
 				table.setHeight(row++, 6);
 				table.add(getSmallErrorText(localize("no_parent_found", "No parent found")), 1, row);
-			}
-
-			Page page = getParentPage();
-			if (page != null) {
-				Script script = page.getAssociatedScript();
-				script.addFunction("checkApplication", getSubmitCheckScript());
 			}
 
 			add(form);

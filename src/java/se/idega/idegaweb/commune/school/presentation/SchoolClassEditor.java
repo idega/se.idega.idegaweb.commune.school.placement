@@ -804,6 +804,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		int userID = ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue();
 		SchoolClassMember member;
 		SchoolSeason previousSeason = getBusiness().getPreviousSchoolSeason(getSchoolSeasonID());
+		getBusiness().resetSchoolClassStatus(getSchoolClassID());
 
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
@@ -841,11 +842,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (schoolClass != null) {
 			if (schoolClass.getReady()) {
 				getBusiness().markSchoolClassLocked(schoolClass);
-				getBusiness().finalizeGroup(schoolClass, localize("school.finalize_subject", ""), localize("school.finalize_body", ""));
+				getBusiness().finalizeGroup(schoolClass, localize("school.finalize_subject", ""), localize("school.finalize_body", ""), true);
 			}
 			else {
 				getBusiness().markSchoolClassReady(schoolClass);
-				getBusiness().finalizeGroup(schoolClass, localize("school.students_put_in_class_subject", ""), localize("school.students_put_in_class_body", ""));
+				getBusiness().finalizeGroup(schoolClass, localize("school.students_put_in_class_subject", ""), localize("school.students_put_in_class_body", ""), false);
 			}
 		}
 	}

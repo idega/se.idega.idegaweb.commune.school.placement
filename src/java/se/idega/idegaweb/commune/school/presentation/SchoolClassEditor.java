@@ -75,6 +75,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean searchEnabled = true;
 	private int applicationsPerPage = 10;
 	private boolean showStatistics = true;
+	
+	private boolean isOngoingSeason = false;
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -107,6 +109,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 
 	private void parseAction(IWContext iwc) throws RemoteException {
+		isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
+		
 		if (iwc.isParameterSet(PARAMETER_PREVIOUS_CLASS_ID))
 			_previousSchoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_PREVIOUS_CLASS_ID));
 
@@ -180,7 +184,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {
-			if (_previousSchoolYearID != -1) {
+			if (_previousSchoolYearID != -1 && !isOngoingSeason) {
 				try {
 					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 					validateSchoolClass(previousClasses);
@@ -256,7 +260,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		boolean showLanguage = false;
 
 		SchoolYear year = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
-		int schoolYearAge = getBusiness().getGradeForYear(getSchoolYearID()) - 1;
+		int schoolYearAge = getBusiness().getGradeForYear(getSchoolYearID());
+		if (!isOngoingSeason)
+			schoolYearAge--;
 		if (year != null && schoolYearAge >= 12)
 			showLanguage = true;
 

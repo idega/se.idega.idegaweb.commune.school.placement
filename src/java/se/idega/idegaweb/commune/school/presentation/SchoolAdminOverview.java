@@ -409,6 +409,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			int pendingSchoolId = -1;
 			boolean showChangePlacementDate = false;
 			boolean hasMoveChoice = false;
+			School oldSchool = null;
 			
 			if (!_showNoChoices) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
@@ -450,6 +451,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 						if (iter.hasNext())
 							table.add(new Break(), 2, row);
+						if (oldSchool == null)
+							oldSchool = choice.getCurrentSchool();
 						if (message == null)
 							message = choice.getMessage();
 						if (language == null && choice.getLanguageChoice() != null)
@@ -482,24 +485,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			SchoolClassMember schoolClassMember = null;
 			if (!_showNoChoices) {
-				table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
-				SchoolSeason season = null;
-				if (hasMoveChoice)
-					getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolSeason(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
-				else
-					getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
-				
-				if (season != null) {
-					schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
-					if (schoolClassMember != null) {
-						SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
-						School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
-
-						String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
-						table.add(getSmallText(schoolString), 2, row);
-					}
+				if (oldSchool != null) {
+					table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
+					/*SchoolSeason season = null;
+					if (hasMoveChoice)
+						getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolSeason(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
+					else
+						getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
+					
+					if (season != null) {
+						schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
+						if (schoolClassMember != null) {
+							SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
+							School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
+	
+							String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
+							table.add(getSmallText(schoolString), 2, row);
+						}
+					}*/
+					table.add(getSmallText(oldSchool.getName()), 2, row);
+					row++;
 				}
-				row++;
 			}
 
 			// show study path, if exists

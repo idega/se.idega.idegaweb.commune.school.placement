@@ -358,6 +358,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				}
 				labelProvider = getSmallHeader(strProvider + Text.NON_BREAKING_SPACE + i + ":");
 				inputTable.add(labelProvider, 1, row);
+				inputTable.setWidth(1, row, 100);
 				inputTable.add(dropdown, 3, row++);
 
 				DateInput date = (DateInput) getStyledInterface(new DateInput(PARAM_DATE + "_" + i));
@@ -368,6 +369,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				if (isAdmin)
 					date.setYearRange(stamp.getYear() - 5, stamp.getYear() + 5);
 				inputTable.add(labelFrom, 1, row);
+				inputTable.setWidth(1, row, 100);
 				inputTable.add(date, 3, row++);
 
 				inputTable.setHeight(row++, 12);
@@ -381,6 +383,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 			inputTable.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
 			inputTable.add(getSmallHeader(localize("message", "Message")), 1, row);
+			inputTable.setWidth(1, row, 100);
 			inputTable.add(messageArea, 3, row++);
 			
 		}
@@ -388,7 +391,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			e.printStackTrace();
 		}
 
-		inputTable.setWidth(1, 100);
 		inputTable.setWidth(2, 8);
 
 		return inputTable;

@@ -167,7 +167,7 @@ public class CheckRequestForm extends CommuneBlock {
 		String paramMTMC = iwc.isParameterSet(PARAM_MOTHER_TONGUE_MOTHER_CHILD) ? iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD) : "";
 		String paramMTFC = iwc.isParameterSet(PARAM_MOTHER_TONGUE_FATHER_CHILD) ? iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD) : "";
 		String paramMTP = iwc.isParameterSet(PARAM_MOTHER_TONGUE_PARENTS) ? iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS) : "";
-		int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(iwc.getCurrentUser(), ((Integer)child.getPrimaryKey()).intValue());
+		int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(((Integer)child.getPrimaryKey()).intValue());
 		boolean showErrors = true;
 		if (createChoices()) {
 			if (checkID != -1)
@@ -264,7 +264,7 @@ public class CheckRequestForm extends CommuneBlock {
 		int row = 1;
 		boolean showCheckForm = true;
 		if (createChoices()) {
-			int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(iwc.getCurrentUser(), ((Integer)child.getPrimaryKey()).intValue());
+			int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(((Integer)child.getPrimaryKey()).intValue());
 			if (checkID != -1)
 				showCheckForm = false;	
 		}

@@ -113,7 +113,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean multibleSchools = false;
 
 	private boolean showStudentTable = true;
-
+	private boolean showMessageTextButton = false;
 	private boolean searchEnabled = true;
 
 	private int applicationsPerPage = 10;
@@ -292,6 +292,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			}
 		}
 
+		if (showMessageTextButton) {
+			GenericButton msgText = getButton(new GenericButton("messageText", localize("school.show_message_text", "Message Text")));
+			msgText.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_MESSAGE_TEXT);
+			msgText.setWindowToOpen(SchoolAdminWindow.class);
+			table.add(msgText, 1, 11);
+			table.add(Text.getNonBrakingSpace(), 1, 11);
+		}
+		
+		
 		add(form);
 	}
 
@@ -1401,5 +1410,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	 */
 	public void setLanguageAge(int languageAge) {
 		this._languageAge = languageAge;
+	}
+	
+	public void setShowMessageTextButton(boolean show) {
+		showMessageTextButton = show;
 	}
 }

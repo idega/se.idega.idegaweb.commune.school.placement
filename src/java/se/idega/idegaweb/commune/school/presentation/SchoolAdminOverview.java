@@ -108,6 +108,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_USER_ID = "sch_user_id";
 	public static final String PARAMETER_SET_AS_DEFAULT = "rem_rej_m";
 	public static final String PARAMETER_NATIVE_LANG = "sch_native_lang";
+	
+	private static final String PARAMETER_REJECT_STUDENT = "sch_rej_st";
+	private static final String PARAMETER_PLACEMENT_OFFER = "sch_pl_o";
+	private static final String PARAMETER_PLACEMENT_CONFIRMATION = "sch_pl_con";
 
 	public static final String PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR = "from_central_placement_editor";
 	public static final String PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN = "resource_perm_central_admin";
@@ -127,6 +131,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_FINISH_RESOURCE = 13;
 	public static final int METHOD_CHANGE_STUDY_PATH = 14;
 	public static final int METHOD_NATIVE_LANG_FORM = 15;
+	public static final int METHOD_MESSAGE_TEXT = 16;
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
@@ -142,7 +147,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int ACTION_FINISH_RESOURCE = 13;
 	public static final int ACTION_CHANGE_STUDY_PATH = 14;
 	public static final int ACTION_SAVE_NATIVE_LANGUAGE = 15;
-
+	private static final int ACTION_SAVE_MESSAGE_TEXT = 16;
+	
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
 	private static final String PARAMETER_PROTOCOL = "sch_admin_protocol";
@@ -228,6 +234,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 				break;
 			case ACTION_SAVE_NATIVE_LANGUAGE :
 				saveNativeLanguage(iwc);
+				break;
+			case ACTION_SAVE_MESSAGE_TEXT :
+				saveMessageText(iwc);
 				break;
 		}
 
@@ -330,6 +339,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 			case METHOD_NATIVE_LANG_FORM :
 				headerTable.add(getHeader(localize("school.native_language", "Native language")), 1, 1);
 				contentTable.add(getNativeLanguageForm(iwc), 1, 1);
+				break;
+			case METHOD_MESSAGE_TEXT :
+				headerTable.add(getHeader(localize("school.message_text", "Message Text")), 1, 1);
+				contentTable.add(getMessageTextForm(iwc), 1, 1);
+				break;
 		}
 
 		add(form);
@@ -707,18 +721,18 @@ public class SchoolAdminOverview extends CommuneBlock {
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		textArea.setRows(4);
-		/*try {
+		try {
 			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(this._schoolID));
 			if (school != null) {
 				String defaultRejectionText = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE);
 				if (defaultRejectionText != null) {
-					textArea.setContent(defaultRejectionText);
+					textArea.setContent(convertMessageTextFromDB(defaultRejectionText));
 				}
 			}
 		}
 		catch (FinderException e1) {
 			e1.printStackTrace();
-		}*/
+		}
 
 		table.add(getSmallHeader(localize("school.reject_student_message_info", "The following message will be sent to the students' parents.")), 1, row++);
 		table.add(textArea, 1, row++);
@@ -905,8 +919,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String body = null;
 		String message = null;
 
-		//String defSubject = "";
-		//String defBody = "";
+		String defBody = null;
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {
@@ -915,15 +928,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 				subject = localize("school.finalize_subject", "");
 				body = localize("school.finalize_body", "");
 				message = localize("school.proceed_with_ready_marking", "Proceed with marking class as ready and send out messages?");
-				//defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_SUBJECT);
-				//defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_BODY);
+				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_MESSAGE);
 			}
 			else {
 				subject = localize("school.students_put_in_class_subject", "");
 				body = localize("school.students_put_in_class_body", "");
 				message = localize("school.proceed_with_locked_marking", "Proceed with marking class as locked and send out messages?");
-				//defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_SUBJECT);
-				//defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_BODY);
+				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_MESSAGE);
 			}
 
 			if (body != null) {
@@ -952,16 +963,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (body != null)
 			text.setContent(body);
 
-		/*if (defSubject != null) {
-			header.setContent(defSubject);
-		}
 
 		if (defBody != null) {
-			text.setContent(defBody);
+			text.setContent(convertMessageTextFromDB(defBody));
 		}
-
-		table.add(getSmallHeader(localize("school.set_as_default", "Set as default") + " "), 1, row);
-		table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);*/
 
 		SubmitButton send = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
 		send.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1416,8 +1421,146 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
+	private void saveMessageText(IWContext iwc) throws RemoteException {
+		String rejectStudent = iwc.getParameter(PARAMETER_REJECT_STUDENT);
+		String placementOffer = iwc.getParameter(PARAMETER_PLACEMENT_OFFER);
+		String placementConfirmation = iwc.getParameter(PARAMETER_PLACEMENT_CONFIRMATION);
+		
+		//add("<br>placementOffer = "+placementOffer);
+		//add("<br>placementConfirmation = "+placementConfirmation);
+		
+		try {
+			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(_schoolID));
+			if (rejectStudent != null && !"".equals(rejectStudent)) {
+				getSchoolBusiness(iwc).setProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE, convertMessageTextForDB(rejectStudent));
+			}
+			if (placementOffer != null && !"".equals(placementOffer)) {
+				getSchoolBusiness(iwc).setProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_MESSAGE, convertMessageTextForDB(placementOffer));
+			}
+			if (placementConfirmation != null && !"".equals(placementConfirmation)) {
+				getSchoolBusiness(iwc).setProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_MESSAGE, convertMessageTextForDB(placementConfirmation));
+			}
+			
+//			add("<br>rejectStudent = "+mReject);
+//			add("<br>placementOffer = "+mPlaceOff);
+//			add("<br>placementConfirmation = "+mPlaceCon);
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private String convertMessageTextForDB(String string) {
+		for (int i = 0; i < 5; i++) {
+			string = TextSoap.findAndReplace(string, "{"+i+"}", "["+i+"]");
+		}
+		return string;
+	}
+	
+	private String convertMessageTextFromDB(String string) {
+		for (int i = 0; i < 5; i++) {
+			string = TextSoap.findAndReplace(string, "["+i+"]", "{"+i+"}");
+		}
+		return string;
+	}
+
+	
+	private Table getMessageTextForm(IWContext iwc) throws RemoteException {
+		Table table = new Table(3, 8);
+		table.setBorder(0);
+		table.setCellpadding(1);
+		table.setCellspacing(2);
+		table.setWidth("100%");
+		table.setWidth(3, 100);
+		
+		TextArea rejectStudent = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_STUDENT));
+		rejectStudent.setWidth(Table.HUNDRED_PERCENT);
+		rejectStudent.setRows(4);
+		
+		TextArea placementOffer = (TextArea) getStyledInterface(new TextArea(PARAMETER_PLACEMENT_OFFER));
+		placementOffer.setWidth(Table.HUNDRED_PERCENT);
+		placementOffer.setRows(4);
+		
+		TextArea placementConfirmation = (TextArea) getStyledInterface(new TextArea(PARAMETER_PLACEMENT_CONFIRMATION));
+		placementConfirmation.setWidth(Table.HUNDRED_PERCENT);
+		placementConfirmation.setRows(4);
+		
+		try {
+			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(_schoolID));
+			String mReject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE);
+			String mPlaceOff = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_MESSAGE);
+			String mPlaceCon = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_MESSAGE);
+			if (mReject != null) {
+				rejectStudent.setContent(convertMessageTextFromDB(mReject));
+			} 
+			if (mPlaceOff != null) {
+				placementOffer.setContent(convertMessageTextFromDB(mPlaceOff));
+			}
+			if (mPlaceCon != null) {
+				placementConfirmation.setContent(convertMessageTextFromDB(mPlaceCon));
+			}
+		} catch (FinderException e) {
+			e.printStackTrace();
+		}
+		
+		
+		table.add(getSmallHeader(localize("school.reject_student", "Reject student")), 1, 1);
+		table.setVerticalAlignment(1, 2, Table.VERTICAL_ALIGN_TOP);
+		table.add(rejectStudent, 1, 2);
+		table.add(getSmallHeader(localize("school.placement_offer", "Placement offer")), 1, 3);
+		table.setVerticalAlignment(1, 4, Table.VERTICAL_ALIGN_TOP);
+		table.add(placementOffer, 1, 4);
+		table.add(getSmallHeader(localize("school.placement_confirmation", "Placement confirmation")), 1, 5);
+		table.setVerticalAlignment(1, 6, Table.VERTICAL_ALIGN_TOP);
+		table.add(placementConfirmation, 1, 6);
+
+		
+		table.setVerticalAlignment(3, 2, Table.VERTICAL_ALIGN_TOP);
+		table.add(getSmallText("{0} "+localize("school.current_user_name", "User name")), 3, 2);
+		table.add(Text.BREAK, 3, 2);
+		table.add(getSmallText("{1} "+localize("school.email", "Email")), 3, 2);
+		table.add(Text.BREAK, 3, 2);
+		table.add(getSmallText("{2} "+localize("school.workphone", "Work Phone")), 3, 2);
+		table.add(Text.BREAK, 3, 2);
+		table.add(getSmallText("{3} "+localize("school.child_name", "Child name")), 3, 2);
+		table.add(Text.BREAK, 3, 2);
+		table.add(getSmallText("{4} "+localize("school.school_name", "School name")), 3, 2);
+		table.add(Text.BREAK, 3, 2);
+		
+		//Object[] rejectArgs = {user.getName(), email, workphone, choice.getChild().getNameLastFirst(true), choice.getChosenSchool().getName()};
+		//Object[] placeArgs = {school.getName(), schoolClass.getName(), new IWTimestamp().getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)};
+
+		table.setVerticalAlignment(3, 4, Table.VERTICAL_ALIGN_TOP);
+		table.add(getSmallText("{0} "+localize("school.school_name", "School name")), 3, 4);
+		table.add(Text.BREAK, 3, 4);
+		table.add(getSmallText("{1} "+localize("school.school_class", "School class")), 3, 4);
+		table.add(Text.BREAK, 3, 4);
+		table.add(getSmallText("{2} "+localize("school.date", "Date")), 3, 4);
+		table.add(Text.BREAK, 3, 4);
+
+		table.setVerticalAlignment(3, 6, Table.VERTICAL_ALIGN_TOP);
+		table.add(getSmallText("{0} "+localize("school.school_name", "School name")), 3, 6);
+		table.add(Text.BREAK, 3, 6);
+		table.add(getSmallText("{1} "+localize("school.school_class", "School class")), 3, 6);
+		table.add(Text.BREAK, 3, 6);
+		table.add(getSmallText("{2} "+localize("school.date", "Date")), 3, 6);
+		table.add(Text.BREAK, 3, 6);
+		
+		
+
+		SubmitButton setButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.set", "Set"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE_MESSAGE_TEXT)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MESSAGE_TEXT)), 1, 8);
+		table.add(setButton, 1, 8);
+
+		table.add(Text.NON_BREAKING_SPACE, 1, 8);
+		
+		CloseButton closeButton = (CloseButton) getStyledInterface(new CloseButton(localize("school.button.close", "Close")));
+		table.add(closeButton, 1, 8);
+
+		return table;
+	}
+
 	private Table getNativeLanguageForm(IWContext iwc) {
-		Table table = new Table();
+		Table table = new Table(2, 8);
 		table.setBorder(0);
 		table.setCellpadding(1);
 		table.setCellspacing(2);
@@ -1619,34 +1762,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String subject = iwc.getParameter(PARAMETER_FINALIZE_SUBJECT);
 		String body = iwc.getParameter(PARAMETER_FINALIZE_BODY);
 
-		String propNameSubj = null;
-		String propNameBody = null;
-
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {
 			if (schoolClass.getReady()) {
 				getSchoolCommuneBusiness(iwc).markSchoolClassLocked(schoolClass);
 				getSchoolCommuneBusiness(iwc).finalizeGroup(schoolClass, subject, body, true);
-				propNameSubj = SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_SUBJECT;
-				propNameBody = SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_BODY;
 			}
 			else {
 				getSchoolCommuneBusiness(iwc).markSchoolClassReady(schoolClass);
 				getSchoolCommuneBusiness(iwc).finalizeGroup(schoolClass, subject, body, false);
-				propNameSubj = SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_SUBJECT;
-				propNameBody = SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_BODY;
-			}
-		}
-
-		if (iwc.isParameterSet(PARAMETER_SET_AS_DEFAULT) && propNameSubj != null && propNameBody != null) {
-			try {
-				School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(_schoolID));
-				getSchoolBusiness(iwc).setProperty(school, propNameSubj, subject);
-				getSchoolBusiness(iwc).setProperty(school, propNameBody, body);
-			}
-			catch (FinderException e) {
-				e.printStackTrace();
 			}
 		}
 

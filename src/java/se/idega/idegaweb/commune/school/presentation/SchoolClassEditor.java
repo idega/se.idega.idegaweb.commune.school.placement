@@ -511,6 +511,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					delButt.setValueOnClick(PARAMETER_DELETE_CHOICE_ID, String.valueOf(choiceID));
 					delButt.setSubmitConfirm(localize("school.confirm_delete_school_choice_msg", 
 																	"Do you really want to erase this school choice?"));
+					delButt.setToolTip(localize("school.delete_school_choice", "Delete school choice"));
 					table.add(delButt, column, row);
 				}
 				row++;
@@ -1129,15 +1130,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean livesOutsideDefaultCommune(IWContext iwc, User applicant) {
 		boolean showEraseButton = false;
 		try {			
-			int defComID = -1;
+
 			int homeComID = -1;
-			int mainAddrID = -1;
+
 
 			// Get default Commune primary key
 			CommuneHome cHome = (CommuneHome) IDOLookup.getHome(Commune.class);
 			Commune defCom = cHome.findDefaultCommune();
 			Integer defComPK = (Integer) defCom.getPrimaryKey();
-			defComID = defComPK.intValue();
+
 			
 			// Get applicants home Commune primary key
 			Address applicantAddr;
@@ -1145,19 +1146,23 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						
 			if (applicantAddr != null) {
 				homeComID = applicantAddr.getCommuneID(); // return -1 if null in db
-				mainAddrID = ((Integer) applicantAddr.getPrimaryKey()).intValue();
+				//mainAddrID = ((Integer) applicantAddr.getPrimaryKey()).intValue();
 			}
 			
-			Collection addrColl = applicant.getAddresses();			
+			/*Collection addrColl = applicant.getAddresses();
+			int defComID = -1;
+			defComID = defComPK.intValue();
+			int mainAddrID = -1;						
 			logWarning("*** LIVES OUTSIDE HOME COMMUNE ***\n" 
 							+ "Applicant:  " + ((Integer) applicant.getPrimaryKey()).intValue() 
 							+ " HomeComPK: " + homeComID + " defComPK: " + defComID + "\n"
 							+ " MainAddressID: " + mainAddrID + " NoOfAddrs: " + addrColl.size() + "\n");
+			*/
 			
 			// If user doesn't live in default commune - return true
 			if (homeComID != -1 && defComPK.intValue() != homeComID) {
 					showEraseButton = true;
-					logWarning("__SHOW ERASE BUTTON__");
+					//logWarning("__SHOW ERASE BUTTON__");
 			}
 					
 		} catch (Exception e) {}		

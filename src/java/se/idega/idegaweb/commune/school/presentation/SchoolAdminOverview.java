@@ -715,7 +715,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		textArea.setRows(4);
-		try {
+		/*try {
 			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(this._schoolID));
 			if (school != null) {
 				String defaultRejectionText = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE);
@@ -726,12 +726,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		catch (FinderException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 
 		table.add(getSmallHeader(localize("school.reject_student_message_info", "The following message will be sent to the students' parents.")), 1, row++);
 		table.add(textArea, 1, row++);
-		table.add(getSmallHeader(localize("school.set_as_default", "Set as default") + " "), 1, row);
-		table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);
+		//table.add(getSmallHeader(localize("school.set_as_default", "Set as default") + " "), 1, row);
+		//table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);
 
 		SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_ACTION, String.valueOf(ACTION_REJECT)));
 		reject.setSubmitConfirm(localize("school.reject_confirmation", "Are you sure you want to reject this student?  Action can not be undone."));

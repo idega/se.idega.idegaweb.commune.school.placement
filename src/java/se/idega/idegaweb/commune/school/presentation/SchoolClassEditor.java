@@ -17,16 +17,19 @@ import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
+import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
 
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolHome;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
+import com.idega.data.IDOException;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -49,6 +52,7 @@ import com.idega.util.GenericUserComparator;
 import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.TextSoap;
 
 /**
  * @author Laddi
@@ -141,7 +145,23 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SEARCH))
 			searchString = iwc.getParameter(PARAMETER_SEARCH);
-
+		/** Fixing String */
+		if (searchString != null && searchString.length() > 0) {
+			try {
+				String temp = searchString;
+				temp = TextSoap.findAndCut(temp, "-");
+				Long.parseLong(temp);
+				if (temp.length() == 10 ) {
+					int firstTwo = Integer.parseInt(temp.substring(0, 2));
+					if (firstTwo < 85) {
+						temp = "20"+temp;
+					}	else {
+						temp = "19"+temp;
+					}
+				}
+				searchString = temp;
+			}catch (NumberFormatException nfe) {}
+		}
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
@@ -408,37 +428,53 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 
 		if (showStatistics) {
-			List firstApplicants = new ArrayList(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1 }, validStatuses, ""));
-			int firstApplSize = firstApplicants.size();
-			List secondApplicants = new ArrayList(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2 }, validStatuses, ""));
-			int secondApplSize = secondApplicants.size();
-			List thirdApplicants = new ArrayList(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 3 }, validStatuses, ""));
-			int thirdApplSize = thirdApplicants.size();
-			List groupedApplicants = new ArrayList(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, null, new String[] { SchoolChoiceBMPBean.CASE_STATUS_GROUPED }, ""));
-			int groupedApplSize = thirdApplicants.size();
+			try {
+				int firstApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1 }, validStatuses, "");
+				int secondApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2 }, validStatuses, "");
+				int thirdApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 3 }, validStatuses, "");
+				int groupedApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, null, new String[] { SchoolChoiceBMPBean.CASE_STATUS_GROUPED }, "");
 
-			Table statTable = new Table();
-			int sRow = 1;
-			statTable.setCellpadding(1);
-			statTable.setCellspacing(0);
-			statTable.add(getSmallText(localize("filtered_applications", "Filtered applications") + ":"), 1, sRow);
-			statTable.add(getSmallText("" + applicantsSize), 2, sRow);
-			++sRow;
-			statTable.add(getSmallText(localize("applications_on_first_choice", "Applcations on first choice") + ":"), 1, sRow);
-			statTable.add(getSmallText("" + firstApplSize), 2, sRow);
-			++sRow;
-			statTable.add(getSmallText(localize("applications_on_second_choice", "Applcations on second choice") + ":"), 1, sRow);
-			statTable.add(getSmallText("" + secondApplSize), 2, sRow);
-			++sRow;
-			statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice") + ":"), 1, sRow);
-			statTable.add(getSmallText("" + thirdApplSize), 2, sRow);
-			++sRow;
-			statTable.add(getSmallText(localize("grouped_applications", "Grouped applcations") + ":"), 1, sRow);
-			statTable.add(getSmallText("" + groupedApplSize), 2, sRow);
-
-			table.mergeCells(1, row, table.getColumns(), row);
-			table.add(statTable, 1, row);
-			++row;
+				String[] allStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED, SchoolChoiceBMPBean.CASE_STATUS_PLACED };
+				String[] handledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED };
+				String[] unhandledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
+				
+				int allApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1 }, allStatuses, "");
+				int handledApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2 }, handledStatuses, "");
+				int unhandledApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 3 }, unhandledStatuses, "");
+				
+				Table statTable = new Table();
+				int sRow = 1;
+				statTable.setCellpadding(1);
+				statTable.setCellspacing(0);
+				statTable.add(getSmallText(localize("applications_all", "All applications") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + allApplSize), 2, sRow);
+				++sRow;
+				statTable.add(getSmallText(localize("applications_handled", "Handled applications") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + handledApplSize), 2, sRow);
+				++sRow;
+				statTable.add(getSmallText(localize("applications_unhandled", "Unhandled applications") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + unhandledApplSize), 2, sRow);
+				++sRow;
+				statTable.add(getSmallText(localize("applications_on_first_choice", "Applcations on first choice") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + firstApplSize), 2, sRow);
+				++sRow;
+				statTable.add(getSmallText(localize("applications_on_second_choice", "Applcations on second choice") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + secondApplSize), 2, sRow);
+				++sRow;
+				statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + thirdApplSize), 2, sRow);
+				++sRow;
+				statTable.add(getSmallText(localize("grouped_applications", "Grouped applcations") + ":"), 1, sRow);
+				statTable.add(getSmallText("" + groupedApplSize), 2, sRow);
+	
+				table.mergeCells(1, row, table.getColumns(), row);
+				table.add(statTable, 1, row);
+				++row;
+			}catch (Exception e) {
+				table.add(getSmallText(localize("error_in_statistics","Error in statistics")), 1, row);
+				++row;
+				e.printStackTrace(System.err);
+			}
 		}
 
 		if (showStudentTable && getSchoolClassID() != -1) {
@@ -863,6 +899,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
+	}
+
+	private SchoolChoiceHome getSchoolChoiceHome() throws RemoteException {
+		return (SchoolChoiceHome) com.idega.data.IDOLookup.getHome(SchoolChoice.class);	
 	}
 
 	/** setters */

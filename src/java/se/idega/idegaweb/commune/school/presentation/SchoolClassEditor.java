@@ -631,23 +631,23 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		table.setColumns(7);
+		table.setColumns(8);
+		table.setWidth(5, "12");
 		table.setWidth(6, "12");
 		table.setWidth(7, "12");
+		table.setWidth(8, "12");
 		int row = 1;
 
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
 		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
 		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
-		table.add(getSmallHeader(localize("school.class", "Class")), 5, row);
-		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 6, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 7, row++);
+		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 5, row);
+		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row++);
 
 		User student;
 		Address address;
 		SchoolClassMember studentMember;
-		SchoolClass schoolClass = null;
 		SubmitButton delete;
 		Link move;
 		Link link;
@@ -665,7 +665,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			while (iter.hasNext()) {
 				studentMember = (SchoolClassMember) iter.next();
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
-				schoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
@@ -713,10 +712,25 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				if (address != null && address.getStreetAddress() != null)
 					table.add(getSmallText(address.getStreetAddress()), 4, row);
-				if (schoolClass != null)
-					table.add(getSmallText(schoolClass.getName()), 5, row);
-				table.add(move, 6, row);
-				table.add(delete, 7, row++);
+				table.add(move, 5, row);
+				table.add(delete, 6, row++);
+				
+				if (hasChoice) {
+					SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
+					if (choice != null) {
+						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
+						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);
+						if (choice.getHasReceivedPlacementMessage())
+							table.add(getSmallHeader("*"), 7, row);
+						else
+							table.add(getSmallText("-"), 7, row);
+						
+						if (choice.getHasReceivedConfirmationMessage())
+							table.add(getSmallHeader("*"), 8, row);
+						else
+							table.add(getSmallText("-"), 8, row);
+					}
+				}
 			}
 		}
 
@@ -830,10 +844,16 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			yearAge = schoolYear.getSchoolYearAge();
 
 		if (searchEnabled) {
+			table.setAlignment(1, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 			table.add(getSmallHeader(localize("school.search_for", "Search for") + ":" + Text.NON_BREAKING_SPACE), 1, 1);
 
 			TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH, searchString));
+			tiSearch.setLength(16);
 			table.add(tiSearch, 2, 1);
+			
+			SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.search","Search")));
+			table.add(Text.getNonBrakingSpace(), 2, 1);
+			table.add(submit, 2, 1);
 
 			table.setHeight(2, "2");
 		}
@@ -851,7 +871,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		menu.setToSubmit();
 		table.add(menu, 2, 3);
 
-		table.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_LEFT);
 
 		return table;
 	}

@@ -45,6 +45,7 @@ import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.PrintButton;
 import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
@@ -391,6 +392,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
 			SubmitButton moveYear = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_year", "Change year"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
 			SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
+			PrintButton print = (PrintButton) getStyledInterface(new PrintButton(localize("school.print","Print")));
 
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
@@ -419,6 +421,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 
+			table.add(print, 1, row);
+			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(close, 1, row);
 		}
 
@@ -459,6 +463,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(textArea, 1, row++);
 
 		SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_ACTION, String.valueOf(ACTION_REJECT)));
+		reject.setSubmitConfirm(localize("school.reject_confirmation","Are you sure you want to reject this student?  Action can not be undone."));
 		table.add(reject, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);

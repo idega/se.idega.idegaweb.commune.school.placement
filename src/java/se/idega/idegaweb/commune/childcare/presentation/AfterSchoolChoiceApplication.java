@@ -66,18 +66,16 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String APPLICATION_INSERTED = "ccas_application_ok";
 	private final static String APPLICATION_FAILURE = "ccas_application_failed";
 
-	//	private final static String EMAIL_PROVIDER_SUBJECT = "child_care.application_received_subject";
-	//	private final static String EMAIL_PROVIDER_MESSAGE = "child_care.application_received_body";
-
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
+	private final static String EMAIL_PROVIDER_SUBJECT = LOCALIZE_PREFIX + "application_received_subject";
+	private final static String EMAIL_PROVIDER_MESSAGE = LOCALIZE_PREFIX + "application_received_body";
+
 	private String prmChildId = CitizenChildren.getChildIDParameterName();
-	//	private String prmParentId = CitizenChildren.getParentIDParameterName();
 
 	private Collection areas;
 	private Map providerMap;
 
-	//	private boolean _noCheckError = false;
 	private boolean isAdmin = false;
 
 	/**
@@ -223,7 +221,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				parent = iwc.getCurrentUser();
 			}
 
-			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, null);
+			String subject = localize(EMAIL_PROVIDER_SUBJECT, "After school application received");
+			String body = localize(EMAIL_PROVIDER_MESSAGE, "We have received your after school application for {0} to {1}.");
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, null, subject, body);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {

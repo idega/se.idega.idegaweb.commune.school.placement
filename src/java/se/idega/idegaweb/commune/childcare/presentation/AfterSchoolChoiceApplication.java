@@ -147,7 +147,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	}
 
-	private void viewForm(IWContext iwc) {
+	private void viewForm(IWContext iwc) throws RemoteException {
 		if (child != null) {
 			Form form = new Form();
 			form.setOnSubmit("return checkApplication()");
@@ -247,7 +247,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			add(new Text(localize(APPLICATION_FAILURE, "Failed to submit application")));
 	}
 
-	private Table getInputTable(IWContext iwc) {
+	private Table getInputTable(IWContext iwc) throws RemoteException {
 		Table inputTable = new Table();
 		inputTable.setCellspacing(0);
 		inputTable.setCellpadding(2);

@@ -213,7 +213,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
 				submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
 				submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-				submit.setToDisableOnClick(submit, true);
+				form.setToDisableOnSubmit(submit, true);
 				SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
 				view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 				table.add(method, 1, 11);

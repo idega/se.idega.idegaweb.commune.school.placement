@@ -133,6 +133,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private String searchString;
 
 	private int _pageID;
+	private Form form;
 	/**
 	 * @see com.idega.presentation.PresentationObject#main(IWContext)
 	 */
@@ -175,7 +176,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
-		Form form = new Form();
+		form = new Form();
 		form.maintainParameter(PARAMETER_USER_ID);
 		form.maintainParameter(PARAMETER_CHOICE_ID);
 		form.maintainParameter(PARAMETER_PAGE_ID);
@@ -681,7 +682,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
-		move.setToDisableOnClick(move, true);
+		form.setToDisableOnSubmit(move, true);
 		table.add(move, 1, row);
 		table.add(Text.NON_BREAKING_SPACE, 1, row);
 		table.add(close, 1, row);

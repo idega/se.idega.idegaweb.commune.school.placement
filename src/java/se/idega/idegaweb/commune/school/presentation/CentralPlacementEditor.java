@@ -64,7 +64,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_WINDOW_HEADING = KP + "window_heading";
 	private static final String KEY_SEARCH_PUPIL_HEADING = KP + "search_pupil_heading";
 	private static final String KEY_PUPIL_HEADING = KP + "pupil_heading";
-	private static final String KEY_CURRENT_PLACEMENT_HEADING = KP + "current_placemant_heading";
+	private static final String KEY_LATEST_PLACEMENT_HEADING = KP + "latest_placement_heading";
 	private static final String KEY_NEW_PLACEMENT_HEADING = KP + "new_placement_heading";
 		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
@@ -128,7 +128,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 	// PARAM_BACK is used in SearchUserModule
 	public static final String PARAM_BACK = "param_back";
 	public static final String PARAM_PAYMENT_BY_AGREEMENT = "payment_by_agreement";
-	public static final String PARAM_PAYMENT_BY_INVOICE = "payment_by_invoice";
 	public static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
 	public static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
 	public static final String PARAM_STUDY_PATH = "study_path";
@@ -167,6 +166,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
 	private SchoolClassMember storedPlacement = null;
+	private School newProvider = null;
 
 	private int _action = -1;
 	private int _presentation = -1;
@@ -213,16 +213,22 @@ public class CentralPlacementEditor extends CommuneBlock {
 				break;
 
 		}
-
-		if (errMsgMid == null && (child == null || _presentation == PRESENTATION_SEARCH_FORM
-				|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX)
-																										|| storedPlacement != null)) {
-			// show search form
-			setMainTableContent(getSearchTable(iwc));
-		} else {
-			// show place pupil form
-			setMainTableContent(getPlacementTable(iwc));
+		
+		try {
+			if (errMsgMid == null && (child == null || _presentation == PRESENTATION_SEARCH_FORM
+					|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX)
+																											|| storedPlacement != null)) {
+				// show search form
+				setMainTableContent(getSearchTable(iwc));
+			} else {
+				// show place pupil form
+				setMainTableContent(getPlacementTable(iwc));
+			}			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			setMainTableContent(new Text("RemoteException thrown!! Error connecting to EJB's"));
 		}
+
 		add(form);
 	}
 
@@ -288,7 +294,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return table;
 	}
 
-	public Table getPlacementTable(IWContext iwc) {
+	public Table getPlacementTable(IWContext iwc) throws RemoteException {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setBorder(0);
@@ -391,10 +397,16 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 		row++;
 		col = 1;
+
+		// School Category
+		table.add(getSmallHeader(localize(KEY_MAIN_ACTIVITY_LABEL, "Main activity: ")), col++, row);
+		table.add(getSchoolCategoriesDropdown(iwc), col++, row);
+		row++;
+		col = 1;
 		
-		// *** HEADING Current placment ***
+		// *** HEADING Latest placment ***
 		Text currentPlacementTxt =
-			new Text(localize(KEY_CURRENT_PLACEMENT_HEADING, "Current placement"));
+			new Text(localize(KEY_LATEST_PLACEMENT_HEADING, "Latest placement"));
 		currentPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
 		table.add(currentPlacementTxt, col, row);
 		table.setRowHeight(row, "20");
@@ -438,26 +450,26 @@ public class CentralPlacementEditor extends CommuneBlock {
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 
-		// Values - Current placement
+		// Values - Latest placement
 		if (child != null) {
 			try {
-				SchoolClassMember placement = getCentralPlacementBusiness(iwc).
-																				getCurrentSchoolClassMembership(child, iwc);
-				if (placement != null) {
+				SchoolClassMember latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(
+																																	iwc, child);
+				if (latestPl != null) {
 					row--; row--;row--;
 					col = 2;
 					// Activity
 
-					//table.add(placement.getSchoolClass().getSchoolType().getName(), col, row);
+					//table.add(latestPl.getSchoolClass().getSchoolType().getName(), col, row);
 					row++;
 
 					// Placement
 					StringBuffer buf =
-						new StringBuffer(placement.getSchoolClass().getSchool().getName());
+						new StringBuffer(latestPl.getSchoolClass().getSchool().getName());
 					buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
-							+ placement.getSchoolClass().getSchoolYear().getName() + ", "
+							+ latestPl.getSchoolClass().getSchoolYear().getName() + ", "
 							+ localize(KEY_SCHOOL_GROUP, "group") + " "
-							+ placement.getSchoolClass().getSchoolClassName());
+							+ latestPl.getSchoolClass().getSchoolClassName());
 					table.add(getSmallText(buf.toString()), col, row);
 					table.mergeCells(col, row, col+2, row);
 					row++;
@@ -500,11 +512,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		row++;
 		col = 1;
-		// School Category
-		table.add(getSmallHeader(localize(KEY_MAIN_ACTIVITY_LABEL, "Main activity: ")), col++, row);
-		table.add(getSchoolCategoriesDropdown(iwc), col++, row);
-		row++;
-		col = 1;
 		// Provider labels
 		table.add(getSmallHeader(localize(KEY_PROVIDER_LABEL, "Provider: ")), col++, row);
 		table.add(getProvidersDropdown(iwc), col++, row);
@@ -540,12 +547,25 @@ public class CentralPlacementEditor extends CommuneBlock {
 				row++;
 				// Administrator value
 				table.add(school.getCentralizedAdministration() ? localize(KEY_CENTRAL_ADMIN, "Central") :
-																		localize(KEY_PROVIDER_ADMIN, "Provider"), col, row);
+																	localize(KEY_PROVIDER_ADMIN, "Provider"), col, row);
 			}
 		}
+		// Compensation by invoice
 		table.add(getSmallHeader(localize(KEY_PAYMENT_BY_INVOICE_LABEL, "Payment by invoice: ")),
-																																++col, row);
-		table.add(getYesNoDropdown(PARAM_PAYMENT_BY_INVOICE), ++col, row);
+																																	++col, row);
+			// value if provider is set
+		if (iwc.isParameterSet(PARAM_PROVIDER) 
+															&& !(iwc.getParameter(PARAM_PROVIDER).equals("-1"))) {													
+			newProvider = getSchoolBusiness(iwc)
+													.getSchool(new Integer(iwc.getParameter(PARAM_PROVIDER)));
+			if (newProvider != null) {
+				boolean hasCompByInv = newProvider.getHasCompensationByInvoice();
+				Text txt = getSmallText(hasCompByInv ? localize(KEY_DROPDOWN_YES, "Yes") 
+														 					: localize(KEY_DROPDOWN_NO, "No"));
+				table.add(txt, ++col, row);											
+			}
+		}
+
 		
 		row++;
 		col = 2;
@@ -561,6 +581,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 			col++, row);
 		table.add(getPlacementParagraphTextInput(), col, row);
 		table.mergeCells(col, row, col+1, row);
+		table.setAlignment(col, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
 		col = 1;
 		// School Year input
@@ -578,7 +599,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		// Study Path input
 		table.add(getSmallHeader(localize(KEY_STUDY_PATH_LABEL, "Study path: ")), col++, row);
-		table.add(getStudyPathsDropdown(iwc), col++, row);
+//********		table.add(getStudyPathsDropdown(iwc), col++, row);
 		row++;
 		col = 1;
 		table.add(transGIF, col, row); // EMPTY SPACE ROW
@@ -896,7 +917,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return drop;		
 	}
 	
-	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
+/*	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
 		DropdownMenu studyPath = new DropdownMenu(PARAM_STUDY_PATH);
 		studyPath.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 
@@ -924,7 +945,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		txt.setLength(25);
 		return txt;
 	}
-	
+*/	
 
 	private DateInput getPlacementDateInput(IWContext iwc) {
 		//DateInput dInput = new DateInput(PARAM_PLACEMENT_DATE);

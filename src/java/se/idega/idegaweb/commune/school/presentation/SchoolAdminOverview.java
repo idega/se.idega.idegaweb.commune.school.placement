@@ -506,7 +506,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 								if (choice.getStatus().equalsIgnoreCase("PLAC") && schClMem != null){
 									//string = string + "&nbsp;&nbsp;" + schClMem.getSchoolYear().getName();
 									if (schClMem != null){
-										string = string + "&nbsp;&nbsp;" + schClMem.getSchoolClass().getName();
+										schoolClass = schClMem.getSchoolClass().getName();
 									}
 									
 								}
@@ -538,11 +538,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 						if (language == null) {
 							language = choice.getLanguageChoice();
 						}
-						SchoolYear scy = null;
 						if (schoolYear == null){
 							schoolYear = choice.getSchoolYear();
-							scy = choice.getCurrentSchoolYear();
 						}
+						
 						
 						if (placementDate == null && choice.getPlacementDate() != null)
 							placementDate = new IWTimestamp(choice.getPlacementDate());
@@ -555,6 +554,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 				if (schoolYear != null) {
 					table.add(getSmallHeader(localize("school.school_choice_year", "School year")), 1, row);
 					table.add(getSmallText(schoolYear.getName()), 2, row++);
+				}
+				if (schoolClass != null) {
+					table.add(getSmallHeader(localize("school.school_class", "School class")), 1, row);
+					table.add(getSmallText(schoolClass), 2, row++);
 				}
 				
 				if (calendar != null) {

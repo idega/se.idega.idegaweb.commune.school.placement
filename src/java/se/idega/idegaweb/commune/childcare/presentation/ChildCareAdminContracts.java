@@ -326,7 +326,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			table.add(getStyledInterface(op),3,row);
 			
 			if (_groupPage != null) {
-				GenericButton createGroup = new GenericButton(localize("child_care.create_group", "Create group"), "");
+				GenericButton createGroup = new GenericButton("", localize("child_care.create_group", "Create group"));
 				createGroup.setPageToOpen(_groupPage);
 				table.add(Text.getNonBrakingSpace(), 3, row);
 				table.add(createGroup, 3, row);

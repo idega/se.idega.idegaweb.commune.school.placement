@@ -862,16 +862,19 @@ public class SchoolAdminOverview extends CommuneBlock {
         
 		String subject = null;
 		String body = null;
+		String message = null;
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {
 			if (schoolClass.getReady()) {
 				subject = localize("school.finalize_subject", "");
 				body = localize("school.finalize_body", "");
+				message = localize("school.proceed_with_ready_marking", "Proceed with marking class as ready and send out messages?");
 			}
 			else {
 				subject = localize("school.students_put_in_class_subject", "");
 				body = localize("school.students_put_in_class_body", "");
+				message = localize("school.proceed_with_locked_marking", "Proceed with marking class as locked and send out messages?");
 			}
             
 			if (body != null) {
@@ -899,10 +902,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 			text.setContent(body);
 		table.add(text, 1, row++);
 		
-		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
-		move.setValueOnClick(PARAMETER_METHOD, "-1");
-		form.setToDisableOnSubmit(move, true);
-		table.add(move, 1, row);
+		SubmitButton send = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
+		send.setValueOnClick(PARAMETER_METHOD, "-1");
+		send.setSubmitConfirm(message);
+		form.setToDisableOnSubmit(send, true);
+		
+		table.add(send, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);

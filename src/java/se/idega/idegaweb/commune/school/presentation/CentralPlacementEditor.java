@@ -24,6 +24,7 @@ import se.idega.idegaweb.commune.care.data.ChildCareContractHome;
 import se.idega.idegaweb.commune.care.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.care.resource.data.Resource;
 import se.idega.idegaweb.commune.care.resource.data.ResourceClassMember;
+import se.idega.idegaweb.commune.childcare.business.ChildCareConstants;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
@@ -32,7 +33,6 @@ import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSessionBean;
-import se.idega.idegaweb.commune.school.business.SchoolConstants;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -79,8 +79,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/19 10:33:42 $ by $Author: thomas $
- * @version $Revision: 1.93 $
+ * Last modified: $Date: 2004/10/19 17:20:02 $ by $Author: thomas $
+ * @version $Revision: 1.94 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -1737,7 +1737,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		linkButton.setWindowToOpen(CentralPlacementChildCareContracts.class);
 		if (child != null) {
 			Integer PK = (Integer) child.getPrimaryKey();
-			linkButton.addParameter(SchoolConstants.PARAMETER_CHILD_ID, PK.intValue());			
+			linkButton.addParameter(ChildCareConstants.PARAMETER_CHILD_ID, PK.intValue());			
 		}
 		return linkButton;
 	}

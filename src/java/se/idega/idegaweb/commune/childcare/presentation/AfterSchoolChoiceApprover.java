@@ -6,13 +6,11 @@ package se.idega.idegaweb.commune.childcare.presentation;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
-
+import se.idega.idegaweb.commune.care.business.CareConstants;
 import se.idega.idegaweb.commune.care.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
-import se.idega.idegaweb.commune.childcare.business.ChildCareConstants;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
-
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
@@ -351,7 +349,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				link.setEventListener(ChildCareEventListener.class);
 				link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
 				link.setParameter(getSession().getParameterApplicationID(), application.getPrimaryKey().toString());
-				link.setParameter(getSession().getParameterCaseCode(), ChildCareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
+				link.setParameter(getSession().getParameterCaseCode(), CareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
 				if (getResponsePage() != null)
 					link.setPage(getResponsePage());
 	

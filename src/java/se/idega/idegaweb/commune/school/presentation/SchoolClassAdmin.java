@@ -17,7 +17,6 @@ import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
 
-import com.idega.block.school.business.SchoolClassMemberComparator;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolYear;

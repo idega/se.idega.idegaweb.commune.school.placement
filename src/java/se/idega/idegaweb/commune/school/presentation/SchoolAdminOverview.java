@@ -1688,12 +1688,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	
 	private Table getMessageTextForm(IWContext iwc) throws RemoteException {
-		Table table = new Table(3, 8);
+		Table table = new Table(3, 9);
 		table.setBorder(0);
 		table.setCellpadding(1);
 		table.setCellspacing(2);
 		table.setWidth("100%");
 		table.setWidth(3, 100);
+		table.mergeCells(1, 1, 3, 1);
+		int row = 1;
 		
 		TextArea rejectStudent = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_STUDENT));
 		rejectStudent.setWidth(Table.HUNDRED_PERCENT);
@@ -1737,59 +1739,63 @@ public class SchoolAdminOverview extends CommuneBlock {
 			e.printStackTrace();
 		}
 		
-		
-		table.add(getSmallHeader(localize("school.reject_student", "Reject student")), 1, 1);
-		table.setVerticalAlignment(1, 2, Table.VERTICAL_ALIGN_TOP);
-		table.add(rejectStudent, 1, 2);
-		table.add(getSmallHeader(localize("school.placement_offer", "Placement offer")), 1, 3);
-		table.setVerticalAlignment(1, 4, Table.VERTICAL_ALIGN_TOP);
-		table.add(placementOffer, 1, 4);
-		table.add(getSmallHeader(localize("school.placement_confirmation", "Placement confirmation")), 1, 5);
-		table.setVerticalAlignment(1, 6, Table.VERTICAL_ALIGN_TOP);
-		table.add(placementConfirmation, 1, 6);
+		table.add(getSmallText(localize("school.message_info", "Here you can change your messages that are sent to the parents")), row, 1);
+		table.add(new Break(),row, 1);
+		table.add(getSmallErrorText(localize("school.message_warning", "The info in the text which is displayed with {1} etc should not be removed.")), row, 1);
+		row++;
+		table.add(getSmallHeader(localize("school.reject_student", "Reject student")), 1, row++);
+		table.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
+		table.add(rejectStudent, 1, row++);
+		table.add(getSmallHeader(localize("school.placement_offer", "Placement offer")), 1, row++);
+		table.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
+		table.add(placementOffer, 1, row++);
+		table.add(getSmallHeader(localize("school.placement_confirmation", "Placement confirmation")), 1, row++);
+		table.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
+		table.add(placementConfirmation, 1, row);
 
-		
-		table.setVerticalAlignment(3, 2, Table.VERTICAL_ALIGN_TOP);
-		table.add(getSmallText("{0} "+localize("school.current_user_name", "User name")), 3, 2);
-		table.add(Text.BREAK, 3, 2);
-		table.add(getSmallText("{1} "+localize("school.email", "Email")), 3, 2);
-		table.add(Text.BREAK, 3, 2);
-		table.add(getSmallText("{2} "+localize("school.workphone", "Work Phone")), 3, 2);
-		table.add(Text.BREAK, 3, 2);
-		table.add(getSmallText("{3} "+localize("school.child_name", "Child name")), 3, 2);
-		table.add(Text.BREAK, 3, 2);
-		table.add(getSmallText("{4} "+localize("school.school_name", "School name")), 3, 2);
-		table.add(Text.BREAK, 3, 2);
+		row = 3;
+		table.setVerticalAlignment(3, row, Table.VERTICAL_ALIGN_TOP);
+		table.add(getSmallText("{0} "+localize("school.current_user_name", "User name")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{1} "+localize("school.email", "Email")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{2} "+localize("school.workphone", "Work Phone")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{3} "+localize("school.child_name", "Child name")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{4} "+localize("school.school_name", "School name")), 3, row);
+		table.add(Text.BREAK, 3, row++);
 		
 		//Object[] rejectArgs = {user.getName(), email, workphone, choice.getChild().getNameLastFirst(true), choice.getChosenSchool().getName()};
 		//Object[] placeArgs = {school.getName(), schoolClass.getName(), new IWTimestamp().getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)};
-
-		table.setVerticalAlignment(3, 4, Table.VERTICAL_ALIGN_TOP);
-		table.add(getSmallText("{0} "+localize("school.school_name", "School name")), 3, 4);
-		table.add(Text.BREAK, 3, 4);
-		table.add(getSmallText("{1} "+localize("school.school_class", "School class")), 3, 4);
-		table.add(Text.BREAK, 3, 4);
-		table.add(getSmallText("{2} "+localize("school.date", "Date")), 3, 4);
-		table.add(Text.BREAK, 3, 4);
-
-		table.setVerticalAlignment(3, 6, Table.VERTICAL_ALIGN_TOP);
-		table.add(getSmallText("{0} "+localize("school.school_name", "School name")), 3, 6);
-		table.add(Text.BREAK, 3, 6);
-		table.add(getSmallText("{1} "+localize("school.school_class", "School class")), 3, 6);
-		table.add(Text.BREAK, 3, 6);
-		table.add(getSmallText("{2} "+localize("school.date", "Date")), 3, 6);
-		table.add(Text.BREAK, 3, 6);
+		row++;
+		table.setVerticalAlignment(3, row, Table.VERTICAL_ALIGN_TOP);
+		table.add(getSmallText("{0} "+localize("school.school_name", "School name")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{1} "+localize("school.school_class", "School class")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{2} "+localize("school.date", "Date")), 3, row);
+		table.add(Text.BREAK, 3, row++);
 		
+		row++;
+		table.setVerticalAlignment(3, row, Table.VERTICAL_ALIGN_TOP);
+		table.add(getSmallText("{0} "+localize("school.school_name", "School name")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{1} "+localize("school.school_class", "School class")), 3, row);
+		table.add(Text.BREAK, 3, row);
+		table.add(getSmallText("{2} "+localize("school.date", "Date")), 3, row);
+		table.add(Text.BREAK, 3, row++);
 		
+		row++;
 
 		SubmitButton setButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.set", "Set"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE_MESSAGE_TEXT)));
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MESSAGE_TEXT)), 1, 8);
-		table.add(setButton, 1, 8);
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MESSAGE_TEXT)), 1, row);
+		table.add(setButton, 1, row);
 
-		table.add(Text.NON_BREAKING_SPACE, 1, 8);
+		table.add(Text.NON_BREAKING_SPACE, 1, row);
 		
 		CloseButton closeButton = (CloseButton) getStyledInterface(new CloseButton(localize("school.button.close", "Close")));
-		table.add(closeButton, 1, 8);
+		table.add(closeButton, 1, row);
 
 		return table;
 	}

@@ -2049,7 +2049,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String PROP_COMMUNE_PROVIDER_GRP_ID = "provider_administrators_group_id";
 
 		// Get group id from the commune bundle for the group Provider
-		IWBundle communeBundle = IWBundle.getBundle(BUNDLE_NAME_COMMUNE, iwc.getApplication());
+		IWBundle communeBundle = IWBundle.getBundle(BUNDLE_NAME_COMMUNE, iwc.getIWMainApplication());
 		String anordnareIdStr = communeBundle.getProperty(PROP_COMMUNE_PROVIDER_GRP_ID);
 
 		return new Integer(anordnareIdStr);

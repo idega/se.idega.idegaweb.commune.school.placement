@@ -32,7 +32,6 @@ import com.idega.presentation.Table;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
-import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
 
@@ -220,8 +219,18 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		col = 1;
 		row++;
-		// User search module - configure and add 
-		table.add(getSearchUserModule(iwc), col++, row);
+		// User search module - configure and add
+		SearchUserModule searchMod = getSearchUserModule();
+		table.add(searchMod, col++, row);
+
+		// Get pupil if only one found
+		try {
+			searchMod.process(iwc);
+			User oneChild = searchMod.getUser();
+			if (oneChild != null) {
+				pupil = oneChild;
+			}
+		} catch (Exception e) {}
 		
 		return table;
 	}
@@ -507,22 +516,23 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		return child;
 	}
 
-	private SearchUserModule getSearchUserModule(IWContext iwc) {
+	private SearchUserModule getSearchUserModule(/*IWContext iwc*/) {
 		SearchUserModule searcher = new SearchUserModule();
 		searcher.setShowMiddleNameInSearch(false);
 		searcher.setOwnFormContainer(false);
 		searcher.setUniqueIdentifier(UNIQUE_SUFFIX);
-		searcher.setSkipResultsForOneFound(false);
+		searcher.setSkipResultsForOneFound(true);
 		searcher.setHeaderFontStyleName(getStyleName(STYLENAME_SMALL_HEADER));
 		searcher.setButtonStyleName(getStyleName(STYLENAME_INTERFACE_BUTTON));
 		searcher.setPersonalIDLength(12);
 		searcher.setFirstNameLength(15);
 		searcher.setLastNameLength(20);
-
-		String prmChild = SearchUserModule.getUniqueUserParameterName("child");
-		if (iwc.isParameterSet(prmChild)) {
-			searcher.maintainParameter(new Parameter(prmChild, iwc.getParameter(prmChild)));
-		}
+		searcher.setShowSearchParamsAfterSearch(false);
+		
+		/*if (iwc.isParameterSet(uniqueUserSearchParam)) {
+			searcher.maintainParameter(new Parameter(uniqueUserSearchParam, 
+														iwc.getParameter(uniqueUserSearchParam)));
+		}*/
 
 		return searcher;
 	}

@@ -64,8 +64,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/03 18:44:04 $ by $Author: goranb $
- * @version $Revision: 1.30 $
+ * Last modified: $Date: 2003/11/03 18:45:58 $ by $Author: goranb $
+ * @version $Revision: 1.31 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1296,7 +1296,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Link getGroupEditorButton(IWContext iwc) {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_GROUP, "New  group")));
 		linkButton.setAsImageButton(true);
-		linkButton.setWindowToOpen(CentralPlacementSchoolClassBuilder.class);
+		linkButton.setWindowToOpen(CentralPlacementSchoolGroupEditor.class);
 		linkButton.addParameter(SchoolGroupEditor.PARAMETER_ACTION, 
 											String.valueOf(SchoolGroupEditor.ACTION_VIEW));
 		if (iwc.isParameterSet(PARAM_PROVIDER)) {

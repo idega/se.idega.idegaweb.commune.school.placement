@@ -70,8 +70,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
-	private final static String EMAIL_PROVIDER_SUBJECT = LOCALIZE_PREFIX + "application_received_subject";
-	private final static String EMAIL_PROVIDER_MESSAGE = LOCALIZE_PREFIX + "application_received_body";
+	private final static String EMAIL_PROVIDER_SUBJECT = "application_received_subject";
+	private final static String EMAIL_PROVIDER_MESSAGE = "application_received_body";
 
 	private String prmChildId = CitizenChildren.getChildIDParameterName();
 

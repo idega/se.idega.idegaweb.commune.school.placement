@@ -844,10 +844,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private Table getNewStudentTable(IWContext iwc) throws RemoteException {
 		boolean isReady = false;
 		boolean isLocked = false;
+		boolean isSubGroup = false;
 		SchoolClass newSchoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 		if (newSchoolClass != null) {
 			isReady = newSchoolClass.getReady();
 			isLocked = newSchoolClass.getLocked();
+			isSubGroup = newSchoolClass.getIsSubGroup();
 		}
 
 		Table table = new Table();
@@ -1009,38 +1011,41 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			buttonLabel = localize("school.class_ready", "Class ready");
 
 		table.add(back, 1, row);
-		table.add(Text.getNonBrakingSpace(), 1, row);
-
-		GenericButton groupReady = (GenericButton) getStyledInterface(new GenericButton("finalize", buttonLabel));
-		groupReady.setWindowToOpen(SchoolAdminWindow.class);
-		groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
-		groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
-		//Link groupReadyLink = new Link(groupReady);
-		//groupReadyLink.setWindowToOpen(SchoolAdminWindow.class);
-		//groupReadyLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD,
-		// SchoolAdminOverview.METHOD_FINALIZE_GROUP);
-		//groupReady.setValueOnClick(PARAMETER_ACTION,
-		// String.valueOf(ACTION_MANAGE));
-		//groupReady.setValueOnClick(PARAMETER_METHOD,
-		// String.valueOf(ACTION_FINALIZE_GROUP));
-		if (isReady) {
-			//groupReady.setSubmitConfirm(localize("school.confirm_group_locked",
-			// "Are you sure you want to set the group as locked and send out
-			// e-mails to all parents?"));
-			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
-				groupReady.setDisabled(true);
+		
+		if (!isSubGroup) {
+			table.add(Text.getNonBrakingSpace(), 1, row);
+	
+			GenericButton groupReady = (GenericButton) getStyledInterface(new GenericButton("finalize", buttonLabel));
+			groupReady.setWindowToOpen(SchoolAdminWindow.class);
+			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
+			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
+			//Link groupReadyLink = new Link(groupReady);
+			//groupReadyLink.setWindowToOpen(SchoolAdminWindow.class);
+			//groupReadyLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD,
+			// SchoolAdminOverview.METHOD_FINALIZE_GROUP);
+			//groupReady.setValueOnClick(PARAMETER_ACTION,
+			// String.valueOf(ACTION_MANAGE));
+			//groupReady.setValueOnClick(PARAMETER_METHOD,
+			// String.valueOf(ACTION_FINALIZE_GROUP));
+			if (isReady) {
+				//groupReady.setSubmitConfirm(localize("school.confirm_group_locked",
+				// "Are you sure you want to set the group as locked and send out
+				// e-mails to all parents?"));
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
+					groupReady.setDisabled(true);
+				}
 			}
-		}
-		else {
-			//groupReady.setSubmitConfirm(localize("school.confirm_group_ready",
-			// "Are you sure you want to set the group as ready and send out
-			// e-mails to all parents?"));
-			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
-				groupReady.setDisabled(true);
+			else {
+				//groupReady.setSubmitConfirm(localize("school.confirm_group_ready",
+				// "Are you sure you want to set the group as ready and send out
+				// e-mails to all parents?"));
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
+					groupReady.setDisabled(true);
+				}
 			}
+	
+			table.add(groupReady, 1, row);
 		}
-
-		table.add(groupReady, 1, row);
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);

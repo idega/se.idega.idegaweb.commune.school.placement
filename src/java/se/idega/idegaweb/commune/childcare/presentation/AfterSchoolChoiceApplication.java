@@ -165,7 +165,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.setHeight(row++, 12);
 
 			GenericButton showPrognosis =
-				(GenericButton) getButton(new GenericButton("show_prognosis",
+				getButton(new GenericButton("show_prognosis",
 					localize("view_prognosis", "View prognosis")));
 			showPrognosis.setWindowToOpen(ChildCarePrognosisWindow.class);
 

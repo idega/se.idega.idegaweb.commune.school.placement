@@ -218,7 +218,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	  mainTable.setColor(col, row, getHeaderColor());
 	  mainTable.setAlignment(col, row, Table.HORIZONTAL_ALIGN_CENTER);
 	  mainTable.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_MIDDLE);
-	  mainTable.setRowHeight(row, "20");
+	  mainTable.setRowHeight(row, "17");
 	  
 	  return mainTable;	  		
   	}

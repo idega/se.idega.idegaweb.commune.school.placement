@@ -883,6 +883,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		IWTimestamp stamp = new IWTimestamp();
 		int userID = ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue();
 		SchoolClassMember member;
+		SchoolChoice choice;
 		SchoolSeason previousSeason = getBusiness().getPreviousSchoolSeason(getSchoolSeasonID());
 		getBusiness().resetSchoolClassStatus(getSchoolClassID());
 
@@ -890,9 +891,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			for (int a = 0; a < applications.length; a++) {
 				StringTokenizer tokens = new StringTokenizer(applications[a], ",");
 				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), stamp.getTimestamp(), userID);
-				getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(tokens.nextToken()), iwc.getCurrentUser());
-				if (member != null)
+				choice = getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(tokens.nextToken()), iwc.getCurrentUser());
+				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
+					if (choice != null && choice.getPlacementDate() != null) {
+						IWTimestamp placementDate = new IWTimestamp(choice.getPlacementDate());
+						member.setRegisterDate(placementDate.getTimestamp());
+						member.store();
+					}
+				}
 			}
 		}
 

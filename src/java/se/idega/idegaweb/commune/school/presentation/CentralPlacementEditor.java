@@ -10,8 +10,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 
-import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
@@ -61,14 +59,14 @@ import com.idega.util.IWTimestamp;
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
 public class CentralPlacementEditor extends CommuneBlock {
-	// Localization keys
+	// *** Localization keys ***
 	private static final String KP = "central_placing_editor.";
 	private static final String KEY_WINDOW_HEADING = KP + "window_heading";
 	private static final String KEY_SEARCH_PUPIL_HEADING = KP + "search_pupil_heading";
 	private static final String KEY_PUPIL_HEADING = KP + "pupil_heading";
 	private static final String KEY_CURRENT_PLACEMENT_HEADING = KP + "current_placemant_heading";
 	private static final String KEY_NEW_PLACEMENT_HEADING = KP + "new_placement_heading";
-
+		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
 	private static final String KEY_FIRST_NAME_LABEL = KP + "first_name_label";
 	private static final String KEY_LAST_NAME_LABEL = KP + "last_name_label";
@@ -89,18 +87,21 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_COMMUNE_LABEL = KP + "commune_label";
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
 	private static final String KEY_PLACEMENT_PARAGRAPH_LABEL = "placement_paragraph_label";
-	private static final String KEY_CENTRAL_ADMIN = KP + "central_admin";
-	private static final String KEY_PROVIDER_ADMIN = KP + "provider_admin";
 	private static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = 
 																								KP + "Payment by agreement: ";
 	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "Invoice interval: ";
 	private static final String KEY_PLACEMENT_DATE_LABEL = KP + "placement_date_label";
+
 	private static final String KEY_DROPDOWN_CHOSE = KP + "dropdown_chose";
 	private static final String KEY_DROPDOWN_YES = KP + "dropdown_yes";
 	private static final String KEY_DROPDOWN_NO = KP + "dropdown_no";
+	private static final String KEY_SCHOOL_YEAR = KP + "school_year";
+	private static final String KEY_SCHOOL_GROUP = KP + "school_group";
+	private static final String KEY_CENTRAL_ADMIN = KP + "central_admin";
+	private static final String KEY_PROVIDER_ADMIN = KP + "provider_admin";
 	
+		// Button keys
 	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
-	//private static final String KEY_BUTTON_BACK = KP + "button_back";
 	private static final String KEY_BUTTON_REGULAR_PAYMENT = KP + "button_regular_payment";
 	private static final String KEY_BUTTON_PLACEMENT_HISTORY = KP + "placement_history";
 	private static final String KEY_BUTTON_PUPIL_OVERVIEW = KP + "pupil_overview";
@@ -110,34 +111,25 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_BUTTON_PLACE = KP + "button_place";
 	private static final String KEY_BUTTON_CANCEL = KP + "button_cancel";	
 
-	private static final String KEY_SCHOOL_YEAR = KP + "school_year";
-	private static final String KEY_SCHOOL_GROUP = KP + "school_group";
-
-	//  Keys for error messages
-	//private static final String KEY_ERROR_PAST_TIME = KP + "error.no_past_dates";
-
 	// Http request parameters  
-	private static final String PARAM_ACTION = "param_action";
-	private static final String PARAM_PRESENTATION = "param_presentation";
-
-	private static final String PARAM_SCHOOL_CATEGORY = "param_school_category";
-	private static final String PARAM_PROVIDER = "param_provider";
-	private static final String PARAM_ACTIVITY = "param_activity";
-	private static final String PARAM_SCHOOL_YEAR = "param_school_year";
-	private static final String PARAM_SCHOOL_GROUP = "param_school_group";
+	public static final String PARAM_ACTION = "param_action";
+	public static final String PARAM_PRESENTATION = "param_presentation";
+	public static final String PARAM_SCHOOL_CATEGORY = "param_school_category";
+	public static final String PARAM_PROVIDER = "param_provider";
+	public static final String PARAM_ACTIVITY = "param_activity";
+	public static final String PARAM_SCHOOL_YEAR = "param_school_year";
+	public static final String PARAM_SCHOOL_GROUP = "param_school_group";
 	//private static final String PARAM_STUDY_PATH = "param_study_path";
-	private static final String PARAM_PLACEMENT_DATE = "param_placement_date";
-	private static final String PARAM_RESOURCES = "param_resources";
+	public static final String PARAM_PLACEMENT_DATE = "param_placement_date";
+	public static final String PARAM_RESOURCES = "param_resources";
 	//private static final String PARAM_HIDDEN_SUBMIT_SRC = "param_hidden_submit_src";
 	// PARAM_BACK is used in SearchUserModule
 	public static final String PARAM_BACK = "param_back";
-	private static final String PARAM_PAYMENT_BY_AGREEMENT = "payment_by_agreement";
-	private static final String PARAM_PAYMENT_BY_INVOICE = "payment_by_invoice";
-	private static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
-	private static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
-	private static final String PARAM_PLACE = "place_pupil";
-	//private static final String PARAM_CANCEL = "cancel";
-	private static final String PARAM_STUDY_PATH = "study_path";
+	public static final String PARAM_PAYMENT_BY_AGREEMENT = "payment_by_agreement";
+	public static final String PARAM_PAYMENT_BY_INVOICE = "payment_by_invoice";
+	public static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
+	public static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
+	public static final String PARAM_STUDY_PATH = "study_path";
 
 	// Actions
 	private static final int ACTION_PLACE_PUPIL = 1;	
@@ -155,7 +147,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		"/idegaweb/bundles/com.idega.core.bundle/resources/transparentcell.gif";
 
 	// Session java bean keys
-	private static final String SESSION_KEY_CHILD = KP + "session_key.child";
+	public static final String SESSION_KEY_CHILD = KP + "session_key.child";
 
 	// Unique parameter suffix used by SearchUserModule
 	private static final String UNIQUE_SUFFIX = "chosen_user";
@@ -210,6 +202,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//String pres = iwc.getParameter(PARAM_PRESENTATION);
 
 		//String uniqueStr = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
+		
+		
+		// Process search to get child (User object)
+		processSearch(iwc);
 
 		// Perform actions according the _action input parameter
 		switch (_action) {
@@ -222,11 +218,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 		}
 
-		// Process search to get child (User object)
-		processSearch(iwc);
-
-		if (child == null || _presentation == PRESENTATION_SEARCH_FORM
-				|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX)) {
+		if (errMsgMid == null && (child == null || _presentation == PRESENTATION_SEARCH_FORM
+				|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX))) {
 			// show search form
 			setMainTableContent(getSearchTable(iwc));
 		} else {
@@ -392,7 +385,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 		row++;
 		col = 1;
-
+		
 		// *** HEADING Current placment ***
 		Text currentPlacementTxt =
 			new Text(localize(KEY_CURRENT_PLACEMENT_HEADING, "Current placement"));
@@ -442,7 +435,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Values - Current placement
 		if (child != null) {
 			try {
-				SchoolClassMember placement = getCurrentSchoolClassMembership(child, iwc);
+				SchoolClassMember placement = getCentralPlacementBusiness(iwc).
+																				getCurrentSchoolClassMembership(child, iwc);
 				if (placement != null) {
 					row--; row--;row--;
 					col = 2;
@@ -488,6 +482,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// ERROR MSG - errMsgMid
 		if (errMsgMid != null) {
 			table.add(getSmallErrorText(errMsgMid), col, row);
+			table.mergeCells(col, row, col+2, row);
 			row++;
 		}
 
@@ -654,7 +649,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Placement date
 		table.add(
 			getSmallHeader(localize(KEY_PLACEMENT_DATE_LABEL, "Placement date: ")), col++, row);
-		table.add(getPlacementDateInput(), col, row);
+		table.add(getPlacementDateInput(iwc), col, row);
 		table.mergeCells(col, row, col + 2, row);
 		col = 1;
 		row++;
@@ -668,7 +663,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// BOTTOM BUTTONS
 			// Place
 		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_PLACE, "Place"), 
-								PARAM_PLACE, String.valueOf(PRESENTATION_SEARCH_FORM)), col++, row);
+								PARAM_ACTION, String.valueOf(ACTION_PLACE_PUPIL)), col++, row);
 			// Cancel		
 		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel"),
 						PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), col++, row);
@@ -918,13 +913,22 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 	
 
-	private DateInput getPlacementDateInput() {
-		DateInput dInput = new DateInput(PARAM_PLACEMENT_DATE);
+	private DateInput getPlacementDateInput(IWContext iwc) {
+		//DateInput dInput = new DateInput(PARAM_PLACEMENT_DATE);
+		DateInput dInput = (DateInput) getStyledInterface(
+																		new DateInput(PARAM_PLACEMENT_DATE, true));
 		IWTimestamp today = IWTimestamp.RightNow();
 		today.setAsDate();
 		java.sql.Date todayDate = today.getDate();
 		dInput.setToDisplayDayLast(true);
-		dInput.setDate(todayDate);
+		if (iwc.isParameterSet(PARAM_PLACEMENT_DATE)) {
+			IWTimestamp placeStamp = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
+			java.sql.Date placeDate = placeStamp.getDate();
+			dInput.setDate(placeDate);
+		} else {
+			dInput.setDate(todayDate);
+		}
+
 		return dInput;
 	}
 	
@@ -947,20 +951,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return school;
 	}
 
-	public SchoolClassMember getCurrentSchoolClassMembership(User user, IWContext iwc)
-		throws RemoteException {
-		try {
-			final SchoolSeason season = getSchoolChoiceBusiness(iwc).getCurrentSeason();
-			//int childID = ((Integer) child.getPrimaryKey()).intValue();
-			//final SchoolClassMember placement = 
-			//    getSchoolBusiness(iwc).getSchoolClassMemberHome().findByUserAndSeason(childID, 2);
-			final SchoolClassMember placement =
-				getSchoolBusiness(iwc).getSchoolClassMemberHome().findByUserAndSeason(user, season);
-			return (null == placement || null != placement.getRemovedDate()) ? null : placement;
-		} catch (final FinderException e) {
-			return null;
-		}
-	}
 	
 	/**
 	 * Gets the name of a Commune. Returns empty String if Commune is null
@@ -1001,12 +991,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		if (child != null)
 			childID = ((Integer) child.getPrimaryKey()).intValue();
 		try {
-			mbr = getCentralPlacementBusiness(iwc).storeSchoolClassMember(iwc, childID);
-			
+			mbr = getCentralPlacementBusiness(iwc).storeSchoolClassMember(iwc, childID);			
 		} catch (CentralPlacementException cpe) {
-			
+			errMsgMid = localize(cpe.getKey(), cpe.getDefTrans());
 		} catch (RemoteException re) {
-			
+			re.printStackTrace();
 		}
 														
 		return mbr;																									

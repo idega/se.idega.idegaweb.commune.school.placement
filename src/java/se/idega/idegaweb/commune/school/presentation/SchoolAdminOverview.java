@@ -643,7 +643,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				try {
 					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByPrimaryKey(new Integer(_schoolClassMemberID));
 					table.add(getSmallHeader(localize("school.placement", "Placement")), 1, row);
-					table.add(getSmallText(CentralPlacementEditor.getPlacementString(scMember, user, getResourceBundle())));
+					table.add(getSmallText(CentralPlacementEditor.getPlacementString(scMember, user, getResourceBundle())), 2, row);
 					++row;
 				} catch (FinderException e) {
 					e.printStackTrace();

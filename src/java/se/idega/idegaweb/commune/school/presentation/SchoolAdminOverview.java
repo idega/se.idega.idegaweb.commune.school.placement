@@ -548,6 +548,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		table.add(getSmallHeader(localize("school.new_school", "New school") + ": "), 1, row);
 		DropdownMenu schools = getSchools(iwc);
+		schools.setToSubmit(false);
 		schools.addMenuElementFirst("-1", localize("school.move_outside_of_nacka", "Outside of Nacka"));
 		table.add(schools, 1, row++);
 
@@ -933,8 +934,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			//if (schoolID != -1) {
 				try {
-					User headmaster = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getHeadmaster(schoolID);
-					//if (headmaster != null) {
 					String address = "";
 					if (studentAddress != null)
 						address = studentAddress.getStreetAddress();
@@ -942,16 +941,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 					String messageSubject = localize("school.student_moved", "Student moved to your school");
 					String messageBody = localize("school.student_moved_body", "The following student has been moved to your school and will need to be handled accordingly: ");
 					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().sendMessageToCommuneAdministrators(MessageFormat.format(messageSubject, arguments), MessageFormat.format(messageBody, arguments));
-					if (headmaster != null)
-						getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster,MessageFormat.format(messageSubject, arguments), MessageFormat.format(messageBody, arguments));
 				}
 				catch (Exception e) {
 				}
 			//}
 
-			IWTimestamp stamp = new IWTimestamp();
 			try {
-				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
+				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChangeChoice(((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 2, 1, 1, "", message, true, false, true, true);
 			}
 			catch (Exception e) {
 				e.printStackTrace();

@@ -20,6 +20,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.data.SchoolArea;
+import com.idega.block.school.data.SchoolSeason;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
 import com.idega.data.IDOCreateException;
@@ -79,6 +80,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private Map providerMap;
 
 	private boolean isAdmin = false;
+	private boolean _useOngoingSeason = false;
 
 	/**
 	 * @see se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock#init(com.idega.presentation.IWContext)
@@ -223,9 +225,22 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				parent = iwc.getCurrentUser();
 			}
 
+			SchoolSeason season = null;
+			if (_useOngoingSeason) {
+				try {
+					season = getBusiness().getSchoolChoiceBusiness().getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
+				}
+				catch (FinderException e) {
+					season = null;
+				}
+				catch (RemoteException e) {
+					season = null;
+				}
+			}
+			
 			String subject = localize(EMAIL_PROVIDER_SUBJECT, "After school application received");
 			String body = localize(EMAIL_PROVIDER_MESSAGE, "We have received your after school application for {0} to {1}.");
-			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, null, subject, body);
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, season, subject, body);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {
@@ -449,5 +464,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	 */
 	public String localize(String textKey, String defaultText) {
 		return super.localize(LOCALIZE_PREFIX + textKey, defaultText);
+	}
+	
+	public void setUseOngoingSeason(boolean useOngoingSeason) {
+		_useOngoingSeason = useOngoingSeason;
 	}
 }

@@ -52,6 +52,7 @@ import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 
@@ -246,6 +247,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
 				String language = null;
+				IWCalendar calendar = null;
 				if (!choices.isEmpty()) {
 					table.add(getSmallHeader(localize("school.school_choice", "School choices")), 1, row);
 
@@ -280,10 +282,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 							message = choice.getMessage();
 						if (language == null && choice.getLanguageChoice() != null)
 							language = choice.getLanguageChoice();
+						calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
 					}
 					row++;
 				}
 
+				if (calendar != null) {
+					table.add(getSmallHeader(localize("school.date","Date")), 1, row);
+					table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), 2, row++);
+				}
 				if (language != null && language.length() > 0) {
 					table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
 					table.add(getSmallText(localize(language,language)), 2, row++);

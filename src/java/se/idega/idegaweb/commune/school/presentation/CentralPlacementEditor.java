@@ -60,8 +60,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/29 11:00:40 $ by $Author: goranb $
- * @version $Revision: 1.26 $
+ * Last modified: $Date: 2003/10/29 12:42:03 $ by $Author: goranb $
+ * @version $Revision: 1.27 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -177,6 +177,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
 	private SchoolClassMember storedPlacement = null;
+	private Link pupilOverviewLinkButton = null;
 
 	private int _action = -1;
 	//private int _presentation = -1;
@@ -449,14 +450,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setAlignment(5,row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
 		col = 1;
-		// Activity
+		// School type
 		table.add(getSmallHeader(localize(KEY_SCHOOL_TYPE_LABEL, "School type: ")), col, row);
-		// BUTTON Pupil overview 
-		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-												KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")), 5, row);
+		// BUTTON Pupil overview
+		pupilOverviewLinkButton = getPupilOverviewButton(); 
+		table.add(pupilOverviewLinkButton, 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		*/
+		
 		row++;
 		col = 1;
 		// Placement
@@ -495,10 +496,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 					try {
 						table.add(getSmallText(latestPl.getSchoolClass().getSchoolType().getName()), col, row);						
 					} catch (Exception e) {}
-					// BUTTON Pupil overview 
-					table.add(getPupilOverviewButton(latestPl), 5, row);
+					// BUTTON Pupil overview
+					activatePupilOverviewButton(latestPl);
+					//table.add(activatePupilOverviewButton(latestPl), 5, row);
 							//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
-					table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+					//table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 
 					row++;
 
@@ -1233,8 +1235,20 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 		return dateStr;
 	}
+
+	private Link getPupilOverviewButton() {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(SchoolAdminWindow.class);
+		linkButton.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		linkButton.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		linkButton.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+		
+		return linkButton;
+	}
 	
-	private Link getPupilOverviewButton(SchoolClassMember plc) {
+	private void activatePupilOverviewButton(SchoolClassMember plc) {
 		//SubmitButton but =  new SubmitButton(iwrb.getLocalizedImageButton(
 		//										KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview"));
 		// Hidden
@@ -1259,20 +1273,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
 		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
 */												
-		Link link = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
-		link.setAsImageButton(true);
-		link.setWindowToOpen(SchoolAdminWindow.class);
-		link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
-		link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
-		link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
-		link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
-		link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-		link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
-		link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
+		//Link link = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
+		pupilOverviewLinkButton.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
+		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
+		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
 		if (plc.getRemovedDate() != null)
-  			link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());
-
-		return link;										
+		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
 	}
 
 	/**

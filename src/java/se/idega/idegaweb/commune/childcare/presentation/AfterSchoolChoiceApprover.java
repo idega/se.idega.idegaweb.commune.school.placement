@@ -6,11 +6,13 @@ package se.idega.idegaweb.commune.childcare.presentation;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
+
 import se.idega.idegaweb.commune.care.business.CareConstants;
 import se.idega.idegaweb.commune.care.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
+
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
@@ -21,11 +23,13 @@ import com.idega.core.location.data.Address;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
+import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -58,11 +62,13 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	//private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
 	//private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
 	private final String PARAMETER_SORT = "sch_choice_sort";
+	private final String PARAMETER_CREATE_CONTRACTS = "sch_create_contracts";
 	//private final String PARAMETER_SORT_PLACED = "sch_choice_sort_placed";
 	//private final String PARAMETER_SEARCH = "scH_choise_search";	
 	
 	private final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
+	private final int ACTION_CREATE_CONTRACTS = 3;
 	
 	public void init(IWContext iwc) throws Exception {
 			
@@ -73,6 +79,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			switch (action) {
 			case ACTION_MANAGE:
 				drawForm(iwc);
+				break;
+			case ACTION_CREATE_CONTRACTS:
+				handleCreateContracts(iwc);
 				break;
 			//case ACTION_SAVE:
 			//	drawNewGroupForm(iwc);
@@ -95,7 +104,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		else
 			method = 0;*/
 
-		if (iwc.isParameterSet(PARAMETER_ACTION))
+		if (iwc.isParameterSet(PARAMETER_CREATE_CONTRACTS))
+			action = ACTION_CREATE_CONTRACTS;		
+		else if (iwc.isParameterSet(PARAMETER_ACTION))
 			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
 		else
 			action = ACTION_MANAGE;
@@ -185,7 +196,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		form.setEventListener(SchoolEventListener.class);
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
 		
-		Table table = new Table(4, 1);
+		Table table = new Table(6, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setBorder(0);
@@ -203,6 +214,12 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.setWidth(2, 4);
 		table.add(menu, 3, 1);
 		
+		SubmitButton createContracts = (SubmitButton) getStyledInterface(new SubmitButton(PARAMETER_CREATE_CONTRACTS, localize("childcare.create_contracts", "Create contracts")));
+//		createContracts.setSingleSubmitConfirm("testa");
+		createContracts.setSubmitConfirm(localize("childcare.confirm_create_contracts", "Create afterschool contracts for students with school placement."));
+		table.add(Text.NON_BREAKING_SPACE, 4, 1);
+		table.add(Text.NON_BREAKING_SPACE, 5, 1);
+		table.add(createContracts, 6, 1);
 		
 		form.add(table);
 		
@@ -387,6 +404,46 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		}
 			
 		return table;
+	}
+
+	private void handleCreateContracts(IWContext iwc) throws RemoteException {
+		String message = localize("childcare.contracts_created_for", "Contracts created for the following students:");
+		String errorMessage = null;
+		Form form = new Form();
+		Table table = new Table();
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setCellpadding(getCellpadding());
+		table.setCellspacing(getCellspacing());
+		
+		Collection students = createContracts(iwc);
+		if (students == null) {
+			errorMessage = localize("childcare.create_contracts_error", "Could not create contracts.");
+		} else {
+			int row = 1;
+			Iterator iter = students.iterator();
+			while (iter.hasNext()) {
+				User student = (User) iter.next();
+				String name = student.getLastName() + ", " + student.getFirstName();
+				table.add(getSmallText(name), 1, row++);
+			}
+ 			form.add(table);
+			form.add(new Break(2));
+		}
+		
+		SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton("", localize("childcare.back", "Back")));
+		form.add(backButton);
+		
+		if (errorMessage != null) {
+			add(getErrorText(errorMessage));
+		} else {
+			add(getSmallHeader(message));
+		}
+		add(new Break(2));
+		add(form);
+	}
+	
+	private Collection createContracts(IWContext iwc) throws RemoteException {
+		return getAfterSchoolBusiness(iwc).createContractsForChildrenWithSchoolPlacement(getSession().getChildCareID(), iwc.getCurrentUser(), iwc.getCurrentLocale());
 	}
 	
 	protected AfterSchoolBusiness getAfterSchoolBusiness(IWApplicationContext iwac) {

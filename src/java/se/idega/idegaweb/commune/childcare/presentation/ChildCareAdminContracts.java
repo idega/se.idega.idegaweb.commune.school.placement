@@ -266,6 +266,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			createProvider.setWindowToOpen(CentralPlacementProviderEditor.class);
 			table.add(Text.getNonBrakingSpace(), 3, row);
 			table.add(createProvider, 3, row);
+			table.setNoWrap(3, row);
 			row++;
 		}
 		catch (RemoteException e1) {

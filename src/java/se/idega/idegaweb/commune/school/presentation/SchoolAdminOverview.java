@@ -681,6 +681,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
+		move.setToDisableOnClick(move, true);
 		table.add(move, 1, row);
 		table.add(Text.NON_BREAKING_SPACE, 1, row);
 		table.add(close, 1, row);

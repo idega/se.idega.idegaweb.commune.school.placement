@@ -184,7 +184,7 @@ public class CheckRequestForm extends CommuneBlock {
       e.printStackTrace(System.err);
     }
 
-    if(getResponsePage()!=null){
+    if( getResponsePage()!=null && !iwc.isInEditMode() ){
       iwc.forwardToIBPage(getParentPage(), getResponsePage());
     }
     else{

@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/19 11:23:51 $ by $Author: goranb $
- * @version $Revision: 1.57 $
+ * Last modified: $Date: 2003/12/19 12:47:28 $ by $Author: goranb $
+ * @version $Revision: 1.58 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -620,12 +620,20 @@ public class CentralPlacementEditor extends CommuneBlock {
 					
 					row++;
 					col = 2;
+					
 					// Start date
-					table.add(getSmallText(getDateString(latestPl.getRegisterDate())), col, row);
+					try {
+						table.add(getSmallText(getDateString(latestPl.getRegisterDate())), col, row);
+					} catch (Exception e) {}
+					
 					col = 4;
+					
 					// End date
-					if (latestPl.getRemovedDate() != null)
-						table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col, row);
+					try {
+						if (latestPl.getRemovedDate() != null)
+							table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col, row);
+					} catch (Exception e) {}
+					
 					// Edit latest placement BUTTON
 					activateEditLatestPlacementButton(latestPl);
 				}

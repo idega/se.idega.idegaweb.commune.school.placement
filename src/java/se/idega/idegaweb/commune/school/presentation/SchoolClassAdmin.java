@@ -253,7 +253,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				move.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
 				move.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 
-				String name = student.getNameLastFirst(true);
+				//String name = student.getNameLastFirst(true);
+				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 

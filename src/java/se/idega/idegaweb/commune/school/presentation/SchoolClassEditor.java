@@ -512,7 +512,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					}
 				}
 
-				String name = applicant.getNameLastFirst(true);
+				//String name = applicant.getNameLastFirst(true);
+				String name = getBusiness().getUserBusiness().getNameLastFirst(applicant, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = applicant.getName();
 
 				if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {

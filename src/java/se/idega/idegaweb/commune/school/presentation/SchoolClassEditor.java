@@ -202,7 +202,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 				table.add(method, 1, 11);
 				table.add(submit, 1, 11);
-				table.add(Text.NON_BREAKING_SPACE, 1, 11);
+				table.add(Text.getNonBrakingSpace(), 1, 11);
 				table.add(view, 1, 11);
 			}
 		}
@@ -239,7 +239,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.add(pdfLink, 1, row);
 			Link excelLink = getXLSLink(SchoolClassWriter.class,getBundle().getImage("shared/xls.gif"));
 			excelLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
-			table.add(Text.NON_BREAKING_SPACE, 1, row);
+			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(excelLink, 1, row++);
 		}
 
@@ -482,7 +482,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			deselectAll.setToCheckOnClick(checkBox, false);
 
 			table.add(selectAll, 1, row);
-			table.add(Text.NON_BREAKING_SPACE, 1, row);
+			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(deselectAll, 1, row);
 			table.mergeCells(1, row, table.getColumns(), row);
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
@@ -609,7 +609,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			deselectAll.setToCheckOnClick(checkBox, false);
 	
 			table.add(selectAll, 1, row);
-			table.add(Text.NON_BREAKING_SPACE, 1, row);
+			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(deselectAll, 1, row);
 			table.mergeCells(1, row, 6, row);
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
@@ -735,7 +735,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			buttonLabel = localize("school.class_ready", "Class ready");
 
 		table.add(back, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 
 		GenericButton groupReady = (GenericButton) getStyledInterface(new GenericButton("finalize", buttonLabel));
 		groupReady.setWindowToOpen(SchoolAdminWindow.class);

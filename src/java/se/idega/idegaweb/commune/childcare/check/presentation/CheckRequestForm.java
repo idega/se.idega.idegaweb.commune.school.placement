@@ -23,7 +23,6 @@ import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
-import com.idega.user.Converter;
 import com.idega.user.data.User;
 
 /**
@@ -211,7 +210,7 @@ public class CheckRequestForm extends CommuneBlock {
 
 		try {
 			if (showErrors)
-				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, Converter.convertToNewUser(iwc.getUser()), "", false, false, false, false, false);
+				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, iwc.getCurrentUser(), "", false, false, false, false, false);
 			
 			if (createChoices()) {
 				/*SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();

@@ -394,29 +394,29 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
-				table.add(Text.NON_BREAKING_SPACE, 1, row);
+				table.add(Text.getNonBrakingSpace(), 1, row);
 
 				if (_schoolID == pendingSchoolId) {
 					table.add(reject, 1, row);
-					table.add(Text.NON_BREAKING_SPACE, 1, row);
+					table.add(Text.getNonBrakingSpace(), 1, row);
 				}
 
 				/** Gimmi 13.11.2002 _schoolID is NOT -1 so no need to check again....    */
 				/** was like this --->  if (_choiceID == -1 && _choiceID != _schoolID) {  */
 				if (_choiceID == -1) {
 					table.add(move, 1, row);
-					table.add(Text.NON_BREAKING_SPACE, 1, row);
+					table.add(Text.getNonBrakingSpace(), 1, row);
 				}
 			}
 
 			if (_choiceID != -1 && !_showNoChoices) {
 				table.add(moveYear, 1, row);
-				table.add(Text.NON_BREAKING_SPACE, 1, row);
+				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 			
 			if (_showNoChoices) {
 				table.add(editStudent, 1, row);
-				table.add(Text.NON_BREAKING_SPACE, 1, row);
+				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 
 			table.add(close, 1, row);
@@ -453,14 +453,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String message = MessageFormat.format(localize("school.reject_student_message", "We are sorry that we cannot offer you a place in our school at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2})."), arguments);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
-		textArea.setHeight(4);
+		textArea.setRows(4);
 
 		table.add(getSmallHeader(localize("school.reject_student_message_info", "The following message will be sent to the students' parents.")), 1, row++);
 		table.add(textArea, 1, row++);
 
 		SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_ACTION, String.valueOf(ACTION_REJECT)));
 		table.add(reject, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -510,14 +510,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		//textArea.setAsNotEmpty(localize("school.must_provide_reason_for_replacement","You must specify a reason for replacement."));
 		textArea.keepStatusOnAction(true);
-		textArea.setHeight(4);
+		textArea.setRows(4);
 		table.add(textArea, 1, row++);
 
 		SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace", "Replace"), PARAMETER_ACTION, String.valueOf(ACTION_REPLACE)));
 		replace.setValueOnClick(PARAMETER_METHOD, "-1");
 		//replace.setToEnableWhenChecked(PARAMETER_PROTOCOL);
 		table.add(replace, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -549,14 +549,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(new Break(), 1, row);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_MOVE_MESSAGE));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
-		textArea.setHeight(4);
+		textArea.setRows(4);
 		textArea.setAsNotEmpty(localize("school.must_provide_reason_for_move", "You must specify a reason for move."));
 		table.add(textArea, 1, row++);
 
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.add(move, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -583,7 +583,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.add(move, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -611,7 +611,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move")));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.add(move, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -672,7 +672,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
 		form.setToDisableOnSubmit(move, true);
 		table.add(move, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -743,7 +743,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		update.setValueOnClick(PARAMETER_METHOD, "-1");
 		table.mergeCells(1, row, 2, row);
 		table.add(update, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -811,7 +811,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 							radio = getRadioButton(PARAMETER_USER_ID, user.getPrimaryKey().toString());
 						
 							userTable.add(radio, 1, userRow);
-							userTable.add(Text.NON_BREAKING_SPACE, 1, userRow);
+							userTable.add(Text.getNonBrakingSpace(), 1, userRow);
 							userTable.add(getSmallText(user.getNameLastFirst(true)), 1, userRow);
 							userTable.add(getSmallText(" ("), 1, userRow);
 							userTable.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())+")"), 1, userRow++);

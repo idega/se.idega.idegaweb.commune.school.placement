@@ -599,7 +599,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		// Study Path input
 		table.add(getSmallHeader(localize(KEY_STUDY_PATH_LABEL, "Study path: ")), col++, row);
-//********		table.add(getStudyPathsDropdown(iwc), col++, row);
+		table.add(getStudyPathsDropdown(iwc), col++, row);
 		row++;
 		col = 1;
 		table.add(transGIF, col, row); // EMPTY SPACE ROW
@@ -917,7 +917,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return drop;		
 	}
 	
-/*	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
+	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
 		DropdownMenu studyPath = new DropdownMenu(PARAM_STUDY_PATH);
 		studyPath.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 
@@ -945,7 +945,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		txt.setLength(25);
 		return txt;
 	}
-*/	
+	
 
 	private DateInput getPlacementDateInput(IWContext iwc) {
 		//DateInput dInput = new DateInput(PARAM_PLACEMENT_DATE);

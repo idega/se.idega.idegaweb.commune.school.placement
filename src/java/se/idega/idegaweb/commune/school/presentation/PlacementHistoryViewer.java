@@ -51,7 +51,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String KEY_PLACEMENTS_HEADING = KP + "placements_heading";
 	private static final String KEY_CONFIRM_REMOVE_PLC_MSG = KP + "confirm_remove_plc_msg";
 	private static final String KEY_TOOLTIP_REMOVE_PLC = KP + "tooltip_remove_placement";
-	private static final String KEY_TOOLTIP_EDIT_PLC = KP + "tooltip_edit_placement";
+	private static final String KEY_TOOLTIP_PUPIL_OVERVIEW = KP + "tooltip_pupil_overview";
 
 		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
@@ -461,13 +461,13 @@ public class PlacementHistoryViewer extends CommuneBlock {
 																							plc.getRemovedDate(), "yyyy-MM-dd");
 					table.add(getSmallText(dateStr), col++, row);
 				} catch (Exception e) {col++;}
-				// Edit resources button
+				// Pupil overview button
 				try {
-					// Get edit button					
+					// Get Pupil overview button					
 					String plcId =  ((Integer) plc.getPrimaryKey()).toString();
 					String schClassId = String.valueOf(plc.getSchoolClassId());
 
-					Link editButt = new Link(this.getEditIcon(localize(KEY_TOOLTIP_REMOVE_PLC, "Edit resources")));
+					Link editButt = new Link(this.getEditIcon(localize(KEY_TOOLTIP_PUPIL_OVERVIEW, "Pupil overview")));
 					editButt.setWindowToOpen(PlacementHistoryEditPlacement.class);
 					editButt.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 					editButt.addParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
@@ -489,7 +489,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				// Remove button
 				try {
 					// Get remove button      
-					Image delImg = getDeleteIcon(localize(KEY_TOOLTIP_EDIT_PLC, "Edit placement"));
+					Image delImg = getDeleteIcon(localize(KEY_TOOLTIP_REMOVE_PLC, "Delete placement"));
 					int plcID = ((Integer) plc.getPrimaryKey()).intValue();
 
 					SubmitButton delButt = new SubmitButton(delImg);

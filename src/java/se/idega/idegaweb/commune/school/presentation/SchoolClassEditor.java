@@ -73,8 +73,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private final int ACTION_FINALIZE_GROUP = 3;
 	private final int ACTION_DELETE = 4;
 
-	private Map students;
-
 	private int action = 0;
 	private int method = 0;
 	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
@@ -189,8 +187,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.add(getNavigationTable(true, multibleSchools), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 2, 1);
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
-
-		students = getBusiness().getStudentList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeason(getSchoolID(), getSchoolSeasonID()));
 
 		table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
@@ -387,7 +383,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				//address = (Address) addressMap.get(new Integer(choice.getChildId()));
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
 				
-				if (students.containsValue(applicant))
+				if (getBusiness().isAlreadyInSchool(choice.getChildId(),getSession().getSchoolID(), getSession().getSchoolSeasonID()))
 					checkBox.setDisabled(true);
 
 				String name = applicant.getNameLastFirst(true);
@@ -557,7 +553,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
-				if (students.containsValue(student))
+				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(),getSession().getSchoolID(), getSession().getSchoolSeasonID()))
 					checkBox.setDisabled(true);
 
 				String name = student.getNameLastFirst(true);

@@ -100,7 +100,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private boolean showStatistics = true;
 	private boolean showBunRadioButtons = false;
-	private boolean isOngoingSeason = false;
+	//private boolean isOngoingSeason = false;
 	private boolean _useForTesting = false;
 
 	private SchoolClass _group;
@@ -142,7 +142,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 
 	private void parseAction(IWContext iwc) throws RemoteException {
-		isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
+		//isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
 
 		if (iwc.isParameterSet(PARAMETER_PREVIOUS_CLASS_ID)) _previousSchoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_PREVIOUS_CLASS_ID));
 

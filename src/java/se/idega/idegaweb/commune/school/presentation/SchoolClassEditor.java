@@ -263,36 +263,45 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 
 		
-		table.mergeCells(3, row, 5, row);
-		table.setAlignment(2, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.setAlignment(3, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.mergeCells(1, row, table.getColumns(), row);
+		
+		Table navigationTable = new Table(3,1);
+		navigationTable.setCellpadding(0);
+		navigationTable.setCellspacing(0);
+		navigationTable.setWidth(Table.HUNDRED_PERCENT);
+		navigationTable.setWidth(1, "33%");
+		navigationTable.setWidth(2, "33%");
+		navigationTable.setWidth(3, "33%");
+		navigationTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_CENTER);
+		navigationTable.setAlignment(3, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.add(navigationTable,1,row++);
+
 		Text prev = getSmallText(localize("previous","Previous"));
 		Text next = getSmallText(localize("next","Next"));
 		Text test = getSmallText("ApplSize : "+applicants.size()+" .... perPage"+ applicationsPerPage);
 		Text info = getSmallText(localize("page","Page") +" "+ (currPage +1) +" "+localize("of", "of") +" "+ (maxPage+1));
 		if (currPage > 0) {
-			Link lPrev = new Link(prev);
+			Link lPrev = getSmallLink(localize("previous","Previous"));
 			lPrev.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage-1));
 			lPrev.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
 			lPrev.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
-			table.add(lPrev, 1, row);
+			navigationTable.add(lPrev, 1, 1);
 		} else {
-			table.add(prev, 1, row);
+			navigationTable.add(prev, 1, 1);
 		}
-		table.add(info, 2, row);
+		navigationTable.add(info, 2, 1);
 		
 		if (currPage < maxPage) {
-			Link lNext = new Link(next);
+			Link lNext = getSmallLink(localize("next","Next"));
 			lNext.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage+1));
 			lNext.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
 			lNext.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
-			table.add(lNext, 3, row);
+			navigationTable.add(lNext, 3, 1);
 		} else {
-			table.add(next, 3, row);
+			navigationTable.add(next, 3, 1);
 		}
 
 
-		++row;	
 		table.setRowColor(row, getHeaderColor());
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
@@ -394,8 +403,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(deselectAll, 1, row);
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setRowColor(row, "#FFFFFF");
 
 		return table;

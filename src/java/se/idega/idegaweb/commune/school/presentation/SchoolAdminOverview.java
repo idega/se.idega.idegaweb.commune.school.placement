@@ -222,6 +222,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (_choiceID != -1) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
+				String language = null;
 				if (!choices.isEmpty()) {
 					table.add(getSmallHeader(localize("school.school_choice","School choices")),1,row);
 					
@@ -247,10 +248,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 							table.add(new Break(),2,row);
 						if (message == null)
 							message = choice.getMessage();
+						if (language == null && choice.getLanguageChoice() != null)
+							language = choice.getLanguageChoice();
 					}
 					row++;
 				}
 				
+				if (language != null && language.length() > 0) {
+					table.add(getSmallHeader(localize("school.school_choice_language","Preferred language")),1,row);
+					table.add(getSmallText(language),2,row++);
+				}
 				if (message != null) {
 					table.add(getSmallHeader(localize("school.school_choice_message","Applicant message")),1,row);
 					table.add(getSmallText(message),2,row++);
@@ -365,7 +372,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE, true));
 		input.setStyle("commune_"+STYLENAME_INTERFACE);
 		input.setYearRange(stamp.getYear(), stamp.getYear() - 5);
-		table.add(getSmallHeader(localize("school.replace_date","Replace date")+":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE),1,row);
+		if (_protocol)
+			table.add(getSmallHeader(localize("school.replace_date","Replace date")+":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE),1,row);
+		else
+			table.add(getSmallErrorText(localize("school.replace_date","Replace date")+":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE),1,row);
 		table.add(input,1,row++);
 		
 		if (_protocol)
@@ -471,10 +481,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void replace(IWContext iwc) throws RemoteException {
-		if (iwc.isParameterSet(PARAMETER_REPLACE_MESSAGE)) {
+		if (iwc.isParameterSet(PARAMETER_REPLACE_MESSAGE) && iwc.isParameterSet(PARAMETER_DATE)) {
 			String message = iwc.getParameter(PARAMETER_REPLACE_MESSAGE);
+			String date = iwc.getParameter(PARAMETER_DATE);
 			
-			IWTimestamp stamp = new IWTimestamp();
+			IWTimestamp stamp = new IWTimestamp(date);
 			getSchoolCommuneBusiness(iwc).getSchoolClassMemberBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
 			if (_choiceID != -1)
 				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().groupPlaceAction(new Integer(_choiceID), iwc.getCurrentUser());
@@ -489,9 +500,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void move(IWContext iwc) throws RemoteException {
-		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE) && iwc.isParameterSet(PARAMETER_DATE)) {
+		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE)) {
 			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
-			String date = iwc.getParameter(PARAMETER_DATE);
 			
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
 			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYear(getSchoolCommuneSession(iwc).getSchoolYearID());
@@ -505,11 +515,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 				if (headmaster != null)
 					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster, localize("school.student_moved","Student moved to your school"), localize("school.student_moved_body","The following student has been moved to your school and will need to be handled accordingly: ") + student.getNameLastFirst(true));
 			}
-			catch (CreateException ce) {
-				ce.printStackTrace();
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 				
-			IWTimestamp stamp = new IWTimestamp(date);
+			IWTimestamp stamp = new IWTimestamp();
 			try {
 				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
 			}

@@ -380,8 +380,8 @@ public class CheckRequestForm extends CommuneBlock {
 		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(child);
 		User parent = null;
 		if (coll != null) {
-			int row = 1;
-			int parentNumber = 1;
+			//int row = 1;
+			//int parentNumber = 1;
 			Iterator iter = coll.iterator();
 			while (iter.hasNext()) {
 				parent = (User) iter.next();

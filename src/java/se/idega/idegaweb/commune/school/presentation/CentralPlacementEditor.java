@@ -213,7 +213,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		mainTable.setCellspacing(0);
 		int col = 1;
 		int row = 1;     
-	  //	*** WINDOW HEADING ***
+	  //  *** WINDOW HEADING ***
 	  mainTable.add(getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Central placing of pupil"), col, row);
 	  mainTable.setColor(col, row, getHeaderColor());
 	  mainTable.setAlignment(col, row, Table.HORIZONTAL_ALIGN_CENTER);

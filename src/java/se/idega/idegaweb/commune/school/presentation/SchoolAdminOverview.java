@@ -188,6 +188,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 			if (_choiceID != -1) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
+				String message = null;
 				if (!choices.isEmpty()) {
 					table.add(getSmallHeader(localize("school.school_choice","School choices")),1,row);
 					
@@ -205,8 +206,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 						
 						if (iter.hasNext())
 							table.add(new Break(),2,row);
+						if (message == null)
+							message = choice.getMessage();
 					}
 					row++;
+				}
+				
+				if (message != null) {
+					table.add(getSmallHeader(localize("school.school_choice_message","Applicant message")),1,row);
+					table.add(getSmallText(message),1,row++);
 				}
 			}
 			

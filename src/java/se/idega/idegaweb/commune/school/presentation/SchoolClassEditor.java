@@ -120,17 +120,21 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		table.add(getNavigationTable(true), 1, 1);
 
-		Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolSeasonBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID())));
-		validateSchoolClass(previousClasses);
-
 		students = getBusiness().getStudentList(getBusiness().getSchoolClassMemberBusiness().findStudentsBySchoolAndSeason(getSchoolID(), getSchoolSeasonID()));
 
 		table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (_previousSchoolYearID != -1) {
-			table.add(getPreviousHeader(previousClasses), 1, 7);
-			table.add(getStudentTable(iwc), 1, 9);
+			try {
+				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolSeasonBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID())));
+				validateSchoolClass(previousClasses);
+	
+				table.add(getPreviousHeader(previousClasses), 1, 7);
+				table.add(getStudentTable(iwc), 1, 9);
+			}
+			catch (NullPointerException ne) {
+			}
 		}
 
 		if (getSchoolClassID() != -1) {
@@ -213,7 +217,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 								table.setRowColor(row, "#EFEFEF");
 						}
 
-						link = (Link) this.getStyleLink(new Link(name), this.STYLENAME_SMALL_TEXT);
+						link = (Link) this.getSmallLink(name);
 						link.setWindowToOpen(SchoolAdminWindow.class);
 						link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 						link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(choice.getChildId()));
@@ -299,7 +303,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
-				link = (Link) this.getStyleLink(new Link(name), this.STYLENAME_SMALL_TEXT);
+				link = (Link) this.getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
@@ -367,7 +371,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				schoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
-				delete = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.delete", "Delete"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE)));
+				delete = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.delete", "Delete")));
 				delete.setValueOnClick(PARAMETER_APPLICANT_ID, String.valueOf(studentMember.getClassMemberId()));
 				delete.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE));
 

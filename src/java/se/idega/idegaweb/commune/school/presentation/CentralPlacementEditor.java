@@ -44,6 +44,7 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Table;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DateInput;
@@ -59,8 +60,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/28 14:00:33 $ by $Author: goranb $
- * @version $Revision: 1.25 $
+ * Last modified: $Date: 2003/10/29 11:00:40 $ by $Author: goranb $
+ * @version $Revision: 1.26 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -451,10 +452,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Activity
 		table.add(getSmallHeader(localize(KEY_SCHOOL_TYPE_LABEL, "School type: ")), col, row);
 		// BUTTON Pupil overview 
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
+		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(
 												KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")), 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		*/
 		row++;
 		col = 1;
 		// Placement
@@ -489,10 +491,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 				if (latestPl != null) {
 					row--;row--;row--;row--;
 					col = 2;
-					// Activity
+					// School type
 					try {
 						table.add(getSmallText(latestPl.getSchoolClass().getSchoolType().getName()), col, row);						
 					} catch (Exception e) {}
+					// BUTTON Pupil overview 
+					table.add(getPupilOverviewButton(latestPl), 5, row);
+							//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+					table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+
 					row++;
 
 					// Placement
@@ -579,6 +586,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		String typ = iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED);
 		String yer = iwc.getParameter(PARAM_SCHOOL_YEAR_CHANGED);
 		*/
+		
 		// Hidden inputs
 		table.add(new HiddenInput(PARAM_SCHOOL_CATEGORY_CHANGED, "-1"), 1, 1);
 		table.add(new HiddenInput(PARAM_PROVIDER_CHANGED, "-1"), 1, 1);
@@ -917,6 +925,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		drop.setToSubmit(true);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
+				&& iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
+				&& !iwc.getParameter(PARAM_SCHOOL_CATEGORY).equals("-1")
 				&& iwc.isParameterSet(PARAM_PROVIDER) 
 				&& !iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
 			try {
@@ -926,8 +936,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 					Collection schTypes = school.findRelatedSchoolTypes();
 					for (Iterator iter = schTypes.iterator(); iter.hasNext();) {
 						SchoolType type = (SchoolType) iter.next();
-						int typeID = ((Integer) type.getPrimaryKey()).intValue();
-						drop.addMenuElement(typeID, type.getName());
+						SchoolCategory cat = type.getCategory();
+						String typeCatID = (String) cat.getPrimaryKey();
+						String paramCatID = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
+						// Show only if type-schCategory resembles dropdown-schCategory
+						if (typeCatID.equals(paramCatID)) {
+							int typeID = ((Integer) type.getPrimaryKey()).intValue();
+							drop.addMenuElement(typeID, type.getName());
+						}
 					}
 					if ("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED))) {
 						drop.setSelectedElement("-1");
@@ -1216,6 +1232,47 @@ public class CentralPlacementEditor extends CommuneBlock {
 			dateStr = iwts.getDateString("yyyy-MM-dd");
 		}
 		return dateStr;
+	}
+	
+	private Link getPupilOverviewButton(SchoolClassMember plc) {
+		//SubmitButton but =  new SubmitButton(iwrb.getLocalizedImageButton(
+		//										KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview"));
+		// Hidden
+/*		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_METHOD, "-1"), 1, 1);
+		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_USER_ID, "-1"), 1, 1);
+		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "-1"), 1, 1);
+		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "-1"), 1, 1);
+		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_PAGE_ID, "-1"), 1, 1);
+		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, "-1"), 1, 1);
+		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, "-1"), 1, 1);
+*/
+
+		//String parentPageId = String.valueOf(getParentPage().getPageID());
+		String schClassId = String.valueOf(plc.getSchoolClassId());
+		String plcId =  ((Integer) plc.getPrimaryKey()).toString();
+/*		but.setWindowToOpen(SchoolAdminWindow.class);
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_PAGE_ID, parentPageId);
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
+		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
+*/												
+		Link link = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
+		link.setAsImageButton(true);
+		link.setWindowToOpen(SchoolAdminWindow.class);
+		link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
+		link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+		link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+		link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
+		link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
+		if (plc.getRemovedDate() != null)
+  			link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());
+
+		return link;										
 	}
 
 	/**

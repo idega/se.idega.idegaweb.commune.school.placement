@@ -34,6 +34,7 @@ import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
+import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.builder.business.BuilderLogic;
@@ -72,10 +73,8 @@ import com.idega.util.text.TextSoap;
 /**
  * @author laddi
  *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * Last modified: $Date:$ by $Author:$
+ * @version $Revision:$
  */
 
 public class SchoolAdminOverview extends CommuneBlock {
@@ -320,7 +319,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private Table getOverview(IWContext iwc) throws RemoteException {
 		Table table = new Table();
-    table.setBorder(0);
+        table.setBorder(0);
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
@@ -472,6 +471,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			if (!_showNoChoices) {
 				table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
+				table.add(getSmallHeader(localize("school.study_path", "Study Path")), 1, row + 1);
 				SchoolSeason season = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				if (season != null) {
 					SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
@@ -481,11 +481,20 @@ public class SchoolAdminOverview extends CommuneBlock {
 	
 						String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
 						table.add(getSmallText(schoolString), 2, row);
+
+                        // Show study path if exists
+                        final SchoolStudyPath studyPath
+                                = getSchoolCommuneBusiness(iwc).getStudyPath
+                                (schoolClassMember);
+                        if (null != studyPath) {
+                            table.add (getSmallText(studyPath.getCode ()), 2,
+                                                    row + 1);
+                        }
 					}
 				}
-				row++;
+				row += 2;
 			}
-      
+
             // *** Resources START ***
             Integer providerGrpID = getProviderGrpId(iwc);
             Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));

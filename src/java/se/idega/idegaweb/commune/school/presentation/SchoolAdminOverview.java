@@ -495,8 +495,8 @@ public class SchoolAdminOverview extends CommuneBlock {
                         
                         // Show study path if exists
                         final SchoolStudyPath studyPath
-                                = getSchoolCommuneBusiness(iwc).getStudyPath
-                                (schoolClassMember);
+                                = getSchoolCommuneBusiness (iwc)
+                                .getStudyPath (schoolClassMember);
                         if (null != studyPath) {
                             table.add (getSmallText(studyPath.getCode ()), 2,
                                        row + 1);
@@ -1798,7 +1798,7 @@ public class SchoolAdminOverview extends CommuneBlock {
                 (getClass () + PARAMETER_SCHOOL_CLASS_MEMBER_ID);
         final int studyPathId
                 = Integer.parseInt (context.getParameter ("school_study_path"));
-        getSchoolCommuneBusiness (context).setStudyPath (student, studyPathId);
+        student.setStudyPathId (studyPathId);
     }
 
     private Table getChangeStudyPathForm (final IWContext context)

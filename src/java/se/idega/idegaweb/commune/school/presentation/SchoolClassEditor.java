@@ -412,16 +412,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						}else {
 							++row;	
 						}
-					//}
 				}
 			}
-		//}
 
 		if (showStatistics) {
-			System.out.println("[SchoolClassEditor] starting statistics  : "+IWTimestamp.RightNow().toString());
-	
-//			List totalApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, null, ""));
-//			int totalApplicantsSize = totalApplicants.size();
 			List firstApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[]{1}, validStatuses, ""));
 			int firstApplSize = firstApplicants.size();
 			List secondApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[]{2}, validStatuses, ""));

@@ -400,6 +400,20 @@ public class SchoolAdminOverview extends CommuneBlock {
 					while (iter.hasNext()) {
 						User parent = (User) iter.next();
 						table.add(getSmallText(parent.getNameLastFirst(true)), 2, row);
+						
+						
+						try {
+							Address addressParent = getCommuneUserBusiness(iwc).getUsersMainAddress(parent);
+							
+							if (addressParent != null) {
+								table.add(new Break(), 2, row);
+								table.add(getSmallText(localize("school.address", "Address") + ": "), 2, row);
+								table.add(getSmallText(addressParent.getStreetAddress() + ", " + addressParent.getPostalAddress()), 2, row);
+							}
+							
+						}
+						catch (Exception naf) {
+						}
 						try {
 							Phone phone = getCommuneUserBusiness(iwc).getUsersHomePhone(parent);
 							if (phone != null && phone.getNumber() != null) {

@@ -584,7 +584,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		boolean isReady = false;
 		SchoolClass newSchoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(getSession().getSchoolClassID()));
 		if (newSchoolClass != null)
-			isReady = newSchoolClass.getLocked();
+			isReady = newSchoolClass.getReady();
 		
 		Table table = new Table();
 		table.setWidth(getWidth());

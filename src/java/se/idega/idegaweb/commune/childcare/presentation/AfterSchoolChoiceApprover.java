@@ -127,7 +127,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	
 				if (hasMessage) {
 					showMessage = true;
-					applicationTable.add(getSmallErrorText("&Delta;"), column, row);
+					applicationTable.add(getSmallErrorText("*"), column, row);
 					applicationTable.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
 				}
 
@@ -146,7 +146,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			if (showMessage) {
 				applicationTable.setHeight(row++, 2);
 				applicationTable.mergeCells(1, row, applicationTable.getColumns(), row);
-				applicationTable.add(getSmallErrorText("&Delta; "), 1, row);
+				applicationTable.add(getSmallErrorText("* "), 1, row);
 				applicationTable.add(getSmallText(localize("child_care.has_message_in_application","The application has a message attached")), 1, row++);
 			}
 			

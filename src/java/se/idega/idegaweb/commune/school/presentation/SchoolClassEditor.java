@@ -563,7 +563,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		List formerStudents = new ArrayList();
 		if (_previousSchoolClassID != -1)
-			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClass(_previousSchoolClassID));
+			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(_previousSchoolClassID,_previousSchoolYearID));
 		else
 			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), _previousSchoolSeasonID, _previousSchoolYearID));
 
@@ -700,7 +700,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
 
-		List formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClass(getSchoolClassID()));
+		List formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();

@@ -180,7 +180,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
 
-		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClass(getSchoolClassID()));
+		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 
 		if (!students.isEmpty()) {
 			numberOfStudents = students.size();

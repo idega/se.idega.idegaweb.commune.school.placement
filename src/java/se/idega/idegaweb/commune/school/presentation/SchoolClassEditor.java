@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
@@ -31,6 +32,7 @@ import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
@@ -48,6 +50,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private final String PARAMETER_METHOD = "sch_method";
 	private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
 	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
+	private final String PARAMETER_SORT ="sch_choice_sort";
 
 	private final int ACTION_MANAGE = 1;
 	private final int ACTION_SAVE = 2;
@@ -58,9 +61,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private int action = 0;
 	private int method = 0;
+	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
+	private int sortChoicesBy = SchoolClassMemberComparator.NAME_SORT;
 	private int _previousSchoolClassID = -1;
 	private int _previousSchoolSeasonID = -1;
 	private int _previousSchoolYearID = -1;
+
 
 	public void init(IWContext iwc) throws RemoteException {
 		parseAction(iwc);
@@ -103,6 +109,16 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			method = Integer.parseInt(iwc.getParameter(PARAMETER_METHOD));
 		else
 			method = 0;
+
+		if (iwc.isParameterSet(PARAMETER_SORT))
+			sortChoicesBy = Integer.parseInt(iwc.getParameter(PARAMETER_SORT));
+		else
+			sortChoicesBy = SchoolChoiceComparator.NAME_SORT;
+			
+		if (sortChoicesBy != SchoolChoiceComparator.LANGUAGE_SORT)
+			sortStudentsBy = sortChoicesBy;
+		else
+			sortStudentsBy = SchoolClassMemberComparator.NAME_SORT;
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
@@ -121,7 +137,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setHeight(10, "12");
 		form.add(table);
 
-		table.add(getNavigationTable(true), 1, 1);
+		Table headerTable = new Table(2,1);
+		headerTable.setWidth(Table.HUNDRED_PERCENT);
+		headerTable.setCellpaddingAndCellspacing(0);
+		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.add(headerTable,1,1);
+		
+		headerTable.add(getNavigationTable(true), 1, 1);
+		headerTable.add(getSortTable(), 2, 1);
 
 		students = getBusiness().getStudentList(getBusiness().getSchoolClassMemberBusiness().findStudentsBySchoolAndSeason(getSchoolID(), getSchoolSeasonID()));
 
@@ -168,7 +191,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setHeight(2, "12");
 		form.add(table);
 
-		table.add(getNavigationTable(true), 1, 1);
+		Table headerTable = new Table(2,1);
+		headerTable.setWidth(Table.HUNDRED_PERCENT);
+		headerTable.setCellpaddingAndCellspacing(0);
+		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.add(headerTable,1,1);
+		
+		headerTable.add(getNavigationTable(true), 1, 1);
+		headerTable.add(getSortTable(), 2, 1);
+
 		table.add(getNewStudentTable(iwc), 1, 3);
 
 		add(form);
@@ -181,19 +212,28 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
 		table.setWidth(5,"12");
+		boolean showLanguage = false;
+
+		SchoolYear year = getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID()));
+		if (year != null && year.getSchoolYearAge() == 12)
+			showLanguage = true;
 
 		int row = 1;
-		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
-		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
-		table.add(getSmallHeader(localize("school.from_school", "From School")), 3, row);
-		table.add(getSmallHeader(localize("school.date", "Date")), 4, row++);
+		int column = 1;
+		
+		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
+		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
+		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
+		if (showLanguage)
+			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		table.add(getSmallHeader(localize("school.date", "Date")), column, row++);
 
 		CheckBox checkBox = new CheckBox();
 		Link link;
-		SchoolYear year = getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		if (year != null) {
-			Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolAndSeasonAndGrade(getSchoolID(), getSchoolSeasonID(), year.getSchoolYearAge() - 1);
+			List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolAndSeasonAndGrade(getSchoolID(), getSchoolSeasonID(), year.getSchoolYearAge() - 1));
 			if (!applicants.isEmpty()) {
+				Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy,iwc.getCurrentLocale(),getUserBusiness(iwc)));
 				SchoolChoice choice;
 				School school;
 				User applicant;
@@ -201,6 +241,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				Iterator iter = applicants.iterator();
 				while (iter.hasNext()) {
+					column = 1;
 					choice = (SchoolChoice) iter.next();
 					if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
 						applicant = getUserBusiness(iwc).getUser(choice.getChildId());
@@ -229,18 +270,21 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(choice.getChildId()));
 						link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, choice.getPrimaryKey().toString());
 						
-						table.add(link, 1, row);
-						table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), 2, row);
+						table.add(link, column++, row);
+						table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 						if (school != null) {
 							String schoolName = school.getName();
 							if (schoolName.length() > 20)
 								schoolName = schoolName.substring(0, 20) + "...";
-							table.add(getSmallText(schoolName), 3, row);
+							table.add(getSmallText(schoolName), column, row);
 							if (choice.getStatus().equalsIgnoreCase("FLYT"))
-								table.add(getSmallText(" ("+localize("school.moved","Moved")+")"),3,row);
+								table.add(getSmallText(" ("+localize("school.moved","Moved")+")"),column,row);
 						}
-						table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), 4, row);
-						table.add(checkBox, 5, row++);
+						column++;
+						if (showLanguage && choice.getLanguageChoice() != null)
+							table.add(getSmallText(choice.getLanguageChoice()), column++, row);
+						table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
+						table.add(checkBox, column, row++);
 					}
 				}
 			}
@@ -297,7 +341,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (!formerStudents.isEmpty()) {
 			Map studentMap = getBusiness().getStudentList(formerStudents);
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSession().getSchoolSeasonID());
-			Collections.sort(formerStudents, new SchoolClassMemberComparator(iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, new SchoolClassMemberComparator(sortStudentsBy,iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				studentMember = (SchoolClassMember) iter.next();
@@ -388,7 +432,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (!formerStudents.isEmpty()) {
 			Map studentMap = getBusiness().getStudentList(formerStudents);
-			Collections.sort(formerStudents, new SchoolClassMemberComparator(iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, new SchoolClassMemberComparator(sortStudentsBy,iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				studentMember = (SchoolClassMember) iter.next();
@@ -490,6 +534,26 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			menu.setSelectedElement(_previousSchoolClassID);
 
 		return (DropdownMenu) getStyledInterface(menu);
+	}
+	
+	protected Table getSortTable() {
+		Table table = new Table(1,1);
+		table.setCellpadding(0);
+		table.setCellspacing(0);
+		
+		table.add(getSmallHeader(localize("school.sort_by","Sort by")+":"+Text.NON_BREAKING_SPACE),1,1);
+		
+		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
+		menu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name","Name"));
+		menu.addMenuElement(SchoolChoiceComparator.ADDRESS_SORT, localize("school.sort_address","Address"));
+		menu.addMenuElement(SchoolChoiceComparator.GENDER_SORT, localize("school.sort_gender","Gender"));
+		if (action != ACTION_SAVE)
+			menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language","Language"));
+		menu.setSelectedElement(sortChoicesBy);
+		menu.setToSubmit();
+		table.add(menu,1,1);
+		
+		return table;
 	}
 
 	private void saveClass(IWContext iwc) throws RemoteException {

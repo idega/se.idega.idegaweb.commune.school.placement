@@ -70,6 +70,10 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String KEY_START_DATE = KP + "start_date";
 	private static final String KEY_RESOURCES = KP + "resources";
 	private static final String KEY_STUDY_PATH = KP + "study_path";
+	private static final String KEY_REGISTRATOR = KP + "registrator";
+	private static final String KEY_REGISTRATION_CREATED_DATE = KP + "registration_created_date";
+	private static final String KEY_NOTES = KP + "notes";
+	
 	
 		// Button keys
 //	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -392,6 +396,12 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_END_DATE, "End date"), col, row);		
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(getLocalizedSmallHeader(KEY_REGISTRATOR, "Registrator"), col, row);		
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(getLocalizedSmallHeader(KEY_REGISTRATION_CREATED_DATE, "Created date"), col, row);		
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(getLocalizedSmallHeader(KEY_NOTES, "Notes"), col, row);		
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(Text.getNonBrakingSpace(), col, row);
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(Text.getNonBrakingSpace(), col, row);
@@ -457,9 +467,26 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				} catch (Exception e) {col++;}		
 				// End date
 				try {
-					String dateStr = getCentralPlacementBusiness(iwc).getDateString(
-																							plc.getRemovedDate(), "yyyy-MM-dd");
+					String dateStr = getCentralPlacementBusiness(iwc).
+																getDateString(plc.getRemovedDate(), "yyyy-MM-dd");
 					table.add(getSmallText(dateStr), col++, row);
+				} catch (Exception e) {col++;}
+				// Registrator
+				try {
+					int registratorID = plc.getRegistratorId();
+					User registrator = getUserBusiness(iwc).getUser(registratorID);
+					if (registrator != null)
+						table.add(getSmallText(registrator.getNameLastFirst(false)), col++, row);
+				} catch (Exception e) {col++;}
+				// Created date
+				try {
+					String dateStr = getCentralPlacementBusiness(iwc).
+														getDateString(plc.getRegistrationCreatedDate(), "yyyy-MM-dd");
+					table.add(getSmallText(dateStr), col++, row);
+				} catch (Exception e) {col++;}
+				// Notes
+				try {
+					table.add(getSmallText(plc.getNotes()), col++, row);
 				} catch (Exception e) {col++;}
 				// Pupil overview button
 				try {
@@ -507,7 +534,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				row++;				
 				
 				// Resources
-				String rscStr = getResourceBusiness(iwc).getResourcesString(plc);
+				String rscStr = getResourceBusiness(iwc).getResourcesStringXtraInfo(plc);
 				if (!("".equals(rscStr))) {
 					table.add(getSmallText("<i>" + localize(KEY_RESOURCES, "Resources")+":</i> "), col, row);
 					table.add(getSmallText("<i>" + rscStr + "</i>"), col, row);

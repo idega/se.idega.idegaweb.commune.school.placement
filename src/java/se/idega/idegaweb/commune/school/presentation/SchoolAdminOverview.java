@@ -20,6 +20,7 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
+import se.idega.util.PIDChecker;
 
 import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
@@ -30,8 +31,11 @@ import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
+import com.idega.core.data.Country;
+import com.idega.core.data.CountryHome;
 import com.idega.core.data.Email;
 import com.idega.core.data.Phone;
+import com.idega.core.data.PostalCode;
 import com.idega.data.IDOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -45,6 +49,7 @@ import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
@@ -56,6 +61,7 @@ import com.idega.user.data.User;
 import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.TextSoap;
 
 /**
  * @author laddi
@@ -72,6 +78,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_USER_ID = "sch_user_id";
 	public static final String PARAMETER_CHOICE_ID = "sch_choice_id";
 	public static final String PARAMETER_SHOW_ONLY_OVERVIEW = "sch_show_only_overview";
+	public static final String PARAMETER_SHOW_NO_CHOICES = "sch_show_no_choices";
+	public static final String PARAMETER_SEARCH = "sch_search";
 
 	public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
@@ -80,6 +88,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_MOVE_GROUP = 5;
 	public static final int METHOD_MOVE_YEAR = 6;
 	public static final int METHOD_FINALIZE_GROUP = 7;
+	public static final int METHOD_EDIT_STUDENT = 8;
+	public static final int METHOD_ADD_STUDENT = 9;
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
@@ -87,6 +97,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int ACTION_MOVE_GROUP = 4;
 	public static final int ACTION_MOVE_YEAR = 5;
 	public static final int ACTION_FINALIZE_GROUP = 6;
+	public static final int ACTION_EDIT_STUDENT = 7;
+	public static final int ACTION_ADD_STUDENT = 8;
+	public static final int ACTION_CREATE_STUDENT = 9;
 
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -109,8 +122,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private boolean _protocol = true;
 	private boolean _move = true;
 	private boolean _showOnlyOverview = false;
+	private boolean _showNoChoices = false;
 
 	private CloseButton close;
+	private String searchString;
 
 	/**
 	 * @see com.idega.presentation.PresentationObject#main(IWContext)
@@ -137,6 +152,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 				break;
 			case ACTION_FINALIZE_GROUP :
 				finalizeGroup(iwc);
+				break;
+			case ACTION_EDIT_STUDENT :
+				editStudent(iwc);
+				break;
+			case ACTION_ADD_STUDENT :
+				addStudent(iwc);
+				break;
+			case ACTION_CREATE_STUDENT :
+				createStudent(iwc);
 				break;
 		}
 
@@ -205,6 +229,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 			case METHOD_FINALIZE_GROUP :
 				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group")));
 				contentTable.add(getFinalizeGroupForm(iwc));
+				break;
+			case METHOD_EDIT_STUDENT :
+				headerTable.add(getHeader(localize("school.edit_student", "Edit student")));
+				contentTable.add(getEditStudentForm(iwc));
+				break;
+			case METHOD_ADD_STUDENT :
+				headerTable.add(getHeader(localize("school.add_student", "Add student")));
+				contentTable.add(getAddStudentForm(iwc));
 				break;
 		}
 		
@@ -275,7 +307,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			int pendingSchoolId = -1;
 
-			//if (_choiceID != -1) {
+			if (!_showNoChoices) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
 				String language = null;
@@ -331,22 +363,24 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(getSmallHeader(localize("school.school_choice_message", "Applicant message")), 1, row);
 					table.add(getSmallText(message), 2, row++);
 				}
-			//}
-
-			table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
-			SchoolSeason season = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
-			if (season != null) {
-				SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
-				if (schoolClassMember != null) {
-					SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
-					School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
-					SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(schoolClass.getSchoolYearId()));
-
-					String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
-					table.add(getSmallText(schoolString), 2, row);
-				}
 			}
-			row++;
+
+			if (!_showNoChoices) {
+				table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
+				SchoolSeason season = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
+				if (season != null) {
+					SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
+					if (schoolClassMember != null) {
+						SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
+						School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
+						SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(schoolClass.getSchoolYearId()));
+	
+						String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
+						table.add(getSmallText(schoolString), 2, row);
+					}
+				}
+				row++;
+			}
 
 			table.setColumnVerticalAlignment(1, Table.VERTICAL_ALIGN_TOP);
 			table.mergeCells(1, row, table.getColumns(), row);
@@ -357,6 +391,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_METHOD, String.valueOf(METHOD_REJECT)));
 			SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
 			SubmitButton moveYear = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_year", "Change year"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
+			SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
 
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
@@ -374,9 +409,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(Text.NON_BREAKING_SPACE, 1, row);
 				}
 			}
-			
-			if (_choiceID != -1) {
+
+			if (_choiceID != -1 && !_showNoChoices) {
 				table.add(moveYear, 1, row);
+				table.add(Text.NON_BREAKING_SPACE, 1, row);
+			}
+			
+			if (_showNoChoices) {
+				table.add(editStudent, 1, row);
 				table.add(Text.NON_BREAKING_SPACE, 1, row);
 			}
 
@@ -639,6 +679,146 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
+	private Table getEditStudentForm(IWContext iwc) throws RemoteException {
+		Table table = new Table();
+		table.setCellpadding(5);
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_STUDENT)));
+		table.add(new HiddenInput(PARAMETER_USER_ID, String.valueOf(_userID)));
+		int row = 1;
+
+		User user = getUserBusiness(iwc).getUser(_userID);
+		Address address = getUserBusiness(iwc).getUsersMainAddress(user);
+		PostalCode code = null;
+		if (address != null) {
+			try {
+				code = address.getPostalCode();
+			}
+			catch (Exception e) {
+				code = null;
+			}
+		}
+
+		table.add(getSmallHeader(localize("school.first_name", "First name") + ":"), 1, row);
+		TextInput firstName = (TextInput) getStyledInterface(new TextInput("first_name"));
+		if (user.getFirstName() != null && !user.getFirstName().equalsIgnoreCase(user.getPersonalID()))
+			firstName.setContent(user.getFirstName());
+		table.add(firstName, 2, row++);
+		
+		table.add(getSmallHeader(localize("school.middle_name", "Middle name") + ":"), 1, row);
+		TextInput middleName = (TextInput) getStyledInterface(new TextInput("middle_name"));
+		if (user.getMiddleName() != null)
+			middleName.setContent(user.getMiddleName());
+		table.add(middleName, 2, row++);
+		
+		table.add(getSmallHeader(localize("school.last_name", "Last name") + ":"), 1, row);
+		TextInput lastName = (TextInput) getStyledInterface(new TextInput("last_name"));
+		if (user.getLastName() != null)
+			lastName.setContent(user.getLastName());
+		table.add(lastName, 2, row++);
+		
+		table.add(getSmallHeader(localize("school.address", "Address") + ":"), 1, row);
+		TextInput streetAddress = (TextInput) getStyledInterface(new TextInput("address"));
+		if (address != null && address.getStreetAddress() != null)
+			streetAddress.setContent(address.getStreetAddress());
+		table.add(streetAddress, 2, row++);
+		
+		table.add(getSmallHeader(localize("school.postal_code", "Postal code") + ":"), 1, row);
+		TextInput postalCode = (TextInput) getStyledInterface(new TextInput("postal_code"));
+		if (code != null && code.getPostalCode() != null)
+			postalCode.setContent(code.getPostalCode());
+		table.add(postalCode, 2, row++);
+		
+		table.add(getSmallHeader(localize("school.city", "City") + ":"), 1, row);
+		TextInput postalName = (TextInput) getStyledInterface(new TextInput("postal_name"));
+		if (address != null && address.getCity() != null)
+			postalName.setContent(address.getCity());
+		table.add(postalName, 2, row++);
+		
+		SubmitButton update = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.update", "Update")));
+		update.setValueOnClick(PARAMETER_METHOD, "-1");
+		table.mergeCells(1, row, 2, row);
+		table.add(update, 1, row);
+		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(close, 1, row);
+		table.setHeight(row, Table.HUNDRED_PERCENT);
+		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		table.setWidth(1, "100");
+
+		return table;
+	}
+	
+	private Table getAddStudentForm(IWContext iwc) {
+		Table table = new Table();
+		table.setCellpadding(5);
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_ADD_STUDENT)));
+		int row = 1;
+
+		table.add(getSmallHeader(localize("commune.enter_search_string","Enter search string")+":"), 1, row);
+		
+		TextInput searchInput = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH));
+		searchInput.setLength(40);
+		searchInput.keepStatusOnAction(true);
+		table.add(searchInput, 2, row++);
+		
+		SubmitButton searchButton = (SubmitButton) this.getButton(new SubmitButton(localize("search","Search")));
+		table.add(searchButton, 1, row++);
+		
+		if (searchString != null) {
+			try {
+				Collection users = getUserBusiness(iwc).getUserHome().findUsersBySearchCondition(searchString);
+				if (!users.isEmpty()) {
+					Table userTable = new Table();
+					userTable.setCellpadding(0);
+					userTable.setCellspacing(0);
+					userTable.setWidth(Table.HUNDRED_PERCENT);
+					table.add(userTable, 1, row);
+		
+					User user;
+					RadioButton radio;
+					int userRow = 1;
+				
+					userTable.add(getSmallHeader(localize("commune.found_users","Found users")+":"), 1, row++);
+					userTable.setHeight(row++, 6);
+				
+					Iterator iter = users.iterator();
+					while (iter.hasNext()) {
+						user = (User) iter.next();
+						radio = getRadioButton(PARAMETER_USER_ID, user.getPrimaryKey().toString());
+						if (row == 2)
+							radio.setSelected();
+					
+						userTable.add(radio, 1, row);
+						userTable.add(Text.NON_BREAKING_SPACE, 1, row);
+						userTable.add(getSmallText(user.getNameLastFirst(true)), 1, row);
+						userTable.add(getSmallText(" ("), 1, row);
+						userTable.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())+")"), 1, row++);
+					}
+				
+					userTable.setHeight(row++, 6);
+					SubmitButton login = (SubmitButton) getButton(new SubmitButton(localize("school.add_student","Add student"), PARAMETER_ACTION, String.valueOf(ACTION_ADD_STUDENT)));
+					login.setValueOnClick(PARAMETER_METHOD, "-1");
+					userTable.add(login, 1, row);
+				}
+				else {
+					table.add(getSmallHeader(localize("school.no_student_found","No student found")), 1, row++);
+					if (PIDChecker.getInstance().isValid(searchString)) {
+						SubmitButton create = (SubmitButton) getButton(new SubmitButton(localize("school.create_student", "Create student"), PARAMETER_ACTION, String.valueOf(ACTION_CREATE_STUDENT)));
+						table.add(create, 1, row);
+					}
+				}
+			}
+			catch (Exception e) {
+			}
+		}
+
+		return table;
+	}
+
 	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
 		Table table = new Table(7, 1);
 		table.setCellpadding(0);
@@ -780,6 +960,42 @@ public class SchoolAdminOverview extends CommuneBlock {
 		getParentPage().setParentToReload();
 		getParentPage().close();
 	}
+	
+	private void editStudent(IWContext iwc) throws RemoteException {
+		User user = getUserBusiness(iwc).getUser(new Integer(_userID));
+		
+		String first = iwc.getParameter("first_name");
+		String middle = iwc.getParameter("middle_name");
+		String last = iwc.getParameter("last_name");
+		String address = iwc.getParameter("address");
+		String postalCode = iwc.getParameter("postal_code");
+		String postalName = iwc.getParameter("postal_name");
+		
+		getUserBusiness(iwc).updateCitizen(_userID, first, middle, last, user.getPersonalID());
+		getUserBusiness(iwc).updateCitizenAddress(_userID, address, postalCode, postalName);
+
+		getParentPage().setParentToReload();
+		getParentPage().close();
+	}
+	
+	private void addStudent(IWContext iwc) throws RemoteException {
+		getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+		getParentPage().setParentToReload();
+		getParentPage().close();
+	}
+	
+	private void createStudent(IWContext iwc) throws RemoteException {
+		try {
+			User user = getUserBusiness(iwc).createSpecialCitizenByPersonalIDIfDoesNotExist(searchString,null,null,searchString);
+			_userID = ((Integer) user.getPrimaryKey()).intValue();
+
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+			_method = METHOD_EDIT_STUDENT;
+		}
+		catch (CreateException ce) {
+			ce.printStackTrace(System.err);
+		}
+	}
 
 	private void parse(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(PARAMETER_METHOD))
@@ -803,9 +1019,32 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (iwc.isParameterSet(PARAMETER_SHOW_ONLY_OVERVIEW))
 			_showOnlyOverview = true;
 
+		if (iwc.isParameterSet(PARAMETER_SHOW_NO_CHOICES))
+			_showNoChoices = true;
+
 		if (_schoolClassID != -1 && _schoolYearID != -1)
 			validateSchoolClass(iwc);
 
+		if (iwc.isParameterSet(PARAMETER_SEARCH))
+			searchString = iwc.getParameter(PARAMETER_SEARCH);
+		if (searchString != null && searchString.length() > 0) {
+			try {
+				String temp = searchString;
+				temp = TextSoap.findAndCut(temp, "-");
+				Long.parseLong(temp);
+				if (temp.length() == 10 ) {
+					int firstTwo = Integer.parseInt(temp.substring(0, 2));
+					if (firstTwo < 04) {
+						temp = "20"+temp;
+					}	else {
+						temp = "19"+temp;
+					}
+				}
+				searchString = temp;
+			}
+			catch (NumberFormatException nfe) {}
+		}
+			
 		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();
 
 		/** @todo LAGA... er ekki alveg rett */
@@ -918,8 +1157,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return (SchoolCommuneSession) IBOLookup.getSessionInstance(iwc, SchoolCommuneSession.class);
 	}
 
-	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
-		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
+	private CommuneUserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
+		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}
 
 	private MemberFamilyLogic getMemberFamilyLogic(IWContext iwc) throws RemoteException {

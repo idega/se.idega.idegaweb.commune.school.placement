@@ -392,7 +392,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.setRowColor(row, getZebraColor2());
 				}
 
-				link = (Link) this.getSmallLink(name);
+				link = getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(choice.getChildId()));
@@ -553,7 +553,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
-				link = (Link) this.getSmallLink(name);
+				link = getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
@@ -703,7 +703,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.setRowColor(row, getZebraColor2());
 				}
 
-				link = (Link) this.getSmallLink(name);
+				link = getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));

@@ -79,6 +79,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean showBunRadioButtons = false;
 	
 	private boolean isOngoingSeason = false;
+	private boolean _useForTesting = false;
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -818,7 +819,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		//groupReady.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_FINALIZE_GROUP));
 		if (isReady) {
 			//groupReady.setSubmitConfirm(localize("school.confirm_group_locked", "Are you sure you want to set the group as locked and send out e-mails to all parents?"));
-			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date")) {
+			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
 				groupReady.setDisabled(true);
 			}
 		}
@@ -1042,5 +1043,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	 */
 	public void setShowBunRadioButtons(boolean show){
 		this.showBunRadioButtons = show;		
+	}
+	/**
+	 * @param useForTesting The useForTesting to set.
+	 */
+	public void setUseForTesting(boolean useForTesting) {
+		this._useForTesting = useForTesting;
 	}
 }

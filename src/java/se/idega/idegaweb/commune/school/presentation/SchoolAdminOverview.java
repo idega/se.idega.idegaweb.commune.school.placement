@@ -1032,7 +1032,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		if (searchString != null) {
 			try {
-				Collection users = getUserBusiness(iwc).getUserHome().findUsersBySearchCondition(searchString);
+				Collection users = getUserBusiness(iwc).getUserHome().findUsersBySearchCondition(searchString, true);
 				if (!users.isEmpty()) {
 					Table userTable = new Table();
 					userTable.setCellpadding(0);

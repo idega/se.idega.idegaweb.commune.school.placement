@@ -29,6 +29,7 @@ import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.User;
 import com.idega.util.IWCalendar;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.Name;
 import com.idega.util.text.TextSoap;
 
 /**
@@ -166,9 +167,8 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 				school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
 				calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
 
-				String name = applicant.getNameLastFirst(true);
-				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
-					name = applicant.getName();
+				Name childName = new Name(applicant.getFirstName(), applicant.getMiddleName(), applicant.getLastName());
+				String name = childName.getName(iwc.getApplicationSettings().getDefaultLocale(), true);
 
 				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
 					table.setRowColor(row, "#FFEAEA");

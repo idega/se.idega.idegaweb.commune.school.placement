@@ -2,7 +2,6 @@ package se.idega.idegaweb.commune.school.presentation;
 
 import is.idega.block.family.business.FamilyLogic;
 import is.idega.block.family.business.NoCustodianFound;
-
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -12,10 +11,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.resource.business.ClassMemberException;
 import se.idega.idegaweb.commune.care.resource.business.DateException;
@@ -25,11 +22,11 @@ import se.idega.idegaweb.commune.care.resource.data.Resource;
 import se.idega.idegaweb.commune.care.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.care.resource.data.ResourcePermission;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
+import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.util.PIDChecker;
-
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.business.SchoolBusinessBean;
 import com.idega.block.school.business.SchoolYearComparator;
@@ -777,7 +774,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				try {
 					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByPrimaryKey(new Integer(_schoolClassMemberID));
 					table.add(getSmallHeader(localize("school.placement", "Placement")), 1, row);
-					table.add(getSmallText(CentralPlacementEditor.getPlacementString(scMember, user, getResourceBundle())), 2, row);
+					table.add(getSmallText(getCentralPlacementBusiness(iwc).getPlacementString(scMember, user, getResourceBundle())), 2, row);
 					++row;
 				} catch (FinderException e) {
 					e.printStackTrace();
@@ -2358,6 +2355,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	 }
 	 }
 	 }*/
+	
+	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) throws RemoteException {
+		return (CentralPlacementBusiness) IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
+	}
 	
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);

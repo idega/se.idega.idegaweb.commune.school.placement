@@ -79,8 +79,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/15 15:12:13 $ by $Author: thomas $
- * @version $Revision: 1.91 $
+ * Last modified: $Date: 2004/10/15 15:40:27 $ by $Author: thomas $
+ * @version $Revision: 1.92 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -131,8 +131,6 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	public static final String KEY_DROPDOWN_CHOSE = KP + "dropdown_chose";
 	public static final String KEY_DROPDOWN_YES = KP + "dropdown_yes";
 	public static final String KEY_DROPDOWN_NO = KP + "dropdown_no";
-	public static final String KEY_SCHOOL_YEAR = KP + "school_year";
-	public static final String KEY_SCHOOL_GROUP = KP + "school_group";
 	public static final String KEY_CENTRAL_ADMIN = KP + "central_admin";
 	public static final String KEY_PROVIDER_ADMIN = KP + "provider_admin";
 	public static final String KEY_STORED_MSG_PRFX = KP + "stored_msg_prfx";
@@ -143,9 +141,6 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	public static final String KEY_NEW_PLACEMENT = KP + "new_placement";
 	public static final String KEY_NEW_PLACEMENT_FOR = KP + "new_placement_for";
 	public static final String KEY_START_DATE = KP + "start_date";
-	public static final String KEY_STUDY_PATH = KP + "study_path";
-	public static final String KEY_LANGUAGE = KP + "language";
-	public static final String KEY_NATIVE_LANGUAGE = KP + "native_language";
 	
 		// Button keys
 //	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -617,7 +612,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					
 					row++;
 
-					String buf = getPlacementString(latestPl, child, this.iwrb);
+					String buf =  getCentralPlacementBusiness(iwc).getPlacementString(latestPl, child, this.iwrb);
 					
 					table.add(getSmallText(buf), col, row);
 					table.mergeCells(col, row, col+2, row);
@@ -725,49 +720,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	/**
 	 * @return
 	 */
-	public static String getPlacementString(SchoolClassMember placement, User user, IWResourceBundle iwrb) {
-		// Placement
-		StringBuffer buf = new StringBuffer("");
-		try {
-			// add school name
-			buf.append(placement.getSchoolClass().getSchool().getName());						
-		} catch (Exception e) {}
-		try {
-			// school year
-			SchoolYear theYear = placement.getSchoolYear();
-			if (theYear != null)
-				buf.append(", " + iwrb.getLocalizedString(KEY_SCHOOL_YEAR, "school year") + " "
-								   												+ theYear.getName());						
-		} catch (Exception e) {}
-		try {
-			// add school group
-			buf.append(", " + iwrb.getLocalizedString(KEY_SCHOOL_GROUP, "group") + " "
-								   + placement.getSchoolClass().getSchoolClassName());						
-		} catch (Exception e) {}
-		try {
-			// add study path
-			if (placement.getStudyPathId() != -1) {
-				SchoolStudyPathHome  home = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
-				SchoolStudyPath sp = home.findByPrimaryKey(new Integer(placement.getStudyPathId()));
-				buf.append(", " + iwrb.getLocalizedString(KEY_STUDY_PATH, "Study path") + " "+ sp.getCode());
-			}
-		} catch (Exception e) {}
-		
-		try {
-			// add language
-			if (placement.getLanguage() != null && !("-1").equals(placement.getLanguage())) {
-				buf.append(", " + iwrb.getLocalizedString(KEY_LANGUAGE, "Language") + " "+ iwrb.getLocalizedString(placement.getLanguage(), ""));
-			}
-		} catch (Exception e) {}
 
-		try {
-			// add native language
-			if (user.getNativeLanguage() != null) {
-				buf.append(", " + iwrb.getLocalizedString(KEY_NATIVE_LANGUAGE, "Native language") + " "+ user.getNativeLanguage());
-			}
-		} catch (Exception e) {}
-		return buf.toString();
-	}
 
 	public Table getNewPlacementTable(IWContext iwc) throws RemoteException {
 		// *** Search Table *** START - the uppermost table
@@ -1683,9 +1636,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				SchoolClass schClass = getSchoolBusiness(iwc).getSchoolClassHome().
 																	findByPrimaryKey(new Integer(pl.getSchoolClassId()));
 				buf.append(schClass.getSchool().getName() + ", ");
-				buf.append(localize(KEY_SCHOOL_GROUP, "School group") + ": "  
+				buf.append(localize(CentralPlacementEditorConstants.KEY_SCHOOL_GROUP, "School group") + ": "  
 																										+ schClass.getName() + ", ");
-				buf.append(localize(KEY_SCHOOL_YEAR, "School year") 
+				buf.append(localize(CentralPlacementEditorConstants.KEY_SCHOOL_YEAR, "School year") 
 											 + ": " + pl.getSchoolYear().getSchoolYearName() + ", ");
 				IWTimestamp regStamp = new IWTimestamp(pl.getRegisterDate().getTime());
 				buf.append(regStamp.getDateString("yyyy-MM-dd"));							
@@ -2028,10 +1981,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				buf.append(", "+latestPl.getSchoolType().getName());					
 			} catch (Exception e) {}
 			try {
-				buf.append(", "+localize(KEY_SCHOOL_YEAR, "school year")+": "+latestPl.getSchoolYear().getName());						
+				buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_YEAR, "school year")+": "+latestPl.getSchoolYear().getName());						
 			} catch (Exception e) {}
 			try {
-				buf.append(", "+localize(KEY_SCHOOL_GROUP, "group")+": "+latestPl.getSchoolClass().getSchoolClassName());						
+				buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_GROUP, "group")+": "+latestPl.getSchoolClass().getSchoolClassName());						
 			} catch (Exception e) {}
 			try {
 				buf.append(", "+localize(KEY_END_DATE, "End date")+": ");
@@ -2073,10 +2026,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 							buf.append(", "+placement.getSchoolType().getName());					
 						} catch (Exception e) {}
 						try {
-							buf.append(", "+localize(KEY_SCHOOL_YEAR, "school year")+": "+placement.getSchoolYear().getName());						
+							buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_YEAR, "school year")+": "+placement.getSchoolYear().getName());						
 						} catch (Exception e) {}
 						try {
-							buf.append(", "+localize(KEY_SCHOOL_GROUP, "group")+": "+placement.getSchoolClass().getSchoolClassName());						
+							buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_GROUP, "group")+": "+placement.getSchoolClass().getSchoolClassName());						
 						} catch (Exception e) {}
 						try {
 							buf.append(", "+localize(KEY_START_DATE, "Start date")+": ");
@@ -2111,10 +2064,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 						buf.append(", "+placement.getSchoolType().getName());					
 					} catch (Exception e) {}
 					try {
-						buf.append(", "+localize(KEY_SCHOOL_YEAR, "school year")+": "+placement.getSchoolYear().getName());						
+						buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_YEAR, "school year")+": "+placement.getSchoolYear().getName());						
 					} catch (Exception e) {}
 					try {
-						buf.append(", "+localize(KEY_SCHOOL_GROUP, "group")+": "+placement.getSchoolClass().getSchoolClassName());						
+						buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_GROUP, "group")+": "+placement.getSchoolClass().getSchoolClassName());						
 					} catch (Exception e) {}
 					try {
 						buf.append(", "+localize(KEY_START_DATE, "Start date")+": ");

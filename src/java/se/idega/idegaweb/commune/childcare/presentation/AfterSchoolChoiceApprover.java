@@ -44,6 +44,13 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.add(getNavigationTable(), 1, 1);
 		table.add(getApplicationTable(iwc), 1, 3);
 		table.add(getLegendTable(), 1, 5);
+		
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, 1, 12);
+			table.setCellpaddingLeft(1, 5, 12);
+			table.setCellpaddingRight(1, 1, 12);
+			table.setCellpaddingRight(1, 5, 12);
+		}
 	}
 	
 	private Collection getApplicationCollection(IWApplicationContext iwac) throws RemoteException {
@@ -68,19 +75,28 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	}
 	
 	private Table getApplicationTable(IWContext iwc) throws RemoteException {
-		Table applicationTable = new Table();
-		applicationTable.setWidth(Table.HUNDRED_PERCENT);
-		applicationTable.setCellpadding(getCellpadding());
-		applicationTable.setCellspacing(getCellspacing());
-		applicationTable.setColumns(4);
-		applicationTable.setRowColor(1, getHeaderColor());
+		Table table = new Table();
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setCellpadding(getCellpadding());
+		table.setCellspacing(getCellspacing());
+		table.setColumns(4);
+		if (useStyleNames()) {
+			table.setRowStyleClass(1, getHeaderRowClass());
+		}
+		else {
+			table.setRowColor(1, getHeaderColor());
+		}
 		int row = 1;
 		int column = 1;
 			
-		applicationTable.add(getLocalizedSmallHeader("child_care.name","Name"), column++, row);
-		applicationTable.add(getLocalizedSmallHeader("child_care.personal_id","Personal ID"), column++, row);
-		applicationTable.add(getLocalizedSmallHeader("child_care.address","Address"), column++, row);
-		applicationTable.add(getLocalizedSmallHeader("child_care.phone","Phone"), column++, row++);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, row, 12);
+			table.setCellpaddingRight(table.getColumns(), row, 12);
+		}
+		table.add(getLocalizedSmallHeader("child_care.name","Name"), column++, row);
+		table.add(getLocalizedSmallHeader("child_care.personal_id","Personal ID"), column++, row);
+		table.add(getLocalizedSmallHeader("child_care.address","Address"), column++, row);
+		table.add(getLocalizedSmallHeader("child_care.phone","Phone"), column++, row++);
 
 		boolean showMessage = false;
 
@@ -103,20 +119,33 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				phone = getBusiness().getUserBusiness().getChildHomePhone(child);
 				hasMessage = application.getMessage() != null;		
 						
+				if (useStyleNames()) {
+					if (row % 2 == 0) {
+						table.setRowStyleClass(row, getDarkRowClass());
+					}
+					else {
+						table.setRowStyleClass(row, getLightRowClass());
+					}
+					table.setCellpaddingLeft(1, row, 12);
+					table.setCellpaddingRight(table.getColumns(), row, 12);
+				}
+
 				if (application.getApplicationStatus() == getBusiness().getStatusAccepted()) {
-					applicationTable.setRowColor(row, ACCEPTED_COLOR);
+					table.setRowColor(row, ACCEPTED_COLOR);
 				}
 				else if (application.getApplicationStatus() == getBusiness().getStatusParentsAccept()) {
-					applicationTable.setRowColor(row, PARENTS_ACCEPTED_COLOR);
+					table.setRowColor(row, PARENTS_ACCEPTED_COLOR);
 				}
 				else if (application.getApplicationStatus() == getBusiness().getStatusContract()) {
-					applicationTable.setRowColor(row, CONTRACT_COLOR);
+					table.setRowColor(row, CONTRACT_COLOR);
 				}
 				else {
-					if (row % 2 == 0)
-						applicationTable.setRowColor(row, getZebraColor1());
-					else
-						applicationTable.setRowColor(row, getZebraColor2());
+					if (!useStyleNames()) {
+						if (row % 2 == 0)
+							table.setRowColor(row, getZebraColor1());
+						else
+							table.setRowColor(row, getZebraColor2());
+					}
 				}
 					
 				//link = getSmallLink(child.getNameLastFirst(true));
@@ -131,34 +160,37 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	
 				if (hasMessage) {
 					showMessage = true;
-					applicationTable.add(getSmallErrorText("*"), column, row);
-					applicationTable.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+					table.add(getSmallErrorText("*"), column, row);
+					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
 				}
 
-				applicationTable.add(link, column++, row);
-				applicationTable.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
+				table.add(link, column++, row);
+				table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 				if (address != null)
-					applicationTable.add(getSmallText(address.getStreetAddress()), column++, row);
+					table.add(getSmallText(address.getStreetAddress()), column++, row);
 				else
-					applicationTable.add(getSmallText("-"), column++, row);
+					table.add(getSmallText("-"), column++, row);
 				if (phone != null)
-					applicationTable.add(getSmallText(phone.getNumber()), column++, row++);
+					table.add(getSmallText(phone.getNumber()), column++, row++);
 				else
-					applicationTable.add(getSmallText("-"), column++, row++);
+					table.add(getSmallText("-"), column++, row++);
 			}
 
 			if (showMessage) {
-				applicationTable.setHeight(row++, 2);
-				applicationTable.mergeCells(1, row, applicationTable.getColumns(), row);
-				applicationTable.add(getSmallErrorText("* "), 1, row);
-				applicationTable.add(getSmallText(localize("child_care.has_message_in_application","The application has a message attached")), 1, row++);
+				table.setHeight(row++, 2);
+				table.mergeCells(1, row, table.getColumns(), row);
+				if (useStyleNames()) {
+					table.setCellpaddingLeft(1, row, 12);
+				}
+				table.add(getSmallErrorText("* "), 1, row);
+				table.add(getSmallText(localize("child_care.has_message_in_application","The application has a message attached")), 1, row++);
 			}
 			
-			applicationTable.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_CENTER);
-			applicationTable.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
+			table.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_CENTER);
+			table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
 		}
 			
-		return applicationTable;
+		return table;
 	}
 	
 	protected AfterSchoolBusiness getAfterSchoolBusiness(IWApplicationContext iwac) {

@@ -783,22 +783,23 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Object[] arguments = {user.getName(), email, workphone, choice.getChild().getNameLastFirst(true), choice.getChosenSchool().getName()};
 
 		String message = MessageFormat.format(localize("school.reject_student_message", "We are sorry that we cannot offer {3} a place in {4} at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2})."), arguments);
-		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
-		textArea.setWidth(Table.HUNDRED_PERCENT);
-		textArea.setRows(4);
-
 		try {
 			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(this._schoolID));
 			if (school != null) {
 				String defaultRejectionText = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE);
 				if (defaultRejectionText != null) {
-					textArea.setContent(convertMessageTextFromDB(defaultRejectionText));
+					message = MessageFormat.format(convertMessageTextFromDB(defaultRejectionText), arguments);
 				}
 			}
 		}
 		catch (FinderException e1) {
 			e1.printStackTrace();
 		}
+
+		
+		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
+		textArea.setWidth(Table.HUNDRED_PERCENT);
+		textArea.setRows(4);
 
 		table.add(getSmallHeader(localize("school.reject_student_message_info", "The following message will be sent to the students' parents.")), 1, row++);
 		table.add(textArea, 1, row++);
@@ -1003,7 +1004,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_MESSAGE);
 			}
 
-			if (body != null) {
+			if (defBody != null) {
+				Object[] arguments = {school.getName(), schoolClass.getName(), new IWTimestamp().getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)};
+				defBody = MessageFormat.format(convertMessageTextFromDB(defBody), arguments);
+			}
+			else if (body != null) {
 				Object[] arguments = {school.getName(), schoolClass.getName(), new IWTimestamp().getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)};
 				body = MessageFormat.format(body, arguments);
 			}
@@ -1026,13 +1031,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		text.setAsNotEmpty(localize("school.not_empty_finalize_body", "Message body can not be empty."));
 		table.add(text, 1, row++);
 
-		if (body != null)
-			text.setContent(body);
-
-
 		if (defBody != null) {
-			text.setContent(convertMessageTextFromDB(defBody));
+			text.setContent(defBody);
 		}
+		else if (body != null) {
+			text.setContent(body);
+		}
+
+
 
 
 		SubmitButton send = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
@@ -1559,11 +1565,23 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (mReject != null) {
 				rejectStudent.setContent(convertMessageTextFromDB(mReject));
 			} 
+			else {
+				String message = localize("school.reject_student_message", "We are sorry that we cannot offer {3} a place in {4} at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2}).");
+				rejectStudent.setContent(message);
+			}
 			if (mPlaceOff != null) {
 				placementOffer.setContent(convertMessageTextFromDB(mPlaceOff));
 			}
+			else {
+				String body = localize("school.students_put_in_class_body", "");
+				placementOffer.setContent(body);
+			}
 			if (mPlaceCon != null) {
 				placementConfirmation.setContent(convertMessageTextFromDB(mPlaceCon));
+			}
+			else {
+				String body = localize("school.finalize_body", "");
+				placementConfirmation.setContent(body);
 			}
 		} catch (FinderException e) {
 			e.printStackTrace();

@@ -406,7 +406,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 					table.add(getSmallText(dateStr), col, row);
 				} catch (Exception e) {}
 				
-				String zebraColor = zebra % 2 == 0 ?  getZebraColor2() : getZebraColor1();		
+				String zebraColor = zebra % 2 == 0 ? getZebraColor2() : getZebraColor1();		
 				table.setRowColor(row, zebraColor);
 				col = 2;
 				row++;

@@ -331,15 +331,7 @@ public class CheckRequestForm extends CommuneBlock {
 		
 		while (iter.hasNext()) {
 			SchoolType st = (SchoolType) iter.next();
-			String localizationKey = st.getLocalizationKey();
-			String name = null;
-			if(localizationKey==null || localizationKey.equals("")){
-				name = st.getName();
-			}
-			else{
-				name = localize(localizationKey, st.getName());
-			}
-			typeChoice.addMenuElement(st.getPrimaryKey().toString(), name);
+			typeChoice.addMenuElement(st.getPrimaryKey().toString(), getSchoolCommuneBusiness(iwc).getLocalizedSchoolType(st));
 		}
 		childCareTypeTable.add(typeChoice, 2, row);
 

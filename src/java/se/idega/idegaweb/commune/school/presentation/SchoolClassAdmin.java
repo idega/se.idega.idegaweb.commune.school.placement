@@ -108,11 +108,12 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		form.setEventListener(SchoolEventListener.class);
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
 
-		Table table = new Table(1, 3);
+		Table table = new Table(1, 5);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setWidth(getWidth());
 		table.setHeight(2, "12");
+		table.setHeight(4, "3");
 
 		form.add(table);
 
@@ -122,6 +123,10 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		headerTable.setHeight(1, 2, "20");
 		//headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.add(headerTable, 1, 1);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, 1, 12);
+			table.setCellpaddingRight(1, 1, 12);
+		}
 
 		headerTable.add(getNavigationTable(true, multipleSchools, showBunRadioButtons), 1, 1);
 		headerTable.add(getSortTable(), 1, 3);
@@ -130,7 +135,11 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		if (getSchoolClassID() != -1) {
 			_group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 			table.add(getStudentTable(iwc), 1, 3);
-			table.add(getLegendTable(), 1, 3);
+			table.add(getLegendTable(), 1, 5);
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, 5, 12);
+				table.setCellpaddingRight(1, 5, 12);
+			}
 		}
 		add(form);
 	}
@@ -145,26 +154,6 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		//table.setWidth(7, "12");
 		int row = 1;
 
-		/*if (_group.getIsSubGroup()) {
-			Table addTable = new Table(3, 1);
-			addTable.setCellpadding(0);
-			addTable.setCellspacing(0);
-			addTable.setWidth(2, "4");
-			table.add(addTable, 1, row++);
-
-			Link addLink = new Link(getEditIcon(localize("school.add_student", "Add student")));
-			addLink.setWindowToOpen(SchoolAdminWindow.class);
-			addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
-			addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-			addTable.add(addLink, 1, 1);
-
-			Link addLinkText = getSmallLink(localize("school.add_student", "Add student"));
-			addLinkText.setWindowToOpen(SchoolAdminWindow.class);
-			addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
-			addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-			addTable.add(addLinkText, 3, 1);
-		}*/
-
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
 		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
@@ -172,7 +161,14 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.class", "Class")), 5, row);
 		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), 6, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row);
-		table.setRowColor(row++, getHeaderColor());
+		if (useStyleNames()) {
+			table.setRowStyleClass(row, getHeaderRowClass());
+			table.setCellpaddingLeft(1, row, 12);
+			table.setCellpaddingRight(6, row++, 12);
+		}
+		else {
+			table.setRowColor(row++, getHeaderColor());
+		}
 
 		User student;
 		Address address;
@@ -258,6 +254,17 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
+				if (useStyleNames()) {
+					if (row % 2 == 0) {
+						table.setRowStyleClass(row, getLightRowClass());
+					}
+					else {
+						table.setRowStyleClass(row, getLightRowClass());
+					}
+					table.setCellpaddingLeft(1, row, 12);
+					table.setCellpaddingRight(6, row, 12);
+				}
+				
 				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				}
@@ -268,10 +275,12 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				}
 				else {
-					if (row % 2 == 0)
-						table.setRowColor(row, getZebraColor1());
-					else
-						table.setRowColor(row, getZebraColor2());
+					if (!useStyleNames()) {
+						if (row % 2 == 0)
+							table.setRowColor(row, getZebraColor1());
+						else
+							table.setRowColor(row, getZebraColor2());
+					}
 				}
 
 				if (hasComment) {
@@ -320,19 +329,28 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 			}
 
 			if (showComment || showNotStarted || showHasTermination) {
-				table.setHeight(row++, 2);
+				table.setHeight(row++, 6);
 				if (showComment) {
 					table.mergeCells(1, row, table.getColumns(), row);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, row, 12);
+					}
 					table.add(getSmallErrorText("* "), 1, row);
 					table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);
 				}
 				if (showNotStarted) {
 					table.mergeCells(1, row, table.getColumns(), row);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, row, 12);
+					}
 					table.add(getSmallErrorText("+ "), 1, row);
 					table.add(getSmallText(localize("school.placement_has_not_started", "Placment has not started yet")), 1, row++);
 				}
 				if (showHasTermination) {
 					table.mergeCells(1, row, table.getColumns(), row);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, row, 12);
+					}
 					table.add(getSmallErrorText("&Delta; "), 1, row);
 					table.add(getSmallText(localize("school.placement_has_termination_date", "Placment has termination date")), 1, row++);
 				}
@@ -341,6 +359,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 		if (numberOfStudents > 0) {
 			table.mergeCells(1, row, table.getColumns(), row);
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, row, 12);
+			}
 			table.add(getSmallHeader(localize("school.number_of_students", "Number of students") + ": " + String.valueOf(numberOfStudents)), 1, row++);
 		}
 

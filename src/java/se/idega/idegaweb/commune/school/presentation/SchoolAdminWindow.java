@@ -14,7 +14,7 @@ import com.idega.presentation.ui.Window;
 public class SchoolAdminWindow extends Window {
 
 	public SchoolAdminWindow() {
-		this.setWidth(400);
+		this.setWidth(500);
 		this.setHeight(350);
 		this.setScrollbar(true);
 		this.setResizable(true);	

@@ -703,13 +703,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 					//SchoolClassMember schoolClassMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSchoolAndSeason(_userID, oldSchool.getID(), getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
 		
 					if (preSchoolClMem != null && !isPlaced && !started) { // && schClMem != null){
-					
+				
 							SchoolClass schoolClassOld = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(preSchoolClMem.getSchoolClassId()));
-							String schoolString = oldSchool.getName() + "&nbsp;" + localize("school.group", "Group") + ":&nbsp;" + schoolClassOld.getName();
-							//table.add(getSmallText(oldSchool.getName()), 2, row);
 							
+							String schoolString = oldSchool.getName() + "&nbsp;" + localize("school.group", "Group") + ":&nbsp;" + schoolClassOld.getName();
 							table.add(getSmallText(schoolString), 2, row);
-						//}
+						
+					}
+					else if (schClMem != null){
+						SchoolClass schoolClassNew = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schClMem.getSchoolClassId()));
+						School schSchool = schoolClassNew.getSchool();
+						String schoolString = schSchool.getName() + "&nbsp;" + localize("school.group", "Group") + ":&nbsp;" + schoolClassNew.getName();
+										
+						table.add(getSmallText(schoolString), 2, row);
 					}
 					row++;
 					

@@ -101,7 +101,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_BUTTON_PUPIL_OVERVIEW = KP + "pupil_overview";
 	//private static final String KEY_BUTTON_NEW_PROVIDER = KP + "button_new_provider";
 	private static final String KEY_BUTTON_CONTRACT_HISTORY = KP + "button_contract_history";
-	private static final String KEY_BUTTON_NEW_GROUP = KP + "button_new_group";	
+	private static final String KEY_BUTTON_NEW_GROUP = KP + "button_new_group";
+	private static final String KEY_BUTTON_PLACE = KP + "button_place";
+	private static final String KEY_BUTTON_CANCEL = KP + "button_cancel";	
 
 	private static final String KEY_SCHOOL_YEAR = KP + "school_year";
 	private static final String KEY_SCHOOL_GROUP = KP + "school_group";
@@ -127,6 +129,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String PARAM_PAYMENT_BY_INVOICE = "payment_by_invoice";
 	//private static final String PARAM_PLACEMENT_PARAGRAPH = "placement_paragraph";
 	private static final String PARAM_INVOICE_INTERVAL = "invoice_interval";
+	private static final String PARAM_PLACE_PUPIL = "place_pupil";
+	private static final String PARAM_CANCEL = "cancel";
 
 	// Actions
 	private static final int ACTION_REMOVE_SESSION_CHILD = 1;
@@ -227,7 +231,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		mainTable.setColor(col, row, getHeaderColor());
 		mainTable.setAlignment(col, row, Table.HORIZONTAL_ALIGN_CENTER);
 		mainTable.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_MIDDLE);
-		mainTable.setRowHeight(row, "17");
+		mainTable.setRowHeight(row, "20");
 
 		return mainTable;
 	}
@@ -604,6 +608,23 @@ public class CentralPlacementEditor extends CommuneBlock {
 			getSmallHeader(localize(KEY_PLACEMENT_DATE_LABEL, "Placement date: ")), col++, row);
 		table.add(getPlacementDateInput(), col, row);
 		table.mergeCells(col, row, col + 2, row);
+		col = 1;
+		row++;
+
+		// empty space row
+		Image trans1 = (Image) transGIF.clone();
+		table.add(trans1, col, row);
+
+		col = 1;
+		row++;		
+		// BOTTOM BUTTONS
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
+																KEY_BUTTON_PLACE, "Place")), col++, row);
+				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
+																KEY_BUTTON_CANCEL, "Cancel")), col++, row);
+				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+
 
 		return table;
 	}

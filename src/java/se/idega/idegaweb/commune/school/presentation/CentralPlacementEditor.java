@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/24 16:06:08 $ by $Author: goranb $
- * @version $Revision: 1.70 $
+ * Last modified: $Date: 2004/03/01 14:16:02 $ by $Author: goranb $
+ * @version $Revision: 1.71 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -222,6 +222,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private Link pupilOverviewLinkButton = null;
 	private Link editLatestPlacementButton = null;
 	private ProviderSession _providerSession = null;
+	private SchoolSeason currentSeason = null;
 
 	private int _action = -1;
 	private boolean _newPlacement = false;
@@ -259,10 +260,11 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		//Get child (User object) from search result param or session attribute
 		getSearchResult(iwc);
 
+		currentSeason = getCentralPlacementBusiness(iwc).getCurrentSeason();
 		// Perform actions according the _action input parameter
 		switch (_action) {
 			case ACTION_PLACE_PUPIL :
-				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementLatestFromElemAndHighSchool(child);
+				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, currentSeason);
 				storedPlacement = storePlacement(iwc, child);
 				break;
 			case ACTION_REMOVE_SESSION_CHILD :
@@ -579,7 +581,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// VALUES - Latest placement
 		if (child != null) {
 			try {
-				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementLatestFromElemAndHighSchool(child);
+				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, currentSeason);
 				if (latestPl != null) {
 					row--;row--;row--;row--;
 					col = 2;
@@ -1387,19 +1389,19 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
 			int yearID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR));
 			
-			SchoolSeason currentSeason = null;
+			SchoolSeason chosenSeason = null;
 			try {
 				//currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
-				currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(getSession().getSchoolSeasonID()));
+				chosenSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(getSession().getSchoolSeasonID()));
 			}
 			catch (FinderException e) {
 				try {
-					currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
+					chosenSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
 				} catch (FinderException fe) {}
 			}
 			
 			try {				
-				int seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
+				int seasonID = ((Integer) chosenSeason.getPrimaryKey()).intValue();
 				Collection groupColl = getSchoolBusiness(iwc)
 							.findSchoolClassesBySchoolAndSeasonAndYear(schoolID, seasonID, yearID);
 				if (groupColl != null) {

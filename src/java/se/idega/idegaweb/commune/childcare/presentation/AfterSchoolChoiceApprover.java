@@ -12,6 +12,7 @@ import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 
+import com.idega.block.school.data.SchoolClassMember;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.contact.data.Phone;
@@ -25,6 +26,7 @@ import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 
 /**
@@ -258,6 +260,8 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			boolean hasMessage = false;
 			String name = null;
 			
+			IWTimestamp today = new IWTimestamp();		
+			
 			Iterator iter = applications.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -266,7 +270,39 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				address = getBusiness().getUserBusiness().getUsersMainAddress(child);
 				phone = getBusiness().getUserBusiness().getChildHomePhone(child);
 				hasMessage = application.getMessage() != null;		
-						
+				boolean active = false;
+				
+				SchoolClassMember member;
+				IWTimestamp terminated = null;
+				IWTimestamp startdate = null;
+				
+				Collection placings = getBusiness().getSchoolBusiness().findClassMemberInChildCare(((Integer) child.getPrimaryKey()).intValue(), getSession().getChildCareID());
+				Iterator iterPlac = placings.iterator();
+				
+				while (iterPlac.hasNext()) {
+					column = 1;
+					member = (SchoolClassMember) iterPlac.next();
+					
+					if (member.getRemovedDate() != null){
+						terminated = new IWTimestamp(member.getRemovedDate());
+						if (terminated.isEarlierThan(today))
+							active = false;
+						else 
+							active = true;
+					}else if (member.getRegisterDate() != null){
+						startdate = new IWTimestamp(member.getRegisterDate());
+						if (startdate.isLaterThan(today)){
+							active = true;
+						}
+					}
+					else {
+						active =true;
+					}
+				}
+				
+				
+				if (!active){
+				
 				if (useStyleNames()) {
 					if (row % 2 == 0) {
 						table.setRowStyleClass(row, getDarkRowClass());
@@ -311,9 +347,10 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 					table.add(getSmallErrorText("*"), column, row);
 					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
 				}
-
+				
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
+				
 				if (address != null)
 					table.add(getSmallText(address.getStreetAddress()), column++, row);
 				else
@@ -323,7 +360,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				else
 					table.add(getSmallText("-"), column++, row++);
 			}
-
+			} //active
 			if (showMessage) {
 				table.setHeight(row++, 2);
 				table.mergeCells(1, row, table.getColumns(), row);

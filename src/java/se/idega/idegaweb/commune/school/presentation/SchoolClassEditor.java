@@ -88,7 +88,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					delete(iwc);
 					break;
 				case ACTION_FINALIZE_GROUP :
-					finalize(iwc);
+					finalizeGroup();
 					break;
 			}
 
@@ -896,7 +896,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 	}
 
-	private void finalize(IWContext iwc) throws RemoteException {
+	private void finalizeGroup() throws RemoteException {
 		int schoolClassID = getSchoolClassID();
 		SchoolClass schoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {

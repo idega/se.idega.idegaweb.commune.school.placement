@@ -267,7 +267,7 @@ public class CheckRequestForm extends CommuneBlock {
 	
 		if (createChoices()) {
 			formTable.add(getLocalizedHeader("check.child_care", "Child care options"), 1, row++);
-			formTable.add(getChildCareTable(iwc), 1, row++);
+			formTable.add(getChildCareTable(), 1, row++);
 			formTable.setHeight(row++, 12);
 		}
 
@@ -501,7 +501,7 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 	*/
 	
-	private Table getChildCareTable(IWContext iwc) {
+	private Table getChildCareTable() {
 		Table childcareTable = new Table();
 		childcareTable.setCellpadding(2);
 		childcareTable.setCellspacing(0);

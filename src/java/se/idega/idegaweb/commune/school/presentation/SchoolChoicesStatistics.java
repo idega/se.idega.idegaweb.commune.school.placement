@@ -211,7 +211,7 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 		}
 
 		table.mergeCells(1, row, table.getColumns(), row);
-		table.add(getStatisticsTable(iwc, validStatuses), 1, row++);
+		table.add(getStatisticsTable(validStatuses), 1, row++);
 
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setRowColor(headerRow, getHeaderColor());
@@ -220,7 +220,7 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 		return table;
 	}
 	
-	private PresentationObject getStatisticsTable(IWContext iwc, String[] validStatuses) {
+	private PresentationObject getStatisticsTable(String[] validStatuses) {
 		try {
 			int firstApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1 }, validStatuses, "");
 			int secondApplSize = getBusiness().getSchoolChoiceBusiness().getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2 }, validStatuses, "");

@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
@@ -57,7 +58,7 @@ import com.idega.util.text.TextSoap;
 /**
  * @author Laddi
  */
-public class SchoolClassEditor extends SchoolCommuneBlock {
+public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	public static final String PARAMETER_ACTION = "sch_action";
 

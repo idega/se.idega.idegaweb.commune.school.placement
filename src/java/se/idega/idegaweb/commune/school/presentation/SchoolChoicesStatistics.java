@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 
+import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
@@ -35,7 +36,7 @@ import com.idega.util.text.TextSoap;
 /**
  * @author laddi
  */
-public class SchoolChoicesStatistics extends SchoolCommuneBlock {
+public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 
 	private final String PARAMETER_SORT = "sch_choice_sort";
 	private final String PARAMETER_SEARCH = "scH_choise_search";

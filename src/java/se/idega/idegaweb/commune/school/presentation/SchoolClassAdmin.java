@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -37,7 +38,7 @@ import com.idega.util.PersonalIDFormatter;
  *         disable the creation of type comments go to
  *         Window>Preferences>Java>Code Generation.
  */
-public class SchoolClassAdmin extends SchoolCommuneBlock {
+public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 
 	private final String PARAMETER_ACTION = "sch_action";
 	private final String PARAMETER_METHOD = "sch_method";

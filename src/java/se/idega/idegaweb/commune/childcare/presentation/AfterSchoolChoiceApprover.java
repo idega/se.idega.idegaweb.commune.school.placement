@@ -419,6 +419,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		if (students == null) {
 			errorMessage = localize("childcare.create_contracts_error", "Could not create contracts.");
 		} else {
+			if (students.size() == 0) {
+				message = localize("childcare.no_contracts_created", "No students with pending after-school application and school placement.");
+			}
 			int row = 1;
 			Iterator iter = students.iterator();
 			while (iter.hasNext()) {

@@ -238,21 +238,17 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (this.showStudentTable) {
 			//if (_previousSchoolYearID != -1 && !isOngoingSeason) {
 			if (_previousSchoolYearID != -1) {
-				try {
-					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
-					validateSchoolClass(previousClasses);
+				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
+				validateSchoolClass(previousClasses);
 
-					table.add(getPreviousHeader(previousClasses), 1, 11);
-					table.add(getStudentTable(iwc), 1, 13);
-					table.add(getLegendTable(), 1, 15);
-					if (useStyleNames()) {
-						table.setCellpaddingLeft(1, 11, 12);
-						table.setCellpaddingLeft(1, 15, 12);
-						table.setCellpaddingRight(1, 11, 12);
-						table.setCellpaddingRight(1, 15, 12);
-					}
-				}
-				catch (NullPointerException ne) {
+				table.add(getPreviousHeader(previousClasses), 1, 11);
+				table.add(getStudentTable(iwc), 1, 13);
+				table.add(getLegendTable(), 1, 15);
+				if (useStyleNames()) {
+					table.setCellpaddingLeft(1, 11, 12);
+					table.setCellpaddingLeft(1, 15, 12);
+					table.setCellpaddingRight(1, 11, 12);
+					table.setCellpaddingRight(1, 15, 12);
 				}
 			}
 

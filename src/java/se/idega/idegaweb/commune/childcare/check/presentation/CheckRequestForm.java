@@ -1,16 +1,18 @@
 package se.idega.idegaweb.commune.childcare.check.presentation;
 
 import is.idega.block.family.business.FamilyLogic;
+
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
+
 import se.idega.idegaweb.commune.care.business.CareBusiness;
-import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareSession;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
+
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.SchoolType;
 import com.idega.core.location.data.Address;
@@ -41,12 +43,9 @@ import com.idega.util.text.Name;
 
 public class CheckRequestForm extends CommuneBlock {
 
-	//private final static String IW_BUNDLE_IDENTIFIER = "se.idega.idegaweb.commune.childcare.check";
-
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_FORM_SUBMITTED = 2;
 
-	//private final static String PARAM_VIEW_FORM = "chk_view_form";
 	private final static String PARAM_FORM_SUBMITTED = "chk_form_submit";
 	private final static String PARAM_MOTHER_TONGUE_MOTHER_CHILD = "chk_mt_mc";
 	private final static String PARAM_MOTHER_TONGUE_FATHER_CHILD = "chk_mt_fc";
@@ -55,28 +54,21 @@ public class CheckRequestForm extends CommuneBlock {
 	private final static String PARAM_WORK_SITUATION = "chk_ws_";
 	private final static String PARAM_WORK_SITUATION_1 = "chk_ws_1";
 	private final static String PARAM_WORK_SITUATION_2 = "chk_ws_2";
-	//private final static String PARAM_PROVIDER = "cca_provider";
-	
 	private final static String PARAM_CHILDCARE_THIS = "ccs_childcare_this";
 	private final static String PARAM_CHILDCARE_OTHER = "ccs_childcare_other";
+
 	//variable for use as admin
 	private boolean _useAsAdmin = false;
 	private boolean _isFreeTimeType = true;
 	
 	private boolean isError = false;
-	//private String errorMessage = null;
-	//private boolean paramErrorMotherTongueMC = false;
-	//private boolean paramErrorMotherTongueFC = false;
-	//private boolean paramErrorMotherTongueP = false;
 	private boolean paramErrorChildCateType = false;
 	private boolean paramErrorWorkSituation1 = false;
 	private boolean paramErrorWorkSituation2 = false;
 
-	//private IBPage formResponsePage = null;
 	private User child;
 	
 	private boolean _createChoices = false;
-	//private int[] providerIDs = { -1, -1, -1 };
 
 	public CheckRequestForm() {}
 
@@ -205,22 +197,8 @@ public class CheckRequestForm extends CommuneBlock {
 			this.paramErrorWorkSituation2 = true;
 		}
 
-		/*if (paramMTMC != null && paramMTMC.trim().equals("")) {
-			this.isError = true;
-			this.paramErrorMotherTongueMC = true;
-		}
-		if (paramMTFC != null && paramMTFC.trim().equals("")) {
-			this.isError = true;
-			this.paramErrorMotherTongueFC = true;
-		}
-		if (paramMTP != null && paramMTP.trim().equals("")) {
-			this.isError = true;
-			this.paramErrorMotherTongueP = true;
-		}*/
-		
 		if (showErrors) {
 			if (isError) {
-				//this.errorMessage = localize("check.incomplete_input", "You must fill in the information marked with red text.");
 				viewForm(iwc);
 				return;
 			}
@@ -242,21 +220,6 @@ public class CheckRequestForm extends CommuneBlock {
 			}
 			
 			if (createChoices()) {
-				/*SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();
-				String date = IWTimestamp.RightNow().toString();
-				if (season != null)
-					date = new IWTimestamp(season.getSchoolSeasonStart()).toString();
-				for (int a = 0; a < 3; a++) {
-					int providerID = iwc.isParameterSet(PARAM_PROVIDER + "_" + (a + 1)) ? Integer.parseInt(iwc.getParameter(PARAM_PROVIDER + "_" + (a + 1))) : -1;
-					if (providerID == -1) {
-						getParentPage().setAlertOnLoad(localize("check.incomplete_providers","Must fill out all providers"));
-						viewForm(iwc);
-						return;
-					}
-					providerIDs[a] = providerID;
-				}
-				getChildCareBusiness(iwc).insertApplications(iwc.getCurrentUser(), providerIDs, date, checkID, ((Integer) child.getPrimaryKey()).intValue(), "", "", true);
-				*/
 				String childcareThisSchool = iwc.getParameter(PARAM_CHILDCARE_THIS);
 				if (childcareThisSchool != null) {
 					Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
@@ -312,10 +275,6 @@ public class CheckRequestForm extends CommuneBlock {
 			formTable.add(getLocalizedHeader("check.custodians", "Custodians"), 1, row++);
 			formTable.add(getCustodianTable(iwc), 1, row++);
 			formTable.setHeight(row++, 12);
-	
-			/*formTable.add(getLocalizedHeader("check.mother_tongue", "Mother tongue"), 1, row++);
-			formTable.add(getMotherTongueTable(iwc), 1, row++);
-			formTable.setHeight(row++, 12);*/
 		}
 		
 		SubmitButton submitButton = (SubmitButton) getButton(new SubmitButton(localize("check.send_request", "Send request")));
@@ -420,11 +379,6 @@ public class CheckRequestForm extends CommuneBlock {
 				Name name = new Name(parent.getFirstName(), parent.getMiddleName(), parent.getLastName());
 				custodianTable.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row++);
 				
-				/*
-				custodianTable.add(getLocalizedSmallHeader("check.phone_daytime", "Phone daytime"), 1, row);
-				custodianTable.add(getSmallText(""), 2, row++);
-				*/
-
 				custodianTable.add(getLocalizedSmallHeader("check.civil_status", "Civil status"), 1, row);
 				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) )
 					custodianTable.add(getSmallText(localize("check.married", "Married")), 2, row++);
@@ -457,82 +411,6 @@ public class CheckRequestForm extends CommuneBlock {
 		return custodianTable;
 	}
 
-	/* Commented out since it is never used...
-	private Table getMotherTongueTable(IWContext iwc) {
-		Table motherTongueTable = new Table();
-		motherTongueTable.setCellpadding(2);
-		motherTongueTable.setCellspacing(0);
-		motherTongueTable.setWidth(1, "170");
-		int row = 1;
-
-		String title = localize("check.mother_child", "Mother - child");
-		if (this.paramErrorMotherTongueMC) {
-			motherTongueTable.add(getSmallErrorText(title), 1, row);
-		}
-		else {
-			motherTongueTable.add(getSmallHeader(title), 1, row);
-		}
-		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_MOTHER_CHILD), 2, row++);
-
-		title = localize("check.father_child", "Father - child");
-		if (this.paramErrorMotherTongueFC) {
-			motherTongueTable.add(getSmallErrorText(title), 1, row);
-		}
-		else {
-			motherTongueTable.add(getSmallHeader(title), 1, row);
-		}
-		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_FATHER_CHILD), 2, row++);
-
-		title = localize("check.parents", "Parents");
-		if (this.paramErrorMotherTongueP) {
-			motherTongueTable.add(getSmallErrorText(title), 1, row);
-		}
-		else {
-			motherTongueTable.add(getSmallHeader(title), 1, row);
-		}
-		motherTongueTable.add(getMotherToungeInput(iwc, PARAM_MOTHER_TONGUE_PARENTS), 2, row++);
-
-		return motherTongueTable;
-	}
-	*/
-
-	/* Commented out since it is never used...
-	private Table getProviderTable(IWContext iwc) throws RemoteException {
-		Table providersTable = new Table();
-		providersTable.setCellpadding(2);
-		providersTable.setCellspacing(0);
-		providersTable.setWidth(1, "170");
-		Collection providers = getProviders(iwc, "CHILDCARE");
-		int row = 1;
-		
-		String provider = localize(PARAM_PROVIDER, "Provider");
-		Text providerText = null;
-
-		for (int i = 1; i < 4; i++) {
-			DropdownMenu providerDrop = getProviderDrop(PARAM_PROVIDER + "_" + i, providers);
-			providerText = getSmallHeader(provider + " " + i + ":");
-			providersTable.add(providerText, 1, row);
-			providersTable.add(providerDrop, 2, row++);
-			if (providerIDs[i-1] != -1)
-				providerDrop.setSelectedElement(providerIDs[i-1]);
-		}
-
-		return providersTable;
-	}
-	*/
-	
-	/* Commented out since it is never used...
-	private TextInput getMotherToungeInput(IWContext iwc, String parameterName) {
-		TextInput input = new TextInput(parameterName);
-		input.setAsNotEmpty(localize(parameterName,parameterName + "- Can not be empty"));
-		String parameterValue = iwc.getParameter(parameterName);
-		if (parameterValue != null) {
-			input.setValue(parameterValue);
-		}
-		return (TextInput) getStyledInterface(input);
-	}
-	*/
-
 	private DropdownMenu getWorkSituationMenu(IWContext iwc, String parameterName) {
 		DropdownMenu workSituationChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(parameterName));
 		workSituationChoice.addMenuElement(1, localize("check.working", "Working"));
@@ -547,21 +425,6 @@ public class CheckRequestForm extends CommuneBlock {
 		return (DropdownMenu) getStyledInterface(workSituationChoice);
 	}
 
-	/* Commented out since it is never used...
-	private DropdownMenu getProviderDrop(String name, Collection providers) {//		try {
-		DropdownMenu drp = (DropdownMenu) getStyledInterface(new DropdownMenu(name));
-		drp.setAsNotEmpty(localize("check.incomplete_providers","Must fill out all providers"), "-1");
-		drp.addMenuElement("-1", localize("cca_provider", "Provider"));
-		Iterator iter = providers.iterator();
-		while (iter.hasNext()) {
-			School provider = (School) iter.next();
-			drp.addMenuElement(provider.getPrimaryKey().toString(), provider.getName());
-		}
-
-		return drp;
-	}
-	*/
-	
 	private Table getChildCareTable() {
 		Table childcareTable = new Table();
 		childcareTable.setCellpadding(2);
@@ -602,31 +465,10 @@ public class CheckRequestForm extends CommuneBlock {
 		return (FamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, FamilyLogic.class);
 	}
 
-	// Commented out since it is never used...
-	private ChildCareBusiness getChildCareBusiness(IWContext iwc) throws Exception {
-		return (ChildCareBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
-	}
-
-
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws Exception {
 		return (SchoolCommuneBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
 	}
 	
-
-	/* Commented out since it is never used...
-	private Collection getProviders(IWContext iwc, String category) {
-		try {
-			SchoolBusiness sBuiz = (SchoolBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
-			//@todo Remove hardcoding
-			return sBuiz.findAllSchoolsByType(3);
-		}
-		catch (Exception ex) {
-		}
-
-		return null;
-	}
-	/*
-
 	/**
 	 * Returns the createChoices.
 	 * @return boolean
@@ -658,5 +500,4 @@ public class CheckRequestForm extends CommuneBlock {
 	public void setIsFreeTimeType(boolean isFreeTimeType) {
 		this._isFreeTimeType = isFreeTimeType;
 	}
-
 }

@@ -60,8 +60,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/29 17:15:03 $ by $Author: goranb $
- * @version $Revision: 1.28 $
+ * Last modified: $Date: 2003/10/31 11:07:41 $ by $Author: goranb $
+ * @version $Revision: 1.29 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -249,7 +249,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		
 		//  *** WINDOW HEADING ***
 		mainTable.add(
-			getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Central placing of pupil"), 
+			getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Central placement of pupil"), 
 																														col, mainTableRow);
 		mainTable.setColor(col, mainTableRow, getHeaderColor());
 		mainTable.setAlignment(col, mainTableRow, Table.HORIZONTAL_ALIGN_CENTER);
@@ -712,10 +712,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getSmallHeader(localize(KEY_SCHOOL_GROUP_LABEL, "School group: ")), col++, row);
 		table.add(getSchoolGroups(iwc), col++, row);
 		// BUTTON New group
-		SubmitButton newGroupBut = new SubmitButton(iwrb.getLocalizedImageButton(
-																					KEY_BUTTON_NEW_GROUP, "New group"));
-		newGroupBut.setValueOnClick(PARAM_SCHOOL_CATEGORY_CHANGED, "1");
-		table.add(newGroupBut, 5, row);
+		table.add(getGroupEditorButton(), 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
@@ -1007,7 +1004,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 						|| "1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED))) {
 					studyPaths.setSelectedElement("-1");					
 				} else if (iwc.isParameterSet(PARAM_STUDY_PATH)) {
-					studyPaths.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_GROUP));
+					studyPaths.setSelectedElement(iwc.getParameter(PARAM_STUDY_PATH));
 				}		
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1062,7 +1059,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	private DropdownMenu getSchoolGroups(IWContext iwc) {
 		DropdownMenu groups = new DropdownMenu(PARAM_SCHOOL_GROUP);
-		groups.setToSubmit(true);
+		//groups.setToSubmit(true);
 		groups.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 			
 		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
@@ -1261,7 +1258,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Link getPupilOverviewButton() {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
 		linkButton.setAsImageButton(true);
-		linkButton.setWindowToOpen(SchoolAdminWindow.class);
+		linkButton.setWindowToOpen(CentralPlacementPupilOverview.class);
 		linkButton.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 		linkButton.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 		linkButton.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
@@ -1271,31 +1268,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 	
 	private void activatePupilOverviewButton(SchoolClassMember plc) {
-		//SubmitButton but =  new SubmitButton(iwrb.getLocalizedImageButton(
-		//										KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview"));
-		// Hidden
-/*		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_METHOD, "-1"), 1, 1);
-		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_USER_ID, "-1"), 1, 1);
-		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "-1"), 1, 1);
-		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "-1"), 1, 1);
-		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_PAGE_ID, "-1"), 1, 1);
-		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, "-1"), 1, 1);
-		tab.add(new HiddenInput(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, "-1"), 1, 1);
-*/
-
-		//String parentPageId = String.valueOf(getParentPage().getPageID());
 		String schClassId = String.valueOf(plc.getSchoolClassId());
 		String plcId =  ((Integer) plc.getPrimaryKey()).toString();
-/*		but.setWindowToOpen(SchoolAdminWindow.class);
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_PAGE_ID, parentPageId);
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
-		but.setValueOnClick(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
-*/												
-		//Link link = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
 		pupilOverviewLinkButton.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
@@ -1306,7 +1280,17 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Link getProviderEditorButton() {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_PROVIDER, "New provider")));
 		linkButton.setAsImageButton(true);
-		linkButton.setWindowToOpen(CentralPlacementFloatingWindow.class);
+		linkButton.setWindowToOpen(CentralPlacementProviderEditor.class);
+		//linkButton.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		//linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+		
+		return linkButton;
+	}
+
+	private Link getGroupEditorButton() {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_GROUP, "New  group")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(CentralPlacementGroupEditor.class);
 		//linkButton.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 		//linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		

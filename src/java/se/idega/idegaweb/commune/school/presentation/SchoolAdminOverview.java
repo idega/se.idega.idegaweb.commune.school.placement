@@ -73,8 +73,8 @@ import com.idega.util.text.TextSoap;
 /**
  * @author laddi
  *
- * Last modified: $Date:$ by $Author:$
- * @version $Revision:$
+ * Last modified: $Date: $ by $Author: $
+ * @version $Revision: $
  */
 
 public class SchoolAdminOverview extends CommuneBlock {

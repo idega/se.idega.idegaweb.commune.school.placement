@@ -183,6 +183,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		int numberOfStudents = 0;
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
+		boolean hasSpecialPlacement = false;
 
 		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 
@@ -198,6 +199,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				hasSpecialPlacement = studentMember.getSpeciallyPlaced();
         
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")),"delete_student_"+String.valueOf(new Integer(studentMember.getClassMemberId())));
 				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
@@ -215,8 +217,10 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
-
-				if (hasChoice || hasMoveChoice) {
+				
+				if (hasSpecialPlacement) {
+					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
+				} else if (hasChoice || hasMoveChoice) {
 					if (hasChoice)
 						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 					if (hasMoveChoice)

@@ -468,6 +468,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SchoolClassMember schClMem = null;
 			String language = null;
 			SchoolYear schoolYear = null;
+			String schoolClass = null;
 			
 			if (!_showNoChoices) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
@@ -504,7 +505,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 								//							table.add("gimmi flippari ", 2, row);
 								if (choice.getStatus().equalsIgnoreCase("PLAC") && schClMem != null){
 									//string = string + "&nbsp;&nbsp;" + schClMem.getSchoolYear().getName();
-									string = string + "&nbsp;&nbsp;" + schClMem.getSchoolClass().getName();
+									if (schClMem != null){
+										string = string + "&nbsp;&nbsp;" + schClMem.getSchoolClass().getName();
+									}
 									
 								}
 								

@@ -198,17 +198,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		form.add(table);
 		
 
-		Table headerTable = new Table(2, 3);
+		Table headerTable = new Table(1, 3);
 		headerTable.setWidth(Table.HUNDRED_PERCENT);
 		headerTable.setCellpaddingAndCellspacing(0);
-		headerTable.setHeight(1, 2, "20");
-		headerTable.setAlignment(1, 3, Table.HORIZONTAL_ALIGN_LEFT);
+		headerTable.setHeight(1, 2, "4");
 		table.add(headerTable, 1, 1);
-
 	
 		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 1, 3);
-		headerTable.setVerticalAlignment(1, 3, Table.VERTICAL_ALIGN_BOTTOM);
 
 		table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getLegendTable(), 1, 5);

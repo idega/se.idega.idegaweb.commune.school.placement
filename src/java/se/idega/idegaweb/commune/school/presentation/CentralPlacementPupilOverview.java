@@ -44,7 +44,7 @@ public class CentralPlacementPupilOverview extends Window {
 			+ "font-size:10px;font-family:Verdana,Arial,Helvetica;font-weight:normal;";
 	
 	public CentralPlacementPupilOverview() {
-		this.setWidth(500);
+		this.setWidth(510);
 		this.setHeight(350);
 		this.setScrollbar(true);
 		this.setResizable(true);	

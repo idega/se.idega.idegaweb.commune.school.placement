@@ -28,12 +28,12 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareConstants;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
-import se.idega.idegaweb.commune.school.accounting.business.PlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSessionBean;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
+import se.idega.idegaweb.commune.school.placement.business.PlacementBusiness;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolCategory;
@@ -79,8 +79,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/19 17:20:02 $ by $Author: thomas $
- * @version $Revision: 1.94 $
+ * Last modified: $Date: 2004/10/22 12:57:49 $ by $Author: thomas $
+ * @version $Revision: 1.95 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***

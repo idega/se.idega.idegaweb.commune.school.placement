@@ -749,7 +749,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (address != null && address.getStreetAddress() != null)
 					table.add(getSmallText(address.getStreetAddress()), 4, row);
 				table.add(move, 5, row);
-				table.add(delete, 6, row++);
+				table.add(delete, 6, row);
 				
 				if (hasChoice) {
 					SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
@@ -767,6 +767,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 							table.add(getSmallText(localize("school_choice.NO", "NO")), 8, row);
 					}
 				}
+				row++;
 			}
 		}
 

@@ -19,9 +19,12 @@ import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolStudyPath;
+import com.idega.block.school.data.SchoolStudyPathHome;
 import com.idega.business.IBOLookup;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
+import com.idega.data.IDOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
@@ -61,6 +64,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String KEY_END_DATE = KP + "end_date";
 	private static final String KEY_START_DATE = KP + "start_date";
 	private static final String KEY_RESOURCES = KP + "resources";
+	private static final String KEY_STUDY_PATH = KP + "study_path";
 	
 		// Button keys
 //	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -344,6 +348,8 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_SCHOOL_YEAR, "School year"), col, row);		
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(getLocalizedSmallHeader(KEY_STUDY_PATH, "Study path"), col, row);
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_SCHOOL_GROUP, "School group"), col, row);		
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_START_DATE, "Start date"), col, row);		
@@ -389,6 +395,15 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				try {
 					table.add(getSmallText(plc.getSchoolYear().getName()), col++, row);						
 				} catch (Exception e) {col++;}
+				// Study path
+				try {
+					if (plc.getStudyPathId() != -1) {
+						SchoolStudyPathHome  home = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+						SchoolStudyPath sp = home.findByPrimaryKey(new Integer(plc.getStudyPathId()));
+						table.add(getSmallText(sp.getCode()), col, row);
+					}
+				} catch (Exception e) {}
+				col++;
 				// School type
 				try {
 					table.add(getSmallText(plc.getSchoolClass().getSchoolClassName()), col++, row);						
@@ -409,7 +424,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				String zebraColor = zebra % 2 == 0 ? getZebraColor2() : getZebraColor1();		
 				table.setRowColor(row, zebraColor);
 				col = 2;
-				row++;
+				row++;				
 				
 				// Resources
 				String rscStr = getResourceBusiness(iwc).getResourcesString(plc);

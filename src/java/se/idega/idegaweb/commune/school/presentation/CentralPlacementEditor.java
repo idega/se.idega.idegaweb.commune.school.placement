@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/16 10:54:10 $ by $Author: goranb $
- * @version $Revision: 1.53 $
+ * Last modified: $Date: 2003/12/19 09:36:27 $ by $Author: goranb $
+ * @version $Revision: 1.54 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1328,7 +1328,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return years;
 	}
 
-	private DropdownMenu getSchoolGroups(IWContext iwc) {
+	private DropdownMenu getSchoolGroups(IWContext iwc) throws RemoteException {
 		DropdownMenu groups = (DropdownMenu) getStyledInterface(
 																				new DropdownMenu(PARAM_SCHOOL_GROUP));
 		groups.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
@@ -1339,10 +1339,21 @@ public class CentralPlacementEditor extends CommuneBlock {
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED)))
 				&& iwc.isParameterSet(PARAM_PROVIDER) 
 				&& iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
+			
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
 			int yearID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR));
+			
+			SchoolSeason currentSeason = null;
+			try {
+				currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
+			}
+			catch (FinderException e) {
+				try {
+					currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
+				} catch (FinderException fe) {}
+			}
+			
 			try {				
-				SchoolSeason currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
 				int seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
 				Collection groupColl = getSchoolBusiness(iwc)
 							.findSchoolClassesBySchoolAndSeasonAndYear(schoolID, seasonID, yearID);

@@ -1,7 +1,6 @@
 package se.idega.idegaweb.commune.school.presentation;
 
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorFloating;
-
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -128,7 +127,7 @@ public class CentralPlacementSchoolGroupEditor extends Window {
 	 * Reload ParentPage and close this window
 	 */
 	private void reloadParentAndClose() {
-		this.setParentPageFormToSubmitOnUnLoad(CentralPlacementEditor.FORM_NAME);
+		this.setParentPageFormToSubmitOnUnLoad(CentralPlacementEditorConstants.FORM_NAME);
 		//setParentPageFormToSubmitOnUnLoad(1);
 		close();
 	}

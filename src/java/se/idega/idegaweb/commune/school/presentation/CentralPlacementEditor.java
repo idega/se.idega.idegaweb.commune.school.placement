@@ -79,12 +79,13 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/15 14:45:12 $ by $Author: thomas $
- * @version $Revision: 1.90 $
+ * Last modified: $Date: 2004/10/15 15:12:13 $ by $Author: thomas $
+ * @version $Revision: 1.91 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
-	private static final String KP = "central_placement_editor.";
+
+	private static final String KP = CentralPlacementEditorConstants.KP;
 	private static final String KEY_WINDOW_HEADING = KP + "window_heading";
 	private static final String KEY_SEARCH_PUPIL_HEADING = KP + "search_pupil_heading";
 	private static final String KEY_PUPIL_HEADING = KP + "pupil_heading";
@@ -119,7 +120,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private static final String KEY_RESOURCE_LABEL = KP + "resource_label";
 	private static final String KEY_COMMUNE_LABEL = KP + "commune_label";
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
-	public static final String KEY_PLACEMENT_PARAGRAPH_LABEL = KP + "placement_paragraph_label";
+
 	public static final String KEY_LATEST_INVOICE_DATE_LABEL = KP + "latest_placement_date_label";
 	public static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = KP + "payment_by_agreement";
 	public static final String KEY_INVOICE_INTERVAL_LABEL = KP + "invoice_interval";
@@ -197,7 +198,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	
 	// Presentations
 	//private static final int PRESENTATION_SEARCH_FORM = 1;
-	public static final String FORM_NAME = "central_placement_editor_form";
+
 
 	// CSS styles   
 	private static final String STYLE_UNDERLINED_SMALL_HEADER =
@@ -241,7 +242,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	public void init(IWContext iwc) throws Exception {
 		iwrb = getResourceBundle(iwc);
 		form = new Form();
-		form.setName(FORM_NAME);
+		form.setName(CentralPlacementEditorConstants.FORM_NAME);
 		form.setEventListener(SchoolEventListener.class);
 		
 		// Parameter name returning chosen User from SearchUserModule
@@ -574,7 +575,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		row++;
 		col = 1;
 		// Placement paragraph
-		table.add(getSmallHeader(localize(KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")), col, row);
+		table.add(getSmallHeader(localize(CentralPlacementEditorConstants.KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")), col, row);
 		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;		
@@ -932,7 +933,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize(KEY_SCHOOL_TYPE_LABEL, "School type:")), col++, row);
 		table.add(getSchoolTypesDropdown(iwc), col++, row);
 		table.add(
-			getSmallHeader(localize(KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")),
+			getSmallHeader(localize(CentralPlacementEditorConstants.KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")),
 			col++, row);
 		table.add(getPlacementParagraphTextInput(iwc), col, row);
 		table.mergeCells(col, row, col+1, row);

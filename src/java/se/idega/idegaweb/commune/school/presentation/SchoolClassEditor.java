@@ -232,7 +232,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		SchoolYear year = getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int schoolYearAge = getBusiness().getGradeForYear(getSession().getSchoolYearID()) - 1;
-		if (year != null && schoolYearAge == 12)
+		if (year != null && schoolYearAge == 13)
 			showLanguage = true;
 			
 			

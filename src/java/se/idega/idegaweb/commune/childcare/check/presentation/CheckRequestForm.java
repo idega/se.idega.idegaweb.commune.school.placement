@@ -82,14 +82,14 @@ public class CheckRequestForm extends CommuneBlock {
 	private boolean getUser(IWContext iwc) {
 		if (iwc.isParameterSet(CitizenChildren.getChildIDParameterName())) {
 			try {
-				child = getCheckBusiness(iwc).getUserById(iwc, Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
+				child = getCheckBusiness(iwc).getUserById(Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
 				return true;
 			} catch (Exception e) {
 				return false;
 			}
 		} else if (iwc.isParameterSet(CitizenChildren.getChildSSNParameterName())) {
 			try {
-				child = getCheckBusiness(iwc).getUserByPersonalId(iwc, iwc.getParameter(CitizenChildren.getChildSSNParameterName()));
+				child = getCheckBusiness(iwc).getUserByPersonalId(iwc.getParameter(CitizenChildren.getChildSSNParameterName()));
 				return true;
 			} catch (Exception e) {
 				return false;
@@ -125,10 +125,12 @@ public class CheckRequestForm extends CommuneBlock {
 		int paramChildCareType = -1;
 		int paramWorkSituation1 = -1;
 		int paramWorkSituation2 = -1;
+		int checkFee = getCheckBusiness(iwc).getCheckFee();
+		int checkAmount = getCheckBusiness(iwc).getCheckAmount();
 		String paramMTMC = iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD);
 		String paramMTFC = iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD);
 		String paramMTP = iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS);
-
+		
 		try {
 			paramChildCareType = Integer.parseInt(iwc.getParameter(PARAM_CHILD_CARE_TYPE));
 		} catch (NumberFormatException ne) {
@@ -169,7 +171,7 @@ public class CheckRequestForm extends CommuneBlock {
 		}
 
 		try {
-			getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), 1, 2800, 1200, Converter.convertToNewUser(iwc.getUser()), "", false, false, false, false, false);
+			getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, Converter.convertToNewUser(iwc.getUser()), "", false, false, false, false, false);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -230,8 +232,8 @@ public class CheckRequestForm extends CommuneBlock {
 		nameTable.add(getText(child.getFirstName()), 2, 2);
 		childTable.add(nameTable, 1, 1);
 
-		Address address = getCheckBusiness(iwc).getUserAddress(iwc, child);
-		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(iwc, child);
+		Address address = getCheckBusiness(iwc).getUserAddress(child);
+		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(child);
 		if (address != null) {
 			Table addressTable = new Table(2, 2);
 			addressTable.setWidth(400);

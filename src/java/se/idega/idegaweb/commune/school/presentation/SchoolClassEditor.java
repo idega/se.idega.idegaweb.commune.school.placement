@@ -11,6 +11,7 @@ import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
+import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
@@ -56,8 +57,16 @@ public class SchoolClassEditor extends CommuneBlock {
 		drawForm(iwc);
 	}
 	
+	private void init(IWContext iwc) throws RemoteException {
+		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();	
+		_schoolSeasonID = getSchoolCommuneSession(iwc).getSchoolSeasonID();
+		_schoolYearID = getSchoolCommuneSession(iwc).getSchoolYearID();
+		_schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
+	}
+	
 	private void drawForm(IWContext iwc) throws Exception {
 		Form form = new Form();
+		form.setEventListener(SchoolEventListener.class);
 		
 		form.add(getSchoolSeasons());
 		form.add(getSchoolYears());
@@ -128,25 +137,6 @@ public class SchoolClassEditor extends CommuneBlock {
 		}
 		
 		add(form);
-	}
-	
-	private void init(IWContext iwc) throws RemoteException {
-		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();	
-
-		if (iwc.isParameterSet(PARAMETER_SCHOOL_SEASON_ID))
-			_schoolSeasonID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_SEASON_ID));
-		
-		if (iwc.isParameterSet(PARAMETER_SCHOOL_YEAR_ID))
-			_schoolYearID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_YEAR_ID));
-		
-		if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_ID))
-			_schoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID));
-		
-		if ( _schoolSeasonID == -1 )
-			setSchoolSeasonID(iwc);
-		
-		if ( _schoolClassID != -1 && _schoolYearID != -1 )
-			validateSchoolClass(iwc);
 	}
 	
 	private DropdownMenu getSchoolSeasons() throws RemoteException {
@@ -234,34 +224,6 @@ public class SchoolClassEditor extends CommuneBlock {
 		return (DropdownMenu) getStyledInterface(menu);	
 	}
 		
-	private void setSchoolSeasonID(IWContext iwc) throws RemoteException {
-		try {
-			_schoolSeasonID = ((Integer)business.getSchoolChoiceBusiness().getCurrentSeason().getPrimaryKey()).intValue();	
-		}
-		catch (FinderException fe) {
-			_schoolSeasonID = -1;	
-		}
-	}
-	
-	private void validateSchoolClass(IWContext iwc) throws RemoteException {
-		try {
-			SchoolClass schoolClass = business.getSchoolClassBusiness().findSchoolClass(new Integer(_schoolClassID));
-			if ( schoolClass.getSchoolYearId() != _schoolYearID ) {
-				Collection schoolClasses = business.getSchoolClassBusiness().findSchoolClassesBySchoolAndSeasonAndYear(_schoolID, _schoolSeasonID, _schoolYearID);
-				if ( !schoolClasses.isEmpty() ) {
-					Iterator iter = schoolClasses.iterator();
-					while (iter.hasNext()) {
-						_schoolClassID = ((Integer)((SchoolClass) iter.next()).getPrimaryKey()).intValue();
-						continue;
-					}
-				}
-			}
-		}
-		catch (FinderException fe) {
-			_schoolClassID = -1;
-		}
-	}
-	
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);	
 	}

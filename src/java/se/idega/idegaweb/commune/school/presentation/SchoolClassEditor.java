@@ -624,7 +624,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (!this.multibleSchools) {
 			table.mergeCells(1, 1, table.getColumns(), 1);
 			table.setAlignment(1, 1, Table.HORIZONTAL_ALIGN_RIGHT);
-			Link excelLink = getChoicesXLSLink(SchoolChoiceWriter.class, getBundle().getImage("shared/xls.gif"));
+			Image xls = getBundle().getImage("shared/xls.gif");
+			xls.setToolTip(localize("school.list_new_students","List new students"));
+			Link excelLink = getChoicesXLSLink(SchoolChoiceWriter.class, xls);
 			excelLink.addParameter(SchoolChoiceWriter.prmGrade, schoolYearAge);
 			table.add(excelLink, 1, 1);
 		}

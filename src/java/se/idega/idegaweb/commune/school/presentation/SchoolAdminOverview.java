@@ -150,6 +150,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		Table contentTable = new Table(1,1);
 		contentTable.setCellpadding(10);
+		contentTable.setWidth(Table.HUNDRED_PERCENT);
 		table.add(contentTable,2,4);
 		
 		switch (_method) {
@@ -366,10 +367,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(box,1,row);
 		table.add(getSmallText(localize("school.protocol_followed","All protocols have been followed")),1,row++);
 		
-		table.add(getNavigationTable(iwc),1,row++);
-		
 		IWTimestamp stamp = new IWTimestamp();
 		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE, true));
+		input.setToDisplayDayLast(true);
 		input.setStyle("commune_"+STYLENAME_INTERFACE);
 		input.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 		if (_protocol)
@@ -377,6 +377,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		else
 			table.add(getSmallErrorText(localize("school.replace_date","Replace date")+":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE),1,row);
 		table.add(input,1,row++);
+		
+		table.add(getNavigationTable(iwc),1,row++);
 		
 		if (_protocol)
 			table.add(getSmallHeader(localize("school.replace_reason","Replace reason")+":"),1,row);

@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/15 19:21:19 $ by $Author: goranb $
- * @version $Revision: 1.37 $
+ * Last modified: $Date: 2003/11/17 12:51:17 $ by $Author: goranb $
+ * @version $Revision: 1.38 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1632,8 +1632,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 			for (Iterator iter = users.iterator(); iter.hasNext();) {
 				SchoolUser providerUser = (SchoolUser) iter.next();
 				User user = providerUser.getUser();
-				System.out.println("CPE End Message to School user: "+user.getNameLastFirst() + " -  id: "
-											+((Integer) user.getPrimaryKey()).toString());
+				/*System.out.println("CPE End Message to School user: "+user.getNameLastFirst() + " -  id: "
+											+((Integer) user.getPrimaryKey()).toString());*/
 				getMessageBusiness(iwc).createUserMessage(user, subject, body, false);
 			}
 		}
@@ -1676,8 +1676,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 						body = buf.toString();
 						for (Iterator iter = parents.iterator(); iter.hasNext();) {
 							User user = (User) iter.next();
-							System.out.println("CPE New Message to Parent: "+user.getNameLastFirst() + " -  id: "
-														+((Integer) user.getPrimaryKey()).toString());
+							/*System.out.println("CPE New Message to Parent: "+user.getNameLastFirst() + " -  id: "
+														+((Integer) user.getPrimaryKey()).toString());*/
 							getMessageBusiness(iwc).createUserMessage(user, subject, body, false);
 						}
 		

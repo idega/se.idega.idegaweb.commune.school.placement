@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/01/07 13:27:58 $ by $Author: goranb $
- * @version $Revision: 1.61 $
+ * Last modified: $Date: 2004/01/08 14:39:53 $ by $Author: goranb $
+ * @version $Revision: 1.62 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1413,11 +1413,18 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private DateInput getLatestInvoiceDateInput(IWContext iwc) {
 		DateInput dInput = (DateInput) getStyledInterface(new DateInput(PARAM_LATEST_INVOICE_DATE, true));
 		dInput.setToDisplayDayLast(true);
+		
+		// Set year range
+		IWTimestamp today = IWTimestamp.RightNow();
+		int thisYear = today.getYear();
+		dInput.setYearRange(thisYear - 1, thisYear + 1);		
+		
 		if (iwc.isParameterSet(PARAM_LATEST_INVOICE_DATE)) {
 			IWTimestamp paramStamp = new IWTimestamp(iwc.getParameter(PARAM_LATEST_INVOICE_DATE));
 			java.sql.Date paramDate = paramStamp.getDate();
 			dInput.setDate(paramDate);
 		}
+		
 		return dInput;
 	}
 	

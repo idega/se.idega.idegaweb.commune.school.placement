@@ -30,6 +30,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.util.PIDChecker;
 
 import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.business.SchoolBusinessBean;
 import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
@@ -40,10 +41,10 @@ import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.builder.business.BuilderLogic;
 import com.idega.business.IBOLookup;
-import com.idega.core.localisation.data.ICLanguage;
-import com.idega.core.location.data.Address;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
+import com.idega.core.localisation.data.ICLanguage;
+import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
@@ -103,7 +104,8 @@ public class SchoolAdminOverview extends CommuneBlock {
     public static final String PARAMETER_SHOW_NO_CHOICES = "sch_show_no_choices";
     public static final String PARAMETER_SHOW_ONLY_OVERVIEW = "sch_show_only_overview";
     public static final String PARAMETER_USER_ID = "sch_user_id";
-
+    public static final String PARAMETER_SET_AS_DEFAULT = "rem_rej_m";
+    
     public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
 	public static final int METHOD_REPLACE = 3;
@@ -668,9 +670,22 @@ public class SchoolAdminOverview extends CommuneBlock {
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		textArea.setRows(4);
-        
+		try {
+			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(this._schoolID));
+			if (school != null) {
+				String defaultRejectionText = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE);
+				if (defaultRejectionText != null) {
+					textArea.setContent(defaultRejectionText);
+				}
+			}
+		} catch (FinderException e1) {
+			e1.printStackTrace();
+		}
+
 		table.add(getSmallHeader(localize("school.reject_student_message_info", "The following message will be sent to the students' parents.")), 1, row++);
 		table.add(textArea, 1, row++);
+		table.add(getSmallHeader(localize("school.set_as_default", "Set as default")+" "), 1, row);
+		table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);
         
 		SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_ACTION, String.valueOf(ACTION_REJECT)));
 		reject.setSubmitConfirm(localize("school.reject_confirmation","Are you sure you want to reject this student?  Action can not be undone."));
@@ -885,27 +900,35 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String subject = null;
 		String body = null;
 		String message = null;
+		
+		String defSubject = "";
+		String defBody = "";
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {
+			School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
 			if (schoolClass.getReady()) {
 				subject = localize("school.finalize_subject", "");
 				body = localize("school.finalize_body", "");
 				message = localize("school.proceed_with_ready_marking", "Proceed with marking class as ready and send out messages?");
+				defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_SUBJECT);
+				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_BODY);
 			}
 			else {
 				subject = localize("school.students_put_in_class_subject", "");
 				body = localize("school.students_put_in_class_body", "");
 				message = localize("school.proceed_with_locked_marking", "Proceed with marking class as locked and send out messages?");
+				defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_SUBJECT);
+				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_BODY);
 			}
             
 			if (body != null) {
-				School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
 				Object[] arguments = { school.getName(), schoolClass.getName(), new IWTimestamp().getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT) };
 				body = MessageFormat.format(body, arguments);
 			}
+			
 		}
-        
+    
 		table.add(getSmallHeader(localize("school.finalize_header", "Message headline") + ": "), 1, row);
 		TextInput header = (TextInput) getStyledInterface(new TextInput(PARAMETER_FINALIZE_SUBJECT));
 		header.setLength(40);
@@ -920,9 +943,22 @@ public class SchoolAdminOverview extends CommuneBlock {
 		text.setWidth(Table.HUNDRED_PERCENT);
 		text.setRows(10);
 		text.setAsNotEmpty(localize("school.not_empty_finalize_body","Message body can not be empty."));
+
 		if (body != null)
 			text.setContent(body);
+		
+		if (defSubject != null) {
+			header.setContent(defSubject);
+		}
+		
+		if (defBody != null) {
+			text.setContent(defBody);
+		}
+		
+		
 		table.add(text, 1, row++);
+		table.add(getSmallHeader(localize("school.set_as_default", "Set as default")+" "), 1, row);
+		table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);
 		
 		SubmitButton send = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
 		send.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1387,7 +1423,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String messageHeader = localize("school.reject_message_header", "School choice rejected.");
 		String messageBody = iwc.getParameter(PARAMETER_REJECT_MESSAGE);
 		getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().rejectApplication(_choiceID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), iwc.getCurrentUser(), messageHeader, messageBody);
-        
+    
+		if (iwc.isParameterSet(PARAMETER_SET_AS_DEFAULT)) {
+			try {
+				School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(_schoolID));
+				getSchoolBusiness(iwc).setProperty(school, SchoolBusinessBean.PROPERTY_NAME_REJECT_STUDENT_MESSAGE, messageBody);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+		}
 		getParentPage().setParentToReload();
 		getParentPage().close();
 	}
@@ -1507,6 +1551,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private void finalizeGroup(IWContext iwc) throws RemoteException {
 		String subject = iwc.getParameter(PARAMETER_FINALIZE_SUBJECT);
 		String body = iwc.getParameter(PARAMETER_FINALIZE_BODY);
+
+		String propNameSubj = null;
+		String propNameBody = null;
 		
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
@@ -1514,13 +1561,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (schoolClass.getReady()) {
 				getSchoolCommuneBusiness(iwc).markSchoolClassLocked(schoolClass);
 				getSchoolCommuneBusiness(iwc).finalizeGroup(schoolClass, subject, body, true);
+				propNameSubj = SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_SUBJECT;
+				propNameBody = SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_BODY;
 			}
 			else {
 				getSchoolCommuneBusiness(iwc).markSchoolClassReady(schoolClass);
 				getSchoolCommuneBusiness(iwc).finalizeGroup(schoolClass, subject, body, false);
+				propNameSubj = SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_SUBJECT;
+				propNameBody = SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_BODY;
 			}
 		}
-        
+    
+		if (iwc.isParameterSet(PARAMETER_SET_AS_DEFAULT) && propNameSubj != null && propNameBody != null) {
+			try {
+				School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(_schoolID));
+				getSchoolBusiness(iwc).setProperty(school, propNameSubj, subject);
+				getSchoolBusiness(iwc).setProperty(school, propNameBody, body);
+			} catch (FinderException e) {
+				e.printStackTrace();
+			}
+		}
+		
 		URLUtil URL = new URLUtil(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 		URL.addParameter(SchoolClassEditor.PARAMETER_ACTION, SchoolClassEditor.ACTION_SAVE);
 		getParentPage().setParentToRedirect(URL.toString());

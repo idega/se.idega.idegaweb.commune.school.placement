@@ -15,8 +15,6 @@ import java.util.Iterator;
 import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.accounting.business.AccountingSession;
-import se.idega.idegaweb.commune.accounting.childcare.data.ChildCareContract;
-import se.idega.idegaweb.commune.accounting.childcare.data.ChildCareContractHome;
 import se.idega.idegaweb.commune.accounting.extra.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.extra.data.Resource;
 import se.idega.idegaweb.commune.accounting.extra.data.ResourceClassMember;
@@ -24,6 +22,8 @@ import se.idega.idegaweb.commune.accounting.invoice.presentation.RegularPaymentE
 import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.business.ProviderSession;
+import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
+import se.idega.idegaweb.commune.childcare.data.ChildCareContractHome;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
@@ -78,8 +78,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/12 18:05:19 $ by $Author: thomas $
- * @version $Revision: 1.85 $
+ * Last modified: $Date: 2004/10/14 10:23:57 $ by $Author: thomas $
+ * @version $Revision: 1.86 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***

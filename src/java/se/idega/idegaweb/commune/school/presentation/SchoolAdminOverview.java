@@ -774,7 +774,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(getSmallErrorText(localize("school.replace_date", "Replace date") + ":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 1, row);
 		table.add(input, 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":"), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":", false), 1, row++);
 
 		//if (_protocol)
 		table.add(getSmallHeader(localize("school.replace_reason", "Replace reason") + ":"), 1, row);
@@ -891,7 +891,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":"), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":", false), 1, row++);
 
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1530,7 +1530,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 	
 	
-	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
+	protected Table getNavigationTable(IWContext iwc, String heading, boolean setToSubmit) throws RemoteException {
 		Table table = new Table(7, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -1541,7 +1541,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(getSmallHeader(localize("school.year", "Year") + ":" + Text.NON_BREAKING_SPACE), 3, 1);
 		table.add(getSchoolYears(iwc), 4, 1);
 		table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 6, 1);
-		table.add(getSchoolClasses(iwc), 7, 1);
+		table.add(getSchoolClasses(iwc, setToSubmit), 7, 1);
 
 		return table;
 	}
@@ -1860,9 +1860,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return (DropdownMenu) getStyledInterface(menu);
 	}
 
-	protected DropdownMenu getSchoolClasses(IWContext iwc) throws RemoteException {
+	protected DropdownMenu getSchoolClasses(IWContext iwc, boolean setToSubmit) throws RemoteException {
 		DropdownMenu menu = new DropdownMenu(getSchoolCommuneSession(iwc).getParameterSchoolClassID());
-		menu.setToSubmit();
+		if (setToSubmit) {
+			menu.setToSubmit();
+		}
 
 		if (_schoolYearID == -1)
 			_schoolYearID = getSchoolCommuneSession(iwc).getSchoolYearID();

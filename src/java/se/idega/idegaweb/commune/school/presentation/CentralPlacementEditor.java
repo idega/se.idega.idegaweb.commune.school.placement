@@ -80,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/06/10 12:32:19 $ by $Author: gimmi $
- * @version $Revision: 1.77 $
+ * Last modified: $Date: 2004/07/08 08:35:30 $ by $Author: malin $
+ * @version $Revision: 1.78 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -755,7 +755,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		
 		try {
 			// add language
-			if (placement.getLanguage() != null) {
+			if (placement.getLanguage() != null && !("-1").equals(placement.getLanguage())) {
 				buf.append(", " + iwrb.getLocalizedString(KEY_LANGUAGE, "Language") + " "+ iwrb.getLocalizedString(placement.getLanguage(), ""));
 			}
 		} catch (Exception e) {}
@@ -1402,7 +1402,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	
 	private DropdownMenu getLanguageDropdown(IWContext iwc) {
 		DropdownMenu txtLangChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_LANGUAGE));
-		txtLangChoice.addMenuElement(-1, localize("school.language", "Language"));
+		txtLangChoice.addMenuElement("-1", localize("school.language", "Language"));
 		txtLangChoice.addMenuElement("school.language_german", localize("school.language_german", "German"));
 		txtLangChoice.addMenuElement("school.language_french", localize("school.language_french", "French"));
 		txtLangChoice.addMenuElement("school.language_spanish", localize("school.language_spanish", "Spanish"));

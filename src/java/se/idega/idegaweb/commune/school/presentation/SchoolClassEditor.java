@@ -91,6 +91,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private boolean isOngoingSeason = false;
 	private boolean _useForTesting = false;
+	
+	private SchoolClass _group;
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -154,6 +156,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SEARCH))
 			searchString = iwc.getParameter(PARAMETER_SEARCH);
+
+		_group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 
 		/** Fixing String */
 		if (searchString != null && searchString.length() > 0) {
@@ -305,7 +309,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			schoolYearAge--;
 		if (year != null && schoolYearAge >= 12)
 			showLanguage = true;
-
+		
 		if (showLanguage)
 			//table.setColumns(8);
 			table.setColumns(9);
@@ -317,12 +321,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.setColumns(table.getColumns() - 1);
 		}
 
-		String[] validStatuses = null;
-		if (showStatistics) {
-			validStatuses = new String[]{SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
-		}
-		else
-			validStatuses = new String[]{SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
+		String[] validStatuses = new String[] {SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
 
 		int applicantsSize = 0;
 		int start = -1;
@@ -423,6 +422,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			IWTimestamp created;
 			boolean hasComment = false;
 			boolean showComment = false;
+			boolean hasPlacement = false;
+			boolean showPlacement = false;
 
 			Iterator iter = applicants.iterator();
 			//logWarning("*** OUTSIDE HOMCOM - NoOfApplicants: " +
@@ -438,8 +439,23 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
 				hasComment = choice.getMessage() != null;
 
-				if (getBusiness().isAlreadyInSchool(choice.getChildId(), getSession().getSchoolID(), getSession().getSchoolSeasonID()))
-					checkBox.setDisabled(true);
+				if (getBusiness().isAlreadyInSchool(choice.getChildId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
+					hasPlacement = true;
+					if (_group != null && _group.getIsSubGroup()) {
+						if (getBusiness().getSchoolBusiness().hasGroupPlacement(choice.getChildId(), getSchoolClassID())) {
+							checkBox.setDisabled(true);
+						}
+					}
+					else {
+						checkBox.setDisabled(true);
+					}
+				}
+				else {
+					hasPlacement = false;
+					if (_group != null && _group.getIsSubGroup()) {
+						checkBox.setDisabled(true);
+					}
+				}
 
 				String name = applicant.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
@@ -464,9 +480,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CHOICE_STATUS, choice.getStatus());
 				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CLASS_MEMBER, "-1");
 
-				if (hasComment) {
-					showComment = true;
-					table.add(getSmallErrorText("*"), column, row);
+				if (hasComment || hasPlacement) {
+					if (hasComment) {
+						showComment = true;
+						table.add(getSmallErrorText("*"), column, row);
+					}
+					if (hasPlacement) {
+						showPlacement = true;
+						table.add(getSmallErrorText("+"), column, row);
+					}
 					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
 				}
 
@@ -520,11 +542,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				row++;
 			}
 
-			if (showComment) {
+			if (showComment || showPlacement) {
 				table.setHeight(2, row++);
-				table.mergeCells(1, row, table.getColumns(), row);
-				table.add(getSmallErrorText("* "), 1, row);
-				table.add(getSmallText(localize("school_choice.has_comment", "Application has comment attached")), 1, row++);
+				if (showComment) {
+					table.mergeCells(1, row, table.getColumns(), row);
+					table.add(getSmallErrorText("* "), 1, row);
+					table.add(getSmallText(localize("school_choice.has_comment", "Application has comment attached")), 1, row++);
+				}
+				if (showPlacement) {
+					table.mergeCells(1, row, table.getColumns(), row);
+					table.add(getSmallErrorText("+ "), 1, row);
+					table.add(getSmallText(localize("school_choice.has_main_group_placement", "Student is placed in main group")), 1, row++);
+				}
 			}
 		}
 
@@ -673,6 +702,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		SchoolClassMember studentMember;
 		CheckBox checkBox = new CheckBox();
 		int numberOfStudents = 0;
+		boolean hasPlacement = false;
+		boolean showPlacement = false;
 
 		List formerStudents = new ArrayList();
 		if (_previousSchoolClassID != -1)
@@ -694,8 +725,21 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
 				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
-					continue;
-					//checkBox.setDisabled(true);
+					hasPlacement = true;
+					if (_group != null && _group.getIsSubGroup()) {
+						if (getBusiness().getSchoolBusiness().hasGroupPlacement(studentMember.getClassMemberId(), getSchoolClassID())) {
+							checkBox.setDisabled(true);
+						}
+					}
+					else {
+						checkBox.setDisabled(true);
+					}
+				}
+				else {
+					hasPlacement = false;
+					if (_group != null && _group.getIsSubGroup()) {
+						checkBox.setDisabled(true);
+					}
 				}
 
 				String name = student.getNameLastFirst(true);
@@ -726,6 +770,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					else
 						table.setRowColor(row, getZebraColor2());
 				}
+				
+				if (hasPlacement) {
+					showPlacement = true;
+					table.add(getSmallErrorText("+"), column, row);
+					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+				}
 
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), column++, row);
@@ -746,6 +796,13 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					table.add(checkBox, column, row);
 				}
 				row++;
+			}
+
+			if (showPlacement) {
+				table.setHeight(2, row++);
+				table.mergeCells(1, row, table.getColumns(), row);
+				table.add(getSmallErrorText("+ "), 1, row);
+				table.add(getSmallText(localize("school_choice.has_main_group_placement", "Student is placed in main group")), 1, row++);
 			}
 		}
 
@@ -1146,10 +1203,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		String student = iwc.getParameter(PARAMETER_APPLICANT_ID);
 		if (student != null && student.length() > 0) {
 			getBusiness().getSchoolBusiness().removeSchoolClassMemberFromClass(Integer.parseInt(student), getSchoolClassID());
-			SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
-			getBusiness().setNeedsSpecialAttention(Integer.parseInt(student), getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID()), false);
-			if (choice != null)
-				getBusiness().getSchoolChoiceBusiness().setAsPreliminary(choice, iwc.getCurrentUser());
+			SchoolClass group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
+			if (!group.getIsSubGroup()) {
+				SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
+				getBusiness().setNeedsSpecialAttention(Integer.parseInt(student), getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID()), false);
+				if (choice != null) {
+					getBusiness().getSchoolChoiceBusiness().setAsPreliminary(choice, iwc.getCurrentUser());
+				}
+				getBusiness().removeSubGroupPlacements(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
+			}
 		}
 	}
 

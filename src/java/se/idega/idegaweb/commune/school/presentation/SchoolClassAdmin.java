@@ -56,6 +56,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 	private boolean multipleSchools = false;
 	private boolean showBunRadioButtons = false;
+	private SchoolClass _group;
 
 	/**
 	 * @see se.idega.idegaweb.commune.school.presentation.SchoolCommuneBlock#init(com.idega.presentation.IWContext)
@@ -127,6 +128,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		headerTable.setVerticalAlignment(1, 3, Table.VERTICAL_ALIGN_BOTTOM);
 
 		if (getSchoolClassID() != -1) {
+			_group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 			table.add(getStudentTable(iwc), 1, 3);
 			table.add(getLegendTable(), 1, 3);
 		}
@@ -143,23 +145,24 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		//table.setWidth(7, "12");
 		int row = 1;
 
-		/*
-		 * Table addTable = new Table(3,1); addTable.setCellpadding(0);
-		 * addTable.setCellspacing(0); addTable.setWidth(2, "4");
-		 * table.add(addTable, 1, row++); Link addLink = new
-		 * Link(getEditIcon(localize("school.add_student", "Add student")));
-		 * addLink.setWindowToOpen(SchoolAdminWindow.class);
-		 * addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD,
-		 * SchoolAdminOverview.METHOD_ADD_STUDENT);
-		 * addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID,
-		 * getParentPage().getPageID()); addTable.add(addLink, 1, 1); Link
-		 * addLinkText = getSmallLink(localize("school.add_student", "Add
-		 * student")); addLinkText.setWindowToOpen(SchoolAdminWindow.class);
-		 * addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD,
-		 * SchoolAdminOverview.METHOD_ADD_STUDENT);
-		 * addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID,
-		 * getParentPage().getPageID()); addTable.add(addLinkText, 3, 1);
-		 */
+		if (_group.getIsSubGroup()) {
+			Table addTable = new Table(3,1);
+			addTable.setCellpadding(0);
+			addTable.setCellspacing(0);
+			addTable.setWidth(2, "4");
+			table.add(addTable, 1, row++);
+	
+			Link addLink = new Link(getEditIcon(localize("school.add_student", "Add student")));
+			addLink.setWindowToOpen(SchoolAdminWindow.class);
+			addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
+			addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+			addTable.add(addLink, 1, 1);
+			
+			Link addLinkText = getSmallLink(localize("school.add_student", "Add student")); addLinkText.setWindowToOpen(SchoolAdminWindow.class);
+			addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
+			addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+			addTable.add(addLinkText, 3, 1);
+		}
 
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);

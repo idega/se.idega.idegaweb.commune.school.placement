@@ -16,9 +16,11 @@ import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
-import se.idega.idegaweb.commune.childcare.business.ChildCareBusinessBean;
+import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
+import se.idega.idegaweb.commune.provider.business.ProviderSession;
+import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
@@ -35,11 +37,13 @@ import com.idega.block.school.data.SchoolStudyPathHome;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBORuntimeException;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.Commune;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
@@ -60,8 +64,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/31 11:07:41 $ by $Author: goranb $
- * @version $Revision: 1.29 $
+ * Last modified: $Date: 2003/11/03 18:44:04 $ by $Author: goranb $
+ * @version $Revision: 1.30 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -176,9 +180,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private String uniqueUserSearchParam;
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
+	private SchoolClassMember latestPl = null;
 	private SchoolClassMember storedPlacement = null;
 	private Link pupilOverviewLinkButton = null;
-//	private Link providerEditorLinkButton = null;
+	private ProviderSession _providerSession = null;
 
 	private int _action = -1;
 	//private int _presentation = -1;
@@ -231,6 +236,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 			setMainTableContent(getPupilTable(iwc, child));
 			setMainTableContent(getLatestPlacementTable(iwc, child));
 			setMainTableContent(getNewPlacementTable(iwc));
+			prepareCentralPlacementProviderSession(iwc);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			setMainTableContent(new Text("RemoteException thrown!! Error connecting to EJB's"));
@@ -489,7 +495,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// VALUES - Latest placement
 		if (child != null) {
 			try {
-				SchoolClassMember latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(child);
+				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(child);
 				if (latestPl != null) {
 					row--;row--;row--;row--;
 					col = 2;
@@ -712,7 +718,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getSmallHeader(localize(KEY_SCHOOL_GROUP_LABEL, "School group: ")), col++, row);
 		table.add(getSchoolGroups(iwc), col++, row);
 		// BUTTON New group
-		table.add(getGroupEditorButton(), 5, row);
+		table.add(getGroupEditorButton(iwc), 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
@@ -1259,9 +1265,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")));
 		linkButton.setAsImageButton(true);
 		linkButton.setWindowToOpen(CentralPlacementPupilOverview.class);
-		linkButton.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
-		linkButton.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
-		linkButton.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
 		linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		
 		return linkButton;
@@ -1270,7 +1276,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private void activatePupilOverviewButton(SchoolClassMember plc) {
 		String schClassId = String.valueOf(plc.getSchoolClassId());
 		String plcId =  ((Integer) plc.getPrimaryKey()).toString();
-		pupilOverviewLinkButton.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
+		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
 		if (plc.getRemovedDate() != null)
@@ -1287,16 +1293,39 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return linkButton;
 	}
 
-	private Link getGroupEditorButton() {
+	private Link getGroupEditorButton(IWContext iwc) {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_GROUP, "New  group")));
 		linkButton.setAsImageButton(true);
-		linkButton.setWindowToOpen(CentralPlacementGroupEditor.class);
-		//linkButton.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		linkButton.setWindowToOpen(CentralPlacementSchoolClassBuilder.class);
+		linkButton.addParameter(SchoolGroupEditor.PARAMETER_ACTION, 
+											String.valueOf(SchoolGroupEditor.ACTION_VIEW));
+		if (iwc.isParameterSet(PARAM_PROVIDER)) {
+			linkButton.addParameter(SchoolGroupEditor.PARAMETER_PROVIDER_ID, 
+													iwc.getParameter(PARAM_PROVIDER));
+		}
+			
 		//linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		
 		return linkButton;
 	}
 	
+	/**
+	 * Gets and sets a ProviderSession session bean with session data used by SchoolGroupEditor reached by New group button
+	 * @param iwc
+	 * @throws RemoteException
+	 */
+	private void prepareCentralPlacementProviderSession(IWContext iwc) throws RemoteException {
+		_providerSession = getCentralPlacementProviderSession(iwc);
+		if (iwc.isParameterSet(PARAM_PROVIDER) && !("-1".equals(iwc.getParameter(PARAM_PROVIDER)))) {
+			String provIdStr = iwc.getParameter(PARAM_PROVIDER);
+			int provID = Integer.parseInt(provIdStr);
+			_providerSession.setProviderID(provID);
+		}
+		
+		if (iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
+			_providerSession.setYearID(Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR)));
+		}
+	}	
 
 	/**
 	 * Parse input request parameters 
@@ -1308,10 +1337,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 			_action = Integer.parseInt(actionStr);
 
 		}
-		/*if (iwc.isParameterSet(PARAM_PRESENTATION)) {
-			String presStr = iwc.getParameter(PARAM_PRESENTATION);
-			_presentation = Integer.parseInt(presStr);
-		}*/
 	}
 
 	// *** ACTIONS ***
@@ -1335,6 +1360,25 @@ public class CentralPlacementEditor extends CommuneBlock {
 		iwc.getSession().removeAttribute(SESSION_KEY_CHILD);
 		child = null;
 	}
+	
+/*	protected CentralPlcmntProviderSession getCentralPlacementProviderSession(IWUserContext iwuc) {
+		try {
+			return (CentralPlcmntProviderSession) IBOLookup.getSessionInstance(iwuc, CentralPlcmntProviderSession.class);
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re.getMessage());
+		}
+	}
+*/
+	protected ProviderSession getCentralPlacementProviderSession(IWUserContext iwuc) {
+		try {
+			return (ProviderSession) IBOLookup.getSessionInstance(iwuc, ProviderSession.class);
+		}
+		catch (RemoteException re) {
+			throw new IBORuntimeException(re.getMessage());
+		}
+	}
+
 	
 	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) 
 																										throws RemoteException {
@@ -1362,9 +1406,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 																								SchoolCommuneBusiness.class);
 	}
 */
-	private ChildCareBusinessBean getChildCareBusiness(IWContext iwc) throws RemoteException {
-		return (ChildCareBusinessBean)
-											 IBOLookup.getServiceInstance(iwc, ChildCareBusinessBean.class);
+	private ChildCareBusiness getChildCareBusiness(IWContext iwc) throws RemoteException {
+		return (ChildCareBusiness)
+											 IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
 	}
 
 	private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {

@@ -30,7 +30,7 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
-import com.idega.presentation.ui.SubmitButton;
+//import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
@@ -140,9 +140,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		table.setColumns(7);
+		table.setColumns(6);
 		table.setWidth(6, "12");
-		table.setWidth(7, "12");
+		//table.setWidth(7, "12");
 		int row = 1;
 		
 		/*
@@ -171,14 +171,14 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
 		table.add(getSmallHeader(localize("school.class", "Class")), 5, row);
 		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), 6, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 7, row);
+		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row);
 		table.setRowColor(row++, getHeaderColor());
 		
 		User student;
 		Address address;
 		SchoolClassMember studentMember;
 		SchoolClass schoolClass = null;
-		SubmitButton delete;
+		//SubmitButton delete;
 		Link move;
 		Link link;
 		int numberOfStudents = 0;
@@ -201,13 +201,14 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasSpecialPlacement = studentMember.getSpeciallyPlaced();
-        
+
+				/*        
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")),"delete_student_"+String.valueOf(new Integer(studentMember.getClassMemberId())));
 				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
 				delete.setValueOnClick(PARAMETER_STUDENT_ID, String.valueOf(studentMember.getClassMemberId()));
 				delete.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE));
 				delete.setSubmitConfirm(localize("school.confirm_student_delete","Are you sure you want to remove the student from this class?"));
-				
+				*/
 				move = new Link(getEditIcon(localize("school.move_to_another_group", "Move this student to another group")));
 				move.setWindowToOpen(SchoolAdminWindow.class);
 				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
@@ -260,7 +261,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				if (schoolClass != null)
 					table.add(getSmallText(schoolClass.getName()), 5, row);
 				table.add(move, 6, row);
-				table.add(delete, 7, row++);
+				//table.add(delete, 7, row);
+				row++;
 			}
 		}
 

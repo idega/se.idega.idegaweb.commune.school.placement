@@ -35,7 +35,6 @@ import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
-import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
@@ -94,6 +93,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_RESOURCE_SEASON = "school_choice_season";
 	public static final String PARAMETER_RESOURCE_STARTDATE = "resource_startdate";
 	public static final String PARAMETER_RESOURCE_STUDENT = "resource_student";
+	public static final String PARAMETER_RESOURCE_PERMISSION = "resource_permission";
 	public static final String PARAMETER_SCHOOL_CLASS_ID = "sch_class_id";
 	public static final String PARAMETER_SCHOOL_CLASS_MEMBER_ID = "sch_class_member_id";
 	public static final String PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE = "sch_class_member_removed";
@@ -104,6 +104,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_USER_ID = "sch_user_id";
 	public static final String PARAMETER_SET_AS_DEFAULT = "rem_rej_m";
 
+	public static final String PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN = "resource_perm_central_admin";
+	public static final Integer VIEW_ALL_RESOURCES_GRP_ID = new Integer("-7");
+	
 	public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
 	public static final int METHOD_REPLACE = 3;
@@ -157,6 +160,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	//private boolean _move = true;
 	private boolean _showOnlyOverview = false;
 	private boolean _showNoChoices = false;
+	private boolean viewAllResources = false;
 
 	private CloseButton close;
 	private String searchString;
@@ -230,6 +234,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		form.maintainParameter(PARAMETER_USER_ID);
 		form.maintainParameter(PARAMETER_CHOICE_ID);
 		form.maintainParameter(PARAMETER_PAGE_ID);
+		form.maintainParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID);
+		form.maintainParameter(PARAMETER_RESOURCE_PERMISSION);
 		form.setStyleAttribute("height:100%");
 
 		Table table = new Table(3, 5);
@@ -540,8 +546,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 					Resource rsc = getResourceBusiness(iwc).getResourceByPrimaryKey(new Integer(rscId));
 					ResourcePermission perm = getResourceBusiness(iwc).getRscPermByRscAndGrpId((Integer) rsc.getPrimaryKey(), providerGrpID);
 
-					// Show resource row only if a provider permission with view rights exists
-					if (perm != null && perm.getPermitViewResource()) {
+
+					boolean providerViewRights = (perm != null && perm.getPermitViewResource());
+					
+					// Show resource according to permissions					
+					if (viewAllResources || providerViewRights){
 						Date startDate = mbr.getStartDate();
 						Date endDate = mbr.getEndDate();
 						// Build resource name date String
@@ -1188,9 +1197,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(new HiddenInput(PARAMETER_RESOURCE_ENDDATE, ""), 6, 1);
 		table.setRowHeight(1, "7");
 
-		// Keep track of SchoolClassMemberID
-		table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, String.valueOf(_schoolClassMemberID)), 1, 1);
-
 		// list resources
 		int row = 2;
 		Integer providerGrpID = getProviderGrpId(iwc);
@@ -1203,23 +1209,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 			int rscId = mbr.getResourceFK();
 			Resource rsc = getResourceBusiness(iwc).getResourceByPrimaryKey(new Integer(rscId));
 			ResourcePermission perm = getResourceBusiness(iwc).getRscPermByRscAndGrpId((Integer) rsc.getPrimaryKey(), providerGrpID);
-			// Row buttons
-			delete = new SubmitButton(getDeleteIcon(localize("school.delete_resource_placement", "Click to remove resource placement from student")), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES));
-			delete.setDescription(localize("school.delete_resource_placement", "Click to remove resource placement from student"));
-			delete.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_DELETE_RESOURCE));
-			delete.setValueOnClick(PARAMETER_DELETE_RESOURCE_PLACEMENT, mbr.getPrimaryKey().toString());
-			delete.setSubmitConfirm(localize("school.confirm_resource_placement_delete", "Are you sure you want to delete this resource from the student?"));
 
-			finish = new SubmitButton(getEditIcon(localize("school.finish_resource_placement", "Click to finish resource placement setting the end date")), PARAMETER_METHOD, String.valueOf(METHOD_FINISH_RESOURCE));
-			finish.setDescription(localize("school.finish_resource_placement", "Click to finish resource placement setting the end date"));
-			finish.setValueOnClick(PARAMETER_RESOURCE_CLASS_MEMBER, mbr.getPrimaryKey().toString());
-			finish.setValueOnClick(PARAMETER_RESOURCE_NAME, rsc.getResourceName());
-			finish.setValueOnClick(PARAMETER_RESOURCE_STARTDATE, mbr.getStartDate().toString());
-			if (mbr.getEndDate() != null)
-				finish.setValueOnClick(PARAMETER_RESOURCE_ENDDATE, mbr.getEndDate().toString());
+			// Show resource row if a provider permission with view rights exists
+			boolean hasProviderRights = (perm != null && perm.getPermitViewResource());
+			
+			// Show all resources according to permissions
+			if (viewAllResources || hasProviderRights) {				
+				// Row buttons
+				delete = new SubmitButton(getDeleteIcon(localize("school.delete_resource_placement", "Click to remove resource placement from student")), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES));
+				delete.setDescription(localize("school.delete_resource_placement", "Click to remove resource placement from student"));
+				delete.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_DELETE_RESOURCE));
+				delete.setValueOnClick(PARAMETER_DELETE_RESOURCE_PLACEMENT, mbr.getPrimaryKey().toString());
+				delete.setSubmitConfirm(localize("school.confirm_resource_placement_delete", "Are you sure you want to delete this resource from the student?"));
 
-			// Show resource row only if a provider permission with view rights exists
-			if (perm != null && perm.getPermitViewResource()) {
+				finish = new SubmitButton(getEditIcon(localize("school.finish_resource_placement", "Click to finish resource placement setting the end date")), PARAMETER_METHOD, String.valueOf(METHOD_FINISH_RESOURCE));
+				finish.setDescription(localize("school.finish_resource_placement", "Click to finish resource placement setting the end date"));
+				finish.setValueOnClick(PARAMETER_RESOURCE_CLASS_MEMBER, mbr.getPrimaryKey().toString());
+				finish.setValueOnClick(PARAMETER_RESOURCE_NAME, rsc.getResourceName());
+				finish.setValueOnClick(PARAMETER_RESOURCE_STARTDATE, mbr.getStartDate().toString());
+				if (mbr.getEndDate() != null)
+					finish.setValueOnClick(PARAMETER_RESOURCE_ENDDATE, mbr.getEndDate().toString());
+				// Build table row			
 				table.add(getSmallText(rsc.getResourceName()), 1, row);
 				Date startDate = mbr.getStartDate();
 				if (startDate != null)
@@ -1269,9 +1279,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(getSmallHeader(localize("school.resource", "Resource")), 1, row++);
 		table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row++);
 		table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
-
-		// Keep track of SchoolClassMemberID
-		table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, String.valueOf(_schoolClassMemberID)), 1, 1);
 
 		// *** Input fields ***
 		if (resourceErrorMsg != null) {
@@ -1336,9 +1343,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setBorder(0);
 		table.setCellpadding(1);
 		table.setCellspacing(2);
-
-		// Keep track of SchoolClassMemberID
-		table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, String.valueOf(_schoolClassMemberID)), 1, 1);
 
 		// *** Input labels ***
 		int row = 1;
@@ -1693,6 +1697,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_MEMBER_ID)) {
 			_schoolClassMemberID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID));
 		}
+		
+		if (iwc.isParameterSet(PARAMETER_RESOURCE_PERMISSION) 
+				&& iwc.getParameter(PARAMETER_RESOURCE_PERMISSION).equals(PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN))
+			viewAllResources = true;
+			
 	}
 
 	protected DropdownMenu getSchoolYears(IWContext iwc) throws RemoteException {
@@ -1785,7 +1794,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 		int classMemberId = 0;
 		classMemberId = _schoolClassMemberID;
 		if (providerGrpId != null && classMemberId != 0) {
-			rscColl = getResourceBusiness(iwc).getAssignableResourcesForPlacement(providerGrpId, new Integer(classMemberId));
+			if (viewAllResources)
+				// central administration is using this block, and has permission to see all resources
+				rscColl = getResourceBusiness(iwc).getAssignableResourcesForPlacement(VIEW_ALL_RESOURCES_GRP_ID, new Integer(classMemberId));
+			else
+				// Only resources with a permission for the provider group id(from getProviderGrpId()) should be visible
+				rscColl = getResourceBusiness(iwc).getAssignableResourcesForPlacement(providerGrpId, new Integer(classMemberId));
+			
 			for (Iterator iter = rscColl.iterator(); iter.hasNext(); ) {
 				Resource currRsc = (Resource) iter.next();
 				DD.addMenuElement(currRsc.getPrimaryKey().toString(), currRsc.getResourceName());

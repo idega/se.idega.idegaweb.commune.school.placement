@@ -64,8 +64,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/03 18:45:58 $ by $Author: goranb $
- * @version $Revision: 1.31 $
+ * Last modified: $Date: 2003/11/04 18:09:01 $ by $Author: laddi $
+ * @version $Revision: 1.32 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -521,7 +521,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 					try {
 						// school year
 						buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
-											   + latestPl.getSchoolClass().getSchoolYear().getName());						
+											   + latestPl.getSchoolYear().getName());						
 					} catch (Exception e) {}
 					try {
 						// add school group

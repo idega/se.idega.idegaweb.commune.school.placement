@@ -242,9 +242,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			Link pdfLink = getPDFLink(SchoolClassWriter.class,getBundle().getImage("shared/pdf.gif"));
 			pdfLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
+			pdfLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
 			table.add(pdfLink, 1, row);
 			Link excelLink = getXLSLink(SchoolClassWriter.class,getBundle().getImage("shared/xls.gif"));
 			excelLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
+			excelLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
 			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(excelLink, 1, row++);
 		}

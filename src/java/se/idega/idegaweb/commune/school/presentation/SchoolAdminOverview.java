@@ -1767,7 +1767,8 @@ public class SchoolAdminOverview extends CommuneBlock {
     
 	private void validateSchoolClass(IWContext iwc) throws RemoteException {
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(_schoolClassID));
-		if (schoolClass.getSchoolYearId() != _schoolYearID) {
+		SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(_schoolYearID));
+		if (schoolYear != null || !schoolClass.hasRelationToSchoolYear(schoolYear)) {
 			Collection schoolClasses = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
 			if (!schoolClasses.isEmpty()) {
 				Iterator iter = schoolClasses.iterator();

@@ -283,7 +283,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			table.add(getStyledInterface(prov),3,row);
 
 			if (_providerPage != null) {
-				GenericButton createProvider = new GenericButton(localize("child_care.create_provider", "Create provider"), "");
+				GenericButton createProvider = new GenericButton("", localize("child_care.create_provider", "Create provider"));
 				createProvider.setPageToOpen(_providerPage);
 				table.add(Text.getNonBrakingSpace(), 3, row);
 				table.add(createProvider, 3, row);
@@ -321,6 +321,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			if (!op.isEmpty()) {
 				op.setAsNotEmpty(localize("child_care.must_select_group","You must select a group."), "-1");
 				op.addMenuElementFirst("-1", "");
+				op.keepStatusOnAction(true);
 			}
 			table.add(getStyledInterface(op),3,row);
 			

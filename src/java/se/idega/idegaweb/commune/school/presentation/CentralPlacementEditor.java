@@ -57,8 +57,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/24 11:31:09 $ by $Author: laddi $
- * @version $Revision: 1.22 $
+ * Last modified: $Date: 2003/10/24 15:40:05 $ by $Author: goranb $
+ * @version $Revision: 1.23 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -473,8 +473,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Values - Latest placement
 		if (child != null) {
 			try {
-				SchoolClassMember latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(
-																																	iwc, child);
+				SchoolClassMember latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(child);
 				if (latestPl != null) {
 					row--; row--;row--;
 					col = 2;
@@ -616,12 +615,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 			// value if provider is set
 		if (iwc.isParameterSet(PARAM_PROVIDER) 
 															&& !(iwc.getParameter(PARAM_PROVIDER).equals("-1"))) {													
-            final Provider provider = new Provider
-                    (Integer.parseInt (iwc.getParameter(PARAM_PROVIDER)));
+			final Provider provider = new Provider
+				   											(Integer.parseInt (iwc.getParameter(PARAM_PROVIDER)));           	
 			if (provider != null) {
 				boolean hasCompByInv = provider.getPaymentByInvoice ();
 				Text txt = getSmallText(hasCompByInv ? localize(KEY_DROPDOWN_YES, "Yes") 
-														 					: localize(KEY_DROPDOWN_NO, "No"));
+																			: localize(KEY_DROPDOWN_NO, "No"));
 				table.add(txt, ++col, row);											
 			}
 		}
@@ -931,9 +930,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 			try {
 				SchoolSeason currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
 				int seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
-				Collection groupColl =
-					getSchoolBusiness(iwc).findSchoolClassesBySchoolAndSeasonAndYear(
-																										schoolID, seasonID, yearID);
+				Collection groupColl = getSchoolBusiness(iwc)
+									.findSchoolClassesBySchoolAndSeasonAndYear(schoolID, seasonID, yearID);
 				if (groupColl != null) {
 					for (Iterator iter = groupColl.iterator(); iter.hasNext();) {
 						SchoolClass group = (SchoolClass) iter.next();
@@ -1155,7 +1153,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) 
 																										throws RemoteException {
 		return (CentralPlacementBusiness) 
-					IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
+											IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
 	}
 
 

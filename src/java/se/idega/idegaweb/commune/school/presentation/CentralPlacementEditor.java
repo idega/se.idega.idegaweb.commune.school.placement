@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/19 10:22:43 $ by $Author: goranb $
- * @version $Revision: 1.55 $
+ * Last modified: $Date: 2003/12/19 10:40:47 $ by $Author: goranb $
+ * @version $Revision: 1.56 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -582,7 +582,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 						if (theYear != null)
 							buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
 											   												+ theYear.getName());						
-
 					} catch (Exception e) {}
 					try {
 						// add school group
@@ -593,12 +592,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 					table.add(getSmallText(buf.toString()), col, row);
 					table.mergeCells(col, row, col+2, row);
 
-					// BUTTON Regular payment for Latest Placement					
-					//if (!(iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) 
-					//		|| "-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY))) {
+					// BUTTON Regular payment for Latest Placement	
+					try {
 						table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row);
 						table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
-					//}
+					} catch (Exception e) {}
+					
 					row++;
 
 					// Resources
@@ -606,6 +605,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 						table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
 						table.mergeCells(col, row, col+2, row);
 					} catch (Exception e) {}
+					
 					row++;
 					
 					// Contract

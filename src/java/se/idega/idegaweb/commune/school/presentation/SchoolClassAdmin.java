@@ -116,17 +116,19 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.setCellspacing(0);
 		table.setWidth(getWidth());
 		table.setHeight(2, "12");
+		
 		form.add(table);
 
-		Table headerTable = new Table(2, 1);
+		Table headerTable = new Table(1, 3);
 		headerTable.setWidth(Table.HUNDRED_PERCENT);
 		headerTable.setCellpaddingAndCellspacing(0);
-		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+		headerTable.setHeight(1, 2, "20");
+		//headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.add(headerTable, 1, 1);
 
 		headerTable.add(getNavigationTable(true, multipleSchools, showBunRadioButtons), 1, 1);
-		headerTable.add(getSortTable(), 2, 1);
-		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
+		headerTable.add(getSortTable(), 1, 3);
+		headerTable.setVerticalAlignment(1, 3, Table.VERTICAL_ALIGN_BOTTOM);
 
 		if (getSchoolClassID() != -1) {
 			table.add(getStudentTable(iwc), 1, 3);

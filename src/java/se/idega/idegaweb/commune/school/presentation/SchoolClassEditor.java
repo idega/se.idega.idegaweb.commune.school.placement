@@ -686,7 +686,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
 		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
 		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 5, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row++);
+		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row);
+		table.add(getSmallHeader(localize("school.placing_offer_alphabet_letter", "E")), 7, row);
+		table.add(getSmallHeader(localize("school.placing_confirmed_alphabet_letter", "D")), 8, row++);
 
 		User student;
 		Address address;
@@ -834,6 +836,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
+		table.setColumnAlignment(7, Table.HORIZONTAL_ALIGN_CENTER);
+		table.setColumnAlignment(8, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setRowColor(1, getHeaderColor());
 		table.setRowColor(row, "#FFFFFF");
 

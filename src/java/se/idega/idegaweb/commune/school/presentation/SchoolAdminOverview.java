@@ -414,7 +414,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			int pendingSchoolId = -1;
 			boolean showChangePlacementDate = false;
-			boolean hasMoveChoice = false;
 			School oldSchool = null;
 			
 			if (!_showNoChoices) {

@@ -381,8 +381,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 								table.add(getSmallText(" ("+localize("school.moved","Moved")+")"),column,row);
 						}
 						column++;
-						if (showLanguage && choice.getLanguageChoice() != null)
-							table.add(getSmallText(choice.getLanguageChoice()), column++, row);
+						if (showLanguage) {
+							if (choice.getLanguageChoice() != null)
+								table.add(getSmallText(choice.getLanguageChoice()), column, row);
+							column++;
+						}
 						table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
 						table.add(checkBox, column, row++);
 					//}

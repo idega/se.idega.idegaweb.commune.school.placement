@@ -228,7 +228,14 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		boolean success;
 		String errorMessage = null;
 		try {
-			User owner = getBusiness().getUserBusiness().getUser(ownerID);
+			User owner;
+			if (ownerID != -1){
+				owner = getBusiness().getUserBusiness().getUser(ownerID);
+			}
+			else {
+				owner = getBusiness().getUserBusiness().getUser(iwc.getCurrentUserId());
+			}
+			
 			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), providerID, groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, terminationDate, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), true, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
 		}
 		catch (RemoteException re) {

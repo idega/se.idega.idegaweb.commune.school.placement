@@ -47,6 +47,21 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		add(form);
 	}
 	
+	private Table getApplicationTable(IWContext iwc) throws RemoteException {
+		Table table = new Table();
+		table.setWidth(getWidth());
+		table.setCellpadding(1);
+		table.setCellspacing(0);
+
+		int row = 1;
+		table.add(getHeader(localize("school.name", "Name")),1,row);
+		table.add(getHeader(localize("school.personal_id", "Personal ID")),2,row);
+		table.add(getHeader(localize("school.address", "Address")),3,row);
+		table.add(getHeader(localize("school.from_school", "From School")),4,row++);
+		
+		return table;
+	}
+	
 	private Table getStudentTable(IWContext iwc) throws RemoteException {
 		Table table = new Table();
 		table.setWidth(getWidth());

@@ -1,5 +1,5 @@
 /*
- * $Id: BusinessLaunchButton.java,v 1.4 2004/12/07 21:54:11 laddi Exp $
+ * $Id: BusinessLaunchButton.java,v 1.5 2004/12/08 10:28:24 laddi Exp $
  *
  * Copyright (C) 2002 Idega hf. All Rights Reserved.
  *
@@ -51,7 +51,7 @@ public class BusinessLaunchButton extends ChildCareBlock {
 		Form form = new Form();
 		SubmitButton button = new SubmitButton(SUBMIT,"Fix elementary school placements");
 		SubmitButton button2 = new SubmitButton(SUBMIT2,"Fix child care placements");
-		SubmitButton button3 = new SubmitButton(SUBMIT2,"Fix high school placements");
+		SubmitButton button3 = new SubmitButton(SUBMIT3,"Fix high school placements");
 		form.add(button);
 		form.add(button2);
 		form.add(button3);

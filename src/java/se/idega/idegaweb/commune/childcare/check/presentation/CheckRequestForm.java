@@ -18,6 +18,8 @@ import com.idega.core.location.data.PostalCode;
 import com.idega.presentation.ExceptionWrapper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
+import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
@@ -393,8 +395,12 @@ public class CheckRequestForm extends CommuneBlock {
 					custodianTable.add(getSmallErrorText(localize("check.social_status", "Social status")), 1, row);
 				else
 					custodianTable.add(getLocalizedSmallHeader("check.social_status", "Social status"), 1, row);
-				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 2, row++);
-
+				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 2, row);
+				Link infoLink = new Link(this.getInformationIcon(localize("check.work_situation_information", "Information about the work situation.")));
+				infoLink.setToOpenAlert(localize("check.work_situation_message", "Information about the work situation..."));
+				custodianTable.add(Text.getNonBrakingSpace(), 2, row);
+				custodianTable.add(infoLink, 2, row++);
+				
 				if (iter.hasNext()) {
 					custodianTable.setHeight(row++, 6);
 					parentNumber++;

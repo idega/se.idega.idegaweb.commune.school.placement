@@ -12,6 +12,7 @@ import java.util.Iterator;
 
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
+import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusinessBean;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
@@ -257,7 +258,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		mainTable.add(obj, col, row);
 	}
 
-	public Table getSearchTable(IWContext iwc) {
+	public Table getSearchTable(IWContext iwc) throws RemoteException {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setBorder(0);
@@ -459,8 +460,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 					row--; row--;row--;
 					col = 2;
 					// Activity
-
-					//table.add(latestPl.getSchoolClass().getSchoolType().getName(), col, row);
+					table.add(getSmallText(latestPl.getSchoolClass().getSchoolType().getName()), col, row);
 					row++;
 
 					// Placement
@@ -475,6 +475,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 					row++;
 
 					// Resources
+					table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
 					row++;
 
 				}
@@ -1003,7 +1004,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return comName;
 	}
 	
-	public Text getStoredPlacementMsg(IWContext iwc) {
+	public Text getStoredPlacementMsg(IWContext iwc) throws RemoteException {
 		Text txt = null;
 		StringBuffer buf = null;
 		if (storedPlacement != null) {
@@ -1022,11 +1023,36 @@ public class CentralPlacementEditor extends CommuneBlock {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			if (!(getResourcesString(iwc, pl).equals("")))
+				buf.append(", " + getResourcesString(iwc, pl));
 
 		}				
 		txt = new Text(buf.toString());
 		txt.setFontStyle(STYLE_STORED_PLACEMENT_MSG);
 		return txt;
+	}
+
+	/**
+	 * Get a String with the Resource names related to param placement
+	 * @param iwc
+	 * @param placement
+	 * @return
+	 */	
+	private String getResourcesString(IWContext iwc, SchoolClassMember placement) 
+																											throws RemoteException {
+		Collection coll = getResourceBusiness(iwc).getResourcePlacementsByMemberId(
+																							(Integer) placement.getPrimaryKey());
+		StringBuffer buf = new StringBuffer("");
+		int i = 1;
+		for (Iterator iter = coll.iterator(); iter.hasNext();) {
+			ResourceClassMember rscPl = (ResourceClassMember) iter.next();
+			buf.append(rscPl.getResource().getResourceName());
+			if (i < coll.size())
+				buf.append(", ");			
+			i++;			
+		}
+				
+		return buf.toString();
 	}
 
 	/**

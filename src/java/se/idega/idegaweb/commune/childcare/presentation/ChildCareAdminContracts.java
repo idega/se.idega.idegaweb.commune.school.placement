@@ -366,6 +366,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			cancel.setPageToOpen(getResponsePage());
 			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(cancel, 1, row);
+			table.mergeCells(1, row, table.getColumns(), row);
 		}
 												
 		form.add(table);

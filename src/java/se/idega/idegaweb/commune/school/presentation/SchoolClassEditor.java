@@ -116,7 +116,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			_previousSchoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_PREVIOUS_CLASS_ID));
 
 		_previousSchoolSeasonID = getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID());
-		_previousSchoolYearID = getBusiness().getPreviousSchoolYear(getSchoolYearID());
+		if (getSchoolYearID() != -1)
+			_previousSchoolYearID = getBusiness().getPreviousSchoolYear(getSchoolYearID());
 
 		if (iwc.isParameterSet(PARAMETER_ACTION))
 			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
@@ -266,6 +267,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			schoolYearAge--;
 		if (year != null && schoolYearAge >= 12)
 			showLanguage = true;
+		
+		if (showLanguage)
+			table.setColumns(8);
+		else
+			table.setColumns(7);
 
 		if (!showStudentTable) {
 			table.setColumns(table.getColumns() - 1);
@@ -519,7 +525,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setRowColor(headerRow, getHeaderColor());
-		table.mergeCells(1, 1, table.getColumns(), 1);
+		if (headerRow != 1)
+			table.mergeCells(1, 1, table.getColumns(), 1);
 
 		return table;
 	}
@@ -867,7 +874,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		Table table = new Table(2, 3);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
-		SchoolYear schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
+		SchoolYear schoolYear = null;
+		if (getSchoolYearID() != -1)
+			schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int yearAge = -1;
 		if (schoolYear != null)
 			yearAge = schoolYear.getSchoolYearAge();

@@ -1,17 +1,15 @@
 package se.idega.idegaweb.commune.childcare.check.presentation;
 
 import is.idega.block.family.business.FamilyLogic;
-
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
-
+import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareSession;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
-
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.SchoolType;
 import com.idega.core.location.data.Address;
@@ -157,7 +155,7 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private void viewForm(IWContext iwc) throws Exception {
-		boolean hasCheck = getCheckBusiness(iwc).hasGrantedCheck(child);
+		boolean hasCheck = getCareBusiness(iwc).hasGrantedCheck(child);
 		if (hasCheck) {
 			if (createChoices() && getResponsePage() != null)
 				iwc.forwardToIBPage(getParentPage(), getResponsePage());
@@ -580,6 +578,10 @@ public class CheckRequestForm extends CommuneBlock {
 		return childcareTable;
 	}
 
+	private CareBusiness getCareBusiness(IWContext iwc) throws Exception {
+		return (CareBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, CareBusiness.class);
+	}
+	
 	private CheckBusiness getCheckBusiness(IWContext iwc) throws Exception {
 		return (CheckBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, CheckBusiness.class);
 	}

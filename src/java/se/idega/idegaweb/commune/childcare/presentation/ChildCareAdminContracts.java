@@ -6,18 +6,15 @@ import java.rmi.RemoteException;
 import java.sql.Date;
 import java.util.Collection;
 import java.util.Iterator;
-
 import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.block.importer.business.AlreadyCreatedException;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
+import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.care.data.ChildCareApplication;
-import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementProviderEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementSchoolGroupEditor;
-
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.business.IBOLookup;
@@ -309,7 +306,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		boolean hasCheck = false;
 		try {
-			if (child != null) hasCheck = getCheckBusiness(iwc).hasGrantedCheck(child);
+			if (child != null) hasCheck = getCareBusiness(iwc).hasGrantedCheck(child);
 		}
 		catch (RemoteException e) {
 			e.printStackTrace();
@@ -548,8 +545,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		return (SchoolBusiness) IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
 	}
 
-	private CheckBusiness getCheckBusiness(IWContext iwc) throws RemoteException {
-		return (CheckBusiness) IBOLookup.getServiceInstance(iwc, CheckBusiness.class);
+	private CareBusiness getCareBusiness(IWContext iwc) throws RemoteException {
+		return (CareBusiness) IBOLookup.getServiceInstance(iwc, CareBusiness.class);
 	}
 
 	/**

@@ -406,6 +406,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t var one = 0;");
 		buffer.append("\n\t var two = 0;");
 		buffer.append("\n\t var three = 0;");
+		buffer.append("\n\t var length = 0;");
 
 		buffer.append("\n\n\t if (dropOne.selectedIndex > 0) {\n\t\t one = dropOne.options[dropOne.selectedIndex].value;\n\t\t length++;\n\t }");
 		buffer.append("\n\t if (dropTwo.selectedIndex > 0) {\n\t\t two = dropTwo.options[dropTwo.selectedIndex].value;\n\t\t length++;\n\t }");

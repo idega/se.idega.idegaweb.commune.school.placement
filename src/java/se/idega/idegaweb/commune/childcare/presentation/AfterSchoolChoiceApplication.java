@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.ejb.FinderException;
+
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.data.AfterSchoolChoice;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
@@ -267,11 +269,18 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		try {
 			Integer seasonID = (Integer) getSchoolChoiceBusiness(iwc).getCurrentSeason().getPrimaryKey();
 			for (int i = 1; i <= 3; i++) {
-				afterSchoolChoice = getAfterSchoolBusiness(iwc).findChoicesByChildAndChoiceNumberAndSeason(childID, i, seasonID);
-				if (afterSchoolChoice != null) {
-					schoolID = afterSchoolChoice.getProviderId();
-					areaID = afterSchoolChoice.getProvider().getSchoolAreaId();
-					message = afterSchoolChoice.getMessage();
+				try {
+					afterSchoolChoice = getAfterSchoolBusiness(iwc).findChoicesByChildAndChoiceNumberAndSeason(childID, i, seasonID);
+					if (afterSchoolChoice != null) {
+						schoolID = afterSchoolChoice.getProviderId();
+						areaID = afterSchoolChoice.getProvider().getSchoolAreaId();
+						message = afterSchoolChoice.getMessage();
+					}
+				}
+				catch (FinderException fe) {
+					schoolID = -1;
+					areaID = -1;
+					message = null;
 				}
 
 				ProviderDropdownDouble dropdown = (ProviderDropdownDouble) getStyledInterface(getDropdown(iwc.getCurrentLocale(), PARAM_AREA + "_" + i, PARAM_PROVIDER + "_" + i));

@@ -296,11 +296,13 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 		if (_showCheckOption) {
 			inputTable.mergeCells(1, row, inputTable.getColumns(), row);
+			inputTable.setWidth(1, row, Table.HUNDRED_PERCENT);
 			inputTable.add(getSmallHeader(localize(CHECK_MESSAGE, "Please note that if you select a private provider, you have to fill out a check application as well.")), 1, row++);
 			inputTable.setHeight(row++, 6);
 			
 			CheckBox sendToCheck = getCheckBox(PARAM_SEND_TO_CHECK, "true");
 			inputTable.mergeCells(1, row, inputTable.getColumns(), row);
+			inputTable.setWidth(1, row, Table.HUNDRED_PERCENT);
 			inputTable.add(sendToCheck, 1, row);
 			inputTable.add(Text.getNonBrakingSpace(), 1, row);
 			inputTable.add(getSmallHeader(localize(SEND_TO_CHECK, "Yes, send me to the check application.")), 1, row++);

@@ -239,7 +239,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 
 		if (this.showStudentTable) {
-			if (_previousSchoolYearID != -1 && !isOngoingSeason) {
+			//if (_previousSchoolYearID != -1 && !isOngoingSeason) {
+			if (_previousSchoolYearID != -1) {
 				try {
 					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 					validateSchoolClass(previousClasses);

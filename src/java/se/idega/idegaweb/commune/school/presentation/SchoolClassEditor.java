@@ -421,7 +421,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			boolean showComment = false;
 
 			Iterator iter = applicants.iterator();			
-			logWarning("*** OUTSIDE HOMCOM - NoOfApplicants: " + applicants.size());
+			//logWarning("*** OUTSIDE HOMCOM - NoOfApplicants: " + applicants.size());
 			
 			while (iter.hasNext()) {
 				column = 1;

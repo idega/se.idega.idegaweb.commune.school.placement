@@ -242,7 +242,7 @@ public class CheckRequestForm extends CommuneBlock {
 				}
 				getChildCareBusiness(iwc).insertApplications(iwc.getCurrentUser(), providerIDs, date, checkID, ((Integer) child.getPrimaryKey()).intValue(), "", "", true);
 				*/
-				String childcareThisSchool = iwc.getParameter(this.PARAM_CHILDCARE_THIS);
+				String childcareThisSchool = iwc.getParameter(PARAM_CHILDCARE_THIS);
 				if (childcareThisSchool != null) {
 					Object[] arguments = { child.getNameLastFirst(true) };
 					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().setChildcarePreferences(iwc.getCurrentUser(),((Integer)child.getPrimaryKey()).intValue(), Boolean.valueOf(childcareThisSchool).booleanValue(), iwc.getParameter(PARAM_CHILDCARE_OTHER), localize("check.student_childcare_other","Application for childcare outside of chosen school"), MessageFormat.format(localize("check.student_childcare_other_body","The following student has applied for childcare outside of the chosen school"), arguments));

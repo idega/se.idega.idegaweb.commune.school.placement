@@ -1072,12 +1072,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		int userID = ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue();
 		SchoolClassMember member;
 		SchoolChoice choice;
-		try {
-			SchoolSeason season = getBusiness().getSchoolChoiceBusiness().getCurrentSeason();
+		SchoolSeason season = getBusiness().getSchoolChoiceBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID()));
+		if (season != null) {
 			stamp = new IWTimestamp(season.getSchoolSeasonStart());
-		}
-		catch (FinderException fe) {
-			fe.printStackTrace();
 		}
 		SchoolSeason previousSeason = getBusiness().getPreviousSchoolSeason(getSchoolSeasonID());
 		getBusiness().resetSchoolClassStatus(getSchoolClassID());

@@ -605,7 +605,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			//SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
 			SubmitButton moveYear = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_year", "Change year"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
 			SubmitButton changeStudyPath = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_study_path", "Change Study Path"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_STUDY_PATH)));
-			SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
+			//SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
 			SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placment_date", "Change placement date"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_PLACEMENT_DATE)));
 			PrintButton print = (PrintButton) getStyledInterface(new PrintButton(localize("school.print", "Print")));
 			SubmitButton resources = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.resources", "Resources"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
@@ -662,10 +662,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 
-			if (_showNoChoices) {
+			/*if (_showNoChoices) {
 				table.add(editStudent, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
-			}
+			}*/
 
 			table.add(print, 1, row);
 			table.add(Text.getNonBrakingSpace(), 1, row);

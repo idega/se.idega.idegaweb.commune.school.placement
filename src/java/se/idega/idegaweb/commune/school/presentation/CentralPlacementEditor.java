@@ -57,8 +57,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/24 11:12:16 $ by $Author: goranb $
- * @version $Revision: 1.19 $
+ * Last modified: $Date: 2003/10/24 11:18:04 $ by $Author: goranb $
+ * @version $Revision: 1.20 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -294,7 +294,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setWidth("100%");
-		table.setBorder(1);
+		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
@@ -400,7 +400,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setWidth("100%");
-		table.setBorder(1);
+		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
@@ -533,7 +533,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public Table getNewPlacementTable(IWContext iwc) throws RemoteException {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
-		table.setBorder(1);
+		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");

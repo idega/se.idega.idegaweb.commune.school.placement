@@ -517,9 +517,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMbrIdOrderByRscName(new Integer(_schoolClassMemberID));
 	            // Add resource label
 	            table.add(getSmallHeader(localize("school.resources", "Resources")), 1, row);
-	            if (rscColl.size() == 0)
-	                row++;
 	            // Loop resources
+	            int noOfShownRscs = 0;
 	            for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
 	                ResourceClassMember mbr = (ResourceClassMember) iter.next();
 	                int rscId = mbr.getResourceFK();
@@ -541,8 +540,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 	                    buf.append(")");
 	                    table.add(getSmallText(buf.toString()), 2, row);
 	                    row++;
+	                    noOfShownRscs++;
 	                }
-	            }            
+	            }
+	            if (noOfShownRscs == 0)
+	            	row++;           
 			}
 			//*** Resources END ***
 						

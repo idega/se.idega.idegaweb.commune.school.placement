@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/20 22:49:19 $ by $Author: goranb $
- * @version $Revision: 1.43 $
+ * Last modified: $Date: 2003/11/21 11:20:45 $ by $Author: goranb $
+ * @version $Revision: 1.44 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -802,8 +802,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 				}
 				Integer primaryKey;
 				Iterator loop = rscColl.iterator();
-				// show maximum 4 resources
-				for (int i = 0; loop.hasNext() && i < 4; i++) {
+				// show resources
+				for (int i = 0; loop.hasNext(); i++) {
 					col = 2;
 					Resource rsc = (Resource) loop.next();
 					CheckBox cBox = (CheckBox) typeRscBox.clone();
@@ -812,8 +812,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 					cBox.setValue(intPK);
 					boolean isChecked = false;
 					if (rscArr != null) {
-						for (int j = 0; j < rscArr.length; i++) {
-							if (intPK == Integer.parseInt(rscArr[i])) {
+						for (int j = 0; j < rscArr.length; j++) {
+							if (intPK == Integer.parseInt(rscArr[j])) {
 								isChecked = true;
 								break;
 							}							

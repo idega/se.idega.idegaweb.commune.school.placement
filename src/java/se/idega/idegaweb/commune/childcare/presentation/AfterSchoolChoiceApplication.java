@@ -118,7 +118,14 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				e.printStackTrace();
 			}
 		}
-
+		else {
+			try {
+				child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	protected boolean isAdmin(IWContext iwc) {

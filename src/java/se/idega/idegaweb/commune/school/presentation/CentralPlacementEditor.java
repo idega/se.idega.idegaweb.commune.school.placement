@@ -593,7 +593,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Invoice interval
 		rowTable.add(getSmallHeader(localize(KEY_INVOICE_INTERVAL_LABEL, "Invoice interval: ")),
 																													tmpCol++, tmpRow);
-		rowTable.add(getInvcIntervalDropdown(), tmpCol++, tmpRow);
+		rowTable.add(getInvoiceIntervalDropdown(iwc), tmpCol++, tmpRow);
 		// BUTTON Regular payment 
 		rowTable.add(new SubmitButton(
 				iwrb.getLocalizedImageButton(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")),
@@ -828,12 +828,21 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return yesNo;
 	}
 	
-	private DropdownMenu getInvcIntervalDropdown() {
+	private DropdownMenu getInvoiceIntervalDropdown(IWContext iwc) {
 		DropdownMenu drop = new DropdownMenu(PARAM_INVOICE_INTERVAL);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		drop.addMenuElement(KEY_DROPDOWN_TERM, localize(KEY_DROPDOWN_TERM, "Term"));
-		drop.addMenuElement(KEY_DROPDOWN_MONTH, localize(KEY_DROPDOWN_MONTH, "Month"));
-		drop.addMenuElement(KEY_DROPDOWN_YEAR, localize(KEY_DROPDOWN_YEAR, "Year"));
+		try {
+			Collection intervals = getSchoolBusiness(iwc).findAllSchClMemberInvoiceIntervalTypes();
+			if (intervals != null) {
+				for (Iterator iter = intervals.iterator(); iter.hasNext();) {
+					String intervalKey = (String) iter.next();
+					drop.addMenuElement(intervalKey, localize(intervalKey, intervalKey));					
+				}
+			}			
+		} catch (RemoteException re) {
+			re.printStackTrace();
+		}
+
 		return drop;		
 	}
 	

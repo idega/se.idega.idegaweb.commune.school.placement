@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/24 14:47:24 $ by $Author: goranb $
- * @version $Revision: 1.69 $
+ * Last modified: $Date: 2004/02/24 16:06:08 $ by $Author: goranb $
+ * @version $Revision: 1.70 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -358,8 +358,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			User oneChild = searchModule.getUser();
 			if (oneChild != null) {
 				iwc.getSession().setAttribute(SESSION_KEY_CHILD, oneChild);
-			} else {
-				errMsgSearch = localize(KEY_SEARCH_NO_PUPIL_FOUND, "No pupil found");
+			} else if (iwc.isParameterSet("usrch_search_fname" + UNIQUE_SUFFIX)
+							|| iwc.isParameterSet("usrch_search_lname" + UNIQUE_SUFFIX)
+							|| iwc.isParameterSet("usrch_search_pid" + UNIQUE_SUFFIX)) {
+					errMsgSearch = localize(KEY_SEARCH_NO_PUPIL_FOUND, "No pupil found");
 			}
 		} catch (Exception e) {}		
 		table.add(searchModule, col++, row);

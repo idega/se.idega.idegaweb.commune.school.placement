@@ -196,16 +196,19 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setHeight(8, "6");
 		table.setHeight(10, "12");
 		form.add(table);
+		
 
-		Table headerTable = new Table(2, 1);
+		Table headerTable = new Table(2, 3);
 		headerTable.setWidth(Table.HUNDRED_PERCENT);
 		headerTable.setCellpaddingAndCellspacing(0);
-		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+		headerTable.setHeight(1, 2, "20");
+		headerTable.setAlignment(1, 3, Table.HORIZONTAL_ALIGN_LEFT);
 		table.add(headerTable, 1, 1);
 
+	
 		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
-		headerTable.add(getSearchAndSortTable(), 2, 1);
-		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
+		headerTable.add(getSearchAndSortTable(), 1, 3);
+		headerTable.setVerticalAlignment(1, 3, Table.VERTICAL_ALIGN_BOTTOM);
 
 		table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getLegendTable(), 1, 5);
@@ -1020,9 +1023,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 
 	protected Table getSearchAndSortTable() throws RemoteException {
-		Table table = new Table(2, 3);
+		Table table = new Table(4, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
+		table.setWidth("100%");
+		
 		SchoolYear schoolYear = null;
 		if (getSchoolYearID() != -1)
 			schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
@@ -1031,21 +1036,21 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			yearAge = schoolYear.getSchoolYearAge();
 
 		if (searchEnabled) {
-			table.setAlignment(1, 1, Table.HORIZONTAL_ALIGN_RIGHT);
-			table.add(getSmallHeader(localize("school.search_for", "Search for") + ":" + Text.NON_BREAKING_SPACE), 1, 1);
+			table.setAlignment(4, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+			table.add(getSmallHeader(localize("school.search_for", "Search for") + ":" + Text.NON_BREAKING_SPACE), 4, 1);
 
 			TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH, searchString));
 			tiSearch.setLength(16);
-			table.add(tiSearch, 2, 1);
+			table.add(tiSearch, 4, 1);
 
 			SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.search", "Search")));
-			table.add(Text.getNonBrakingSpace(), 2, 1);
-			table.add(submit, 2, 1);
+			table.add(Text.getNonBrakingSpace(), 4, 1);
+			table.add(submit, 4, 1);
 
-			table.setHeight(2, "2");
+		
 		}
 
-		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":" + Text.NON_BREAKING_SPACE), 1, 3);
+		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":" + Text.NON_BREAKING_SPACE), 1, 1);
 
 		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
 		menu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name", "Name"));
@@ -1057,9 +1062,16 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		menu.addMenuElement(SchoolChoiceComparator.CREATED_SORT, localize("school.sort_created", "Created"));
 		menu.setSelectedElement(sortChoicesBy);
 		menu.setToSubmit();
-		table.add(menu, 2, 3);
+		table.add(menu, 2, 1);
 
-		table.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_LEFT);
+		table.setColumnAlignment(1, Table.HORIZONTAL_ALIGN_LEFT);
+		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_RIGHT);		
+		//table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_RIGHT);
+		//table.setWidth(3, 1, "100%");
+		table.setNoWrap(1, 1);
+		table.setNoWrap(4, 1);
+		table.setWidth(1, 1, "100");
+		
 
 		return table;
 	}

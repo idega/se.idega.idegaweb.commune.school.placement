@@ -80,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/06/09 15:57:27 $ by $Author: gimmi $
- * @version $Revision: 1.76 $
+ * Last modified: $Date: 2004/06/10 12:32:19 $ by $Author: gimmi $
+ * @version $Revision: 1.77 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -604,7 +604,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			try {
 				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, currentSeason);
 				if (latestPl != null) {
-					row--;row--;row--;row--;
+					row--;row--;row--;row--;row--;
 					col = 2;
 					// School type
 					try {

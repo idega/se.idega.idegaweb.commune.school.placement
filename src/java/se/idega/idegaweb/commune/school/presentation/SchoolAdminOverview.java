@@ -1980,7 +1980,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
 		try {
-			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, !_viewAllResources);
+			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, _viewAllResources);
 		}
 		catch (ResourceException re) {
 			errMsg = localize(re.getKey(), re.getDefTrans());
@@ -2001,7 +2001,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
 		try {
 			getResourceBusiness(iwc).finishResourceClassMember(new Integer(_schoolClassMemberID), 
-																						classMemberID, startDateStr, endDateStr);
+																						classMemberID, startDateStr, endDateStr, _viewAllResources);
 		}
 		catch (DateException de) {
 			errMsg = localize(de.getKey(), de.getDefTrans());

@@ -214,7 +214,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		table.add(getApplicationTable(iwc), 1, 5);
 
-		table.add(getLegendTable(true), 1, 5);
+		table.add(getLegendTable(getSchoolID() < 1), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {
@@ -480,7 +480,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				else if (choice.getChoiceOrder() > 1) {
 					table.setRowColor(row, HAS_REJECTED_FIRST_CHOICE_COLOR);
 				}
-				else if ((choice.getSchoolChoiceDate().before(from) || choice.getSchoolChoiceDate().after(to)) && currentSeason) {
+				else if ((choice.getSchoolChoiceDate().before(from) || choice.getSchoolChoiceDate().after(to)) && currentSeason && (getSchoolID() < 1)) {
 					table.setRowColor(row, HAS_MOVED_TO_COMMUNE_COLOR);
 				}
 				else {

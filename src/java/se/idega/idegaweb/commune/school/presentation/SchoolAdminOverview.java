@@ -725,7 +725,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 			}
 			
-			SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
+			SchoolClassMember schoolClassMember = null;
+			try {
+				schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID())));
+			}
+			catch (RemoteException re) {
+				log(re);
+			}
+			catch (FinderException fe) {
+				//Nothing found so we proceed...
+			}
 			
 			//show school year
 			if (null != schoolClassMember && schoolYear == null) {

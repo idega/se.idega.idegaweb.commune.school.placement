@@ -133,11 +133,6 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 	}
 
 	private Table getStudentTable(IWContext iwc) throws RemoteException {
-		boolean isReady = false;
-		SchoolClass newSchoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
-		if (newSchoolClass != null)
-			isReady = newSchoolClass.getReady();
-
 		Table table = new Table();
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());

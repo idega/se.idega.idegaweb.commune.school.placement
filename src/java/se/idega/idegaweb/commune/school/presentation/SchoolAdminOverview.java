@@ -381,7 +381,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 					if (schoolClassMember != null) {
 						SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
 						School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
-						SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(schoolClass.getSchoolYearId()));
 	
 						String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
 						table.add(getSmallText(schoolString), 2, row);
@@ -457,7 +456,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			workphone = "";
 		}
 
-		Object[] arguments = { user.getName(), mail, workphone };
+		Object[] arguments = { user.getName(), email, workphone };
 
 		String message = MessageFormat.format(localize("school.reject_student_message", "We are sorry that we cannot offer you a place in our school at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2})."), arguments);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
@@ -585,8 +584,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(new HiddenInput(PARAMETER_SHOW_NO_CHOICES, "true"));
 		int row = 1;
 
-		User user = getUserBusiness(iwc).getUser(_userID);
-
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
 
 		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":"), 1, row++);
@@ -610,8 +607,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
 		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_YEAR)));
 		int row = 1;
-
-		User user = getUserBusiness(iwc).getUser(_userID);
 
 		table.add(getSmallHeader(localize("school.move_year_info", "Select the new year for the student and click 'Move'.")), 1, row++);
 
@@ -926,7 +921,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 			}
 
-			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(getSchoolCommuneSession(iwc).getSchoolYearID()));
 			int grade = getSchoolCommuneBusiness(iwc).getGradeForYear(getSchoolCommuneSession(iwc).getSchoolYearID()) - 1;
 			User student = getUserBusiness(iwc).getUser(_userID);
 			Address studentAddress = getUserBusiness(iwc).getUserAddress1(_userID);

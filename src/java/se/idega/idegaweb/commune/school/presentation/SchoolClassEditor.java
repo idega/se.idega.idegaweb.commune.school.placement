@@ -371,7 +371,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 			Iterator iter = applicants.iterator();
 
-			int counter = 0;
 			while (iter.hasNext()) {
 				column = 1;
 				choice = (SchoolChoice) iter.next();

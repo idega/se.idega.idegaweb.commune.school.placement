@@ -24,6 +24,7 @@ import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -146,11 +147,21 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.setWidth(7, "12");
 		int row = 1;
 		
-		GenericButton button = (GenericButton) getStyledInterface(new GenericButton("add", localize("school.add_student", "Add student")));
-		Link addLink = new Link(button);
+		Table addTable = new Table(3,1);
+		addTable.setCellpadding(0);
+		addTable.setCellspacing(0);
+		addTable.setWidth(2, "4");
+		table.add(addTable, 1, row++);
+		
+		Link addLink = new Link(getEditIcon(localize("school.add_student", "Add student")));
 		addLink.setWindowToOpen(SchoolAdminWindow.class);
 		addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
-		table.add(addLink, 1, row++);
+		addTable.add(addLink, 1, 1);
+
+		Link addLinkText = getSmallLink(localize("school.add_student", "Add student"));
+		addLinkText.setWindowToOpen(SchoolAdminWindow.class);
+		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
+		addTable.add(addLinkText, 3, 1);
 
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);

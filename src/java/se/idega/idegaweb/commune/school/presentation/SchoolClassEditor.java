@@ -447,7 +447,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				int firstApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1 }, validStatuses, "");
 				int secondApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2 }, validStatuses, "");
 				int thirdApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 3 }, validStatuses, "");
-				int groupedApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, null, new String[] { SchoolChoiceBMPBean.CASE_STATUS_GROUPED }, "");
 
 				String[] allStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED, SchoolChoiceBMPBean.CASE_STATUS_PLACED };
 				String[] handledStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED };
@@ -478,9 +477,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				++sRow;
 				statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice") + ":"), 1, sRow);
 				statTable.add(getSmallText("" + thirdApplSize), 2, sRow);
-				++sRow;
-				statTable.add(getSmallText(localize("grouped_applications", "Grouped applcations") + ":"), 1, sRow);
-				statTable.add(getSmallText("" + groupedApplSize), 2, sRow);
 	
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(statTable, 1, row);

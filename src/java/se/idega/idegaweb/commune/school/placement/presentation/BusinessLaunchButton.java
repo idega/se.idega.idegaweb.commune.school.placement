@@ -1,5 +1,5 @@
 /*
- * $Id: BusinessLaunchButton.java,v 1.2 2004/12/07 20:37:26 laddi Exp $
+ * $Id: BusinessLaunchButton.java,v 1.3 2004/12/07 21:22:20 laddi Exp $
  *
  * Copyright (C) 2002 Idega hf. All Rights Reserved.
  *
@@ -34,7 +34,10 @@ public class BusinessLaunchButton extends ChildCareBlock {
 	
 	protected void control(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(SUBMIT)) {
-			getBusiness(iwc).fixPlacements();
+			getBusiness(iwc).fixElementarySchoolPlacements();
+		}
+		if (iwc.isParameterSet(SUBMIT2)) {
+			getBusiness(iwc).fixChildCarePlacements();
 		}
 		
 		displayForm();			
@@ -42,8 +45,10 @@ public class BusinessLaunchButton extends ChildCareBlock {
 
 	protected void displayForm() {
 		Form form = new Form();
-		SubmitButton button = new SubmitButton(SUBMIT,"Fix placements");
+		SubmitButton button = new SubmitButton(SUBMIT,"Fix school placements");
+		SubmitButton button2 = new SubmitButton(SUBMIT2,"Fix child care placements");
 		form.add(button);
+		form.add(button2);
 		add(form);	
 	}
 

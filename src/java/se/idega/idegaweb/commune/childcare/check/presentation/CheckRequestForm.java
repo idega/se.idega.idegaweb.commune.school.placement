@@ -36,6 +36,7 @@ public class CheckRequestForm extends CommuneBlock {
   private final static String PARAM_MOTHER_TONGUE_FATHER_CHILD = "chk_mt_fc";
   private final static String PARAM_MOTHER_TONGUE_PARENTS = "chk_mt_p";
   private final static String PARAM_CHILD_CARE_TYPE = "chk_cct";
+  private final static String PARAM_WORK_SITUATION = "chk_ws_";
   private final static String PARAM_WORK_SITUATION_1 = "chk_ws_1";
   private final static String PARAM_WORK_SITUATION_2 = "chk_ws_2";
 
@@ -44,6 +45,9 @@ public class CheckRequestForm extends CommuneBlock {
   private boolean paramErrorMotherTongueMC = false;
   private boolean paramErrorMotherTongueFC = false;
   private boolean paramErrorMotherTongueP = false;
+  private boolean paramErrorChildCateType = false;
+  private boolean paramErrorWorkSituation1 = false;
+  private boolean paramErrorWorkSituation2 = false;
 
   private IBPage formResponsePage = null;
   private User child;
@@ -124,12 +128,36 @@ public class CheckRequestForm extends CommuneBlock {
   }
 
   private void formSubmitted(IWContext iwc)throws Exception{
-    int paramWorkSituation1 = Integer.parseInt(iwc.getParameter(PARAM_WORK_SITUATION_1));
-    int paramWorkSituation2 = Integer.parseInt(iwc.getParameter(PARAM_WORK_SITUATION_2));
+    int paramChildCareType = -1;
+    int paramWorkSituation1 = -1;
+    int paramWorkSituation2 = -1;
     String paramMTMC = iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD);
     String paramMTFC = iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD);
     String paramMTP = iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS);
-    int paramChildCareType = Integer.parseInt(iwc.getParameter(PARAM_CHILD_CARE_TYPE));
+
+    try {
+      paramChildCareType = Integer.parseInt(iwc.getParameter(PARAM_CHILD_CARE_TYPE));
+    }
+    catch (NumberFormatException ne) {
+      this.isError = true;
+      this.paramErrorChildCateType = true;
+    }
+
+    try {
+      paramWorkSituation1 = Integer.parseInt(iwc.getParameter(PARAM_WORK_SITUATION_1));
+    }
+    catch (NumberFormatException ne) {
+      this.isError = true;
+      this.paramErrorWorkSituation1 = true;
+    }
+
+    try {
+      paramWorkSituation2 = Integer.parseInt(iwc.getParameter(PARAM_WORK_SITUATION_2));
+    }
+    catch (NumberFormatException ne) {
+      this.isError = true;
+      this.paramErrorWorkSituation2 = true;
+    }
 
     if(paramMTMC.trim().equals("")){
       this.isError = true;
@@ -150,25 +178,7 @@ public class CheckRequestForm extends CommuneBlock {
     }
 
     try {
-    getCheckBusiness(iwc).createCheck(
-	paramChildCareType,
-	paramWorkSituation1,
-	paramWorkSituation2,
-	paramMTMC,
-	paramMTFC,
-	paramMTP,
-	123, //Child id
-	1, //Method
-	2800, //Amount
-	1200,
-	1, //Admin id
-	"", //Notes
-	false, //Rule 1
-	false, //Rule 2
-	false, //Rule 3
-	false, //Rule 4
-	false //Rule 5
-	); // Check fee
+      getCheckBusiness(iwc).createCheck(paramChildCareType,paramWorkSituation1,paramWorkSituation2,paramMTMC,paramMTFC,paramMTP,((Integer)child.getPrimaryKey()).intValue(),1,2800,1200,-1,"",false,false,false,false,false);
     }
     catch (Exception e) {
       e.printStackTrace(System.err);
@@ -184,6 +194,8 @@ public class CheckRequestForm extends CommuneBlock {
 
   private Form getForm(IWContext iwc) throws Exception {
     Form f = new Form();
+    f.add(new HiddenInput(CitizenChildren.getChildIDParameterName(),((Integer)child.getPrimaryKey()).toString()));
+
     Table formTable = new Table();
     formTable.setWidth(600);
     formTable.setCellspacing(0);
@@ -250,7 +262,7 @@ public class CheckRequestForm extends CommuneBlock {
   }
 
   private Table getChildcareTypeTable(IWContext iwc) throws RemoteException {
-    Table childCareTypeTable = new Table(1,1);
+    Table childCareTypeTable = new Table();
     childCareTypeTable.setWidth("100%");
     childCareTypeTable.setCellspacing(0);
     childCareTypeTable.setCellpadding(4);
@@ -265,6 +277,10 @@ public class CheckRequestForm extends CommuneBlock {
       typeChoice.addMenuElement(st.getPrimaryKey().toString(),localize(st.getLocalizationKey(),st.getName()));
     }
     childCareTypeTable.add(typeChoice,1,1);
+
+    if ( this.paramErrorChildCateType ) {
+      childCareTypeTable.add(getSmallErrorText(localize("check.child_care_type_error","You must select child care type")),2,1);
+    }
 
     return childCareTypeTable;
   }
@@ -284,12 +300,17 @@ public class CheckRequestForm extends CommuneBlock {
 
 	custodianTable.add(getLocalizedSmallText("check.last_and_first_name","Last and first name"),1,row);
 	custodianTable.add(getLocalizedSmallText("check.phone_daytime","Phone daytime"),2,row);
-	custodianTable.add(getLocalizedSmallText("check.civil_status","Civil status"),3,row++);
+	custodianTable.add(getLocalizedSmallText("check.civil_status","Civil status"),3,row);
+
+	if ( ( row == 1 && this.paramErrorWorkSituation1 ) || ( row == 2 && this.paramErrorWorkSituation2 ) )
+	  custodianTable.add(getSmallErrorText(localize("check.social_status","Social status")),4,row++);
+	else
+	  custodianTable.add(getLocalizedSmallText("check.social_status","Social status"),4,row++);
 
 	custodianTable.add(getText(parent.getNameLastFirst()),1,row);
 	custodianTable.add(getText("08-633 54 67"),2,row);
 	custodianTable.add(getText("Gift"),3,row);
-	custodianTable.add(getWorkSituationMenu(iwc,PARAM_WORK_SITUATION_1),4,row++);
+	custodianTable.add(getWorkSituationMenu(iwc,PARAM_WORK_SITUATION+String.valueOf(row)),4,row++);
 
 	if ( iter.hasNext() ) {
 	  row++;

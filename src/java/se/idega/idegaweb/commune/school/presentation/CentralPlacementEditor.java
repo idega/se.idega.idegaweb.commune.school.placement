@@ -80,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/07/08 08:35:30 $ by $Author: malin $
- * @version $Revision: 1.78 $
+ * Last modified: $Date: 2004/08/03 13:24:28 $ by $Author: malin $
+ * @version $Revision: 1.79 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -574,7 +574,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
-		// Resources
+		// Placement paragraph
 		table.add(getSmallHeader(localize(KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")), col, row);
 		table.setRowHeight(row, rowHeight);
 		row++;
@@ -630,19 +630,19 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					
 					row++;
 					
-					// Placement
-					if (latestPl.getPlacementParagraph() != null) {
-						table.add(getSmallText(latestPl.getPlacementParagraph()), col, row);
-						table.mergeCells(col, row, col+2, row);
-					}
-					
-					row++;
-
 					// Resources
 					try {
 						table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
 						table.mergeCells(col, row, col+2, row);
 					} catch (Exception e) {}
+					
+					row++;
+					
+					// Placement
+					if (latestPl.getPlacementParagraph() != null) {
+						table.add(getSmallText(latestPl.getPlacementParagraph()), col, row);
+						table.mergeCells(col, row, col+2, row);
+					}
 					
 					row++;
 					

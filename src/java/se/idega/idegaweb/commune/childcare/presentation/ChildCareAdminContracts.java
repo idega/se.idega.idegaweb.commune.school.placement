@@ -166,7 +166,13 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private void save(IWContext iwc) {
 		int ownerID = -1;
 		if (iwc.isParameterSet(PARAM_GETBILL)){
-			ownerID = Integer.parseInt(iwc.getParameter(PARAM_GETBILL));	
+			try {
+				ownerID = Integer.parseInt(iwc.getParameter(PARAM_GETBILL));	
+			}
+			catch (NumberFormatException nfe) {
+				ownerID = -1;
+			}
+				
 		}
 		
 		int schoolTypeID = -1;

@@ -346,7 +346,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(getSmallHeader(localize("child_care.pre_school", "Specify pre-school:")), 1, row);
 		TextInput preSchool = (TextInput) getStyledInterface(new TextInput(PARAM_PRE_SCHOOL));
 		preSchool.setLength(40);
-		if (_application.getPreSchool() != null)
+		if (_application != null && _application.getPreSchool() != null)
 			preSchool.setContent(_application.getPreSchool());
 		table.add(preSchool, 3, row++);
 		table.setHeight(row++, 12);
@@ -380,7 +380,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		if (_application != null)
 			hasExtraContract.setSelected(_application.getHasExtraContract());
 		TextInput extraContractMessage = (TextInput) getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_MESSAGE));
-		if (_application.getExtraContractMessage() != null)
+		if (_application != null && _application.getExtraContractMessage() != null)
 			extraContractMessage.setContent(_application.getExtraContractMessage());
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT, "Extra contract")), 1, row);
 		table.add(hasExtraContract, 3, row);
@@ -392,7 +392,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		if (_application != null)
 			hasExtraContractOther.setSelected(_application.getHasExtraContractOther());
 		TextInput extraContractOtherMessage = (TextInput) getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_OTHER_MESSAGE));
-		if (_application.getExtraContractMessageOther() != null)
+		if (_application != null && _application.getExtraContractMessageOther() != null)
 			extraContractOtherMessage.setContent(_application.getExtraContractMessageOther());
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER, "Extra contract other")), 1, row);
 		table.add(hasExtraContractOther, 3, row);

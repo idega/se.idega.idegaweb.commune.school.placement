@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/24 12:22:37 $ by $Author: goranb $
- * @version $Revision: 1.68 $
+ * Last modified: $Date: 2004/02/24 14:47:24 $ by $Author: goranb $
+ * @version $Revision: 1.69 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -489,7 +489,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setWidth("100%");
-		table.setBorder(1);
+		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");

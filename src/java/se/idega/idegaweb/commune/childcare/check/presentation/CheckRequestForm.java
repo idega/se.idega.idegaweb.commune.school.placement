@@ -114,7 +114,14 @@ public class CheckRequestForm extends CommuneBlock {
 					return false;
 				}
 			} else {
-				return false;
+				Integer childID = (Integer) iwc.getSessionAttribute(CitizenChildren.getChildIDParameterName());
+					try {
+						child = getCheckBusiness(iwc).getUserById(childID.intValue());
+						return true;
+					}
+					catch (Exception e) {
+						return false;
+					}
 			}
 		}
 		else {

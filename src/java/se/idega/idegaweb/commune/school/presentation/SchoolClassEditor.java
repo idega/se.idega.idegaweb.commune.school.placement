@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -26,7 +27,9 @@ import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
+import com.idega.idegaweb.IWMainApplication;
 import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
@@ -316,7 +319,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		
 		Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy, applicationsPerPage, start);
 
-		int row = 1;
+		int row = 2;
+		if (multibleSchools)
+			row = 1;
 		int column = 1;
 		int headerRow = -1;
 
@@ -565,6 +570,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (headerRow != 1)
 			table.mergeCells(1, 1, table.getColumns(), 1);
 
+		if (this.multibleSchools) {
+			table.mergeCells(1, 1, table.getColumns(), 1);
+			table.setAlignment(1, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+			Link excelLink = getChoicesXLSLink(SchoolChoiceWriter.class, getBundle().getImage("shared/xls.gif"));
+			excelLink.addParameter(SchoolChoiceWriter.prmGrade, schoolYearAge);
+			table.add(excelLink, 1, 1);
+		}
+		
 		return table;
 	}
 
@@ -1015,6 +1028,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
 			}
 		}
+	}
+
+	private Link getChoicesXLSLink(Class classToUse, Image image) throws RemoteException {
+		Link link = new Link(image);
+		link.setWindow(getFileWindow());
+		link.addParameter(SchoolChoiceWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
+		link.addParameter(SchoolChoiceWriter.prmSchoolId, getSession().getSchoolID());
+		link.addParameter(SchoolChoiceWriter.prmSeasonId, getSession().getSchoolSeasonID());
+		return link;
 	}
 
 	private void delete(IWContext iwc) throws RemoteException {

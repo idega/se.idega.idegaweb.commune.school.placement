@@ -185,6 +185,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
     	table.add(getApplicationTable(iwc), 1, 5);
+    	table.add(getLegendTable(), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {
@@ -195,6 +196,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 					table.add(getPreviousHeader(previousClasses), 1, 7);
 					table.add(getStudentTable(iwc), 1, 9);
+					table.add(getLegendTable(), 1, 9);
 				}
 				catch (NullPointerException ne) {
 				}
@@ -253,8 +255,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.add(excelLink, 1, row++);
 		}
 
-		table.add(getNewStudentTable(iwc), 1, row);
-
+		table.add(getNewStudentTable(iwc), 1, row++);
+		table.add(getLegendTable(), 1, row);
+		
 		add(form);
 	}
 
@@ -399,7 +402,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					name = applicant.getName();
 
 				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
-					table.setRowColor(row, "#FFEAEA");
+					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
@@ -626,12 +629,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					checkBox.setDisabled(true);
 					boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
 					if (hasChoices[0] && hasChoices[1])
-						table.setRowColor(row, "#FFEAEA");
+						table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 					else if (hasChoices[0] && !hasChoices[1])
-						table.setRowColor(row, "#EAFFEE");
+						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 					else {
 						if (studentMember.getSpeciallyPlaced())
-							table.setRowColor(row, "#EAF1FF");
+							table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
 					}
 					link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, String.valueOf(getBusiness().getChosenSchoolID((Collection) studentChoices.get(new Integer(studentMember.getClassMemberId())))));
 				}
@@ -761,9 +764,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				if (hasChoice || hasMoveChoice) {
 					if (hasChoice)
-						table.setRowColor(row, "#EAFFEE");
+						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 					if (hasMoveChoice)
-						table.setRowColor(row, "#FFEAEA");
+						table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				}
 				else {
 					if (row % 2 == 0)

@@ -128,8 +128,10 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		headerTable.add(getSortTable(), 2, 1);
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
-		if (getSchoolClassID() != -1)
+		if (getSchoolClassID() != -1) {
 			table.add(getStudentTable(iwc), 1, 3);
+			table.add(getLegendTable(), 1, 3);
+		}
 		add(form);
 	}
 
@@ -214,9 +216,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 				if (hasChoice || hasMoveChoice) {
 					if (hasChoice)
-						table.setRowColor(row, "#EAFFEE");
+						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 					if (hasMoveChoice)
-						table.setRowColor(row, "#FFEAEA");
+						table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				}
 				else {
 					if (row % 2 == 0)

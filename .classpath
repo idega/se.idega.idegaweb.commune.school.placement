@@ -13,6 +13,8 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/jta/jars/jta-spec1_0_1.jar">
   </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/javaldap/jars/javaldap-server-0.3.jar">
+  </classpathentry>
   <classpathentry kind="src" path="/com.idega.core">
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.process">

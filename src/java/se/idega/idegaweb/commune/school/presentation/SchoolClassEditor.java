@@ -204,7 +204,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		form.setEventListener(SchoolEventListener.class);
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
 
-		Table table = new Table(1, 11);
+		Table table = new Table(1, 17);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setWidth(getWidth());

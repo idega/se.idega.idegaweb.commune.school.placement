@@ -16,6 +16,7 @@ import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.data.AfterSchoolChoice;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
+import se.idega.idegaweb.commune.school.data.SchoolChoice;
 
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.data.SchoolArea;
@@ -263,6 +264,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		IWTimestamp stamp = new IWTimestamp();
 
 		AfterSchoolChoice afterSchoolChoice = null;
+		SchoolChoice schoolChoice = null;
 		int areaID = -1;
 		int schoolID = -1;
 		Integer childID = new Integer(getSession().getChildID());
@@ -271,16 +273,27 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			for (int i = 1; i <= 3; i++) {
 				try {
 					afterSchoolChoice = getAfterSchoolBusiness(iwc).findChoicesByChildAndChoiceNumberAndSeason(childID, i, seasonID);
-					if (afterSchoolChoice != null) {
-						schoolID = afterSchoolChoice.getProviderId();
-						areaID = afterSchoolChoice.getProvider().getSchoolAreaId();
-						message = afterSchoolChoice.getMessage();
-					}
+					areaID = afterSchoolChoice.getProvider().getSchoolAreaId();
+					schoolID = afterSchoolChoice.getProviderId();
+					message = afterSchoolChoice.getMessage();
 				}
 				catch (FinderException fe) {
-					schoolID = -1;
-					areaID = -1;
-					message = null;
+					try {
+						schoolChoice = getSchoolChoiceBusiness(iwc).getSchoolChoiceHome().findByChildAndChoiceNumberAndSeason(childID, new Integer(i), seasonID);
+						if (getSchoolChoiceBusiness(iwc).getSchoolBusiness().hasAfterSchoolActivities(schoolChoice.getChosenSchoolId())) {
+							areaID = schoolChoice.getChosenSchool().getSchoolAreaId();
+							schoolID = schoolChoice.getChosenSchoolId();
+						}
+						else {
+							areaID = -1;
+							schoolID = -1;
+						}
+					}
+					catch (FinderException e) {
+						areaID = -1;
+						schoolID = -1;
+						message = null;
+					}
 				}
 
 				ProviderDropdownDouble dropdown = (ProviderDropdownDouble) getStyledInterface(getDropdown(iwc.getCurrentLocale(), PARAM_AREA + "_" + i, PARAM_PROVIDER + "_" + i));

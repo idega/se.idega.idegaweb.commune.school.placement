@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.ejb.FinderException;
 
@@ -435,7 +434,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				created = new IWTimestamp(choice.getCreated());
 				applicant = getUserBusiness(iwc).getUser(choice.getChildId());
 				school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
-				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, choice.getPrimaryKey().toString() + "," + String.valueOf(choice.getChildId()));
+				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, choice.getPrimaryKey().toString());
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
 				hasComment = choice.getMessage() != null;
 
@@ -1105,21 +1104,20 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
-				StringTokenizer tokens = new StringTokenizer(applications[a], ",");
-
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
-				choice = getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(tokens.nextToken()), iwc.getCurrentUser());
+				choice = getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(applications[a]), iwc.getCurrentUser());
 				IWTimestamp placementDate = null;
-				if (choice != null && choice.getPlacementDate() != null) {
-					placementDate = new IWTimestamp(choice.getPlacementDate());
-				}
-				else {
-					placementDate = new IWTimestamp(stamp);
-				}
-				
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice());
-				if (member != null) {
-					getBusiness().importStudentInformationToNewClass(member, previousSeason);
+				if (choice != null) { 
+					if (choice.getPlacementDate() != null) {
+						placementDate = new IWTimestamp(choice.getPlacementDate());
+					}
+					else {
+						placementDate = new IWTimestamp(stamp);
+					}
+					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice());
+					if (member != null) {
+						getBusiness().importStudentInformationToNewClass(member, previousSeason);
+					}
 				}
 			}
 		}

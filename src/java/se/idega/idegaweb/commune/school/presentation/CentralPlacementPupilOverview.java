@@ -30,7 +30,7 @@ public class CentralPlacementPupilOverview extends Window {
 	private static final String PARAM_CLOSE_AND_RELOAD = "close_and_reload";
 
 	Table mainTable = null;
-	String FRAME_COLOR = "#9999FF";
+	String FRAME_COLOR = "#DDDDDD";
 	IWResourceBundle iwrb = null;
 	 
 	// CSS styles   
@@ -109,7 +109,7 @@ public class CentralPlacementPupilOverview extends Window {
 	 * Reload ParentPage and close this window
 	 */
 	private void submitParentAndClose() {
-		this.setParentPageFormToSubmitOnUnLoad(1);
+		this.setParentPageFormToSubmitOnUnLoad(CentralPlacementEditor.FORM_NAME);
 		close();
 	}
 

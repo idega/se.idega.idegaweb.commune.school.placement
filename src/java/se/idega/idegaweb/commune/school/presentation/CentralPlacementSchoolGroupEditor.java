@@ -1,6 +1,6 @@
 package se.idega.idegaweb.commune.school.presentation;
 
-import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
+import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorFloating;
 
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
@@ -32,7 +32,7 @@ public class CentralPlacementSchoolGroupEditor extends Window {
 	private static final String PARAM_CLOSE_AND_RELOAD = "close_and_reload";
 
 	Table mainTable = null;
-	String FRAME_COLOR = "#9999FF";
+	String FRAME_COLOR = "#DDDDDD";
 	IWResourceBundle iwrb = null;
 	 
 	// CSS styles   
@@ -44,7 +44,7 @@ public class CentralPlacementSchoolGroupEditor extends Window {
 			+ "font-size:10px;font-family:Verdana,Arial,Helvetica;font-weight:normal;";
 	
 	public CentralPlacementSchoolGroupEditor() {
-		this.setWidth(600);
+		this.setWidth(635);
 		this.setHeight(400);
 		this.setScrollbar(true);
 		this.setResizable(true);	
@@ -111,7 +111,8 @@ public class CentralPlacementSchoolGroupEditor extends Window {
 	 * Reload ParentPage and close this window
 	 */
 	private void reloadParentAndClose() {
-		setParentPageFormToSubmitOnUnLoad(1);
+		this.setParentPageFormToSubmitOnUnLoad(CentralPlacementEditor.FORM_NAME);
+		//setParentPageFormToSubmitOnUnLoad(1);
 		close();
 	}
 
@@ -124,7 +125,7 @@ public class CentralPlacementSchoolGroupEditor extends Window {
 			reloadParentAndClose();
 		} else {
 			mainTable = getMainTable();
-			setMainTableContent(new SchoolGroupEditor());
+			setMainTableContent(new SchoolGroupEditorFloating());
 			add(mainTable);
 		}
 	}

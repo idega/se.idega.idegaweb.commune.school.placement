@@ -1136,21 +1136,25 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			
 			// Get applicants home Commune primary key
 			Address applicantAddr;
-			applicantAddr = getUserBusiness(iwc).getUsersMainAddress(applicant);
+			applicantAddr = getUserBusiness(iwc).getUsersMainAddress(applicant);			
 						
 			if (applicantAddr != null) {
 				homeComID = applicantAddr.getCommuneID(); // return -1 if null in db
 				mainAddrID = ((Integer) applicantAddr.getPrimaryKey()).intValue();
 			}
 			
-			logWarning("*** OUTSIDE HOME COMMUNE ***\n" 
+			Collection addrColl = applicant.getAddresses();			
+			logWarning("*** LIVES OUTSIDE HOME COMMUNE ***\n" 
 							+ "Applicant:  " + ((Integer) applicant.getPrimaryKey()).intValue() 
-							+ " HomeComPK: " + homeComID + " defComPK: " + defComID 
-							+ " MainAddressID: " + mainAddrID + "\n");
+							+ " HomeComPK: " + homeComID + " defComPK: " + defComID + "\n"
+							+ " MainAddressID: " + mainAddrID + " NoOfAddrs: " + addrColl.size() + "\n");
 			
 			// If user doesn't live in default commune - return true
-			if (homeComID != -1 && defComPK.intValue() != homeComID)
+			if (homeComID != -1 && defComPK.intValue() != homeComID) {
 					showEraseButton = true;
+					logWarning("__SHOW ERASE BUTTON__");
+			}
+					
 		} catch (Exception e) {}		
 		
 		return showEraseButton;

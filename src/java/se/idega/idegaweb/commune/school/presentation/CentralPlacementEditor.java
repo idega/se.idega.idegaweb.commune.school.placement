@@ -57,8 +57,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/22 12:28:56 $ by $Author: staffan $
- * @version $Revision: 1.18 $
+ * Last modified: $Date: 2003/10/24 11:12:16 $ by $Author: goranb $
+ * @version $Revision: 1.19 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -165,7 +165,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private int mainTableRow;
 	private User child;
 	private String uniqueUserSearchParam;
-	private Address address;
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
 	private SchoolClassMember storedPlacement = null;
@@ -208,27 +207,19 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Perform actions according the _action input parameter
 		switch (_action) {
 			case ACTION_PLACE_PUPIL :
-				storedPlacement = storePlacement(iwc);
+				storedPlacement = storePlacement(iwc, child);
 				break;
 			case ACTION_REMOVE_SESSION_CHILD :
 				removeSessionChild(iwc);
 				break;
 
 		}
-		
+		// Show main page tables		
 		try {
-			if (errMsgMid == null && (child == null || _presentation == PRESENTATION_SEARCH_FORM
-					|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX)
-																											|| storedPlacement != null)) {
-				// show search form
-				setMainTableContent(getSearchTable(iwc));
-				setMainTableContent(getPlacementTable(iwc));
-				
-			} else {
-				// show place pupil form
-				setMainTableContent(getSearchTable(iwc));
-				setMainTableContent(getPlacementTable(iwc));
-			}			
+			setMainTableContent(getSearchTable(iwc));
+			setMainTableContent(getPupilTable(iwc, child));
+			setMainTableContent(getLatestPlacementTable(iwc, child));
+			setMainTableContent(getNewPlacementTable(iwc));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			setMainTableContent(new Text("RemoteException thrown!! Error connecting to EJB's"));
@@ -298,11 +289,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		
 		return table;
 	}
-
-	public Table getPlacementTable(IWContext iwc) throws RemoteException {
+	
+	public Table getPupilTable(IWContext iwc, User child) throws RemoteException {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
-		table.setBorder(0);
+		table.setWidth("100%");
+		table.setBorder(1);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
@@ -317,11 +309,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(transGIF, col++, row);
 		table.add(transGIF, col++, row);
 		// Set COLUMN WIDTH for column 1 to 5
-		table.setWidth(1, row, "1");
-		table.setWidth(2, row, "70");
-		table.setWidth(3, row, "70");
-		table.setWidth(4, row, "70");
-		table.setWidth(5, row, "104");
+		table.setWidth(1, row, "100");
+		//table.setWidth(2, row, "70");
+		//table.setWidth(3, row, "70");
+		//table.setWidth(4, row, "70");
+		//table.setWidth(5, row, "104");
 
 		row++;
 		col = 1;
@@ -374,15 +366,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 		if (child != null) {
 			try {
 				// child address
-				if (address != null) {
-					address = getUserBusiness(iwc).getUsersMainAddress(child);
-					StringBuffer aBuf = new StringBuffer(address.getStreetAddress());
-					aBuf.append(", ");
-					aBuf.append(address.getPostalCode().getPostalAddress());
-					row--;
-					table.add(getSmallText(aBuf.toString()), col, row);
-					row++;
-				}
+				Address address = getUserBusiness(iwc).getUsersMainAddress(child);
+				StringBuffer aBuf = new StringBuffer(address.getStreetAddress());
+				aBuf.append(", ");
+				aBuf.append(address.getPostalCode().getPostalAddress());
+				row--;
+				table.add(getSmallText(aBuf.toString()), col, row);
+				row++;
 				// Get child phones
 				Collection phones = child.getPhones();
 				int i = 0;
@@ -402,14 +392,39 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 		row++;
 		col = 1;
+		
+		return table;
+	}
+	
+	public Table getLatestPlacementTable(IWContext iwc, User child) throws RemoteException {
+		// *** Search Table *** START - the uppermost table
+		Table table = new Table();
+		table.setWidth("100%");
+		table.setBorder(1);
+		table.setCellpadding(2);
+		table.setCellspacing(0);
+		transGIF.setHeight("1");
+		transGIF.setWidth("1");
 
-		// School Category
-		table.add(getSmallHeader(localize(KEY_MAIN_ACTIVITY_LABEL, "Main activity: ")), col++, row);
-		table.add(getSchoolCategoriesDropdown(iwc), col++, row);
+		int row = 1;
+		int col = 1;
+		// add empty space row
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		// Set COLUMN WIDTH for column 1 to 5
+		table.setWidth(1, row, "100");
+		//table.setWidth(2, row, "100");
+		//table.setWidth(3, row, "70");
+		//table.setWidth(4, row, "70");
+		//table.setWidth(5, row, "104");
+
 		row++;
 		col = 1;
-		
-		// *** HEADING Latest placment ***
+
+		// *** HEADING Latest placement ***
 		Text currentPlacementTxt =
 			new Text(localize(KEY_LATEST_PLACEMENT_HEADING, "Latest placement"));
 		currentPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
@@ -509,6 +524,39 @@ public class CentralPlacementEditor extends CommuneBlock {
 			row++;
 		}
 
+		return table;
+	}
+	
+	
+	//*********************************************************************************
+
+	public Table getNewPlacementTable(IWContext iwc) throws RemoteException {
+		// *** Search Table *** START - the uppermost table
+		Table table = new Table();
+		table.setBorder(1);
+		table.setCellpadding(2);
+		table.setCellspacing(0);
+		transGIF.setHeight("1");
+		transGIF.setWidth("1");
+
+		int row = 1;
+		int col = 1;
+		// add empty space row
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row);
+		// Set COLUMN WIDTH for column 1 to 5
+		table.setWidth(1, row, "100");
+		//table.setWidth(2, row, "70");
+		//table.setWidth(3, row, "70");
+		//table.setWidth(4, row, "70");
+		//table.setWidth(5, row, "104");
+
+		row++;
+		col = 1;
+
 		// *** HEADING New placement *** 
 		Text newPlacementTxt = new Text(localize(KEY_NEW_PLACEMENT_HEADING, "New placement"));
 		newPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
@@ -517,6 +565,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		row++;
 		col = 1;
+		
+		// School Category
+		table.add(getSmallHeader(localize(KEY_MAIN_ACTIVITY_LABEL, "Main activity: ")), col++, row);
+		table.add(getSchoolCategoriesDropdown(iwc), col++, row);
+		row++;
+		col = 1;
+		
 		// Provider labels
 		table.add(getSmallHeader(localize(KEY_PROVIDER_LABEL, "Provider: ")), col++, row);
 		table.add(getProvidersDropdown(iwc), col++, row);
@@ -570,7 +625,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 				table.add(txt, ++col, row);											
 			}
 		}
-
 		
 		row++;
 		col = 2;
@@ -1077,7 +1131,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 
 	// *** ACTIONS ***
-	private SchoolClassMember storePlacement(IWContext iwc) {
+	private SchoolClassMember storePlacement(IWContext iwc, User child) {
 		SchoolClassMember mbr = null;
 		int childID =  -1;
 		if (child != null)

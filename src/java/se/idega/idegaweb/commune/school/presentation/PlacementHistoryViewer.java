@@ -29,6 +29,7 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Table;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
@@ -50,6 +51,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String KEY_PLACEMENTS_HEADING = KP + "placements_heading";
 	private static final String KEY_CONFIRM_REMOVE_PLC_MSG = KP + "confirm_remove_plc_msg";
 	private static final String KEY_TOOLTIP_REMOVE_PLC = KP + "tooltip_remove_placement";
+	private static final String KEY_TOOLTIP_EDIT_PLC = KP + "tooltip_edit_placement";
 
 		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
@@ -121,6 +123,9 @@ public class PlacementHistoryViewer extends CommuneBlock {
 
 	// Unique parameter suffix used by SearchUserModule
 	private static final String UNIQUE_SUFFIX = "chosen_user";
+	
+	public static final String SEARCH_FORM_NAME = "search_form";
+
 
 	// Instance variables
 	//private IWResourceBundle iwrb;
@@ -136,6 +141,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	public void main(IWContext iwc) throws Exception {
 		//iwrb = getResourceBundle(iwc);
 		form = new Form();
+		form.setName(SEARCH_FORM_NAME);
 		
 	
 		// Parameter name returning chosen User from SearchUserModule
@@ -388,6 +394,8 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(Text.getNonBrakingSpace(), col, row);
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(Text.getNonBrakingSpace(), col, row);
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		
 		table.setRowColor(row, getHeaderColor());
 				
@@ -453,10 +461,35 @@ public class PlacementHistoryViewer extends CommuneBlock {
 																							plc.getRemovedDate(), "yyyy-MM-dd");
 					table.add(getSmallText(dateStr), col++, row);
 				} catch (Exception e) {col++;}
+				// Edit resources button
+				try {
+					// Get edit button					
+					String plcId =  ((Integer) plc.getPrimaryKey()).toString();
+					String schClassId = String.valueOf(plc.getSchoolClassId());
+
+					Link editButt = new Link(this.getEditIcon(localize(KEY_TOOLTIP_REMOVE_PLC, "Edit resources")));
+					editButt.setWindowToOpen(PlacementHistoryEditPlacement.class);
+					editButt.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_RESOURCE_PERMISSION, 
+							SchoolAdminOverview.PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN);
+					editButt.addParameter(SchoolAdminOverview.PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR, "true");
+					if (plc.getRemovedDate() != null)
+						editButt.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
+				
+					table.add(editButt, col, row);
+					table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+				} catch (Exception e) {col++;}				
 				// Remove button
 				try {
 					// Get remove button      
-					Image delImg = getDeleteIcon(localize("delete", "Delete"));
+					Image delImg = getDeleteIcon(localize(KEY_TOOLTIP_EDIT_PLC, "Edit placement"));
 					int plcID = ((Integer) plc.getPrimaryKey()).intValue();
 
 					SubmitButton delButt = new SubmitButton(delImg);
@@ -476,8 +509,8 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				// Resources
 				String rscStr = getResourceBusiness(iwc).getResourcesString(plc);
 				if (!("".equals(rscStr))) {
-					table.add(getSmallHeader(localize(KEY_RESOURCES, "Resources")+": "), col, row);
-					table.add(getSmallText(rscStr), col, row);
+					table.add(getSmallText("<i>" + localize(KEY_RESOURCES, "Resources")+":</i> "), col, row);
+					table.add(getSmallText("<i>" + rscStr + "</i>"), col, row);
 					table.setRowColor(row, zebraColor);
 					table.mergeCells(col, row, table.getColumns(), row);
 					row++;

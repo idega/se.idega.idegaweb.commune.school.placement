@@ -399,28 +399,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 				row++;
 
 			
-			if (schoolClassId != null) {
-				try {
-					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassMember(_userID, Integer.parseInt(schoolClassId));
-					//String scID = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass()
-					if (scMember != null) {
-						String notes = scMember.getNotes();
-//						sLanguage = scMember.getLanguage();
-						if (notes != null) {
-							table.add(getSmallHeader(localize("school.comment", "Comment")), 1, row);
-							table.add(getSmallText(notes), 2, row);
-						}
-						++row;
-					}
-				}
-				catch (Exception e) {
-					++row;
-				}
-			}
-			else {
-				++row;
-			}
-			
 			try {
 				Collection parents = getMemberFamilyLogic(iwc).getCustodiansFor(user);
 				table.add(getSmallHeader(localize("school.custodians", "Custodians")), 1, row);
@@ -502,7 +480,29 @@ public class SchoolAdminOverview extends CommuneBlock {
 			}
 			catch (NoCustodianFound ncf) {
 			}
-
+			
+			if (schoolClassId != null) {
+				try {
+					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassMember(_userID, Integer.parseInt(schoolClassId));
+					//String scID = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass()
+					if (scMember != null) {
+						String notes = scMember.getNotes();
+//						sLanguage = scMember.getLanguage();
+						if (notes != null) {
+							table.add(getSmallHeader(localize("school.comment", "Comment")), 1, row);
+							table.add(getSmallText(notes), 2, row);
+						}
+						++row;
+					}
+				}
+				catch (Exception e) {
+					++row;
+				}
+			}
+			else {
+				++row;
+			}
+			
 			int pendingSchoolId = -1;
 			boolean showChangePlacementDate = false;
 			boolean isPlaced = false;
@@ -1033,11 +1033,17 @@ public class SchoolAdminOverview extends CommuneBlock {
 			choice = null;
 		}
 		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE));
+		//vänta på svar från Nacka
+		SchoolSeason schSeason =  getSchoolBusiness(iwc).getSchoolSeason(new Integer (getSchoolCommuneSession(iwc).getSchoolSeasonID()));
+		input.setLatestPossibleDate(schSeason.getSchoolSeasonEnd(), localize("school.dates_not_in_season", "You can not choose a date outside of the season."));
+		
 		if (choice != null && choice.getPlacementDate() != null)
 			input.setDate(choice.getPlacementDate());
 		else
 			input.setDate(stamp.getDate());
 		input.setEarliestPossibleDate(stamp.getDate(), localize("school.dates_back_in_time_not_allowed", "You can not choose a date back in time."));
+		
+		
 		table.add(input, 1, row++);
 
 		SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placement_date", "Change placement date"), PARAMETER_ACTION, String.valueOf(ACTION_CHANGE_PLACEMENT_DATE)));

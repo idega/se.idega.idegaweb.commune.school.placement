@@ -287,18 +287,27 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		else
 			validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
 				
-		List applicants = new ArrayList(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString));
-		int applicantsSize = applicants.size();
-
-		int row = 1;
-		int column = 1;
-		int headerRow = -1;
+		int applicantsSize = 0;
+		try {
+			applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, null, validStatuses, searchString);
+		}
+		catch (Exception e) {
+			applicantsSize = 0;
+		}
 
 		int currPage = 0;
 		int maxPage = (int) Math.ceil(applicantsSize / applicationsPerPage);
 		if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
 			currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
 		}
+		int start = currPage * applicationsPerPage;
+		
+		Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy, applicationsPerPage, start);
+
+		int row = 1;
+		int column = 1;
+		int headerRow = -1;
+
 
 		Table navigationTable = new Table(3, 1);
 		navigationTable.setCellpadding(0);
@@ -350,8 +359,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		Link link;
 
 		if (!applicants.isEmpty()) {
-			Map studentMap = getBusiness().getUserMapFromChoices(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolQuery(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString));
-			Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Map studentMap = getBusiness().getUserMapFromChoices(applicants);
+			//Map addressMap = null;
+			//if (sortChoicesBy == SchoolChoiceComparator.ADDRESS_SORT)
+			//	addressMap = getBusiness().getUserAddressesMapFromChoices(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolQuery(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy));
+			//System.out.println("Sorting: "+(System.currentTimeMillis() - currentTime)+"ms");
+			//Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap, addressMap));
 			SchoolChoice choice;
 			School school;
 			User applicant;
@@ -359,19 +372,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 			Iterator iter = applicants.iterator();
 
-			/** Calculating page....starts */
-			int start = currPage * applicationsPerPage;
-			int end = start + applicationsPerPage;
-			for (int i = 0; i < start; i++) {
-				if (iter.hasNext()) {
-					iter.next();
-				}
-			}
-			/** Calculating page....ends */
-
 			int counter = 0;
-			while (iter.hasNext() && counter < applicationsPerPage) {
-				++counter;
+			while (iter.hasNext()) {
 				column = 1;
 				choice = (SchoolChoice) iter.next();
 				applicant = (User) studentMap.get(new Integer(choice.getChildId()));

@@ -58,7 +58,9 @@ public class CheckRequestForm extends CommuneBlock {
 	
 	private final static String PARAM_CHILDCARE_THIS = "ccs_childcare_this";
 	private final static String PARAM_CHILDCARE_OTHER = "ccs_childcare_other";
-
+	//variable for use as admin
+	private boolean _useAsAdmin = false;
+	
 	private boolean isError = false;
 	//private String errorMessage = null;
 	//private boolean paramErrorMotherTongueMC = false;
@@ -223,8 +225,19 @@ public class CheckRequestForm extends CommuneBlock {
 		}
 
 		try {
-			if (showErrors)
-				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, iwc.getCurrentUser(), "", false, false, false, false, false);
+			if (showErrors){
+				User user = null;
+				if (_useAsAdmin){
+					user = getCustodian(iwc);
+					if (user == null)
+						user = iwc.getCurrentUser();	
+				}
+				else{
+					user = iwc.getCurrentUser();
+				}
+					
+				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, user, "", false, false, false, false, false);
+			}
 			
 			if (createChoices()) {
 				/*SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();
@@ -363,6 +376,22 @@ public class CheckRequestForm extends CommuneBlock {
 		return childCareTypeTable;
 	}
 
+	private User getCustodian(IWContext iwc) throws Exception{
+		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(child);
+		User parent = null;
+		if (coll != null) {
+			int row = 1;
+			int parentNumber = 1;
+			Iterator iter = coll.iterator();
+			while (iter.hasNext()) {
+				parent = (User) iter.next();
+				if (parent.getGenderID() == 2){
+					return parent;			
+				}
+			}			
+		}
+		return parent;
+	}
 	private Table getCustodianTable(IWContext iwc) throws Exception {
 		Table custodianTable = new Table();
 		custodianTable.setCellpadding(2);
@@ -596,6 +625,14 @@ public class CheckRequestForm extends CommuneBlock {
 	 */
 	public void setCreateChoices(boolean createChoices) {
 		_createChoices = createChoices;
+	}
+	
+	/**
+	 * @param isUseAsAdmin
+	 *          The isUseAsAdmin to set.
+	 */
+	public void setUseAsAdmin(boolean isUseAsAdmin) {
+		this._useAsAdmin = isUseAsAdmin;
 	}
 
 }

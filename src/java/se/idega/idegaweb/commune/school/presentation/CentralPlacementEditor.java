@@ -80,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/06/01 14:13:07 $ by $Author: malin $
- * @version $Revision: 1.74 $
+ * Last modified: $Date: 2004/06/08 13:00:10 $ by $Author: gimmi $
+ * @version $Revision: 1.75 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -612,48 +612,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					
 					row++;
 
-					// Placement
-					StringBuffer buf = new StringBuffer("");
-					try {
-						// add school name
-						buf.append(latestPl.getSchoolClass().getSchool().getName());						
-					} catch (Exception e) {}
-					try {
-						// school year
-						SchoolYear theYear = latestPl.getSchoolYear();
-						if (theYear != null)
-							buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
-											   												+ theYear.getName());						
-					} catch (Exception e) {}
-					try {
-						// add school group
-						buf.append(", " + localize(KEY_SCHOOL_GROUP, "group") + " "
-											   + latestPl.getSchoolClass().getSchoolClassName());						
-					} catch (Exception e) {}
-					try {
-						// add study path
-						if (latestPl.getStudyPathId() != -1) {
-							SchoolStudyPathHome  home = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
-							SchoolStudyPath sp = home.findByPrimaryKey(new Integer(latestPl.getStudyPathId()));
-							buf.append(", " + localize(KEY_STUDY_PATH, "Study path") + " "+ sp.getCode());
-						}
-					} catch (Exception e) {}
+					String buf = getPlacementString(latestPl, child, this.iwrb);
 					
-					try {
-						// add language
-						if (latestPl.getLanguage() != null) {
-							buf.append(", " + localize(KEY_LANGUAGE, "Language") + " "+ localize(latestPl.getLanguage(), ""));
-						}
-					} catch (Exception e) {}
-
-					try {
-						// add native language
-						if (child.getNativeLanguage() != null) {
-							buf.append(", " + localize(KEY_NATIVE_LANGUAGE, "Native language") + " "+ child.getNativeLanguage());
-						}
-					} catch (Exception e) {}
-					
-					table.add(getSmallText(buf.toString()), col, row);
+					table.add(getSmallText(buf), col, row);
 					table.mergeCells(col, row, col+2, row);
 
 					// BUTTON Regular payment for Latest Placement	
@@ -746,6 +707,53 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 
 		return table;
+	}
+
+	/**
+	 * @return
+	 */
+	public static String getPlacementString(SchoolClassMember placement, User user, IWResourceBundle iwrb) {
+		// Placement
+		StringBuffer buf = new StringBuffer("");
+		try {
+			// add school name
+			buf.append(placement.getSchoolClass().getSchool().getName());						
+		} catch (Exception e) {}
+		try {
+			// school year
+			SchoolYear theYear = placement.getSchoolYear();
+			if (theYear != null)
+				buf.append(", " + iwrb.getLocalizedString(KEY_SCHOOL_YEAR, "school year") + " "
+								   												+ theYear.getName());						
+		} catch (Exception e) {}
+		try {
+			// add school group
+			buf.append(", " + iwrb.getLocalizedString(KEY_SCHOOL_GROUP, "group") + " "
+								   + placement.getSchoolClass().getSchoolClassName());						
+		} catch (Exception e) {}
+		try {
+			// add study path
+			if (placement.getStudyPathId() != -1) {
+				SchoolStudyPathHome  home = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+				SchoolStudyPath sp = home.findByPrimaryKey(new Integer(placement.getStudyPathId()));
+				buf.append(", " + iwrb.getLocalizedString(KEY_STUDY_PATH, "Study path") + " "+ sp.getCode());
+			}
+		} catch (Exception e) {}
+		
+		try {
+			// add language
+			if (placement.getLanguage() != null) {
+				buf.append(", " + iwrb.getLocalizedString(KEY_LANGUAGE, "Language") + " "+ iwrb.getLocalizedString(placement.getLanguage(), ""));
+			}
+		} catch (Exception e) {}
+
+		try {
+			// add native language
+			if (user.getNativeLanguage() != null) {
+				buf.append(", " + iwrb.getLocalizedString(KEY_NATIVE_LANGUAGE, "Native language") + " "+ user.getNativeLanguage());
+			}
+		} catch (Exception e) {}
+		return buf.toString();
 	}
 
 	public Table getNewPlacementTable(IWContext iwc) throws RemoteException {

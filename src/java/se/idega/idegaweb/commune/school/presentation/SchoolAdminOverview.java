@@ -1633,7 +1633,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			//}
 
 			try {
-				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChangeChoice(((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 2, 1, 1, "", message, true, false, true, true, getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason());
+				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChangeChoice(((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 2, 1, 1, "", message, true, false, true, true, getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason(), null);
 			}
 			catch (Exception e) {
 				e.printStackTrace();

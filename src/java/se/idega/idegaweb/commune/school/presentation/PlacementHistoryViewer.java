@@ -31,7 +31,9 @@ import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
+import com.idega.presentation.ui.SubmitButton;
 import com.idega.user.data.User;
 
 /**
@@ -47,6 +49,8 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String KEY_SEARCH_PUPIL_HEADING = KP + "search_pupil_heading";
 	private static final String KEY_PUPIL_HEADING = KP + "pupil_heading";
 	private static final String KEY_PLACEMENTS_HEADING = KP + "placements_heading";
+	private static final String KEY_CONFIRM_REMOVE_PLC_MSG = KP + "confirm_remove_plc_msg";
+	private static final String KEY_TOOLTIP_REMOVE_PLC = KP + "tooltip_remove_placement";
 
 		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
@@ -98,6 +102,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	public static final String PARAM_STORED_PLACEMENT_ID = "stored_placement_id";
 	public static final String PARAM_LATEST_PLACEMENT_ID = "latest_placement_id";
 	public static final String PARAM_LATEST_INVOICE_DATE = "param_latest_invoice_date";
+	public static final String PARAM_REMOVE_PLACEMENT = "remove_placement";
 	
 	// CSS styles   
 	private static final String STYLE_UNDERLINED_SMALL_HEADER =
@@ -132,9 +137,25 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	public void main(IWContext iwc) throws Exception {
 		//iwrb = getResourceBundle(iwc);
 		form = new Form();
+		
 	
 		// Parameter name returning chosen User from SearchUserModule
 		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
+		form.maintainAllParameters();
+		
+		if (iwc.isParameterSet(PARAM_REMOVE_PLACEMENT) 
+				&& !("-1".equals(iwc.getParameter(PARAM_REMOVE_PLACEMENT)))) {
+			// A remove placement button is pressed
+			String plcIdStr = null;
+			try {
+				plcIdStr = iwc.getParameter(PARAM_REMOVE_PLACEMENT);
+				Integer plcPK = new Integer(plcIdStr);
+				getCentralPlacementBusiness(iwc).removeSchoolClassMember(plcPK);
+			}catch (Exception e) {
+				logWarning("Error erasing SchooClassMember with PK: " + plcIdStr);
+				log(e);
+			}
+		}
 
 		pupil = getPupilFromParam(iwc);
 		
@@ -356,6 +377,9 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
 		table.add(getLocalizedSmallHeader(KEY_END_DATE, "End date"), col, row);		
 		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		table.add(Text.getNonBrakingSpace(), col, row);
+		table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
+		
 		table.setRowColor(row, getHeaderColor());
 				
 
@@ -376,6 +400,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		if (placements != null && placements.size() > 0) {
 			int zebra = 0;
 			int rowNum = 0;
+			table.add(new HiddenInput(PARAM_REMOVE_PLACEMENT, "-1"), 1, 1);
 			for (Iterator iter = placements.iterator(); iter.hasNext();) {
 				rowNum++;
 				SchoolClassMember plc = (SchoolClassMember) iter.next();
@@ -418,7 +443,21 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				try {
 					String dateStr = getCentralPlacementBusiness(iwc).getDateString(
 																							plc.getRemovedDate(), "yyyy-MM-dd");
-					table.add(getSmallText(dateStr), col, row);
+					table.add(getSmallText(dateStr), col++, row);
+				} catch (Exception e) {col++;}
+				// Remove button
+				try {
+					// Get remove button      
+					Image delImg = getDeleteIcon(localize("delete", "Delete"));
+					int plcID = ((Integer) plc.getPrimaryKey()).intValue();
+
+					SubmitButton delButt = new SubmitButton(delImg);
+					delButt.setValueOnClick(PARAM_REMOVE_PLACEMENT, String.valueOf(plcID));							
+					delButt.setSubmitConfirm(localize(KEY_CONFIRM_REMOVE_PLC_MSG, 
+									"Do you really want to erase this school placement and its resource placements?"));
+					delButt.setToolTip(localize(KEY_TOOLTIP_REMOVE_PLC, "Delete school placement"));
+					table.add(delButt, col, row);
+					table.setAlignment(col, row, Table.HORIZONTAL_ALIGN_CENTER);
 				} catch (Exception e) {}
 				
 				String zebraColor = zebra % 2 == 0 ? getZebraColor2() : getZebraColor1();		

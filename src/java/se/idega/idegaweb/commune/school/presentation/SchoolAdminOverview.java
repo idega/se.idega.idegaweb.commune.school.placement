@@ -156,7 +156,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private static final String PARAMETER_DATE = "sch_date";
 	private static final String PARAMETER_FINALIZE_SUBJECT = "sch_admin_finalize_subject";
 	private static final String PARAMETER_FINALIZE_BODY = "sch_admin_finalize_body";
-
+	
 	private int _method = -1;
 	private int _action = -1;
 
@@ -238,6 +238,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			case ACTION_SAVE_MESSAGE_TEXT :
 				saveMessageText(iwc);
 				break;
+
 		}
 
 		if (_method != -1)
@@ -356,13 +357,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
 		int row = 1;
-
+		String sLanguage = null;
+		
 		String schoolClassId = iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID);
 
 		if (_userID != -1) {
 			User user = getUserBusiness(iwc).getUser(_userID);
 			Address address = getUserBusiness(iwc).getUserAddress1(_userID);
-
+			
+			
 			table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 			table.add(getSmallText(user.getNameLastFirst(true)), 2, row++);
 
@@ -375,13 +378,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 			else
 				row++;
 
-			table.add(getSmallHeader(localize("school.comment", "Comment")), 1, row);
+			
 			if (schoolClassId != null) {
 				try {
 					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassMember(_userID, Integer.parseInt(schoolClassId));
+					//String scID = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass()
 					if (scMember != null) {
 						String notes = scMember.getNotes();
+//						sLanguage = scMember.getLanguage();
 						if (notes != null) {
+							table.add(getSmallHeader(localize("school.comment", "Comment")), 1, row);
 							table.add(getSmallText(notes), 2, row);
 						}
 						++row;
@@ -394,7 +400,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			else {
 				++row;
 			}
-
+			
 			try {
 				Collection parents = getMemberFamilyLogic(iwc).getCustodiansFor(user);
 				table.add(getSmallHeader(localize("school.custodians", "Custodians")), 1, row);
@@ -451,12 +457,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 			int pendingSchoolId = -1;
 			boolean showChangePlacementDate = false;
 			School oldSchool = null;
+			SchoolClassMember schClMem = null;
+			String language = null;
+			SchoolYear schoolYear = null;
 			
 			if (!_showNoChoices) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
 				String extraChoice = null;
-				String language = null;
+				
+				
 				IWCalendar calendar = null;
 				IWTimestamp placementDate = null;
 				if (!choices.isEmpty()) {
@@ -471,10 +481,26 @@ public class SchoolAdminOverview extends CommuneBlock {
 						if (choice.getChosenSchoolId() != -1) {
 							school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(choice.getChosenSchoolId()));
 							String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice.getCaseStatus(), iwc.getCurrentLocale()) + ")";
+							
+							try {
+								schClMem =  getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByUserAndSchool(_userID, ((Integer) school.getPrimaryKey()).intValue());	
+							}
+							catch (FinderException fe){
+								
+							}
+							
+							
 							if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("PLAC") || choice.getStatus().equalsIgnoreCase("FLYT")) {
 								if (pendingSchoolId == -1)
 									pendingSchoolId = choice.getChosenSchoolId();
 								//							table.add("gimmi flippari ", 2, row);
+								if (choice.getStatus().equalsIgnoreCase("PLAC")){
+									//string = string + "&nbsp;&nbsp;" + schClMem.getSchoolYear().getName();
+									string = string + "&nbsp;&nbsp;" + schClMem.getSchoolClass().getName();
+									
+								}
+								
+								
 							}
 							if (choice.getChosenSchoolId() == getSchoolCommuneSession(iwc).getSchoolID()) {
 								if (choice.getStatus().equalsIgnoreCase("FLYT")) {
@@ -497,20 +523,38 @@ public class SchoolAdminOverview extends CommuneBlock {
 							oldSchool = choice.getCurrentSchool();
 						if (message == null)
 							message = choice.getMessage();
-						if (language == null && choice.getLanguageChoice() != null)
+						
+						if (language == null) {
 							language = choice.getLanguageChoice();
+						}
+						
+						if (schoolYear == null){
+							schoolYear = choice.getSchoolYear();
+						}
+						
 						if (placementDate == null && choice.getPlacementDate() != null)
 							placementDate = new IWTimestamp(choice.getPlacementDate());
 						calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
 					}
 					row++;
 				}
+				
 
+				if (schoolYear != null) {
+					table.add(getSmallHeader(localize("school.school_choice_year", "School year")), 1, row);
+					table.add(getSmallText(schoolYear.getName()), 2, row++);
+				}
+				
 				if (calendar != null) {
 					table.add(getSmallHeader(localize("school.date", "Date")), 1, row);
 					table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), 2, row++);
 				}
-				if (language != null && language.length() > 0) {
+				/*if (language == null){
+				 language = schClMem.getLanguage();
+				 }
+				 */
+								
+				if (language != null && language.length() > 0 && !language.equals("-1")) {
 					table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
 					table.add(getSmallText(localize(language, language)), 2, row++);
 				}
@@ -534,26 +578,38 @@ public class SchoolAdminOverview extends CommuneBlock {
 				if (oldSchool != null) {
 					table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
 					/*SchoolSeason season = null;
-					if (hasMoveChoice)
-						getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolSeason(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
-					else
-						getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
-					
-					if (season != null) {
-						schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
-						if (schoolClassMember != null) {
-							SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
-							School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
-	
-							String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
-							table.add(getSmallText(schoolString), 2, row);
-						}
-					}*/
+					 if (hasMoveChoice)
+					 getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolSeason(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
+					 else
+					 getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
+					 
+					 if (season != null) {
+					 schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
+					 if (schoolClassMember != null) {
+					 SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
+					 School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
+					 
+					 String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
+					 table.add(getSmallText(schoolString), 2, row);
+					 }
+					 }*/
 					table.add(getSmallText(oldSchool.getName()), 2, row);
 					row++;
 				}
 			}
-
+			
+			SchoolClassMember schMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
+			
+			//show school year
+			if (null != schMember && schoolYear == null) {
+				SchoolYear scYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(schoolClassMember);
+				if (null != scYear) {
+					table.add(getSmallHeader(localize("school.school_choice_year", "School year")), 1, row);
+					table.add(getSmallText(scYear.getName()), 2, row);
+					row++;
+				}
+			}
+			
 			// show study path, if exists
 			if (null != schoolClassMember) {
 				final SchoolStudyPath studyPath = getSchoolCommuneBusiness(iwc).getStudyPath(schoolClassMember);
@@ -563,7 +619,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 					row++;
 				}
 			}
-
+			
+			// show language, if exists					
+			
+			if (schMember != null)
+				sLanguage = schMember.getLanguage();
+			if (sLanguage != null && language == null){
+				table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
+				table.add(getSmallText(localize(sLanguage, sLanguage)), 2, row++);
+			}
+			
 			// Native language
 			table.add(getSmallHeader(localize("school.native_language", "Native language")), 1, row);
 			ICLanguage nativeLang = user.getNativeLanguage();
@@ -721,6 +786,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REJECT_MESSAGE, message));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		textArea.setRows(4);
+
 		try {
 			School school = getSchoolBusiness(iwc).getSchoolHome().findByPrimaryKey(new Integer(this._schoolID));
 			if (school != null) {
@@ -967,6 +1033,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (defBody != null) {
 			text.setContent(convertMessageTextFromDB(defBody));
 		}
+
 
 		SubmitButton send = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
 		send.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1623,9 +1690,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 			User pupil = getUserBusiness(iwc).getUser(_userID);
 			ICLanguage lang = pupil.getNativeLanguage();
 			if (lang != null) {
-			 	Integer langPK = (Integer) lang.getPrimaryKey();
-			 	int langID = langPK.intValue();
-			 	drop.setSelectedElement(langID);
+				Integer langPK = (Integer) lang.getPrimaryKey();
+				int langID = langPK.intValue();
+				drop.setSelectedElement(langID);
 			}
 		} catch (RemoteException re) {
 			re.printStackTrace();
@@ -1647,8 +1714,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(getSmallHeader(localize("school.year_class", "Year/Class") + ":" + Text.NON_BREAKING_SPACE), 3, 1);
 		table.add(getDropdown(iwc, showSubGroups, setDefaultValues), 4, 1);
 		/*table.add(getSchoolYears(iwc), 4, 1);
-		table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 6, 1);
-		table.add(getSchoolClasses(iwc, setToSubmit), 7, 1);*/
+		 table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 6, 1);
+		 table.add(getSchoolClasses(iwc, setToSubmit), 7, 1);*/
 
 		return table;
 	}
@@ -1851,7 +1918,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			_pageID = Integer.parseInt(iwc.getParameter(PARAMETER_PAGE_ID));
 
 		//if (_schoolClassID != -1 && _schoolYearID != -1)
-			//validateSchoolClass(iwc);
+		//validateSchoolClass(iwc);
 
 		if (iwc.isParameterSet(PARAMETER_SEARCH))
 			searchString = iwc.getParameter(PARAMETER_SEARCH);
@@ -1924,39 +1991,39 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	/*protected DropdownMenu getSchoolClasses(IWContext iwc, boolean setToSubmit) throws RemoteException {
-		DropdownMenu menu = new DropdownMenu(getSchoolCommuneSession(iwc).getParameterSchoolClassID());
-		if (setToSubmit) {
-			menu.setToSubmit();
-		}
+	 DropdownMenu menu = new DropdownMenu(getSchoolCommuneSession(iwc).getParameterSchoolClassID());
+	 if (setToSubmit) {
+	 menu.setToSubmit();
+	 }
 
-		if (_schoolYearID == -1)
-			_schoolYearID = getSchoolCommuneSession(iwc).getSchoolYearID();
+	 if (_schoolYearID == -1)
+	 _schoolYearID = getSchoolCommuneSession(iwc).getSchoolYearID();
 
-		if (getSchoolCommuneSession(iwc).getSchoolID() != -1 && getSchoolCommuneSession(iwc).getSchoolSeasonID() != -1 && _schoolYearID != -1) {
-			Collection classes = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
-			if (!classes.isEmpty()) {
-				Iterator iter = classes.iterator();
-				while (iter.hasNext()) {
-					SchoolClass element = (SchoolClass) iter.next();
-					menu.addMenuElement(element.getPrimaryKey().toString(), element.getName());
-					if (_schoolClassID == -1)
-						_schoolClassID = ((Integer) element.getPrimaryKey()).intValue();
-				}
-			}
-			else {
-				_schoolClassID = -1;
-				menu.addMenuElement(-1, "");
-			}
-		}
-		else {
-			menu.addMenuElement(-1, "");
-		}
+	 if (getSchoolCommuneSession(iwc).getSchoolID() != -1 && getSchoolCommuneSession(iwc).getSchoolSeasonID() != -1 && _schoolYearID != -1) {
+	 Collection classes = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
+	 if (!classes.isEmpty()) {
+	 Iterator iter = classes.iterator();
+	 while (iter.hasNext()) {
+	 SchoolClass element = (SchoolClass) iter.next();
+	 menu.addMenuElement(element.getPrimaryKey().toString(), element.getName());
+	 if (_schoolClassID == -1)
+	 _schoolClassID = ((Integer) element.getPrimaryKey()).intValue();
+	 }
+	 }
+	 else {
+	 _schoolClassID = -1;
+	 menu.addMenuElement(-1, "");
+	 }
+	 }
+	 else {
+	 menu.addMenuElement(-1, "");
+	 }
 
-		if (_schoolClassID != -1)
-			menu.setSelectedElement(_schoolClassID);
+	 if (_schoolClassID != -1)
+	 menu.setSelectedElement(_schoolClassID);
 
-		return (DropdownMenu) getStyledInterface(menu);
-	}*/
+	 return (DropdownMenu) getStyledInterface(menu);
+	 }*/
 
 	protected DropdownMenu getSchools(IWContext iwc) throws RemoteException {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_SCHOOL_ID);
@@ -2036,7 +2103,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
 		try {
 			getResourceBusiness(iwc).finishResourceClassMember(new Integer(_schoolClassMemberID), 
-																						classMemberID, startDateStr, endDateStr, _viewAllResources);
+					classMemberID, startDateStr, endDateStr, _viewAllResources);
 		}
 		catch (DateException de) {
 			errMsg = localize(de.getKey(), de.getDefTrans());
@@ -2085,19 +2152,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	/*private void validateSchoolClass(IWContext iwc) throws RemoteException {
-		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(_schoolClassID));
-		SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(_schoolYearID));
-		if (schoolYear != null || !schoolClass.hasRelationToSchoolYear(schoolYear)) {
-			Collection schoolClasses = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
-			if (!schoolClasses.isEmpty()) {
-				Iterator iter = schoolClasses.iterator();
-				while (iter.hasNext()) {
-					_schoolClassID = ((Integer) ((SchoolClass) iter.next()).getPrimaryKey()).intValue();
-					continue;
-				}
-			}
-		}
-	}*/
+	 SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(_schoolClassID));
+	 SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(_schoolYearID));
+	 if (schoolYear != null || !schoolClass.hasRelationToSchoolYear(schoolYear)) {
+	 Collection schoolClasses = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
+	 if (!schoolClasses.isEmpty()) {
+	 Iterator iter = schoolClasses.iterator();
+	 while (iter.hasNext()) {
+	 _schoolClassID = ((Integer) ((SchoolClass) iter.next()).getPrimaryKey()).intValue();
+	 continue;
+	 }
+	 }
+	 }
+	 }*/
 
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);

@@ -486,7 +486,10 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				} catch (Exception e) {col++;}
 				// Notes
 				try {
-					table.add(getSmallText(plc.getNotes()), col++, row);
+					if (plc.getNotes() != null)
+						table.add(getSmallText(plc.getNotes()), col++, row);
+					else
+						col++;
 				} catch (Exception e) {col++;}
 				// Pupil overview button
 				try {

@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/18 11:16:16 $ by $Author: goranb $
- * @version $Revision: 1.39 $
+ * Last modified: $Date: 2003/11/19 12:31:45 $ by $Author: goranb $
+ * @version $Revision: 1.40 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -482,9 +482,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.mergeCells(col, row, col+1, row);	
 		// BUTTON Placement history 
 		col = 5;
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-												KEY_BUTTON_PLACEMENT_HISTORY, "Placement history")), col, row);
-				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(
+												KEY_BUTTON_PLACEMENT_HISTORY, "Placement history")), col, row);*/
+		table.add(getPlacementHistoryButton(), col, row);
+		
+						//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5,row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
 		col = 1;
@@ -1465,6 +1467,24 @@ public class CentralPlacementEditor extends CommuneBlock {
 		if (plc.getRemovedDate() != null)
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
 	}
+
+	private Link getPlacementHistoryButton() {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_PLACEMENT_HISTORY, "Placement history")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(CentralPlacementHistoryViewer.class);
+		if (child != null) {
+			Integer PK = (Integer) child.getPrimaryKey();
+			linkButton.addParameter(PlacementHistoryViewer.PARAM_PUPIL_ID, PK.intValue());			
+		}
+		
+		/*linkButton.addParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+		linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+		*/
+		return linkButton;
+	}
+
 	
 	private Link getProviderEditorButton() {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_PROVIDER, "New provider")));

@@ -181,13 +181,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			schoolTypeID = -1;
 		}
 
-		int careTime = -1;
-		try {
-			careTime = Integer.parseInt(iwc.getParameter(PARAM_HOURS));
-		}
-		catch (NumberFormatException nfe) {
-			careTime = -1;
-		}
+		String careTime = iwc.getParameter(PARAM_HOURS);
 
 		int employmentTypeID = -1;
 		try {
@@ -356,7 +350,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		            contractTable.add(getSmallText(dateFormat.format(contract.getValidFromDate())),3,crow);
 		        if(contract.getTerminatedDate()!=null)
 		            contractTable.add(getSmallText(dateFormat.format(contract.getTerminatedDate())),4,crow);
-		        contractTable.add(getSmallText(String.valueOf(contract.getCareTime())),5,crow);
+		        contractTable.add(getSmallText(getCareTime(contract.getCareTime())),5,crow);
 		        if(contract.getContractFileID()>0)
 		            contractTable.add(getPDFLink(contract.getContractFileID(),localize("child_care.view_contract","View contract")),6,crow);
 		        

@@ -15,6 +15,7 @@ import com.idega.core.location.data.Address;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.ui.Form;
 import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
 
@@ -27,15 +28,17 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	 * @see se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock#init(com.idega.presentation.IWContext)
 	 */
 	public void init(IWContext iwc) throws Exception {
-		Table table = new Table(1,3);
+		Table table = new Table(1,5);
 		table.setWidth(getWidth());
-		table.setHeight(2, 6);
+		table.setHeight(2, 12);
+		table.setHeight(4, 6);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		add(table);
 		
-		table.add(getApplicationTable(iwc), 1, 1);
-		table.add(getLegendTable(), 1, 3);
+		table.add(getNavigationTable(), 1, 1);
+		table.add(getApplicationTable(iwc), 1, 3);
+		table.add(getLegendTable(), 1, 5);
 	}
 	
 	private Collection getApplicationCollection() throws RemoteException {
@@ -43,6 +46,22 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		return applications;
 	}
 
+	private Form getNavigationTable() throws RemoteException {
+		Form form = new Form();
+		form.setEventListener(ChildCareEventListener.class);
+		
+		Table table = new Table(3, 1);
+		table.setWidth(2, 4);
+		table.setCellpadding(0);
+		table.setCellspacing(0);
+		form.add(table);
+		
+		table.add(getSmallHeader(localize("child_care.season", "Season") + ":"), 1, 1);
+		table.add(getSeasons(), 3, 1);
+		
+		return form;
+	}
+	
 	private Table getApplicationTable(IWContext iwc) throws RemoteException {
 		Table applicationTable = new Table();
 		applicationTable.setWidth(Table.HUNDRED_PERCENT);

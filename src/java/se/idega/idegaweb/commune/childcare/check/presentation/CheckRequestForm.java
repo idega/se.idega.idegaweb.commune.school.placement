@@ -72,6 +72,9 @@ public class CheckRequestForm extends CommuneBlock {
 	super.add(new ExceptionWrapper(e,this));
       }
     }
+    else {
+      super.add(this.getErrorText(localize("child.no_child_found","No child selected")));
+    }
   }
 
   private boolean getUser(IWContext iwc) {
@@ -94,7 +97,7 @@ public class CheckRequestForm extends CommuneBlock {
       }
     }
     else {
-      return true;
+      return false;
     }
   }
 
@@ -292,6 +295,9 @@ public class CheckRequestForm extends CommuneBlock {
 	  row++;
 	}
       }
+    }
+    else {
+      custodianTable.add(getErrorText(localize("child.no_custodians_found","No custodians found")));
     }
 
     return custodianTable;

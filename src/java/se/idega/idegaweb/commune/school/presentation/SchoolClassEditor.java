@@ -827,7 +827,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 		else {
 			//groupReady.setSubmitConfirm(localize("school.confirm_group_ready", "Are you sure you want to set the group as ready and send out e-mails to all parents?"));
-			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date")) {
+			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
 				groupReady.setDisabled(true);
 			}
 		}

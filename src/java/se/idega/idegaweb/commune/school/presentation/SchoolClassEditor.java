@@ -564,8 +564,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.setRowColor(row, "#FFEAEA");
 					else if (hasChoices[0] && !hasChoices[1])
 						table.setRowColor(row, "#EAFFEE");
-					else
-						table.setRowColor(row, "#EAF1FF");
+					else {
+						if (studentMember.getSpeciallyPlaced())
+							table.setRowColor(row, "#EAF1FF");
+					}
 					link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, String.valueOf(getBusiness().getChosenSchoolID((Collection) studentChoices.get(new Integer(studentMember.getClassMemberId())))));
 				}
 				else {

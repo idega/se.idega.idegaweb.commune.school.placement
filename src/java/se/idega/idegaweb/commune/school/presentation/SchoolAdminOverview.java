@@ -30,6 +30,7 @@ import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
+import com.idega.builder.business.BuilderLogic;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
 import com.idega.core.data.Country;
@@ -63,6 +64,7 @@ import com.idega.util.Age;
 import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.URLUtil;
 import com.idega.util.text.TextSoap;
 
 /**
@@ -82,6 +84,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_SHOW_ONLY_OVERVIEW = "sch_show_only_overview";
 	public static final String PARAMETER_SHOW_NO_CHOICES = "sch_show_no_choices";
 	public static final String PARAMETER_SEARCH = "sch_search";
+	public static final String PARAMETER_PAGE_ID = "sch_page_id";
 
 	public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
@@ -129,6 +132,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private CloseButton close;
 	private String searchString;
 
+	private int _pageID;
 	/**
 	 * @see com.idega.presentation.PresentationObject#main(IWContext)
 	 */
@@ -174,6 +178,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Form form = new Form();
 		form.maintainParameter(PARAMETER_USER_ID);
 		form.maintainParameter(PARAMETER_CHOICE_ID);
+		form.maintainParameter(PARAMETER_PAGE_ID);
 		form.setStyleAttribute("height:100%");
 
 		Table table = new Table(3, 5);
@@ -573,6 +578,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_GROUP)));
 		//table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
+		if (_showNoChoices)
+			table.add(new HiddenInput(PARAMETER_SHOW_NO_CHOICES, "true"));
 		int row = 1;
 
 		User user = getUserBusiness(iwc).getUser(_userID);
@@ -629,6 +637,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_FINALIZE_GROUP)));
 		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_FINALIZE_GROUP)));
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
 		int row = 1;
 
 		String subject = null;
@@ -689,6 +698,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
 		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_STUDENT)));
 		table.add(new HiddenInput(PARAMETER_USER_ID, String.valueOf(_userID)));
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
 		int row = 1;
 
 		User user = getUserBusiness(iwc).getUser(_userID);
@@ -758,6 +768,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_ADD_STUDENT)));
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
 		int row = 1;
 
 		table.add(getSmallHeader(localize("commune.enter_search_string","Enter search string")+":"), 1, row);
@@ -955,7 +966,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private void moveGroup(IWContext iwc) throws RemoteException {
 		getSchoolCommuneBusiness(iwc).moveToGroup(_userID, _schoolClassID, getSchoolCommuneSession(iwc).getSchoolClassID());
-		getParentPage().setParentToReload();
+		URLUtil URL = new URLUtil(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
+		if (!_showNoChoices)
+			URL.addParameter(SchoolClassEditor.PARAMETER_ACTION, SchoolClassEditor.ACTION_SAVE);
+		getParentPage().setParentToRedirect(URL.toString());
 		getParentPage().close();
 	}
 
@@ -982,7 +996,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 			}
 		}
 
-		getParentPage().setParentToReload();
+		URLUtil URL = new URLUtil(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
+		URL.addParameter(SchoolClassEditor.PARAMETER_ACTION, SchoolClassEditor.ACTION_SAVE);
+		getParentPage().setParentToRedirect(URL.toString());
 		getParentPage().close();
 	}
 	
@@ -999,14 +1015,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		getUserBusiness(iwc).updateCitizen(_userID, first, middle, last, user.getPersonalID());
 		getUserBusiness(iwc).updateCitizenAddress(_userID, address, postalCode, postalName);
 
-		getParentPage().setParentToReload();
+		getParentPage().setParentToRedirect(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 		getParentPage().close();
 	}
 	
 	private void addStudent(IWContext iwc) throws RemoteException {
 		if (_userID != -1) {
 			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
-			getParentPage().setParentToReload();
+			getParentPage().setParentToRedirect(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 			getParentPage().close();
 		}
 		else
@@ -1050,6 +1066,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		if (iwc.isParameterSet(PARAMETER_SHOW_NO_CHOICES))
 			_showNoChoices = true;
+
+		if (iwc.isParameterSet(PARAMETER_PAGE_ID))
+			_pageID = Integer.parseInt(iwc.getParameter(PARAMETER_PAGE_ID));
 
 		if (_schoolClassID != -1 && _schoolYearID != -1)
 			validateSchoolClass(iwc);

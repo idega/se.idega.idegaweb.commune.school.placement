@@ -156,11 +156,13 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		Link addLink = new Link(getEditIcon(localize("school.add_student", "Add student")));
 		addLink.setWindowToOpen(SchoolAdminWindow.class);
 		addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
+		addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		addTable.add(addLink, 1, 1);
 
 		Link addLinkText = getSmallLink(localize("school.add_student", "Add student"));
 		addLinkText.setWindowToOpen(SchoolAdminWindow.class);
 		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
+		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 		addTable.add(addLinkText, 3, 1);
 
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
@@ -203,6 +205,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				move.setWindowToOpen(SchoolAdminWindow.class);
 				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
 				move.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
+				move.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+				move.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
@@ -219,6 +223,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
+				link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
 

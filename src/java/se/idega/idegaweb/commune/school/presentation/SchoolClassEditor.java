@@ -59,7 +59,7 @@ import com.idega.util.text.TextSoap;
  */
 public class SchoolClassEditor extends SchoolCommuneBlock {
 
-	private final String PARAMETER_ACTION = "sch_action";
+	public static final String PARAMETER_ACTION = "sch_action";
 	private final String PARAMETER_METHOD = "sch_method";
 	private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
 	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
@@ -69,7 +69,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private final String PARAMETER_CURRENT_APPLICATION_PAGE = "sch_crrap_pg";
 
 	private final int ACTION_MANAGE = 1;
-	private final int ACTION_SAVE = 2;
+	public static final int ACTION_SAVE = 2;
 	private final int ACTION_FINALIZE_GROUP = 3;
 	private final int ACTION_DELETE = 4;
 
@@ -213,6 +213,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
 				submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
 				submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+				submit.setToDisableOnClick(submit, true);
 				SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
 				view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 				table.add(method, 1, 11);
@@ -690,7 +691,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				move.setWindowToOpen(SchoolAdminWindow.class);
 				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
 				move.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
-
+				move.setParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
+				
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
@@ -742,6 +744,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		GenericButton groupReady = (GenericButton) getStyledInterface(new GenericButton("finalize", buttonLabel));
 		groupReady.setWindowToOpen(SchoolAdminWindow.class);
 		groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
+		groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 		//Link groupReadyLink = new Link(groupReady);
 		//groupReadyLink.setWindowToOpen(SchoolAdminWindow.class);
 		//groupReadyLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_FINALIZE_GROUP);

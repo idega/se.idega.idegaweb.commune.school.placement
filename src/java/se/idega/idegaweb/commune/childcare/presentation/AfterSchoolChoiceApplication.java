@@ -239,7 +239,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			SchoolSeason season = null;
 			if (_useOngoingSeason) {
 				try {
-					season = getBusiness().getSchoolChoiceBusiness().getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
+					season = getCareBusiness().getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
 				}
 				catch (FinderException e) {
 					season = null;
@@ -325,7 +325,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		int schoolID = -1;
 		Integer childID = new Integer(getSession().getChildID());
 		try {
-			Integer seasonID = (Integer) getSchoolChoiceBusiness(iwc).getCurrentSeason().getPrimaryKey();
+			Integer seasonID = (Integer) getCareBusiness().getCurrentSeason().getPrimaryKey();
 			for (int i = 1; i <= 3; i++) {
 				try {
 					afterSchoolChoice = getAfterSchoolBusiness(iwc).findChoicesByChildAndChoiceNumberAndSeason(childID, i, seasonID);

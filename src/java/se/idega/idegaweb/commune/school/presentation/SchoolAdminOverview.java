@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
+import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.care.resource.business.ClassMemberException;
 import se.idega.idegaweb.commune.care.resource.business.DateException;
 import se.idega.idegaweb.commune.care.resource.business.ResourceBusiness;
@@ -546,7 +547,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 														
 							if (schClMem == null) {
 								try {								
-									schSeason = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));									
+									schSeason = getCareBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));									
 									schClMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), schSeason);
 									
 								}
@@ -655,7 +656,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (preSchoolClMem == null && !showChangePlacementDate){
 				try {
 					previousSeasonId = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeasonID(getSchoolCommuneSession(iwc).getSchoolSeasonID());
-					preSchoolseason = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(previousSeasonId));
+					preSchoolseason = getCareBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(previousSeasonId));
 					
 					preSchoolClMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), preSchoolseason);
 					
@@ -725,7 +726,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 			SchoolClassMember schoolClassMember = null;
 			try {
-				schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID())));
+				schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), getCareBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID())));
 			}
 			catch (RemoteException re) {
 				log(re);
@@ -2366,6 +2367,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) throws RemoteException {
 		return (CentralPlacementBusiness) IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
 	}
+
+	private CareBusiness getCareBusiness(IWContext iwc) throws RemoteException {
+		return (CareBusiness) IBOLookup.getServiceInstance(iwc, CareBusiness.class);
+	}	
 	
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);

@@ -79,8 +79,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/15 15:40:27 $ by $Author: thomas $
- * @version $Revision: 1.92 $
+ * Last modified: $Date: 2004/10/19 10:33:42 $ by $Author: thomas $
+ * @version $Revision: 1.93 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -1468,11 +1468,11 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			SchoolSeason chosenSeason = null;
 			try {
 				//currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
-				chosenSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(getSession().getSchoolSeasonID()));
+				chosenSeason = getCareBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(getSession().getSchoolSeasonID()));
 			}
 			catch (FinderException e) {
 				try {
-					chosenSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
+					chosenSeason = getCareBusiness().getCurrentSeason();
 				} catch (FinderException fe) {}
 			}
 			
@@ -1881,7 +1881,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 		// SchoolSeasonID	
 		try {
-			SchoolSeason currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
+			SchoolSeason currentSeason = getCareBusiness().getCurrentSeason();
 			if (currentSeason != null) {
 				seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
 				if (pSession != null)

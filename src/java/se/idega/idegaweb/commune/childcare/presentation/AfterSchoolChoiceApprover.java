@@ -7,11 +7,15 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Iterator;
 
+import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 
+import com.idega.business.IBOLookup;
+import com.idega.business.IBORuntimeException;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
+import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
@@ -41,8 +45,8 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.add(getLegendTable(), 1, 5);
 	}
 	
-	private Collection getApplicationCollection() throws RemoteException {
-		Collection applications = getBusiness().getUnhandledApplicationsByProvider(getSession().getChildCareID());
+	private Collection getApplicationCollection(IWApplicationContext iwac) throws RemoteException {
+		Collection applications = getAfterSchoolBusiness(iwac).findChoicesByProvider(getSession().getChildCareID());
 		return applications;
 	}
 
@@ -77,7 +81,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		applicationTable.add(getLocalizedSmallHeader("child_care.address","Address"), column++, row);
 		applicationTable.add(getLocalizedSmallHeader("child_care.phone","Phone"), column++, row++);
 				
-		Collection applications = getApplicationCollection();
+		Collection applications = getApplicationCollection(iwc);
 		if (applications != null && !applications.isEmpty()) {
 			ChildCareApplication application;
 			User child;
@@ -132,5 +136,14 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		}
 			
 		return applicationTable;
+	}
+	
+	protected AfterSchoolBusiness getAfterSchoolBusiness(IWApplicationContext iwac) {
+		try {
+			return (AfterSchoolBusiness) IBOLookup.getServiceInstance(iwac, AfterSchoolBusiness.class);
+		}
+		catch (RemoteException e) {
+			throw new IBORuntimeException(e.getMessage());
+		}
 	}
 }

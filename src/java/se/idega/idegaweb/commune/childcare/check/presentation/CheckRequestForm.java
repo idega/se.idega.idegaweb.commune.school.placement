@@ -313,9 +313,9 @@ public class CheckRequestForm extends CommuneBlock {
 				custodianTable.add(getText(parent.getNameLastFirst()), 1, row);
 				//custodianTable.add(getText("08-633 54 67"), 2, row);
 				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) )
-					custodianTable.add(getText("Gift"), 3, row);
+					custodianTable.add(getLocalizedText("check.married", "Married"), 3, row);
 				else
-					custodianTable.add(getText("Ugift"), 3,row);
+					custodianTable.add(getLocalizedText("check.un_married", "UnMarried"), 3,row);
 				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 4, row++);
 
 				if (iter.hasNext()) {

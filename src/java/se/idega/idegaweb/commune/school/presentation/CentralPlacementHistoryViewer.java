@@ -21,6 +21,8 @@ import com.idega.presentation.ui.Window;
  */
 public class CentralPlacementHistoryViewer extends Window {
 
+	private static final String IW_BUNDLE_NAME = "se.idega.idegaweb.commune";
+
 	// *** Localization keys ***
 	private static final String KP = "central_placement_floating_windows.";
 	private static final String KEY_WINDOW_HEADING_1 = KP + "edit_window_opened_from";
@@ -32,6 +34,8 @@ public class CentralPlacementHistoryViewer extends Window {
 	Table mainTable = null;
 	String FRAME_COLOR = "#DDDDDD";
 	IWResourceBundle iwrb = null;
+	int row = 2;
+	int col = 2;
 	 
 	// CSS styles   
 	private static final String STYLE_BIG_HEADER =
@@ -49,12 +53,19 @@ public class CentralPlacementHistoryViewer extends Window {
 		this.setAllMargins(0);
 	}
 	
+	/*
+	 * @see com.idega.presentation.PresentationObject#getBundleIdentifier()
+	 */
+	public String getBundleIdentifier() {
+		return IW_BUNDLE_NAME;
+	}
+
 	private Table getMainTable() {
 		Table mainTable = new Table();
 		mainTable.setWidth(Table.HUNDRED_PERCENT);
 		mainTable.setHeight(Table.HUNDRED_PERCENT);
 		mainTable.setColumns(4);
-		mainTable.setRows(3);
+		mainTable.setRows(4);
 		mainTable.setBorder(0);
 		mainTable.setCellpadding(2);
 		mainTable.setCellspacing(0);

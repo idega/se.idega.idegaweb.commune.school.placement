@@ -21,6 +21,8 @@ import com.idega.presentation.ui.Window;
  */
 public class CentralPlacementPupilOverview extends Window {
 
+	private static final String IW_BUNDLE_NAME = "se.idega.idegaweb.commune";
+
 	// *** Localization keys ***
 	private static final String KP = "central_placement_floating_windows.";
 	private static final String KEY_WINDOW_HEADING_1 = KP + "edit_window_opened_from";
@@ -49,10 +51,18 @@ public class CentralPlacementPupilOverview extends Window {
 		this.setAllMargins(0);
 	}
 	
+	/*
+	 * @see com.idega.presentation.PresentationObject#getBundleIdentifier()
+	 */
+	public String getBundleIdentifier() {
+		return IW_BUNDLE_NAME;
+	}
+
 	private Table getMainTable() {
 		Table mainTable = new Table();
 		mainTable.setColumns(4);
 		mainTable.setRows(3);
+		mainTable.setWidthAndHeightToHundredPercent();
 		mainTable.setBorder(0);
 		mainTable.setCellpadding(2);
 		mainTable.setCellspacing(0);

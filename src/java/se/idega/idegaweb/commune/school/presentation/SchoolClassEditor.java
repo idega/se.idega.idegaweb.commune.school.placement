@@ -54,6 +54,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
 	private final String PARAMETER_SORT ="sch_choice_sort";
 	private final String PARAMETER_SEARCH = "scH_choise_search";
+	
+	private final String PARAMETER_CURRENT_APPLICATION_PAGE = "sch_crrap_pg";
 
 	private final int ACTION_MANAGE = 1;
 	private final int ACTION_SAVE = 2;
@@ -70,9 +72,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private int _previousSchoolClassID = -1;
 	private int _previousSchoolSeasonID = -1;
 	private int _previousSchoolYearID = -1;
+
 	private boolean multibleSchools = false;
 	private boolean showStudentTable = true;
 	private boolean searchEnabled = true;
+	private int applicationsPerPage = 10;
 
 
 	public void init(IWContext iwc) throws RemoteException {
@@ -218,7 +222,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		add(form);
 	}
-
+	
 	private Table getApplicationTable(IWContext iwc) throws RemoteException {
 		Table table = new Table();
 		table.setWidth(getWidth());
@@ -239,9 +243,57 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.setWidth(6,"12");
 		}
 
+		int schoolYearAge = -1;
+		if (year != null) {
+			schoolYearAge = year.getSchoolYearAge() - 1;	
+		}
+
+		String[] validStatuses = new String[] {"PREL", "FLYT"};
+		//if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
+
+		List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString));
+
 		int row = 1;
 		int column = 1;
 		
+		int currPage = 0;
+		int maxPage = (int) Math.ceil( applicants.size() / applicationsPerPage );
+		if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
+			currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
+		}
+
+		
+		table.mergeCells(3, row, 5, row);
+		table.setAlignment(2, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setAlignment(3, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		Text prev = getSmallText(localize("previous","Previous"));
+		Text next = getSmallText(localize("next","Next"));
+		Text test = getSmallText("ApplSize : "+applicants.size()+" .... perPage"+ applicationsPerPage);
+		Text info = getSmallText(localize("page","Page") +" "+ (currPage +1) +" "+localize("of", "of") +" "+ (maxPage+1));
+		if (currPage > 0) {
+			Link lPrev = new Link(prev);
+			lPrev.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage-1));
+			lPrev.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
+			lPrev.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
+			table.add(lPrev, 1, row);
+		} else {
+			table.add(prev, 1, row);
+		}
+		table.add(info, 2, row);
+		
+		if (currPage < maxPage) {
+			Link lNext = new Link(next);
+			lNext.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage+1));
+			lNext.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
+			lNext.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
+			table.add(lNext, 3, row);
+		} else {
+			table.add(next, 3, row);
+		}
+
+
+		++row;	
+		table.setRowColor(row, getHeaderColor());
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
 		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
@@ -252,24 +304,32 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		CheckBox checkBox = new CheckBox();
 		Link link;
-		int schoolYearAge = -1;
-		if (year != null) {
-			schoolYearAge = year.getSchoolYearAge() - 1;	
-		}
 
-			List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, searchString));
 			if (!applicants.isEmpty()) {
 				Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy,iwc.getCurrentLocale(),getUserBusiness(iwc)));
 				SchoolChoice choice;
 				School school;
 				User applicant;
 				IWCalendar calendar;
-
+				
 				Iterator iter = applicants.iterator();
-				while (iter.hasNext()) {
+
+				/** Calculating page....starts */
+				int start = currPage * applicationsPerPage;
+				int end = start + applicationsPerPage;
+				for (int i = 0; i < start; i++) {
+					if (iter.hasNext()) {
+						iter.next();
+					}
+				}
+				/** Calculating page....ends */
+
+				int counter = 0;
+				while (iter.hasNext() && counter < applicationsPerPage) {
+					++counter;
 					column = 1;
 					choice = (SchoolChoice) iter.next();
-					if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
+					//if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
 						applicant = getUserBusiness(iwc).getUser(choice.getChildId());
 						school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
 						checkBox = getCheckBox(PARAMETER_APPLICANT_ID, String.valueOf(choice.getChildId()) + "," + choice.getPrimaryKey().toString());
@@ -316,7 +376,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 							table.add(getSmallText(choice.getLanguageChoice()), column++, row);
 						table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
 						table.add(checkBox, column, row++);
-					}
+					//}
 				}
 			}
 		//}
@@ -334,7 +394,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(deselectAll, 1, row);
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.setRowColor(1, getHeaderColor());
+		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
+		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setRowColor(row, "#FFFFFF");
 
 		return table;

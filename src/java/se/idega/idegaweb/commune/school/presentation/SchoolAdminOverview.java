@@ -946,8 +946,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String body = null;
 		String message = null;
 
-		String defSubject = "";
-		String defBody = "";
+		//String defSubject = "";
+		//String defBody = "";
 		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {
@@ -956,15 +956,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 				subject = localize("school.finalize_subject", "");
 				body = localize("school.finalize_body", "");
 				message = localize("school.proceed_with_ready_marking", "Proceed with marking class as ready and send out messages?");
-				defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_SUBJECT);
-				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_BODY);
+				//defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_SUBJECT);
+				//defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_CONFIRM_BODY);
 			}
 			else {
 				subject = localize("school.students_put_in_class_subject", "");
 				body = localize("school.students_put_in_class_body", "");
 				message = localize("school.proceed_with_locked_marking", "Proceed with marking class as locked and send out messages?");
-				defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_SUBJECT);
-				defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_BODY);
+				//defSubject = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_SUBJECT);
+				//defBody = getSchoolBusiness(iwc).getProperty(school, SchoolBusinessBean.PROPERTY_NAME_GROUP_OFFER_BODY);
 			}
 
 			if (body != null) {
@@ -988,11 +988,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 		text.setWidth(Table.HUNDRED_PERCENT);
 		text.setRows(10);
 		text.setAsNotEmpty(localize("school.not_empty_finalize_body", "Message body can not be empty."));
+		table.add(text, 1, row++);
 
 		if (body != null)
 			text.setContent(body);
 
-		if (defSubject != null) {
+		/*if (defSubject != null) {
 			header.setContent(defSubject);
 		}
 
@@ -1000,9 +1001,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			text.setContent(defBody);
 		}
 
-		table.add(text, 1, row++);
 		table.add(getSmallHeader(localize("school.set_as_default", "Set as default") + " "), 1, row);
-		table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);
+		table.add(new CheckBox(PARAMETER_SET_AS_DEFAULT), 1, row++);*/
 
 		SubmitButton send = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
 		send.setValueOnClick(PARAMETER_METHOD, "-1");

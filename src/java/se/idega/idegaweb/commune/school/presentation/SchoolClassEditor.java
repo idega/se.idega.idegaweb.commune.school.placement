@@ -613,6 +613,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		SchoolClass schoolClass = null;
 		SubmitButton delete;
 		Link move;
+		Link link;
 		int numberOfStudents = 0;
 
 		List formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClass(getSchoolClassID()));
@@ -646,7 +647,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				else
 					table.setRowColor(row, getZebraColor2());
 
-				table.add(getSmallText(name), 1, row);
+				link = (Link) this.getSmallLink(name);
+				link.setWindowToOpen(SchoolAdminWindow.class);
+				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
+				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
+				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
 
 				if (PIDChecker.getInstance().isFemale(student.getPersonalID()))
@@ -873,7 +879,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 
 	public Window getFileWindow() {
-		Window w = new Window(localize("school.class", "School class"), "/servlet/MediaServlet");
+		Window w = new Window(localize("school.class", "School class"), getIWApplicationContext().getApplication().getMediaServletURI());
 		w.setResizable(true);
 		w.setMenubar(true);
 		w.setHeight(400);

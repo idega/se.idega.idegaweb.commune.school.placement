@@ -183,10 +183,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					submit.setDisabled(true);
 				}
 			}
+			table.add(submit, 1, row);
 			submit.setOnSubmitFunction("checkApplication", getSubmitCheckScript());
 			form.setToDisableOnSubmit(submit, true);
 			
-			table.add(submit, 1, row);
 
 			if (submit.getDisabled()) {
 				row++;

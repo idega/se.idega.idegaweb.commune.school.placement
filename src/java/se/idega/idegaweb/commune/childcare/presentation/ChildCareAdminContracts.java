@@ -404,6 +404,10 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			parents = null;
 		}
 
+		table.setHeight(row++, 12);
+		table.add(getLocalizedHeader("child_care.new_contract", "New contract"), 1, row++);
+		table.setHeight(row++, 12);
+		
 		if (parents != null) {
 			table.add(getLocalizedHeader("child_care.custodians", "Custodians"), 1, row++);
 
@@ -527,24 +531,35 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(preSchool, 3, row++);
 		table.setHeight(row++, 12);
 
-		TextInput hoursWeek = (TextInput) getStyledInterface(new TextInput(PARAM_HOURS));
-		hoursWeek.keepStatusOnAction(true);
-		hoursWeek.setLength(2);
-		if (!isUpdate || finalize) {
-			hoursWeek.setAsNotEmpty(localize("child_care.child_care_time_required", "You must fill in the child care time."));
-			hoursWeek.setAsIntegers(localize("child_care.only_integers_allowed", "Not a valid child care time."));
-		}
 		table.add(getLocalizedLabel(LABEL_HOURS, "Hours pr. week"), 1, row);
-		table.add(hoursWeek, 3, row++);
+		if (isUsePredefinedCareTimeValues()) {
+			DropdownMenu menu = getCareTimeMenu(PARAM_HOURS);
+			menu.addMenuElementFirst("-1", localize("child_care.select_care_time", "Select care time"));
+			menu.keepStatusOnAction(true);
+			menu.setAsNotEmpty(localize("child_care.child_care_time_required", "You must fill in the child care time."));
+			table.add(menu, 3, row++);
+		}
+		else {
+			TextInput hoursWeek = (TextInput) getStyledInterface(new TextInput(PARAM_HOURS));
+			hoursWeek.keepStatusOnAction(true);
+			hoursWeek.setLength(2);
+			if (!isUpdate || finalize) {
+				hoursWeek.setAsNotEmpty(localize("child_care.child_care_time_required", "You must fill in the child care time."));
+				hoursWeek.setAsIntegers(localize("child_care.only_integers_allowed", "Not a valid child care time."));
+			}
+			table.add(hoursWeek, 3, row++);
+		}
 
 		try {
-			DropdownMenu employment = this.getEmploymentTypes(PARAM_EMPLOYMENT, -1);
-			employment.keepStatusOnAction(true);
-			if (!isUpdate || finalize) {
-				employment.setAsNotEmpty(localize("child_care.must_select_employment_type", "You must select employment type."), "-1");
+			if (getBusiness().getUseEmployment()) {
+				DropdownMenu employment = this.getEmploymentTypes(PARAM_EMPLOYMENT, -1);
+				employment.keepStatusOnAction(true);
+				if (!isUpdate || finalize) {
+					employment.setAsNotEmpty(localize("child_care.must_select_employment_type", "You must select employment type."), "-1");
+				}
+				table.add(getLocalizedLabel(LABEL_EMPLOYMENT, "Employment"), 1, row);
+				table.add(employment, 3, row++);
 			}
-			table.add(getLocalizedLabel(LABEL_EMPLOYMENT, "Employment"), 1, row);
-			table.add(employment, 3, row++);
 		}
 		catch (RemoteException e1) {
 			e1.printStackTrace();

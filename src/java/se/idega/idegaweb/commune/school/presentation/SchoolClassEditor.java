@@ -462,9 +462,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = applicant.getName();
 
-				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
+				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
-				else {
+				} else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
 					else
@@ -754,18 +754,17 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				if (studentMember.getNeedsSpecialAttention()) {
 					checkBox.setDisabled(true);
-					boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
-					if (hasChoices[0] && hasChoices[1])
-						table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
-					else if (hasChoices[0] && !hasChoices[1])
-						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
-					else {
-						if (studentMember.getSpeciallyPlaced())
-							table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
-					}
 					link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, String.valueOf(getBusiness().getChosenSchoolID((Collection) studentChoices.get(new Integer(studentMember.getClassMemberId())))));
 				}
-				else {
+				
+				boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
+				if (hasChoices[0] && hasChoices[1])
+					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
+				else if (hasChoices[0] && !hasChoices[1])
+					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
+				else if (studentMember.getSpeciallyPlaced()) {
+					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
+				}	else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
 					else
@@ -872,6 +871,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		int numberOfStudents = 0;
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
+		boolean isSpeciallyPlaced = false;
 		boolean hasComment = false;
 		boolean showComment = false;
 
@@ -888,6 +888,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				isSpeciallyPlaced = studentMember.getSpeciallyPlaced();
+				
 				hasComment = studentMember.getNotes() != null;
 
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")), "delete_student_" + String.valueOf(new Integer(studentMember.getClassMemberId())));
@@ -905,11 +907,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
-				if (hasChoice || hasMoveChoice) {
-					if (hasChoice)
-						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
-					if (hasMoveChoice)
-						table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
+				if (hasMoveChoice) {
+					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
+				} else if (hasChoice) {
+					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
+				} else if (isSpeciallyPlaced) {
+					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
 				}
 				else {
 					if (row % 2 == 0)

@@ -285,51 +285,61 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		close = (CloseButton) getStyledInterface(new CloseButton(localize("close_window", "Close")));
 
-		String userName= null;
-		if (_userID != -1) {
-			User user = getUserBusiness(iwc).getUser(_userID);
-			userName = user.getName();
-		}		
 		
+		String userName= null;
+		String personalId = null;
+		String personalIdUserName = null;
+		
+		User child;
+		
+		if (_userID != -1) {
+			child = getUserBusiness(iwc).getUser(_userID);
+			if (child != null){
+				personalId = child.getPersonalID();
+				userName = getUserBusiness(iwc).getNameLastFirst(child, true);
+			}
+		}
+		
+		personalIdUserName =  "  -  " + userName + "   " + personalId;
 		switch (_method) {
 			case METHOD_OVERVIEW :
-				headerTable.add(getHeader(localize("school.student_overview", "Student overview") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.student_overview", "Student overview") + "  -  " + userName), 1, 1);
 				contentTable.add(getOverview(iwc), 1, 1);
 				break;
 			case METHOD_REJECT :
-				headerTable.add(getHeader(localize("school.reject_student", "Reject student") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.reject_student", "Reject student") + personalIdUserName), 1, 1);
 				contentTable.add(getRejectForm(iwc), 1, 1);
 				break;
 			case METHOD_REPLACE :
-				headerTable.add(getHeader(localize("school.student_replacing", "Replace student") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.student_replacing", "Replace student") + personalIdUserName), 1, 1);
 				contentTable.add(getReplaceForm(iwc), 1, 1);
 				break;
 			case METHOD_MOVE_GROUP :
-				headerTable.add(getHeader(localize("school.student_move_group", "Move student to group") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.student_move_group", "Move student to group") + personalIdUserName), 1, 1);
 				contentTable.add(getMoveGroupForm(iwc), 1, 1);
 				break;
 			case METHOD_MOVE_YEAR :
-				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice") + personalIdUserName), 1, 1);
 				contentTable.add(getMoveYearForm(iwc), 1, 1);
 				break;
 			case METHOD_FINALIZE_GROUP :
-				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group") + personalIdUserName), 1, 1);
 				contentTable.add(getFinalizeGroupForm(iwc), 1, 1);
 				break;
 			case METHOD_EDIT_STUDENT :
-				headerTable.add(getHeader(localize("school.edit_student", "Edit student") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.edit_student", "Edit student") + personalIdUserName), 1, 1);
 				contentTable.add(getEditStudentForm(iwc), 1, 1);
 				break;
 			case METHOD_ADD_STUDENT :
-				headerTable.add(getHeader(localize("school.add_student", "Add student") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.add_student", "Add student") + personalIdUserName), 1, 1);
 				contentTable.add(getAddStudentForm(iwc), 1, 1);
 				break;
 			case METHOD_CHANGE_PLACEMENT_DATE :
-				headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date") + personalIdUserName), 1, 1);
 				contentTable.add(getChangePlacementDateForm(iwc), 1, 1);
 				break;
 			case METHOD_LIST_RESOURCES :
-				headerTable.add(getHeader(localize("school.resources.current", "Current Resources") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.resources.current", "Current Resources") + personalIdUserName), 1, 1);
 				contentTable.add(getResourceList(iwc), 1, 1);
 				break;
 			case METHOD_NEW_RESOURCE :
@@ -341,11 +351,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 				contentTable.add(getFinishResourceForm(iwc), 1, 1);
 				break;
 			case METHOD_CHANGE_STUDY_PATH :
-				headerTable.add(getHeader(localize("school.change_study_path", "Change Study Path") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.change_study_path", "Change Study Path") + personalIdUserName), 1, 1);
 				contentTable.add(getChangeStudyPathForm(iwc), 1, 1);
 				break;
 			case METHOD_NATIVE_LANG_FORM :
-				headerTable.add(getHeader(localize("school.native_language", "Native language") + "&nbsp;&nbsp;-&nbsp;&nbsp;" + userName), 1, 1);
+				headerTable.add(getHeader(localize("school.native_language", "Native language") + personalIdUserName), 1, 1);
 				contentTable.add(getNativeLanguageForm(iwc), 1, 1);
 				break;
 			case METHOD_MESSAGE_TEXT :

@@ -854,7 +854,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			choice = null;
 		}
 		DateInput input = new DateInput(PARAMETER_DATE);
-		if (choice != null)
+		if (choice != null && choice.getPlacementDate() != null)
 			input.setDate(choice.getPlacementDate());
 		else
 			input.setDate(stamp.getDate());

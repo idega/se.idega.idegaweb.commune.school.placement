@@ -19,7 +19,6 @@ import se.idega.util.PIDChecker;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolYear;
-import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -28,7 +27,6 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
-import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -423,9 +421,6 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		}
 	}
 
-	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
-		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
-	}
 
 	/* Setters */
 	/**

@@ -2359,19 +2359,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private CommuneUserBusiness getCommuneUserBusiness(IWContext iwc) throws RemoteException {
-		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
+		return getUserBusiness(iwc);
 	}
 
 	private SchoolCommuneSession getSchoolCommuneSession(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneSession) IBOLookup.getSessionInstance(iwc, SchoolCommuneSession.class);
 	}
 
-	private CommuneUserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
-		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
-	}
 
 	private FamilyLogic getMemberFamilyLogic(IWContext iwc) throws RemoteException {
-		return (FamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, FamilyLogic.class);
+		return getUserBusiness(iwc).getMemberFamilyLogic();
 	}
 
 	private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {

@@ -1,5 +1,5 @@
 /*
- * $Id: PlacementBusinessBean.java,v 1.3 2005/01/10 14:06:32 laddi Exp $
+ * $Id: PlacementBusinessBean.java,v 1.4 2005/02/08 13:21:42 laddi Exp $
  * Created on Oct 15, 2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -429,7 +429,7 @@ public class PlacementBusinessBean extends IBOServiceBean  implements PlacementB
 				Iterator iter = coll.iterator();
 				while (iter.hasNext()) {
 					SchoolChoice element = (SchoolChoice) iter.next();
-					if (element.getChoiceOrder() == (choice.getChoiceOrder() + 1) && !element.getCaseStatus().equals("AVSL")) {
+					if (element.getChoiceOrder() == (choice.getChoiceOrder() + 1) && !element.getStatus().equals("AVSL")) {
 						schoolChoiceBusiness.changeCaseStatus(element, schoolChoiceBusiness.getCaseStatusPreliminary().getStatus(), performer);
 						schoolChoiceBusiness.sendMessageToParents(element, schoolChoiceBusiness.getPreliminaryMessageSubject(), schoolChoiceBusiness.getPreliminaryMessageBody(element),code, schoolChoiceBusiness.getPreliminaryMessageSubject(),schoolChoiceBusiness.getPreliminaryMessageBody(element),code,false);
 						continue;						

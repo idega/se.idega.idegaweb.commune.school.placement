@@ -435,7 +435,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				created = new IWTimestamp(choice.getCreated());
 				applicant = getUserBusiness(iwc).getUser(choice.getChildId());
 				school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
-				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, String.valueOf(choice.getChildId()) + "," + choice.getPrimaryKey().toString());
+				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, choice.getPrimaryKey().toString() + "," + String.valueOf(choice.getChildId()));
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
 				hasComment = choice.getMessage() != null;
 
@@ -1086,32 +1086,25 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			for (int a = 0; a < applications.length; a++) {
 				StringTokenizer tokens = new StringTokenizer(applications[a], ",");
 
-				//member =
-				// getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()),
-				// getSchoolClassID(), getSchoolYearID(), stamp.getTimestamp(),
-				// userID);
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID);
-
 				choice = getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(tokens.nextToken()), iwc.getCurrentUser());
+				IWTimestamp placementDate = null;
+				if (choice != null && choice.getPlacementDate() != null) {
+					placementDate = new IWTimestamp(choice.getPlacementDate());
+				}
+				else {
+					placementDate = new IWTimestamp(stamp);
+				}
+				
+				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), userID);
 				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
-					if (choice != null && choice.getPlacementDate() != null) {
-						IWTimestamp placementDate = new IWTimestamp(choice.getPlacementDate());
-						member.setRegisterDate(placementDate.getTimestamp());
-						member.store();
-					}
 				}
 			}
 		}
 
 		if (students != null && students.length > 0) {
 			for (int a = 0; a < students.length; a++) {
-
-				//member =
-				// getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]),
-				// getSchoolClassID(), getSchoolYearID(), stamp.getTimestamp(),
-				// userID);
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
 				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID);
 

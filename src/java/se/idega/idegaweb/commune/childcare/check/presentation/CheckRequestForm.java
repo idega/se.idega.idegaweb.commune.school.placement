@@ -127,7 +127,7 @@ public class CheckRequestForm extends CommuneBlock {
     childCareTypeTable.setCellpadding(4);
 
     SchoolTypeBusiness schoolTypeBusiness = (SchoolTypeBusiness)com.idega.business.IBOLookup.getServiceInstance(iwc,SchoolTypeBusiness.class);
-    Collection childCareTypes = schoolTypeBusiness.findAllSchoolTypesInCategory(SchoolType.CHILDCARE);
+    Collection childCareTypes = schoolTypeBusiness.findAllSchoolTypesForChildCare();
 
     DropdownMenu typeChoice = new DropdownMenu(PARAM_CHILD_CARE_TYPE);
     Iterator iter = childCareTypes.iterator();

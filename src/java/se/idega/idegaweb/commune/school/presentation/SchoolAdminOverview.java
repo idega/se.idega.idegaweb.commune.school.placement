@@ -921,7 +921,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(getSmallHeader(localize("school.new_year", "New year") + ": "), 1, row);
 
 		DropdownMenu menu = getSchoolYears(iwc);
-		menu.setToSubmit(false);
 		table.add(menu, 1, row++);
 
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move")));
@@ -1815,8 +1814,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (iwc.isParameterSet(PARAMETER_PAGE_ID))
 			_pageID = Integer.parseInt(iwc.getParameter(PARAMETER_PAGE_ID));
 
-		if (_schoolClassID != -1 && _schoolYearID != -1)
-			validateSchoolClass(iwc);
+		//if (_schoolClassID != -1 && _schoolYearID != -1)
+			//validateSchoolClass(iwc);
 
 		if (iwc.isParameterSet(PARAMETER_SEARCH))
 			searchString = iwc.getParameter(PARAMETER_SEARCH);
@@ -1860,7 +1859,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	protected DropdownMenu getSchoolYears(IWContext iwc) throws RemoteException {
 		DropdownMenu menu = new DropdownMenu(getSchoolCommuneSession(iwc).getParameterSchoolYearID());
-		menu.setToSubmit();
 
 		if (getSchoolCommuneSession(iwc).getSchoolID() != -1) {
 			List years = new Vector(getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolYearsInSchool(getSchoolCommuneSession(iwc).getSchoolID()));
@@ -1889,7 +1887,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return (DropdownMenu) getStyledInterface(menu);
 	}
 
-	protected DropdownMenu getSchoolClasses(IWContext iwc, boolean setToSubmit) throws RemoteException {
+	/*protected DropdownMenu getSchoolClasses(IWContext iwc, boolean setToSubmit) throws RemoteException {
 		DropdownMenu menu = new DropdownMenu(getSchoolCommuneSession(iwc).getParameterSchoolClassID());
 		if (setToSubmit) {
 			menu.setToSubmit();
@@ -1922,7 +1920,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			menu.setSelectedElement(_schoolClassID);
 
 		return (DropdownMenu) getStyledInterface(menu);
-	}
+	}*/
 
 	protected DropdownMenu getSchools(IWContext iwc) throws RemoteException {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_SCHOOL_ID);
@@ -2047,7 +2045,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return new Integer(anordnareIdStr);
 	}
 
-	private void validateSchoolClass(IWContext iwc) throws RemoteException {
+	/*private void validateSchoolClass(IWContext iwc) throws RemoteException {
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(_schoolClassID));
 		SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(_schoolYearID));
 		if (schoolYear != null || !schoolClass.hasRelationToSchoolYear(schoolYear)) {
@@ -2060,7 +2058,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 			}
 		}
-	}
+	}*/
 
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);

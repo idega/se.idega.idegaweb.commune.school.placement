@@ -659,9 +659,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private Table getNewStudentTable(IWContext iwc) throws RemoteException {
 		boolean isReady = false;
+		boolean isLocked = false;
 		SchoolClass newSchoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
-		if (newSchoolClass != null)
+		if (newSchoolClass != null) {
 			isReady = newSchoolClass.getReady();
+			isLocked = newSchoolClass.getLocked();
+		}
 
 		Table table = new Table();
 		table.setWidth(getWidth());
@@ -774,6 +777,19 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (numberOfStudents > 0) {
 			table.mergeCells(1, row, table.getColumns(), row);
 			table.add(getSmallHeader(localize("school.number_of_students", "Number of students") + ": " + String.valueOf(numberOfStudents)), 1, row++);
+		}
+		
+		if (isReady && newSchoolClass.getReadyDate() != null) {
+			table.setHeight(row++, 3);
+
+			IWTimestamp readyDate = new IWTimestamp(newSchoolClass.getReadyDate());
+			table.mergeCells(1, row, table.getColumns(), row);
+			table.add(getSmallHeader(localize("school.mark_ready_when", "School group was marked as ready") + ": " + readyDate.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)), 1, row++);
+			if (isLocked && newSchoolClass.getLockedDate() != null) {
+				IWTimestamp lockedDate = new IWTimestamp(newSchoolClass.getLockedDate());
+				table.mergeCells(1, row, table.getColumns(), row);
+				table.add(getSmallHeader(localize("school.mark_locked_when", "School group was marked as locked") + ": " + lockedDate.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)), 1, row++);
+			}
 		}
 
 		SubmitButton back = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.back", "Back")));

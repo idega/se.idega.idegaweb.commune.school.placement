@@ -8,6 +8,7 @@ import java.util.Iterator;
 
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
+import se.idega.idegaweb.commune.childcare.check.data.Check;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
@@ -146,7 +147,15 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private void viewForm(IWContext iwc) throws Exception {
-		add(getForm(iwc));
+		boolean hasCheck = getCheckBusiness(iwc).hasGrantedCheck(child);
+		if (hasCheck) {
+			if (createChoices() && getResponsePage() != null)
+				iwc.forwardToIBPage(getParentPage(), getResponsePage());
+			else
+				add(getLocalizedHeader("check.already_has_check","Child already has a check granted."));
+		}
+		else
+			add(getForm(iwc));
 	}
 
 	private void formSubmitted(IWContext iwc) throws Exception {
@@ -341,7 +350,7 @@ public class CheckRequestForm extends CommuneBlock {
 		if (this.paramErrorChildCateType) {
 			childCareTypeTable.add(getSmallErrorText(localize("check.child_care_type_error", "You must select child care type")), 2, 1);
 		}
-
+		
 		return childCareTypeTable;
 	}
 

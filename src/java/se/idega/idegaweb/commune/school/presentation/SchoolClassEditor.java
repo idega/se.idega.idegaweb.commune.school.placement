@@ -82,27 +82,31 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 
 	public void init(IWContext iwc) throws RemoteException {
-		parseAction(iwc);
-
-		switch (method) {
-			case ACTION_SAVE :
-				saveClass(iwc);
-				break;
-			case ACTION_DELETE :
-				delete(iwc);
-				break;
-			case ACTION_FINALIZE_GROUP :
-				finalize(iwc);
-				break;
-		}
-
-		switch (action) {
-			case ACTION_MANAGE :
-				drawForm(iwc);
-				break;
-			case ACTION_SAVE :
-				drawNewGroupForm(iwc);
-				break;
+		if (iwc.isLoggedOn()) {
+			parseAction(iwc);
+	
+			switch (method) {
+				case ACTION_SAVE :
+					saveClass(iwc);
+					break;
+				case ACTION_DELETE :
+					delete(iwc);
+					break;
+				case ACTION_FINALIZE_GROUP :
+					finalize(iwc);
+					break;
+			}
+	
+			switch (action) {
+				case ACTION_MANAGE :
+					drawForm(iwc);
+					break;
+				case ACTION_SAVE :
+					drawNewGroupForm(iwc);
+					break;
+			}
+		}else {
+			add(super.getSmallHeader(localize("not_logged_on","Not logged on")));
 		}
 	}
 

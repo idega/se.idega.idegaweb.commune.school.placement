@@ -1093,7 +1093,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					placementDate = new IWTimestamp(stamp);
 				}
 				
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), userID);
+				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), userID, choice.getMessage());
 				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
 				}

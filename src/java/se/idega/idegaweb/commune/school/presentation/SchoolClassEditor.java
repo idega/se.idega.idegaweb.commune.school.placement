@@ -272,7 +272,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 
 		String[] validStatuses = null;
-		//if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
 		if (showStatistics) {
 			validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
 		}
@@ -280,19 +279,27 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
 				
 		int applicantsSize = 0;
-		try {
-			applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, null, validStatuses, searchString);
-		}
-		catch (Exception e) {
-			applicantsSize = 0;
-		}
-
+		int start = -1;
 		int currPage = 0;
-		int maxPage = (int) Math.ceil(applicantsSize / applicationsPerPage);
-		if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
-			currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
+		int maxPage = 0;
+		if (this.multibleSchools) {
+			try {
+				applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, null, validStatuses, searchString);
+			}
+			catch (Exception e) {
+				applicantsSize = 0;
+			}
+
+			currPage = 0;
+			maxPage = (int) Math.ceil(applicantsSize / applicationsPerPage);
+			if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
+				currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
+			}
+			start = currPage * applicationsPerPage;
 		}
-		int start = currPage * applicationsPerPage;
+		else {
+			applicationsPerPage = -1;
+		}
 		
 		Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy, applicationsPerPage, start);
 
@@ -300,42 +307,43 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		int column = 1;
 		int headerRow = -1;
 
-
-		Table navigationTable = new Table(3, 1);
-		navigationTable.setCellpadding(0);
-		navigationTable.setCellspacing(0);
-		navigationTable.setWidth(Table.HUNDRED_PERCENT);
-		navigationTable.setWidth(1, "33%");
-		navigationTable.setWidth(2, "33%");
-		navigationTable.setWidth(3, "33%");
-		navigationTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_CENTER);
-		navigationTable.setAlignment(3, 1, Table.HORIZONTAL_ALIGN_RIGHT);
-		table.add(navigationTable, 1, row++);
-
-		Text prev = getSmallText(localize("previous", "Previous"));
-		Text next = getSmallText(localize("next", "Next"));
-		Text info = getSmallText(localize("page", "Page") + " " + (currPage + 1) + " " + localize("of", "of") + " " + (maxPage + 1));
-		if (currPage > 0) {
-			Link lPrev = getSmallLink(localize("previous", "Previous"));
-			lPrev.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage - 1));
-			lPrev.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
-			lPrev.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
-			navigationTable.add(lPrev, 1, 1);
-		}
-		else {
-			navigationTable.add(prev, 1, 1);
-		}
-		navigationTable.add(info, 2, 1);
-
-		if (currPage < maxPage) {
-			Link lNext = getSmallLink(localize("next", "Next"));
-			lNext.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage + 1));
-			lNext.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
-			lNext.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
-			navigationTable.add(lNext, 3, 1);
-		}
-		else {
-			navigationTable.add(next, 3, 1);
+		if (this.multibleSchools) {
+			Table navigationTable = new Table(3, 1);
+			navigationTable.setCellpadding(0);
+			navigationTable.setCellspacing(0);
+			navigationTable.setWidth(Table.HUNDRED_PERCENT);
+			navigationTable.setWidth(1, "33%");
+			navigationTable.setWidth(2, "33%");
+			navigationTable.setWidth(3, "33%");
+			navigationTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_CENTER);
+			navigationTable.setAlignment(3, 1, Table.HORIZONTAL_ALIGN_RIGHT);
+			table.add(navigationTable, 1, row++);
+	
+			Text prev = getSmallText(localize("previous", "Previous"));
+			Text next = getSmallText(localize("next", "Next"));
+			Text info = getSmallText(localize("page", "Page") + " " + (currPage + 1) + " " + localize("of", "of") + " " + (maxPage + 1));
+			if (currPage > 0) {
+				Link lPrev = getSmallLink(localize("previous", "Previous"));
+				lPrev.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage - 1));
+				lPrev.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
+				lPrev.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
+				navigationTable.add(lPrev, 1, 1);
+			}
+			else {
+				navigationTable.add(prev, 1, 1);
+			}
+			navigationTable.add(info, 2, 1);
+	
+			if (currPage < maxPage) {
+				Link lNext = getSmallLink(localize("next", "Next"));
+				lNext.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage + 1));
+				lNext.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
+				lNext.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
+				navigationTable.add(lNext, 3, 1);
+			}
+			else {
+				navigationTable.add(next, 3, 1);
+			}
 		}
 
 		headerRow = row;
@@ -345,37 +353,33 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
 		if (showLanguage)
-			table.add(getSmallHeader(localize("school.language", "Language")), column, row);
+			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		table.add(getSmallHeader(localize("school.created", "Created")), column, row);
 		row++;
 		
 		CheckBox checkBox = new CheckBox();
 		Link link;
 
 		if (!applicants.isEmpty()) {
-			//Map studentMap = getBusiness().getUserMapFromChoices(applicants);
-			//Map addressMap = getBusiness().getUserAddressesMapFromChoices(applicants);
-			//if (sortChoicesBy == SchoolChoiceComparator.ADDRESS_SORT)
-			//	addressMap = getBusiness().getUserAddressesMapFromChoices(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolQuery(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy));
-			//System.out.println("Sorting: "+(System.currentTimeMillis() - currentTime)+"ms");
-			//Collections.sort(applicants, new SchoolChoiceComparator(sortChoicesBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap, addressMap));
 			SchoolChoice choice;
 			School school;
 			User applicant;
 			Address address;
-			//IWCalendar calendar;
+			IWTimestamp created;
+			boolean hasComment = false;
+			boolean showComment = false;
 
 			Iterator iter = applicants.iterator();
 
 			while (iter.hasNext()) {
 				column = 1;
 				choice = (SchoolChoice) iter.next();
-				//applicant = (User) studentMap.get(new Integer(choice.getChildId()));
+				created = new IWTimestamp(choice.getCreated());
 				applicant = getUserBusiness(iwc).getUser(choice.getChildId());
 				school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
 				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, String.valueOf(choice.getChildId()) + "," + choice.getPrimaryKey().toString());
-				//calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
-				//address = (Address) addressMap.get(new Integer(choice.getChildId()));
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
+				hasComment = choice.getMessage() != null;
 				
 				if (getBusiness().isAlreadyInSchool(choice.getChildId(),getSession().getSchoolID(), getSession().getSchoolSeasonID()))
 					checkBox.setDisabled(true);
@@ -402,7 +406,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
         link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_STUDENT, String.valueOf(choice.getChildId()));
         link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CHOICE_STATUS, choice.getStatus());
         link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CLASS_MEMBER, "-1");
-				table.add(link, column++, row);
+
+				if (hasComment) {
+					showComment = true;
+					table.add(getSmallErrorText("*"), column, row);
+				}
+				if (showComment)
+					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+        
+        table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 				if (address != null && address.getStreetAddress() != null) {
 					table.add(getSmallText(address.getStreetAddress()), column, row);
@@ -427,12 +439,19 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.add(getSmallText(localize(choice.getLanguageChoice(),"")), column, row);
 					column++;
 				}
-				//table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
+				table.add(getSmallText(created.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), column++, row);
 				if (showStudentTable && getSchoolClassID() != -1) {
 					table.setWidth(column, "12");
 					table.add(checkBox, column, row);
 				}
 				row++;
+			}
+
+			if (showComment) {
+				table.setHeight(2, row++);
+				table.mergeCells(1, row, table.getColumns(), row);
+				table.add(getSmallErrorText("* "), 1, row);
+				table.add(getSmallText(localize("school_choice.has_comment","Application has comment attached")), 1, row++);
 			}
 		}
 
@@ -731,14 +750,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
 						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);
 						if (choice.getHasReceivedPlacementMessage())
-							table.add(getSmallHeader("*"), 7, row);
+							table.add(getSmallText(localize("school_choice.YES", "YES")), 7, row);
 						else
-							table.add(getSmallText("-"), 7, row);
+							table.add(getSmallText(localize("school_choice.NO", "NO")), 7, row);
 						
 						if (choice.getHasReceivedConfirmationMessage())
-							table.add(getSmallHeader("*"), 8, row);
+							table.add(getSmallText(localize("school_choice.YES", "YES")), 8, row);
 						else
-							table.add(getSmallText("-"), 8, row);
+							table.add(getSmallText(localize("school_choice.NO", "NO")), 8, row);
 					}
 				}
 			}
@@ -877,6 +896,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		menu.addMenuElement(SchoolChoiceComparator.GENDER_SORT, localize("school.sort_gender", "Gender"));
 		if (action != ACTION_SAVE && yearAge >= 12)
 			menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language", "Language"));
+		menu.addMenuElement(SchoolChoiceComparator.CREATED_SORT, localize("school.sort_created", "Created"));
 		menu.setSelectedElement(sortChoicesBy);
 		menu.setToSubmit();
 		table.add(menu, 2, 3);

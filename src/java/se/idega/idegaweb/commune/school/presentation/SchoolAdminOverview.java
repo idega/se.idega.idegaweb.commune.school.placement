@@ -290,7 +290,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		String userName= null;
 		String personalId = null;
-		String personalIdUserName = null;
+		String personalIdUserName = "";
 		
 		User child;
 		
@@ -299,10 +299,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (child != null){
 				personalId = child.getPersonalID();
 				userName = getUserBusiness(iwc).getNameLastFirst(child, true);
+				personalIdUserName =  "  -  " + userName + "   " + personalId;
 			}
 		}
+				
 		
-		personalIdUserName =  "  -  " + userName + "   " + personalId;
+		
 		switch (_method) {
 		case METHOD_OVERVIEW :
 			headerTable.add(getHeader(localize("school.student_overview", "Student overview") + "  -  " + userName), 1, 1);

@@ -112,7 +112,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	public void initChild(IWContext iwc) {
 		String ID = iwc.getParameter(prmChildId);
-		if (ID != null) {
+		if (ID != null && !ID.equals("-1")) {
 			try {
 				child = getBusiness().getUserBusiness().getUser(Integer.parseInt(ID));
 			}
@@ -130,6 +130,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			catch (RemoteException e) {
 				e.printStackTrace();
 			}
+			catch (Exception e){
+				log(e);
+			}
+			
 		}
 	}
 

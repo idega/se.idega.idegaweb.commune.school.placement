@@ -11,6 +11,9 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.ejb.FinderException;
+
+import se.idega.idegaweb.commune.accounting.business.AccountingSession;
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
@@ -20,9 +23,12 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.provider.business.ProviderSession;
+import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
+import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
+import se.idega.idegaweb.commune.school.business.SchoolCommuneSessionBean;
 
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -63,8 +69,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/06 18:14:45 $ by $Author: goranb $
- * @version $Revision: 1.34 $
+ * Last modified: $Date: 2003/11/11 21:44:56 $ by $Author: goranb $
+ * @version $Revision: 1.35 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -152,6 +158,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	
 	// Presentations
 	private static final int PRESENTATION_SEARCH_FORM = 1;
+	public static final String FORM_NAME = "central_placement_editor_form";
 
 	// CSS styles   
 	private static final String STYLE_UNDERLINED_SMALL_HEADER =
@@ -189,15 +196,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	public void main(IWContext iwc) throws Exception {
 		iwrb = getResourceBundle(iwc);
-		form = new Form();		
+		form = new Form();
+		form.setName(FORM_NAME);	
 		// Parameter name returning chosen User from SearchUserModule
 		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
 
 		form.add(getMainTable());
 		parse(iwc);
-		
-		// remove warning
-		PARAM_BACK.toString();
 		
 		// Borgman test
 		//String testParam = iwc.getParameter(PARAM_BACK);
@@ -1109,9 +1114,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 	
 	private DropdownMenu getPaymentByAgreementDropdown(IWContext iwc, String param) {
 		DropdownMenu yesNo = new DropdownMenu(param);
-		yesNo.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
+		//yesNo.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		yesNo.addMenuElement(KEY_DROPDOWN_NO, localize(KEY_DROPDOWN_NO, "No"));
 		yesNo.addMenuElement(KEY_DROPDOWN_YES, localize(KEY_DROPDOWN_YES, "Yes"));
+		yesNo.setSelectedElement(KEY_DROPDOWN_NO);
 		if (storedPlacement == null && iwc.isParameterSet(PARAM_PAYMENT_BY_AGREEMENT)) {
 			yesNo.setSelectedElement(iwc.getParameter(PARAM_PAYMENT_BY_AGREEMENT));
 		}
@@ -1298,14 +1304,65 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return linkButton;
 	}
 
-	private Link getGroupEditorButton(IWContext iwc) {
+	private Link getGroupEditorButton(IWContext iwc) throws RemoteException {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_GROUP, "New  group")));
 		linkButton.setAsImageButton(true);
 		linkButton.setWindowToOpen(CentralPlacementSchoolGroupEditor.class);
-		iwc.getParameter(PARAM_ACTION);
-			
-		//linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+		String categoryID = "-1";
+		int typeID = -1;
+		int providerID = -1;
+		int seasonID = -1;
+		int yearID = -1;
+
+		//String tmp = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
 		
+		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
+			categoryID = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
+
+		if (!categoryID.equals("-1") && iwc.isParameterSet(PARAM_SCHOOL_TYPE))
+			typeID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_TYPE));
+
+
+		if (!categoryID.equals("-1") && typeID != -1 && iwc.isParameterSet(PARAM_PROVIDER))
+			providerID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
+
+		if (!categoryID.equals("-1") && typeID != -1  && providerID != -1 
+				&& iwc.isParameterSet(PARAM_SCHOOL_YEAR))
+			yearID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR));
+		
+	// Set parameters and session values to use as default in SchoolGroupEditorAdmin
+	
+		// SchoolCategoryID		
+		AccountingSession aSession = (AccountingSession) 
+												IBOLookup.getSessionInstance(iwc, AccountingSession.class);
+		if (aSession != null)										
+			aSession.setOperationalField(iwc.getParameter(PARAM_SCHOOL_CATEGORY));
+
+		// Only Bunadmin schools?
+		linkButton.addParameter(SchoolGroupEditorAdmin.PARAM_BUNADM, ""+false);
+
+		// SchoolTypeID
+		linkButton.addParameter(SchoolGroupEditor.PARAMETER_TYPE_ID, typeID);
+
+		// SchoolID
+		linkButton.addParameter(SchoolCommuneSessionBean.PARAMETER_SCHOOL_ID, providerID);
+
+		// SchoolYearID
+		ProviderSession pSession = (ProviderSession)
+													IBOLookup.getSessionInstance(iwc, ProviderSession.class);
+		if (pSession != null)
+			pSession.setYearID(yearID);
+
+		// SchoolSeasonID	
+		try {
+			SchoolSeason currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
+			if (currentSeason != null) {
+				seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
+				if (pSession != null)
+					pSession.setSeasonID(seasonID);			
+			}						
+		} catch (FinderException e) {	}
+				
 		return linkButton;
 	}
 	

@@ -20,6 +20,7 @@ import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
+import com.idega.data.IDOEntity;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
@@ -284,7 +285,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 				getBill.keepStatusOnAction(true);
 				getBill.setMustBeSelected(localize("child_care.must_select_billed_to", "You must select who to send the bill to."));
 				if (_application != null) {
-					if (_application.getOwner().equals(parent)) {
+					//TODO: Remove type cast/Fix UserBMPBean
+					if (_application.getOwner().equals((IDOEntity)parent)) {
 						getBill.setSelected(true);
 					}
 				}

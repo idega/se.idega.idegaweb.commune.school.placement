@@ -8,21 +8,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
-import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
-
+import se.idega.util.SchoolClassMemberComparatorForSweden;
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -80,7 +77,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private int action = 0;
 	private int method = 0;
 	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
-	private int sortChoicesBy = SchoolClassMemberComparator.NAME_SORT;
+	private int sortChoicesBy = SchoolClassMemberComparatorForSweden.NAME_SORT;
 	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
 	private int sortPlacedUnplacedBy = -1;
 
@@ -823,7 +820,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
 
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSchoolSeasonID());
-			Collections.sort(formerStudents, new SchoolClassMemberComparator(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -1047,7 +1044,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
-			Collections.sort(formerStudents, new SchoolClassMemberComparator(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;

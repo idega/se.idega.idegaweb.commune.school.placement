@@ -12,11 +12,12 @@ import java.util.Map;
 
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
-import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
+import se.idega.util.SchoolClassMemberComparatorForSweden;
 
+import com.idega.block.school.business.SchoolClassMemberComparator;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolYear;
@@ -207,7 +208,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		if (!students.isEmpty()) {
 			numberOfStudents = students.size();
 			Map studentMap = getCareBusiness().getStudentList(students);
-			Collections.sort(students, new SchoolClassMemberComparator(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(students, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = students.iterator();
 			while (iter.hasNext()) {
 				column = 1;

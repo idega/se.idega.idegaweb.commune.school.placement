@@ -1,6 +1,6 @@
 package se.idega.idegaweb.commune.childcare.check.presentation;
 
-import is.idega.idegaweb.member.business.MemberFamilyLogic;
+import is.idega.block.family.business.FamilyLogic;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -583,8 +583,8 @@ public class CheckRequestForm extends CommuneBlock {
 		return (ChildCareSession) com.idega.business.IBOLookup.getSessionInstance(iwc, ChildCareSession.class);
 	}
 
-	private MemberFamilyLogic getMemberFamilyLogic(IWContext iwc) throws Exception {
-		return (MemberFamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, MemberFamilyLogic.class);
+	private FamilyLogic getMemberFamilyLogic(IWContext iwc) throws Exception {
+		return (FamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, FamilyLogic.class);
 	}
 
 	/* Commented out since it is never used...

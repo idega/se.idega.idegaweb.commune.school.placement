@@ -1,6 +1,6 @@
 package se.idega.idegaweb.commune.school.presentation;
 
-import is.idega.idegaweb.member.business.MemberFamilyLogic;
+import is.idega.block.family.business.FamilyLogic;
 import is.idega.idegaweb.member.business.NoCustodianFound;
 
 import java.rmi.RemoteException;
@@ -2260,8 +2260,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}
 
-	private MemberFamilyLogic getMemberFamilyLogic(IWContext iwc) throws RemoteException {
-		return (MemberFamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, MemberFamilyLogic.class);
+	private FamilyLogic getMemberFamilyLogic(IWContext iwc) throws RemoteException {
+		return (FamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, FamilyLogic.class);
 	}
 
 	private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {

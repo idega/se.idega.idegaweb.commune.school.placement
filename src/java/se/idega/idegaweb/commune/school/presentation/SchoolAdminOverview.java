@@ -151,10 +151,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolID = -1;
 	private int _schoolClassID = -1;
 	private int _schoolYearID = -1;
-  private int _rsc_studentID = -1;
-  private int _rsc_seasonID = -1;
-  private int _rsc_classMemberID = -1;
-  private String _rsc_choiceStatus = null;
+//  private int _rsc_studentID = -1;
+//  private int _rsc_seasonID = -1;
+//  private int _rsc_classMemberID = -1;
+//  private String _rsc_choiceStatus = null;
   private SchoolAdminOverviewTO _rscTO = new SchoolAdminOverviewTO();  // Transfer object to hold resource params in http session
 
 	private boolean _protocol = true;

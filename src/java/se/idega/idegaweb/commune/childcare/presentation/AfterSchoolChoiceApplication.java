@@ -13,15 +13,12 @@ import java.util.Map;
 
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
-import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
-import se.idega.idegaweb.commune.childcare.check.data.GrantedCheck;
 import se.idega.idegaweb.commune.childcare.data.AfterSchoolChoice;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 
 import com.idega.block.navigation.presentation.UserHomeLink;
-import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolArea;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
@@ -38,7 +35,6 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
-import com.idega.user.data.Group;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -51,7 +47,7 @@ import com.idega.util.PersonalIDFormatter;
 public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	private User child;
-	private GrantedCheck check;
+//	private GrantedCheck check;
 
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_SUBMIT = 2;
@@ -74,18 +70,18 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String APPLICATION_INSERTED = "ccas_application_ok";
 	private final static String APPLICATION_FAILURE = "ccas_application_failed";
 
-	private final static String EMAIL_PROVIDER_SUBJECT = "child_care.application_received_subject";
-	private final static String EMAIL_PROVIDER_MESSAGE = "child_care.application_received_body";
+//	private final static String EMAIL_PROVIDER_SUBJECT = "child_care.application_received_subject";
+//	private final static String EMAIL_PROVIDER_MESSAGE = "child_care.application_received_body";
 
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
 	private String prmChildId = CitizenChildren.getChildIDParameterName();
-	private String prmParentId = CitizenChildren.getParentIDParameterName();
+//	private String prmParentId = CitizenChildren.getParentIDParameterName();
 
 	private Collection areas;
 	private Map providerMap;
 
-	private boolean _noCheckError = false;
+//	private boolean _noCheckError = false;
 	private boolean isAdmin = false;
 
 	/**
@@ -542,9 +538,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		return (AfterSchoolBusiness) IBOLookup.getServiceInstance(iwac,AfterSchoolBusiness.class);
 	}
 
-	private CheckBusiness getCheckBusiness(IWApplicationContext iwac) throws RemoteException {
-		return (CheckBusiness) IBOLookup.getServiceInstance(iwac, CheckBusiness.class);
-	}
+//	private CheckBusiness getCheckBusiness(IWApplicationContext iwac) throws RemoteException {
+//		return (CheckBusiness) IBOLookup.getServiceInstance(iwac, CheckBusiness.class);
+//	}
 	/* (non-Javadoc)
 	 * @see se.idega.idegaweb.commune.presentation.CommuneBlock#localize(java.lang.String, java.lang.String)
 	 */

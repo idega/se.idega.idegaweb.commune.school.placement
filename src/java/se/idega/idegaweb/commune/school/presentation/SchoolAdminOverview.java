@@ -1334,6 +1334,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		long currentTime = new Date().getTime();
 
 		DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+		startDate.setToDisplayDayLast(true);
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_STARTDATE)) {
 			startDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_STARTDATE));
 		}
@@ -1343,6 +1344,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(startDate, 2, row++);
 
 		DateInput endDate = new DateInput(PARAMETER_RESOURCE_ENDDATE);
+		endDate.setToDisplayDayLast(true);
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_ENDDATE)) {
 			endDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_ENDDATE));
 		}
@@ -1414,6 +1416,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		// *** Enddate ***
 		DateInput endDate = new DateInput(PARAMETER_RESOURCE_ENDDATE);
+		endDate.setToDisplayDayLast(true);
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_ENDDATE)) {
 			endDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_ENDDATE));
 		}

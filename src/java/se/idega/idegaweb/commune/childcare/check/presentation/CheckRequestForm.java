@@ -274,7 +274,15 @@ public class CheckRequestForm extends CommuneBlock {
         123, //Child id
         1, //Method
         2800, //Amount
-        1200); // Check fee
+        1200,
+        1, //Admin id
+        "", //Notes
+        false, //Rule 1
+        false, //Rule 2
+        false, //Rule 3
+        false, //Rule 4
+        false //Rule 5
+        ); // Check fee
 
     if(this.formResponsePage!=null){
       iwc.forwardToIBPage(getParentPage(), this.formResponsePage);

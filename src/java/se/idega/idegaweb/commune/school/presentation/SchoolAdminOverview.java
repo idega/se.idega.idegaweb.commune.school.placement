@@ -29,6 +29,7 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.util.PIDChecker;
 
+import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
@@ -1380,7 +1381,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String date = iwc.getParameter(PARAMETER_DATE);
             
 			IWTimestamp stamp = new IWTimestamp(date);
-			SchoolClassMember member = getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, _schoolYearID, stamp.getTimestamp(), ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
+			int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(_schoolClassID);
+			SchoolClassMember member = getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, _schoolYearID, schoolTypeID, stamp.getTimestamp(), ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
 			getSchoolCommuneBusiness(iwc).setStudentAsSpeciallyPlaced(member);
 			getSchoolCommuneBusiness(iwc).setNeedsSpecialAttention(member, getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID()), true);
 			if (_choiceID != -1)
@@ -1509,7 +1511,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	
 	private void addStudent(IWContext iwc) throws RemoteException {
 		if (_userID != -1) {
-			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), getSchoolCommuneSession(iwc).getSchoolYearID(),  new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), iwc.getParameter(PARAMETER_COMMENT));
+			int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolCommuneSession(iwc).getSchoolClassID());            
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), getSchoolCommuneSession(iwc).getSchoolYearID(),  schoolTypeID, new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), iwc.getParameter(PARAMETER_COMMENT));
 			getParentPage().setParentToRedirect(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 			getParentPage().close();
 		}
@@ -1521,8 +1524,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		try {
 			User user = getUserBusiness(iwc).createSpecialCitizenByPersonalIDIfDoesNotExist(searchString,null,null,searchString);
 			_userID = ((Integer) user.getPrimaryKey()).intValue();
-            
-			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), getSchoolCommuneSession(iwc).getSchoolYearID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+			int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolCommuneSession(iwc).getSchoolClassID());            
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), getSchoolCommuneSession(iwc).getSchoolYearID(), schoolTypeID, new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
 			_method = METHOD_EDIT_STUDENT;
 		}
 		catch (CreateException ce) {
@@ -1783,7 +1786,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
 	}
-    
+	
+	private SchoolBusiness getSchoolBusiness(IWContext iwc) throws RemoteException {
+		return (SchoolBusiness) IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
+	}
+     
 	private CommuneUserBusiness getCommuneUserBusiness(IWContext iwc) throws RemoteException {
 		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}

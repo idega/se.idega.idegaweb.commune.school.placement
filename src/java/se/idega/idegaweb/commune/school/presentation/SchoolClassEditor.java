@@ -926,7 +926,13 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		boolean hasComment = false;
 		boolean showComment = false;
 
-		List formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
+		List formerStudents = null;
+		if (!isSubGroup) {
+			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
+		}
+		else {
+			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findSubGroupPlacements(newSchoolClass));
+		}
 
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
@@ -1269,7 +1275,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (choice != null) {
 					getBusiness().getSchoolChoiceBusiness().setAsPreliminary(choice, iwc.getCurrentUser());
 				}
-				getBusiness().removeSubGroupPlacements(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
 			}
 		}
 	}

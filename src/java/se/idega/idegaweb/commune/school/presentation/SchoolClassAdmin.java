@@ -146,19 +146,20 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		int row = 1;
 
 		if (_group.getIsSubGroup()) {
-			Table addTable = new Table(3,1);
+			Table addTable = new Table(3, 1);
 			addTable.setCellpadding(0);
 			addTable.setCellspacing(0);
 			addTable.setWidth(2, "4");
 			table.add(addTable, 1, row++);
-	
+
 			Link addLink = new Link(getEditIcon(localize("school.add_student", "Add student")));
 			addLink.setWindowToOpen(SchoolAdminWindow.class);
 			addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
 			addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 			addTable.add(addLink, 1, 1);
-			
-			Link addLinkText = getSmallLink(localize("school.add_student", "Add student")); addLinkText.setWindowToOpen(SchoolAdminWindow.class);
+
+			Link addLinkText = getSmallLink(localize("school.add_student", "Add student"));
+			addLinkText.setWindowToOpen(SchoolAdminWindow.class);
 			addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
 			addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 			addTable.add(addLinkText, 3, 1);
@@ -190,11 +191,17 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		boolean showComment = false;
 		boolean showNotStarted = false;
 		boolean showHasTermination = false;
-		
+
 		IWTimestamp stamp = new IWTimestamp();
 		IWTimestamp startDate;
 
-		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
+		List students = null;
+		if (!_group.getIsSubGroup()) {
+			students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
+		}
+		else {
+			students = new ArrayList(getBusiness().getSchoolBusiness().findSubGroupPlacements(_group));
+		}
 
 		if (!students.isEmpty()) {
 			numberOfStudents = students.size();
@@ -212,7 +219,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				hasComment = studentMember.getNotes() != null;
 				notStarted = false;
 				hasTerminationDate = false;
-				
+
 				if (studentMember.getRegisterDate() != null) {
 					startDate = new IWTimestamp(studentMember.getRegisterDate());
 					if (startDate.isLaterThan(stamp)) {
@@ -229,8 +236,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				 * "Click to remove student from
 				 * group")),"delete_student_"+String.valueOf(new
 				 * Integer(studentMember.getClassMemberId())));
-				 * delete.setDescription(localize("school.delete_from_group",
-				 * "Click to remove student from group"));
+				 * delete.setDescription(localize("school.delete_from_group", "Click to
+				 * remove student from group"));
 				 * delete.setValueOnClick(PARAMETER_STUDENT_ID,
 				 * String.valueOf(studentMember.getClassMemberId()));
 				 * delete.setValueOnClick(PARAMETER_METHOD,
@@ -252,9 +259,11 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
-				}	else if (hasSpecialPlacement) {
+				}
+				else if (hasSpecialPlacement) {
 					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
-				}	else if (hasChoice) {
+				}
+				else if (hasChoice) {
 					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				}
 				else {
@@ -394,8 +403,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 	}
 
 	/**
-	 * Turns on/off view of radiobuttons for showing BUN administrated shools
-	 * or not
+	 * Turns on/off view of radiobuttons for showing BUN administrated shools or
+	 * not
 	 * 
 	 * @param show
 	 */

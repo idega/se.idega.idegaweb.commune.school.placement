@@ -1070,7 +1070,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				move.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
 				move.setParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
-				String name = student.getNameLastFirst(true);
+				//String name = student.getNameLastFirst(true);
+				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
 
 				if (useStyleNames()) {

@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/24 20:06:54 $ by $Author: goranb $
- * @version $Revision: 1.45 $
+ * Last modified: $Date: 2003/12/02 14:30:05 $ by $Author: goranb $
+ * @version $Revision: 1.46 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1518,6 +1518,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
+		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_RESOURCE_PERMISSION, 
+																  SchoolAdminOverview.PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN);
 		if (plc.getRemovedDate() != null)
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
 	}

@@ -10,8 +10,6 @@ import java.util.Iterator;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
-import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 
 import com.idega.business.IBOLookup;
@@ -26,8 +24,6 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
-import com.idega.presentation.ui.SubmitButton;
-import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
 
@@ -43,24 +39,24 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	public static final String PARAMETER_ACTION = "sch_action";
 	
 	private int action = 0;
-	private int method = 0;
+	//private int method = 0;
 	private String sortStudentsBy = "c.QUEUE_DATE";
 	private String sortChoicesBy = "";
-	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
-	private int sortPlacedUnplacedBy = -1;
+	//private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
+	//private int sortPlacedUnplacedBy = -1;
 
 	
 	
-	private String searchString = "";
-	private boolean searchEnabled = true;
+	//private String searchString = "";
+	//private boolean searchEnabled = true;
 	
 	
-	private final String PARAMETER_METHOD = "sch_method";
-	private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
-	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
+	//private final String PARAMETER_METHOD = "sch_method";
+	//private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
+	//private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
 	private final String PARAMETER_SORT = "sch_choice_sort";
-	private final String PARAMETER_SORT_PLACED = "sch_choice_sort_placed";
-	private final String PARAMETER_SEARCH = "scH_choise_search";	
+	//private final String PARAMETER_SORT_PLACED = "sch_choice_sort_placed";
+	//private final String PARAMETER_SEARCH = "scH_choise_search";	
 	
 	private final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
@@ -88,13 +84,13 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	
 	}
 	
-	private void parseAction(IWContext iwc) throws RemoteException {
+	private void parseAction(IWContext iwc) {
 		//isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
 
-		if (iwc.isParameterSet(PARAMETER_METHOD))
+		/*if (iwc.isParameterSet(PARAMETER_METHOD))
 			method = Integer.parseInt(iwc.getParameter(PARAMETER_METHOD));
 		else
-			method = 0;
+			method = 0;*/
 
 		if (iwc.isParameterSet(PARAMETER_ACTION))
 			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
@@ -169,10 +165,10 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	
 	
 	
-	private Collection getApplicationCollection(IWApplicationContext iwac) throws RemoteException {
+	/*private Collection getApplicationCollection(IWApplicationContext iwac) throws RemoteException {
 		Collection applications = getAfterSchoolBusiness(iwac).findChoicesByProvider(getSession().getChildCareID());
 		return applications;
-	}
+	}*/
 
 	
 	///malin
@@ -181,7 +177,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		return applications;
 	}
 	
-	protected Form getSearchAndSortTable() throws RemoteException {
+	protected Form getSearchAndSortTable() {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
 		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
@@ -355,6 +351,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	}
 	
 	public void setSearchEnabled(boolean searchEnabled) {
-		this.searchEnabled = searchEnabled;
+		if (searchEnabled) {
+			
+		}
+		//this.searchEnabled = searchEnabled;
 	}
 }

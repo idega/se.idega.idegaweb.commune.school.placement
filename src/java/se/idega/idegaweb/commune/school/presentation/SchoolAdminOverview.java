@@ -25,7 +25,6 @@ import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.accounting.resource.data.ResourcePermission;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -509,13 +508,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 			boolean showChangePlacementDate = false;
 			boolean isPlaced = false;
 			School oldSchool = null;
-			int oldSchoolId = -1;
+			//int oldSchoolId = -1;
 			SchoolClassMember schClMem = null;
 			SchoolClassMember preSchoolClMem = null;
 			String language = null;
 			SchoolYear schoolYear = null;
 			String schoolClass = null;
-			SchoolChoiceBusiness schBuiz;
+			//SchoolChoiceBusiness schBuiz;
 			int previousSeasonId = -1;
 			SchoolSeason preSchoolseason = null;
 			boolean started = false;
@@ -589,7 +588,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 							table.add(new Break(), 2, row);
 						if (oldSchool == null){
 							oldSchool = choice.getCurrentSchool();
-							oldSchoolId = choice.getCurrentSchoolId();
+							//oldSchoolId = choice.getCurrentSchoolId();
 						}
 						if (message == null)
 							message = choice.getMessage();
@@ -902,7 +901,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			email = mail.getEmailAddress();
 
 		String workphone = "";
-		Collection phones = null;
+		//Collection phones = null;
 		try {
 			Phone phone = getUserBusiness(iwc).getUsersWorkPhone(user);
 			workphone = phone.getNumber();

@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/01/08 14:39:53 $ by $Author: goranb $
- * @version $Revision: 1.62 $
+ * Last modified: $Date: 2004/01/15 15:21:27 $ by $Author: goranb $
+ * @version $Revision: 1.63 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -229,7 +229,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public void main(IWContext iwc) throws Exception {
 		iwrb = getResourceBundle(iwc);
 		form = new Form();
-		form.setName(FORM_NAME);	
+		form.setName(FORM_NAME);
+		
 		// Parameter name returning chosen User from SearchUserModule
 		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
 
@@ -253,8 +254,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//String uniqueStr = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
 		
 		
-		// Process search to get child (User object)
-		processSearch(iwc);
+		//Get child (User object) from search result param or session attribute
+		getSearchResult(iwc);
 
 		// Perform actions according the _action input parameter
 		switch (_action) {
@@ -346,8 +347,21 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		col = 1;
 		row++;
+		
 		// User search module - configure and add 
-		table.add(getSearchUserModule(iwc), col++, row);
+		SearchUserModule searchModule = getSearchUserModule(iwc);
+		try {
+			// if one user found, set session attribute directly
+			searchModule.process(iwc);
+			User oneChild = searchModule.getUser();
+			if (oneChild != null) {
+				iwc.getSession().setAttribute(SESSION_KEY_CHILD, oneChild);
+			}
+		} catch (Exception e) {}		
+		table.add(searchModule, col++, row);
+		
+		// Get current pupil from session attribute
+		child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);		
 		
 		return table;
 	}
@@ -390,12 +404,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 		pupilTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
 		table.add(pupilTxt, col++, row);
 		table.setRowHeight(row, rowHeight);
-		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
-
-		// BUTTON Search new child 
-		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_SEARCH, "Search"),
-							PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
-		table.setAlignment(5,row, Table.HORIZONTAL_ALIGN_RIGHT);*/
 		row++;
 		col = 1;
 		// Personal Id Number
@@ -820,12 +828,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 			}
 		}
 
-/*		row++;
-		col = 2;
-		table.add(transGIF, col, row); // EMPTY SPACE ROW
-		table.setRowHeight(row, "10");
-*/
-
 		row++;
 		col = 1;
 		//  input
@@ -859,11 +861,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 		row++;
 		col = 1;
 		
-	/*	table.add(transGIF, col, row); // EMPTY SPACE ROW
-		table.setRowHeight(row, "10");
-		row++;
-		col = 1;
-*/
 		// Resource
 		table.add(getSmallHeader(localize(KEY_RESOURCE_LABEL, "Resource: ")), col++, row);
 		//  Resource input checkboxes
@@ -1127,7 +1124,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	 * session for further use. So here the User session bean is renew if uniqueuserSearchParam is set.
 	 * @param iwc Request object context
 	 */
-	public void processSearch(IWContext iwc) {
+	public void getSearchResult(IWContext iwc) {
 		if (iwc.isParameterSet(uniqueUserSearchParam)) {
 			Integer userID = Integer.valueOf(iwc.getParameter(uniqueUserSearchParam));
 			try {
@@ -1147,12 +1144,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 		searcher.setShowMiddleNameInSearch(false);
 		searcher.setOwnFormContainer(false);
 		searcher.setUniqueIdentifier(UNIQUE_SUFFIX);
-		searcher.setSkipResultsForOneFound(false);
+		searcher.setSkipResultsForOneFound(true);
 		searcher.setHeaderFontStyleName(getStyleName(STYLENAME_SMALL_HEADER));
 		searcher.setButtonStyleName(getStyleName(STYLENAME_INTERFACE_BUTTON));
 		searcher.setPersonalIDLength(12);
 		searcher.setFirstNameLength(15);
 		searcher.setLastNameLength(20);
+		searcher.setShowSearchParamsAfterSearch(false);
 
 		String prmChild = SearchUserModule.getUniqueUserParameterName("child");
 		if (iwc.isParameterSet(prmChild)) {

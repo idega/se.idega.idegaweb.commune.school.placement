@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/01/05 13:34:46 $ by $Author: goranb $
- * @version $Revision: 1.59 $
+ * Last modified: $Date: 2004/01/05 13:43:07 $ by $Author: goranb $
+ * @version $Revision: 1.60 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -136,6 +136,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public static final String KEY_NEW_PLACEMENT = KP + "new_placement";
 	public static final String KEY_NEW_PLACEMENT_FOR = KP + "new_placement_for";
 	public static final String KEY_START_DATE = KP + "start_date";
+	public static final String KEY_STUDY_PATH = KP + "study_path";
 	
 		// Button keys
 //	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -593,7 +594,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 						if (latestPl.getStudyPathId() != -1) {
 							SchoolStudyPathHome  home = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
 							SchoolStudyPath sp = home.findByPrimaryKey(new Integer(latestPl.getStudyPathId()));
-							buf.append(", " + localize(KEY_STUDY_PATH_LABEL, "Study path") + sp.getCode());
+							buf.append(", " + localize(KEY_STUDY_PATH, "Study path") + " "+ sp.getCode());
 						}
 					} catch (Exception e) {}
 

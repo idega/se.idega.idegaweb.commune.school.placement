@@ -2,34 +2,27 @@ package se.idega.idegaweb.commune.childcare.check.presentation;
 
 import is.idega.idegaweb.member.business.MemberFamilyLogic;
 
-import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 
-import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
-import com.idega.block.school.business.SchoolBusiness;
-import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolType;
-import com.idega.builder.data.IBPage;
 import com.idega.core.data.Address;
 import com.idega.core.data.PostalCode;
 import com.idega.presentation.ExceptionWrapper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
-import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
-import com.idega.presentation.ui.TextInput;
 import com.idega.user.Converter;
 import com.idega.user.data.User;
 
@@ -44,12 +37,12 @@ import com.idega.user.data.User;
 
 public class CheckRequestForm extends CommuneBlock {
 
-	private final static String IW_BUNDLE_IDENTIFIER = "se.idega.idegaweb.commune.childcare.check";
+	//private final static String IW_BUNDLE_IDENTIFIER = "se.idega.idegaweb.commune.childcare.check";
 
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_FORM_SUBMITTED = 2;
 
-	private final static String PARAM_VIEW_FORM = "chk_view_form";
+	//private final static String PARAM_VIEW_FORM = "chk_view_form";
 	private final static String PARAM_FORM_SUBMITTED = "chk_form_submit";
 	private final static String PARAM_MOTHER_TONGUE_MOTHER_CHILD = "chk_mt_mc";
 	private final static String PARAM_MOTHER_TONGUE_FATHER_CHILD = "chk_mt_fc";
@@ -58,25 +51,25 @@ public class CheckRequestForm extends CommuneBlock {
 	private final static String PARAM_WORK_SITUATION = "chk_ws_";
 	private final static String PARAM_WORK_SITUATION_1 = "chk_ws_1";
 	private final static String PARAM_WORK_SITUATION_2 = "chk_ws_2";
-	private final static String PARAM_PROVIDER = "cca_provider";
+	//private final static String PARAM_PROVIDER = "cca_provider";
 	
 	private final static String PARAM_CHILDCARE_THIS = "ccs_childcare_this";
 	private final static String PARAM_CHILDCARE_OTHER = "ccs_childcare_other";
 
 	private boolean isError = false;
 	private String errorMessage = null;
-	private boolean paramErrorMotherTongueMC = false;
-	private boolean paramErrorMotherTongueFC = false;
-	private boolean paramErrorMotherTongueP = false;
+	//private boolean paramErrorMotherTongueMC = false;
+	//private boolean paramErrorMotherTongueFC = false;
+	//private boolean paramErrorMotherTongueP = false;
 	private boolean paramErrorChildCateType = false;
 	private boolean paramErrorWorkSituation1 = false;
 	private boolean paramErrorWorkSituation2 = false;
 
-	private IBPage formResponsePage = null;
+	//private IBPage formResponsePage = null;
 	private User child;
 	
 	private boolean _createChoices = false;
-	private int[] providerIDs = { -1, -1, -1 };
+	//private int[] providerIDs = { -1, -1, -1 };
 
 	public CheckRequestForm() {}
 
@@ -404,6 +397,7 @@ public class CheckRequestForm extends CommuneBlock {
 		return custodianTable;
 	}
 
+	/* Commented out since it is never used...
 	private Table getMotherTongueTable(IWContext iwc) {
 		Table motherTongueTable = new Table();
 		motherTongueTable.setCellpadding(2);
@@ -440,7 +434,9 @@ public class CheckRequestForm extends CommuneBlock {
 
 		return motherTongueTable;
 	}
+	*/
 
+	/* Commented out since it is never used...
 	private Table getProviderTable(IWContext iwc) throws RemoteException {
 		Table providersTable = new Table();
 		providersTable.setCellpadding(2);
@@ -463,7 +459,9 @@ public class CheckRequestForm extends CommuneBlock {
 
 		return providersTable;
 	}
+	*/
 	
+	/* Commented out since it is never used...
 	private TextInput getMotherToungeInput(IWContext iwc, String parameterName) {
 		TextInput input = new TextInput(parameterName);
 		input.setAsNotEmpty(localize(parameterName,parameterName + "- Can not be empty"));
@@ -473,6 +471,7 @@ public class CheckRequestForm extends CommuneBlock {
 		}
 		return (TextInput) getStyledInterface(input);
 	}
+	*/
 
 	private DropdownMenu getWorkSituationMenu(IWContext iwc, String parameterName) {
 		DropdownMenu workSituationChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(parameterName));
@@ -488,23 +487,20 @@ public class CheckRequestForm extends CommuneBlock {
 		return (DropdownMenu) getStyledInterface(workSituationChoice);
 	}
 
-	private DropdownMenu getProviderDrop(String name, Collection providers) {
-//		try {
-			DropdownMenu drp = (DropdownMenu) getStyledInterface(new DropdownMenu(name));
-			drp.setAsNotEmpty(localize("check.incomplete_providers","Must fill out all providers"), "-1");
-			drp.addMenuElement("-1", localize("cca_provider", "Provider"));
-			Iterator iter = providers.iterator();
-			while (iter.hasNext()) {
-				School provider = (School) iter.next();
-				drp.addMenuElement(provider.getPrimaryKey().toString(), provider.getName());
-			}
+	/* Commented out since it is never used...
+	private DropdownMenu getProviderDrop(String name, Collection providers) {//		try {
+		DropdownMenu drp = (DropdownMenu) getStyledInterface(new DropdownMenu(name));
+		drp.setAsNotEmpty(localize("check.incomplete_providers","Must fill out all providers"), "-1");
+		drp.addMenuElement("-1", localize("cca_provider", "Provider"));
+		Iterator iter = providers.iterator();
+		while (iter.hasNext()) {
+			School provider = (School) iter.next();
+			drp.addMenuElement(provider.getPrimaryKey().toString(), provider.getName());
+		}
 
-			return drp;
-//		}
-//		catch (java.rmi.RemoteException e) {
-//			return null;
-//		}
+		return drp;
 	}
+	*/
 	
 	private Table getChildCareTable(IWContext iwc) {
 		Table childcareTable = new Table();
@@ -538,14 +534,17 @@ public class CheckRequestForm extends CommuneBlock {
 		return (MemberFamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, MemberFamilyLogic.class);
 	}
 
+	/* Commented out since it is never used...
 	private ChildCareBusiness getChildCareBusiness(IWContext iwc) throws Exception {
 		return (ChildCareBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
 	}
+	*/
 
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws Exception {
 		return (SchoolCommuneBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
 	}
 
+	/* Commented out since it is never used...
 	private Collection getProviders(IWContext iwc, String category) {
 		try {
 			SchoolBusiness sBuiz = (SchoolBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
@@ -557,6 +556,7 @@ public class CheckRequestForm extends CommuneBlock {
 
 		return null;
 	}
+	/*
 
 	/**
 	 * Returns the createChoices.

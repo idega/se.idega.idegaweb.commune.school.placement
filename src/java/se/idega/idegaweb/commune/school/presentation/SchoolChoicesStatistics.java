@@ -18,7 +18,6 @@ import se.idega.util.PIDChecker;
 
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolYear;
-import com.idega.business.IBOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.PresentationObject;
 import com.idega.presentation.Table;
@@ -27,7 +26,6 @@ import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.TextInput;
-import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
 import com.idega.util.IWCalendar;
 import com.idega.util.PersonalIDFormatter;
@@ -35,18 +33,12 @@ import com.idega.util.text.TextSoap;
 
 /**
  * @author laddi
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
  */
 public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 
 	private final String PARAMETER_SORT = "sch_choice_sort";
 	private final String PARAMETER_SEARCH = "scH_choise_search";
 	private final String PARAMETER_CURRENT_APPLICATION_PAGE = "sch_crrap_pg";
-	private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
 
 	private int applicationsPerPage = 10;
 	private int sortChoicesBy = SchoolChoiceComparator.NAME_SORT;
@@ -317,10 +309,6 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 		}
 		
 		return navigationTable;
-	}
-
-	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
-		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
 	}
 
 	protected Table getChoiceHeader() throws RemoteException {

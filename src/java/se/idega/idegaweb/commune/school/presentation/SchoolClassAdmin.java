@@ -230,7 +230,10 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
 				link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());        
-        link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_MEMBER_ID, ((Integer) studentMember.getPrimaryKey()).toString());
+        link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, ((Integer) studentMember.getPrimaryKey()).toString());
+        if (studentMember.getRemovedDate() != null)
+          link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, studentMember.getRemovedDate().toString());
+         
 
 				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);

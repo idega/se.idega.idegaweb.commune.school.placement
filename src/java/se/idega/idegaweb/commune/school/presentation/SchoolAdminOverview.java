@@ -16,8 +16,12 @@ import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.accounting.resource.business.ClassMemberException;
+import se.idega.idegaweb.commune.accounting.resource.business.DateException;
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
+import se.idega.idegaweb.commune.accounting.resource.business.ResourceException;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
+import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
+import se.idega.idegaweb.commune.accounting.resource.data.ResourcePermission;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
@@ -25,7 +29,6 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.util.PIDChecker;
 
-import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
@@ -39,7 +42,6 @@ import com.idega.core.data.Address;
 import com.idega.core.data.Email;
 import com.idega.core.data.Phone;
 import com.idega.core.data.PostalCode;
-import com.idega.data.IDOQuery;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -90,15 +92,18 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_COMMENT = "sch_comment";
 	public static final String PARAMETER_SCHOOL_CLASS_ID = "sch_class_id";
   public static final String PARAMETER_RESOURCE_ID = "cacc_resource_id";
+  public static final String PARAMETER_RESOURCE_NAME = "sch_resource_name";
   public static final String PARAMETER_RESOURCE_STARTDATE = "resource_startdate";  // by Göran Borgman 09.09.2003
   public static final String PARAMETER_RESOURCE_ENDDATE = "resource_enddate";       // by Göran Borgman 09.09.2003
   public static final String PARAMETER_RESOURCE_SEASON = "school_choice_season";   // by Göran Borgman 14.09.2003
   public static final String PARAMETER_RESOURCE_STUDENT = "resource_student";    // by Göran Borgman 14.09.2003
   public static final String PARAMETER_RESOURCE_CLASS_MEMBER = "resource_school_member";    // by Göran Borgman 14.09.2003
   public static final String PARAMETER_RESOURCE_CHOICE_STATUS = "resource_school_choice_status";  // by Göran Borgman 14.09.2003
-  public static final String PARAMETER_RESOURCE_BEAN_INIT = "set_resource_java_bean";  
+  public static final String PARAMETER_DELETE_RESOURCE_PLACEMENT = "delete_resource_placement"; // by Göran Borgman 17.09.2003
+  //public static final String PARAMETER_RESOURCE_BEAN_INIT = "set_resource_java_bean";  
   public static final String PARAMETER_SCHOOL_MEMBER_ID = "sch_member_id";
-  public static final String PARAMETER_SCHOOL_CLASS_MEMBER_ID = "sch_school_member_id"; //  // by Göran Borgman 14.09.2003
+  public static final String PARAMETER_SCHOOL_CLASS_MEMBER_ID = "sch_class_member_id"; //  // by Göran Borgman 14.09.2003
+  public static final String PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE = "sch_class_member_removed";
   public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
 	public static final int METHOD_REPLACE = 3;
@@ -111,6 +116,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_CHANGE_PLACEMENT_DATE = 10;
   public static final int METHOD_LIST_RESOURCES = 11;  // by Göran Borgman 09.09.2003
   public static final int METHOD_NEW_RESOURCE = 12;    // by Göran Borgman 09.09.2003
+  public static final int METHOD_FINISH_RESOURCE = 13;  // by Göran Borgman 09.09.2003
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
@@ -123,6 +129,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int ACTION_CREATE_STUDENT = 9;
 	public static final int ACTION_CHANGE_PLACEMENT_DATE = 10;
   public static final int ACTION_SAVE_RESOURCE = 11;  // by Göran Borgman 09.09.2003
+  public static final int ACTION_DELETE_RESOURCE = 12;  // by Göran Borgman 17.09.2003
+  public static final int ACTION_FINISH_RESOURCE = 13;  // by Göran Borgman 17.09.2003
 
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -156,6 +164,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private CloseButton close;
 	private String searchString;
+  private String resourceErrorMsg;
 
 	private int _pageID;
 	private Form form;
@@ -199,7 +208,17 @@ public class SchoolAdminOverview extends CommuneBlock {
 				changePlacementDate(iwc);
 				break;
       case ACTION_SAVE_RESOURCE :
-        saveResource(iwc);
+        resourceErrorMsg = saveResource(iwc);
+        if (resourceErrorMsg != null) 
+          _method = METHOD_NEW_RESOURCE;
+        break;
+      case ACTION_DELETE_RESOURCE :
+        deleteResource(iwc);
+        break;
+      case ACTION_FINISH_RESOURCE :
+        resourceErrorMsg = finishResource(iwc);
+        if (resourceErrorMsg != null)
+          _method = METHOD_FINISH_RESOURCE;
         break;
 		}
 
@@ -243,52 +262,56 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		switch (_method) {
 			case METHOD_OVERVIEW :
-				headerTable.add(getHeader(localize("school.student_overview", "Student overview")));
-				contentTable.add(getOverview(iwc));
+				headerTable.add(getHeader(localize("school.student_overview", "Student overview")), 1, 1);
+				contentTable.add(getOverview(iwc), 1, 1);
 				break;
 			case METHOD_REJECT :
-				headerTable.add(getHeader(localize("school.reject_student", "Reject student")));
-				contentTable.add(getRejectForm(iwc));
+				headerTable.add(getHeader(localize("school.reject_student", "Reject student")), 1, 1);
+				contentTable.add(getRejectForm(iwc), 1, 1);
 				break;
 			case METHOD_REPLACE :
-				headerTable.add(getHeader(localize("school.student_replacing", "Replace student")));
-				contentTable.add(getReplaceForm(iwc));
+				headerTable.add(getHeader(localize("school.student_replacing", "Replace student")), 1, 1);
+				contentTable.add(getReplaceForm(iwc), 1, 1);
 				break;
 			case METHOD_MOVE :
-				headerTable.add(getHeader(localize("school.student_move", "Move student")));
-				contentTable.add(getMoveForm(iwc));
+				headerTable.add(getHeader(localize("school.student_move", "Move student")), 1, 1);
+				contentTable.add(getMoveForm(iwc), 1, 1);
 				break;
 			case METHOD_MOVE_GROUP :
-				headerTable.add(getHeader(localize("school.student_move_group", "Move student to group")));
-				contentTable.add(getMoveGroupForm(iwc));
+				headerTable.add(getHeader(localize("school.student_move_group", "Move student to group")), 1, 1);
+				contentTable.add(getMoveGroupForm(iwc), 1, 1);
 				break;
 			case METHOD_MOVE_YEAR :
-				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice")));
-				contentTable.add(getMoveYearForm(iwc));
+				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice")), 1, 1);
+				contentTable.add(getMoveYearForm(iwc), 1, 1);
 				break;
 			case METHOD_FINALIZE_GROUP :
-				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group")));
-				contentTable.add(getFinalizeGroupForm(iwc));
+				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group")), 1, 1);
+				contentTable.add(getFinalizeGroupForm(iwc), 1, 1);
 				break;
 			case METHOD_EDIT_STUDENT :
-				headerTable.add(getHeader(localize("school.edit_student", "Edit student")));
-				contentTable.add(getEditStudentForm(iwc));
+				headerTable.add(getHeader(localize("school.edit_student", "Edit student")), 1, 1);
+				contentTable.add(getEditStudentForm(iwc), 1, 1);
 				break;
 			case METHOD_ADD_STUDENT :
-				headerTable.add(getHeader(localize("school.add_student", "Add student")));
-				contentTable.add(getAddStudentForm(iwc));
+				headerTable.add(getHeader(localize("school.add_student", "Add student")), 1, 1);
+				contentTable.add(getAddStudentForm(iwc), 1, 1);
 				break;
 			case METHOD_CHANGE_PLACEMENT_DATE :
-				headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date")));
-				contentTable.add(getChangePlacementDateForm(iwc));
+				headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date")), 1, 1);
+				contentTable.add(getChangePlacementDateForm(iwc), 1, 1);
 				break;
       case METHOD_LIST_RESOURCES :
-        headerTable.add(getHeader(localize("school.resources.current", "Current Resources")));
-        contentTable.add(getResourceList(iwc));
+        headerTable.add(getHeader(localize("school.resources.current", "Current Resources")), 1, 1);
+        contentTable.add(getResourceList(iwc), 1, 1);
         break;
       case METHOD_NEW_RESOURCE :
-        headerTable.add(getHeader(localize("school.resources.new", "New Resource")));
-        contentTable.add(getResourceForm(iwc));
+        headerTable.add(getHeader(localize("school.resources.new", "New Resource")), 1, 1);
+        contentTable.add(getResourceForm(iwc), 1, 1);
+        break;
+      case METHOD_FINISH_RESOURCE :
+        headerTable.add(getHeader(localize("school.resources.finish", "Finish Resource")), 1, 1);
+        contentTable.add(getFinishResourceForm(iwc), 1, 1);
         break;
 		}
 		
@@ -297,6 +320,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private Table getOverview(IWContext iwc) throws RemoteException {
 		Table table = new Table();
+    table.setBorder(0);
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
@@ -461,6 +485,39 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 				row++;
 			}
+      
+      // *** Resources START ***
+      Integer providerGrpID = getProviderGrpId(iwc);
+      Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
+      // Add resource label
+      table.add(getSmallHeader(localize("school.resources", "Resources")), 1, row);
+      if (rscColl.size() == 0)
+        row++;
+      // Loop resources
+      for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
+        ResourceClassMember mbr = (ResourceClassMember) iter.next();
+        int rscId = mbr.getResourceFK();
+        Resource rsc = getResourceBusiness(iwc).getResourceByPrimaryKey(new Integer(rscId));
+        ResourcePermission perm = getResourceBusiness(iwc).getRscPermByRscAndGrpId((Integer) rsc.getPrimaryKey(), providerGrpID);
+     
+       // Show resource row only if a provider permission with view rights exists 
+        if (perm != null && perm.getPermitViewResource()) {
+          Date startDate = mbr.getStartDate();
+          Date endDate = mbr.getEndDate();
+          // Build resource name date String
+          StringBuffer buf = new StringBuffer();
+          buf.append(rsc.getResourceName() + " (");
+          if (startDate != null)
+            buf.append(startDate.toString());
+          buf.append(" - ");
+          if (endDate != null)
+            buf.append(endDate.toString());
+          buf.append(")");
+          table.add(getSmallText(buf.toString()), 2, row);
+          row++;
+        }
+      }            
+      //*** Resources END ***
 
 			table.setColumnVerticalAlignment(1, Table.VERTICAL_ALIGN_TOP);
 			table.mergeCells(1, row, table.getColumns(), row);
@@ -572,7 +629,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_REPLACE)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_REPLACE)), 1, 1);
 		int row = 1;
 
 		User user = getUserBusiness(iwc).getUser(_userID);
@@ -629,7 +686,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE)), 1, 1);
 		int row = 1;
 
 		User user = getUserBusiness(iwc).getUser(_userID);
@@ -706,11 +763,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_GROUP)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_GROUP)), 1, 1);
 		//table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
-		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)), 1, 1);
 		if (_showNoChoices)
-			table.add(new HiddenInput(PARAMETER_SHOW_NO_CHOICES, "true"));
+			table.add(new HiddenInput(PARAMETER_SHOW_NO_CHOICES, "true"), 1, 1);
 		int row = 1;
 
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
@@ -733,8 +790,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
-		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_YEAR)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_YEAR)), 1, 1);
 		int row = 1;
 
 		table.add(getSmallHeader(localize("school.move_year_info", "Select the new year for the student and click 'Move'.")), 1, row++);
@@ -761,9 +818,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_FINALIZE_GROUP)));
-		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_FINALIZE_GROUP)));
-		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_FINALIZE_GROUP)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_FINALIZE_GROUP)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)), 1, 1);
 		int row = 1;
 
 		String subject = null;
@@ -822,10 +879,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
-		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_STUDENT)));
-		table.add(new HiddenInput(PARAMETER_USER_ID, String.valueOf(_userID)));
-		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_EDIT_STUDENT)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_USER_ID, String.valueOf(_userID)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)), 1, 1);
 		int row = 1;
 
 		User user = getUserBusiness(iwc).getUser(_userID);
@@ -894,8 +951,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
-		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_ADD_STUDENT)));
-		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)));
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_ADD_STUDENT)), 1, 1);
+		table.add(new HiddenInput(PARAMETER_PAGE_ID, String.valueOf(_pageID)), 1, 1);
 		int row = 1;
 
 		table.add(getSmallHeader(localize("commune.enter_search_string","Enter search string")+":"), 1, row);
@@ -996,7 +1053,7 @@ public class SchoolAdminOverview extends CommuneBlock {
   
   private Table getResourceList(IWContext iwc) throws RemoteException {
     Table table = new Table();
-    table.setBorder(1);
+    table.setBorder(0);
     table.setCellpadding(1);
     table.setCellspacing(2);
     table.setWidth(Table.HUNDRED_PERCENT);
@@ -1012,19 +1069,72 @@ public class SchoolAdminOverview extends CommuneBlock {
     table.add(getSmallHeader(localize("school.startdate", "Startdate")), 2, 1);
     table.add(getSmallHeader(localize("school.enddate", "Enddate")), 3, 1);
     table.add(getSmallHeader(localize("school.finish", "Finish")), 4, 1);
-    table.add(getSmallHeader(localize("school.remove", "Remove")), 5, 1);
+    table.add(getSmallHeader(localize("school.delete", "Delete")), 5, 1);
     table.addText(Text.NON_BREAKING_SPACE, 6, 1);
     table.setRowColor(1, getHeaderColor());
     table.setColor(6, 1, "#FFFFFF");
+    table.add(new HiddenInput(PARAMETER_ACTION, "-1"), 6, 1);
+    table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, "false"), 6, 1);
+    table.add(new HiddenInput(PARAMETER_DELETE_RESOURCE_PLACEMENT, "-1"), 6, 1);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_CLASS_MEMBER, "-1"), 6, 1);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_NAME, ""), 6, 1);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_STARTDATE, ""), 6, 1);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_ENDDATE, ""), 6, 1);
     table.setRowHeight(1, "7");
     
     // list resources
     int row = 2;
+    Integer providerGrpID = getProviderGrpId(iwc);
+    Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
+    SubmitButton finish;
+    SubmitButton delete;
 
-    SubmitButton newButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.new", "New"), PARAMETER_METHOD, String.valueOf(METHOD_NEW_RESOURCE)));
+   for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
+			ResourceClassMember mbr = (ResourceClassMember) iter.next();
+      int rscId = mbr.getResourceFK();
+      Resource rsc = getResourceBusiness(iwc).getResourceByPrimaryKey(new Integer(rscId));
+      ResourcePermission perm = getResourceBusiness(iwc).getRscPermByRscAndGrpId((Integer) rsc.getPrimaryKey(), providerGrpID);
+      // Row buttons
+     delete = new SubmitButton(getDeleteIcon(localize("school.delete_resource_placement", "Click to remove resource placement from student")), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES));
+     delete.setDescription(localize("school.delete_resource_placement", "Click to remove resource placement from student"));
+     delete.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_DELETE_RESOURCE));
+     delete.setValueOnClick(PARAMETER_DELETE_RESOURCE_PLACEMENT, mbr.getPrimaryKey().toString());
+     delete.setSubmitConfirm(localize("school.confirm_resource_placement_delete","Are you sure you want to delete this resource from the student?"));
 
-    newButton.setValueOnClick(PARAMETER_METHOD, "-1");
+     finish = new SubmitButton(getEditIcon(localize("school.finish_resource_placement", "Click to finish resource placement setting the end date")), PARAMETER_METHOD, String.valueOf(METHOD_FINISH_RESOURCE));
+     finish.setDescription(localize("school.finish_resource_placement", "Click to finish resource placement setting the end date"));
+     finish.setValueOnClick(PARAMETER_RESOURCE_CLASS_MEMBER, mbr.getPrimaryKey().toString());
+     finish.setValueOnClick(PARAMETER_RESOURCE_NAME, rsc.getResourceName());
+     finish.setValueOnClick(PARAMETER_RESOURCE_STARTDATE, mbr.getStartDate().toString());
+     if (mbr.getEndDate() != null)
+       finish.setValueOnClick(PARAMETER_RESOURCE_ENDDATE, mbr.getEndDate().toString());
+     
+     // Show resource row only if a provider permission with view rights exists 
+      if (perm != null && perm.getPermitViewResource()) {
+  			table.add(getSmallText(rsc.getResourceName()), 1, row);
+        Date startDate = mbr.getStartDate();
+        if (startDate != null)
+          table.add(getSmallText(startDate.toString()), 2, row);
+        Date endDate = mbr.getEndDate();
+        if (endDate != null)
+          table.add(getSmallText(endDate.toString()), 3, row);
+        table.add(finish, 4, row);
+        table.add(delete, 5, row);
+        if (row % 2 == 1)
+          table.setRowColor(row, getZebraColor1());
+        else
+          table.setRowColor(row, getZebraColor2());
+        table.setColor(6, row, "#FFFFFF");
+        row++;
+      }
+		}
+    SubmitButton newButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("sch.button.new", "New"), PARAMETER_METHOD, String.valueOf(METHOD_NEW_RESOURCE)));
+    SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+    backButton.setValueOnClick(PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+
     table.add(newButton, 1, row);
+    table.add(Text.getNonBrakingSpace(), 1, row);
+    table.add(backButton, 1, row);    
     table.add(Text.getNonBrakingSpace(), 1, row);
     table.add(close, 1, row++);
     // Last transparent row to fill up the page    
@@ -1037,36 +1147,62 @@ public class SchoolAdminOverview extends CommuneBlock {
   
   private Table getResourceForm(IWContext iwc) throws RemoteException {
     Table table = new Table();
-    table.setBorder(1);
+    table.setBorder(0);
     table.setCellpadding(1);
     table.setCellspacing(2);
 
     // *** Input labels ***
     int row = 1;
+    if (resourceErrorMsg != null) {
+      table.mergeCells(1,1,2,1);
+      table.add(getSmallErrorText(resourceErrorMsg), 1, row++);
+    }
     table.add(getSmallHeader(localize("school.resource", "Resource")), 1, row++);
     table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row++);
     table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
    
     // *** Input fields ***
-    row = 1;
+    if (resourceErrorMsg != null) {
+      row = 2;
+    } else {
+      row = 1;
+    }
     DropdownMenu rscDD = getAssignableResources(iwc);
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_ID))
+      rscDD.setSelectedElement(iwc.getParameter(PARAMETER_RESOURCE_ID));
     table.add(rscDD, 2, row++);
     long currentTime = new Date().getTime();
+    
     DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
-    startDate.setDate(new java.sql.Date(currentTime));
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_STARTDATE)) {
+      startDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_STARTDATE));
+    } else {
+      startDate.setDate(new java.sql.Date(currentTime));
+    }
     table.add(startDate, 2, row++);
+    
     DateInput endDate = new DateInput(PARAMETER_RESOURCE_ENDDATE);
-    endDate.setDate(new java.sql.Date(currentTime));
-    table.add(endDate, 2, row++);
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_ENDDATE)) {
+      endDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_ENDDATE));
+    }
+    table.add(endDate, 2, row++);    
     
     // *** Button row ***
-    SubmitButton addButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.add", "Add"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE_RESOURCE)));
-    table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
-    addButton.setValueOnClick(PARAMETER_METHOD, "-1");
+    SubmitButton addButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.add", "Add"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+    addButton.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE_RESOURCE));
+    addButton.setValueOnClick(PARAMETER_SHOW_ONLY_OVERVIEW, "true");
     table.add(addButton, 1, row);
-    SubmitButton cancelButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.rsc.cancel", "Cancel"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
     table.add(Text.getNonBrakingSpace(), 1, row);
-    table.add(cancelButton, 1, row++);
+    
+    SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
+    table.add(backButton, 1, row);
+    table.add(Text.getNonBrakingSpace(), 1, row);    
+
+    table.add(close, 1, row);
+    table.mergeCells(1, row, 3, row++);
+
+    table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, ""),1 ,row);
+    table.add(new HiddenInput(PARAMETER_ACTION, "-1"), 1, row);
     
     // *** Bottom&Right table space ***
     table.setWidth(Table.HUNDRED_PERCENT);
@@ -1079,6 +1215,77 @@ public class SchoolAdminOverview extends CommuneBlock {
     table.setRowHeight(row, "100%");
     
     return table;        
+  }
+  
+  private Table getFinishResourceForm(IWContext iwc) throws RemoteException {
+    Table table = new Table();
+    table.setBorder(0);
+    table.setCellpadding(1);
+    table.setCellspacing(2);
+
+    // *** Input labels ***
+    int row = 1;
+    if (resourceErrorMsg != null) {
+      table.mergeCells(1,1,2,1);
+      table.add(getSmallErrorText(resourceErrorMsg), 1, row++);
+    }
+    table.add(getSmallHeader(localize("school.resource", "Resource")), 1, row++);
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_STARTDATE))
+      table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row++);
+    table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
+   
+    // *** Error message ***
+    if (resourceErrorMsg != null) {
+      row = 2;
+    } else {
+      row = 1;
+    }
+    table.add(getSmallText(iwc.getParameter(PARAMETER_RESOURCE_NAME)), 2, row++);
+    DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_STARTDATE)) { 
+      startDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_STARTDATE));
+      startDate.setDisabled(true);
+      table.add(startDate, 2, row++);
+    }
+            
+    // *** Enddate ***  
+    DateInput endDate = new DateInput(PARAMETER_RESOURCE_ENDDATE);
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_ENDDATE)) {
+      endDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_ENDDATE));
+    } else {
+      endDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_STARTDATE));
+    }   
+    table.add(endDate, 2, row++);
+    
+    // *** Button row ***
+    SubmitButton finishButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.finish", "Finish"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+    table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_FINISH_RESOURCE)), 1, row);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_CLASS_MEMBER, iwc.getParameter(PARAMETER_RESOURCE_CLASS_MEMBER)), 1, row);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_NAME, iwc.getParameter(PARAMETER_RESOURCE_NAME)), 1, row);
+    table.add(new HiddenInput(PARAMETER_RESOURCE_STARTDATE, iwc.getParameter(PARAMETER_RESOURCE_STARTDATE)), 1, row);
+    table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, "true"), 1, row);
+    table.add(finishButton, 1, row);
+    table.add(Text.getNonBrakingSpace(), 1, row);
+
+    SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
+    backButton.setValueOnClick(PARAMETER_ACTION, "-1");
+    table.add(backButton, 1, row);
+    table.add(Text.getNonBrakingSpace(), 1, row);
+
+    table.add(close, 1, row);
+    table.mergeCells(1, row, 3, row++);
+        
+    // *** Bottom&Right table space ***
+    table.setWidth(Table.HUNDRED_PERCENT);
+    table.setHeight(Table.HUNDRED_PERCENT);
+    // Last transparent column to fill up the page
+    table.addText(Text.NON_BREAKING_SPACE, 3, 1);
+    // Last transparent row to fill up the page    
+    table.addText(Text.NON_BREAKING_SPACE, 1, row);
+    table.mergeCells(1, row, 3, row);
+    table.setRowHeight(row, "100%");
+        
+    return table;
   }
 
 	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
@@ -1141,7 +1348,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		else {
 			_protocol = false;
-			_method = this.METHOD_REPLACE;
+			_method = METHOD_REPLACE;
 		}
 	}
 
@@ -1198,7 +1405,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		else {
 			//_move = false;
-			_method = this.METHOD_MOVE;
+			_method = METHOD_MOVE;
 		}
 	}
 
@@ -1344,6 +1551,7 @@ public class SchoolAdminOverview extends CommuneBlock {
     } else {    
       // Get rscTO from session
       _rscTO = (SchoolAdminOverviewTO) iwc.getSessionAttribute(KEY_SESSION_ATTRIBUTE_RSCTO);
+      //_showNoChoices = _rscTO.isShowOnlyOverview();
     }   
 
 		/** @todo LAGA... er ekki alveg rett */
@@ -1432,22 +1640,28 @@ public class SchoolAdminOverview extends CommuneBlock {
   
   private DropdownMenu getAssignableResources(IWContext iwc) throws RemoteException {
     DropdownMenu DD = new DropdownMenu(PARAMETER_RESOURCE_ID);
+    DD.addMenuElement("-1", "- "+localize("cacc_chose_resource", "chose resource")+" -");
     Collection rscColl = null;
+    
     Integer providerGrpId = getProviderGrpId(iwc);
-    if (providerGrpId != null) {
-      rscColl = getResourceBusiness(iwc).getProviderAssignRightResources(providerGrpId);
+    int classMemberId = 0;
+    classMemberId = _rscTO.getClassMemberID();
+    if (providerGrpId != null && classMemberId != 0) {
+      rscColl = getResourceBusiness(iwc).getAssignableResourcesForPlacement(providerGrpId, new Integer(classMemberId));
       for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
 				Resource currRsc = (Resource) iter.next();
         DD.addMenuElement(currRsc.getPrimaryKey().toString(), currRsc.getResourceName());				
 			}
     }
+    DD.setSelectedElement("-1");
     
     return DD;
   }
   
-  private void saveResource(IWContext iwc) throws RemoteException, FinderException, ClassMemberException {
+  private String saveResource(IWContext iwc) throws RemoteException, FinderException {
     int rscID = -1;
     int placementID = -1;
+    String errMsg = null;
     
     String rscIdStr = iwc.getParameter(PARAMETER_RESOURCE_ID);
     if (rscIdStr != null) 
@@ -1455,12 +1669,44 @@ public class SchoolAdminOverview extends CommuneBlock {
     placementID = _rscTO.getClassMemberID();
 
     // Save the resource placement
-    if (rscID != -1 && placementID != -1) {
-      String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
-      String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);        
+    String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
+    String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
+    try {        
       getResourceBusiness(iwc).createResourcePlacement(rscID, placementID, startDateStr, endDateStr);
-    } else {
-      throw new ClassMemberException("school.no_valid_classmember", "No valid student placement could be found");
+    } catch (ResourceException re) {
+      errMsg = localize(re.getKey(), re.getDefTrans());
+    } catch (DateException de) {
+      errMsg = localize(de.getKey(), de.getDefTrans());
+    } catch (ClassMemberException cme) {
+      errMsg = localize(cme.getKey(), cme.getDefTrans());      
+    }
+    return errMsg;    
+  }
+  
+  private String finishResource(IWContext iwc)  throws RemoteException, FinderException {
+    String errMsg = null;
+    Integer classMemberID = new Integer(iwc.getParameter(PARAMETER_RESOURCE_CLASS_MEMBER));
+    String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE); 
+    String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
+    try {
+      getResourceBusiness(iwc).finishResourceClassMember(classMemberID,startDateStr, endDateStr);
+    } catch (DateException de) {
+      errMsg = localize(de.getKey(), de.getDefTrans());
+    }  catch (ClassMemberException cme) {
+      errMsg = localize(cme.getKey(), cme.getDefTrans());      
+   }
+    return errMsg;
+  }
+  
+  private void deleteResource(IWContext iwc) {
+    Integer rscPlaceID;
+    if (iwc.isParameterSet(PARAMETER_DELETE_RESOURCE_PLACEMENT)) {
+      try {
+        rscPlaceID = new Integer(iwc.getParameter(PARAMETER_DELETE_RESOURCE_PLACEMENT));
+        getResourceBusiness(iwc).deleteResourceClassMember(rscPlaceID);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
     }    
   }
   

@@ -924,7 +924,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 		String schoolIdStr = iwc.getParameter(PARAM_PROVIDER);
 		String schTypeIdStr = iwc.getParameter(PARAM_ACTIVITY);		
-		if (schoolIdStr != null && schTypeIdStr != null) {
+		if (schoolIdStr != null && !schoolIdStr.equals("-1") && schTypeIdStr != null && 
+																										!schTypeIdStr.equals("-1")) {
 			Integer schTypePK = new Integer(schTypeIdStr);
 			try {
 				School school = getSchoolBusiness(iwc).getSchool(new Integer(schoolIdStr));

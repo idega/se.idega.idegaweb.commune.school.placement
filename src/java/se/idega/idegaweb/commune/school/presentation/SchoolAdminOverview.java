@@ -77,11 +77,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_REPLACE = 3;
 	public static final int METHOD_MOVE = 4;
 	public static final int METHOD_MOVE_GROUP = 5;
+	public static final int METHOD_MOVE_YEAR = 6;
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
 	public static final int ACTION_MOVE = 3;
 	public static final int ACTION_MOVE_GROUP = 4;
+	public static final int ACTION_MOVE_YEAR = 5;
 
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -124,6 +126,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 				break;
 			case ACTION_MOVE_GROUP :
 				moveGroup(iwc);
+				break;
+			case ACTION_MOVE_YEAR :
+				moveYear(iwc);
 				break;
 		}
 
@@ -184,6 +189,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 			case METHOD_MOVE_GROUP :
 				headerTable.add(getHeader(localize("school.student_move_group", "Move student to group")));
 				contentTable.add(getMoveGroupForm(iwc));
+				break;
+			case METHOD_MOVE_YEAR :
+				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice")));
+				contentTable.add(getMoveYearForm(iwc));
 				break;
 		}
 
@@ -335,6 +344,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace", "Replace"), PARAMETER_METHOD, String.valueOf(METHOD_REPLACE)));
 			SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_METHOD, String.valueOf(METHOD_REJECT)));
 			SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
+			SubmitButton moveYear = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_year", "Change year"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
 
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
@@ -351,6 +361,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(move, 1, row);
 					table.add(Text.NON_BREAKING_SPACE, 1, row);
 				}
+			}
+			
+			if (_choiceID != -1) {
+				table.add(moveYear, 1, row);
+				table.add(Text.NON_BREAKING_SPACE, 1, row);
 			}
 
 			table.add(close, 1, row);
@@ -503,16 +518,42 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
 		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_GROUP)));
-		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
+		//table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
 		int row = 1;
 
 		User user = getUserBusiness(iwc).getUser(_userID);
 
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
 
-		table.add(getSmallHeader(localize("school.new_group", "New group") + ": "), 1, row);
+		table.add(getNavigationTable(iwc), 1, row++);
 
-		DropdownMenu menu = getSchoolClasses(iwc);
+		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
+		move.setValueOnClick(PARAMETER_METHOD, "-1");
+		table.add(move, 1, row);
+		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(close, 1, row);
+		table.setHeight(row, Table.HUNDRED_PERCENT);
+		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+
+		return table;
+	}
+
+	private Table getMoveYearForm(IWContext iwc) throws RemoteException {
+		Table table = new Table();
+		table.setCellpadding(5);
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_MOVE_YEAR)));
+		int row = 1;
+
+		User user = getUserBusiness(iwc).getUser(_userID);
+
+		table.add(getSmallHeader(localize("school.move_year_info", "Select the new year for the student and click 'Move'.")), 1, row++);
+
+		table.add(getSmallHeader(localize("school.new_year", "New year") + ": "), 1, row);
+
+		DropdownMenu menu = getSchoolYears(iwc);
 		menu.setToSubmit(false);
 		table.add(menu, 1, row++);
 
@@ -638,6 +679,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private void moveGroup(IWContext iwc) throws RemoteException {
 		getSchoolCommuneBusiness(iwc).moveToGroup(_userID, _schoolClassID, getSchoolCommuneSession(iwc).getSchoolClassID());
+		getParentPage().setParentToReload();
+		getParentPage().close();
+	}
+
+	private void moveYear(IWContext iwc) throws RemoteException {
+		getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().changeSchoolYearForChoice(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
 		getParentPage().setParentToReload();
 		getParentPage().close();
 	}

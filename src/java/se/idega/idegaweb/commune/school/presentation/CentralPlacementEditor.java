@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/02 14:30:05 $ by $Author: goranb $
- * @version $Revision: 1.46 $
+ * Last modified: $Date: 2003/12/02 16:45:30 $ by $Author: goranb $
+ * @version $Revision: 1.47 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -148,7 +148,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_BUTTON_NEW_GROUP = KP + "button_new_group";
 	private static final String KEY_BUTTON_PLACE = KP + "button_place";
 	private static final String KEY_BUTTON_CANCEL = KP + "button_cancel";
-	private static final String KEY_BUTTON_SEND = KP + "button_send";	
+	private static final String KEY_BUTTON_SEND = KP + "button_send";
+	private static final String KEY_BUTTON_NEW_PLACEMENT = KP + "button_new_placement";
 
 	// Http request parameters  
 	public static final String PARAM_ACTION = "param_action";
@@ -175,6 +176,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public static final String PARAM_STORED_PLACEMENT_ID = "stored_placement_id";
 	public static final String PARAM_LATEST_PLACEMENT_ID = "latest_placement_id";
 	public static final String PARAM_LATEST_INVOICE_DATE = "param_latest_invoice_date";
+	public static final String PARAM_NEW_PLACEMENT = "param_new_placement";
+	public static final String PARAM_CANCEL_NEW_PLACEMENT = "param_cancel_new_placement";
 	
 	// Actions
 	private static final int ACTION_PLACE_PUPIL = 1;	
@@ -218,7 +221,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private ProviderSession _providerSession = null;
 
 	private int _action = -1;
-	//private int _presentation = -1;
+	private boolean _newPlacement = false;
+	private boolean _cancelNewPlacement = false;
 
 	public void main(IWContext iwc) throws Exception {
 		iwrb = getResourceBundle(iwc);
@@ -268,11 +272,16 @@ public class CentralPlacementEditor extends CommuneBlock {
 		try {
 			if (storedPlacement == null) {
 				// Show main form parts
-				setMainTableContent(getSearchTable(iwc));
-				setMainTableContent(getPupilTable(iwc, child));
-				setMainTableContent(getLatestPlacementTable(iwc, child));
-				setMainTableContent(getNewPlacementTable(iwc));
-				prepareCentralPlacementProviderSession(iwc);				
+				if (!_newPlacement || _cancelNewPlacement) {
+					// First part with search, pupil and latest placement
+					setMainTableContent(getSearchTable(iwc));
+					setMainTableContent(getPupilTable(iwc, child));
+					setMainTableContent(getLatestPlacementTable(iwc, child));
+				} else {
+					// New placement form
+					setMainTableContent(getNewPlacementTable(iwc));
+					prepareCentralPlacementProviderSession(iwc);
+				}
 			} else {
 				// Show message form
 
@@ -535,7 +544,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getSmallHeader(localize(KEY_STARTDATE_LABEL, "Start date: ")), col, row);
 		table.add(getSmallHeader(localize(KEY_ENDDATE_LABEL, "End date: ")), col+2, row);
 		table.setRowHeight(row, rowHeight);
-
+			
 		// VALUES - Latest placement
 		if (child != null) {
 			try {
@@ -619,13 +628,26 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 		row++;
 		col = 1;
+		
+		// Empty space row
+		table.setRowHeight(row, rowHeight);
+		row++;
+		col = 1;
+		
+		
+		// BUTTON New placement
+		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_NEW_PLACEMENT, "New placement"), 
+																							PARAM_NEW_PLACEMENT, "true"), col++, row);
+		row++;
+		col = 1;
+		
+		// Empty space row
+		table.add(transGIF, col, row);
+		table.setRowHeight(row, rowHeight);
+		row++;
+		col = 1;
+		
 
-		// ERROR MSG - errMsgMid
-		if (errMsgMid != null) {
-			table.add(getSmallErrorText(errMsgMid), col, row);
-			table.mergeCells(col, row, col+2, row);
-			row++;
-		}
 
 		return table;
 	}
@@ -665,6 +687,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(new HiddenInput(PARAM_PROVIDER_CHANGED, "-1"), 1, 1);
 		table.add(new HiddenInput(PARAM_SCHOOL_TYPE_CHANGED, "-1"), 1, 1);
 		table.add(new HiddenInput(PARAM_SCHOOL_YEAR_CHANGED, "-1"), 1, 1);
+		table.add(new HiddenInput(PARAM_NEW_PLACEMENT, "true"), 1, 1);
+		
+		// ERROR MSG - errMsgMid
+		if (errMsgMid != null) {
+			row++;
+			col = 1;
+			table.add(getSmallErrorText(errMsgMid), col, row);
+			table.mergeCells(col, row, col+2, row);
+		}
 
 		row++;
 		col = 1;
@@ -934,7 +965,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 								PARAM_ACTION, String.valueOf(ACTION_PLACE_PUPIL)), col++, row);
 			// Cancel		
 		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel"),
-						PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), col++, row);
+						PARAM_CANCEL_NEW_PLACEMENT, "true"), col++, row);
 		col = 1;
 		row++;		
 		
@@ -1710,6 +1741,16 @@ public class CentralPlacementEditor extends CommuneBlock {
 			String actionStr = iwc.getParameter(PARAM_ACTION);
 			_action = Integer.parseInt(actionStr);
 
+		}
+		
+		if (iwc.isParameterSet(PARAM_NEW_PLACEMENT)
+				&& "true".equals(iwc.getParameter(PARAM_NEW_PLACEMENT))) {
+			_newPlacement = true;		
+		}
+		
+		if (iwc.isParameterSet(PARAM_CANCEL_NEW_PLACEMENT)
+				&& "true".equals(iwc.getParameter(PARAM_CANCEL_NEW_PLACEMENT))) {
+			_cancelNewPlacement = true;
 		}
 	}
 

@@ -1086,7 +1086,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		table.setWidth(1, "100");
-
+		table.setWidth(1, row, Table.HUNDRED_PERCENT);
+		
 		return table;
 	}
 

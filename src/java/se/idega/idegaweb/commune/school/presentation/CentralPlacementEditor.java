@@ -13,6 +13,7 @@ import java.util.Iterator;
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
+import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusinessBean;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
@@ -54,10 +55,10 @@ import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 
 /**
- * @author Göran Borgman
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
+ * @author 
+ * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
+ * Last modified: $Date: 2003/10/22 12:28:56 $ by $Author: staffan $
+ * @version $Revision: 1.18 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -168,7 +169,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
 	private SchoolClassMember storedPlacement = null;
-	private School newProvider = null;
 
 	private int _action = -1;
 	private int _presentation = -1;
@@ -561,10 +561,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 			// value if provider is set
 		if (iwc.isParameterSet(PARAM_PROVIDER) 
 															&& !(iwc.getParameter(PARAM_PROVIDER).equals("-1"))) {													
-			newProvider = getSchoolBusiness(iwc)
-													.getSchool(new Integer(iwc.getParameter(PARAM_PROVIDER)));
-			if (newProvider != null) {
-				boolean hasCompByInv = newProvider.getHasCompensationByInvoice();
+            final Provider provider = new Provider
+                    (Integer.parseInt (iwc.getParameter(PARAM_PROVIDER)));
+			if (provider != null) {
+				boolean hasCompByInv = provider.getPaymentByInvoice ();
 				Text txt = getSmallText(hasCompByInv ? localize(KEY_DROPDOWN_YES, "Yes") 
 														 					: localize(KEY_DROPDOWN_NO, "No"));
 				table.add(txt, ++col, row);											

@@ -25,6 +25,7 @@ import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.accounting.resource.data.ResourcePermission;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -36,6 +37,7 @@ import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.block.school.presentation.SchoolClassDropdownDouble;
@@ -190,55 +192,55 @@ public class SchoolAdminOverview extends CommuneBlock {
 		parse(iwc);
 
 		switch (_action) {
-			case ACTION_REJECT :
-				reject(iwc);
-				break;
-			case ACTION_REPLACE :
-				replace(iwc);
-				break;
-			case ACTION_MOVE_GROUP :
-				moveGroup(iwc);
-				break;
-			case ACTION_MOVE_YEAR :
-				moveYear(iwc);
-				break;
-			case ACTION_FINALIZE_GROUP :
-				finalizeGroup(iwc);
-				break;
-			case ACTION_EDIT_STUDENT :
-				editStudent(iwc);
-				break;
-			case ACTION_ADD_STUDENT :
-				addStudent(iwc);
-				break;
-			case ACTION_CREATE_STUDENT :
-				createStudent(iwc);
-				break;
-			case ACTION_CHANGE_PLACEMENT_DATE :
-				changePlacementDate(iwc);
-				break;
-			case ACTION_SAVE_RESOURCE :
-				resourceErrorMsg = saveResource(iwc);
-				if (resourceErrorMsg != null)
-					_method = METHOD_NEW_RESOURCE;
-				break;
-			case ACTION_DELETE_RESOURCE :
-				deleteResource(iwc);
-				break;
-			case ACTION_FINISH_RESOURCE :
-				resourceErrorMsg = finishResource(iwc);
-				if (resourceErrorMsg != null)
-					_method = METHOD_FINISH_RESOURCE;
-				break;
-			case ACTION_CHANGE_STUDY_PATH :
-				changeStudyPath(iwc);
-				break;
-			case ACTION_SAVE_NATIVE_LANGUAGE :
-				saveNativeLanguage(iwc);
-				break;
-			case ACTION_SAVE_MESSAGE_TEXT :
-				saveMessageText(iwc);
-				break;
+		case ACTION_REJECT :
+			reject(iwc);
+			break;
+		case ACTION_REPLACE :
+			replace(iwc);
+			break;
+		case ACTION_MOVE_GROUP :
+			moveGroup(iwc);
+			break;
+		case ACTION_MOVE_YEAR :
+			moveYear(iwc);
+			break;
+		case ACTION_FINALIZE_GROUP :
+			finalizeGroup(iwc);
+			break;
+		case ACTION_EDIT_STUDENT :
+			editStudent(iwc);
+			break;
+		case ACTION_ADD_STUDENT :
+			addStudent(iwc);
+			break;
+		case ACTION_CREATE_STUDENT :
+			createStudent(iwc);
+			break;
+		case ACTION_CHANGE_PLACEMENT_DATE :
+			changePlacementDate(iwc);
+			break;
+		case ACTION_SAVE_RESOURCE :
+			resourceErrorMsg = saveResource(iwc);
+			if (resourceErrorMsg != null)
+				_method = METHOD_NEW_RESOURCE;
+			break;
+		case ACTION_DELETE_RESOURCE :
+			deleteResource(iwc);
+			break;
+		case ACTION_FINISH_RESOURCE :
+			resourceErrorMsg = finishResource(iwc);
+			if (resourceErrorMsg != null)
+				_method = METHOD_FINISH_RESOURCE;
+			break;
+		case ACTION_CHANGE_STUDY_PATH :
+			changeStudyPath(iwc);
+			break;
+		case ACTION_SAVE_NATIVE_LANGUAGE :
+			saveNativeLanguage(iwc);
+			break;
+		case ACTION_SAVE_MESSAGE_TEXT :
+			saveMessageText(iwc);
+			break;
 
 		}
 
@@ -302,66 +304,66 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		personalIdUserName =  "  -  " + userName + "   " + personalId;
 		switch (_method) {
-			case METHOD_OVERVIEW :
-				headerTable.add(getHeader(localize("school.student_overview", "Student overview") + "  -  " + userName), 1, 1);
-				contentTable.add(getOverview(iwc), 1, 1);
-				break;
-			case METHOD_REJECT :
-				headerTable.add(getHeader(localize("school.reject_student", "Reject student") + personalIdUserName), 1, 1);
-				contentTable.add(getRejectForm(iwc), 1, 1);
-				break;
-			case METHOD_REPLACE :
-				headerTable.add(getHeader(localize("school.student_replacing", "Replace student") + personalIdUserName), 1, 1);
-				contentTable.add(getReplaceForm(iwc), 1, 1);
-				break;
-			case METHOD_MOVE_GROUP :
-				headerTable.add(getHeader(localize("school.student_move_group", "Move student to group") + personalIdUserName), 1, 1);
-				contentTable.add(getMoveGroupForm(iwc), 1, 1);
-				break;
-			case METHOD_MOVE_YEAR :
-				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice") + personalIdUserName), 1, 1);
-				contentTable.add(getMoveYearForm(iwc), 1, 1);
-				break;
-			case METHOD_FINALIZE_GROUP :
-				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group") + personalIdUserName), 1, 1);
-				contentTable.add(getFinalizeGroupForm(iwc), 1, 1);
-				break;
-			case METHOD_EDIT_STUDENT :
-				headerTable.add(getHeader(localize("school.edit_student", "Edit student") + personalIdUserName), 1, 1);
-				contentTable.add(getEditStudentForm(iwc), 1, 1);
-				break;
-			case METHOD_ADD_STUDENT :
-				headerTable.add(getHeader(localize("school.add_student", "Add student") + personalIdUserName), 1, 1);
-				contentTable.add(getAddStudentForm(iwc), 1, 1);
-				break;
-			case METHOD_CHANGE_PLACEMENT_DATE :
-				headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date") + personalIdUserName), 1, 1);
-				contentTable.add(getChangePlacementDateForm(iwc), 1, 1);
-				break;
-			case METHOD_LIST_RESOURCES :
-				headerTable.add(getHeader(localize("school.resources.current", "Current Resources") + personalIdUserName), 1, 1);
-				contentTable.add(getResourceList(iwc), 1, 1);
-				break;
-			case METHOD_NEW_RESOURCE :
-				headerTable.add(getHeader(localize("school.resources.new", "New Resource")), 1, 1);
-				contentTable.add(getResourceForm(iwc), 1, 1);
-				break;
-			case METHOD_FINISH_RESOURCE :
-				headerTable.add(getHeader(localize("school.resources.finish", "Finish Resource")), 1, 1);
-				contentTable.add(getFinishResourceForm(iwc), 1, 1);
-				break;
-			case METHOD_CHANGE_STUDY_PATH :
-				headerTable.add(getHeader(localize("school.change_study_path", "Change Study Path") + personalIdUserName), 1, 1);
-				contentTable.add(getChangeStudyPathForm(iwc), 1, 1);
-				break;
-			case METHOD_NATIVE_LANG_FORM :
-				headerTable.add(getHeader(localize("school.native_language", "Native language") + personalIdUserName), 1, 1);
-				contentTable.add(getNativeLanguageForm(iwc), 1, 1);
-				break;
-			case METHOD_MESSAGE_TEXT :
-				headerTable.add(getHeader(localize("school.message_text", "Message Text")), 1, 1);
-				contentTable.add(getMessageTextForm(iwc), 1, 1);
-				break;
+		case METHOD_OVERVIEW :
+			headerTable.add(getHeader(localize("school.student_overview", "Student overview") + "  -  " + userName), 1, 1);
+			contentTable.add(getOverview(iwc), 1, 1);
+			break;
+		case METHOD_REJECT :
+			headerTable.add(getHeader(localize("school.reject_student", "Reject student") + personalIdUserName), 1, 1);
+			contentTable.add(getRejectForm(iwc), 1, 1);
+			break;
+		case METHOD_REPLACE :
+			headerTable.add(getHeader(localize("school.student_replacing", "Replace student") + personalIdUserName), 1, 1);
+			contentTable.add(getReplaceForm(iwc), 1, 1);
+			break;
+		case METHOD_MOVE_GROUP :
+			headerTable.add(getHeader(localize("school.student_move_group", "Move student to group") + personalIdUserName), 1, 1);
+			contentTable.add(getMoveGroupForm(iwc), 1, 1);
+			break;
+		case METHOD_MOVE_YEAR :
+			headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice") + personalIdUserName), 1, 1);
+			contentTable.add(getMoveYearForm(iwc), 1, 1);
+			break;
+		case METHOD_FINALIZE_GROUP :
+			headerTable.add(getHeader(localize("school.finalize_group", "Finalize group")), 1, 1);
+			contentTable.add(getFinalizeGroupForm(iwc), 1, 1);
+			break;
+		case METHOD_EDIT_STUDENT :
+			headerTable.add(getHeader(localize("school.edit_student", "Edit student") + personalIdUserName), 1, 1);
+			contentTable.add(getEditStudentForm(iwc), 1, 1);
+			break;
+		case METHOD_ADD_STUDENT :
+			headerTable.add(getHeader(localize("school.add_student", "Add student") + personalIdUserName), 1, 1);
+			contentTable.add(getAddStudentForm(iwc), 1, 1);
+			break;
+		case METHOD_CHANGE_PLACEMENT_DATE :
+			headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date") + personalIdUserName), 1, 1);
+			contentTable.add(getChangePlacementDateForm(iwc), 1, 1);
+			break;
+		case METHOD_LIST_RESOURCES :
+			headerTable.add(getHeader(localize("school.resources.current", "Current Resources") + personalIdUserName), 1, 1);
+			contentTable.add(getResourceList(iwc), 1, 1);
+			break;
+		case METHOD_NEW_RESOURCE :
+			headerTable.add(getHeader(localize("school.resources.new", "New Resource")), 1, 1);
+			contentTable.add(getResourceForm(iwc), 1, 1);
+			break;
+		case METHOD_FINISH_RESOURCE :
+			headerTable.add(getHeader(localize("school.resources.finish", "Finish Resource")), 1, 1);
+			contentTable.add(getFinishResourceForm(iwc), 1, 1);
+			break;
+		case METHOD_CHANGE_STUDY_PATH :
+			headerTable.add(getHeader(localize("school.change_study_path", "Change Study Path") + personalIdUserName), 1, 1);
+			contentTable.add(getChangeStudyPathForm(iwc), 1, 1);
+			break;
+		case METHOD_NATIVE_LANG_FORM :
+			headerTable.add(getHeader(localize("school.native_language", "Native language") + personalIdUserName), 1, 1);
+			contentTable.add(getNativeLanguageForm(iwc), 1, 1);
+			break;
+		case METHOD_MESSAGE_TEXT :
+			headerTable.add(getHeader(localize("school.message_text", "Message Text")), 1, 1);
+			contentTable.add(getMessageTextForm(iwc), 1, 1);
+			break;
 		}
 
 		add(form);
@@ -375,7 +377,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setHeight(Table.HUNDRED_PERCENT);
 		int row = 1;
 		String sLanguage = null;
-		
+		boolean isCommuneAdmin = isCommuneAdministrator(iwc);
 		String schoolClassId = iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID);
 //		String schoolClassMemberId = iwc.getParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID);
 
@@ -441,28 +443,45 @@ public class SchoolAdminOverview extends CommuneBlock {
 						}
 						catch (Exception naf) {
 						}
+						
 						try {
 							Phone phone = getCommuneUserBusiness(iwc).getUsersHomePhone(parent);
-							Phone phoneMobile = getCommuneUserBusiness(iwc).getUsersMobilePhone(parent);
-							Phone phoneWork = getCommuneUserBusiness(iwc).getUsersWorkPhone(parent);
+							
 							if (phone != null && phone.getNumber() != null) {
 								table.add(new Break(), 2, row);
 								table.add(getSmallText(localize("school.phone", "Phone") + ": "), 2, row);
 								table.add(getSmallText(phone.getNumber()), 2, row);
 							}
+						}
+						catch (NoPhoneFoundException npf) {
+							log(npf);
+						}
+						
+						try {
+							Phone phoneMobile = getCommuneUserBusiness(iwc).getUsersMobilePhone(parent);
 							if (phoneMobile != null && phoneMobile.getNumber() != null) {
 								table.add(new Break(), 2, row);
 								table.add(getSmallText(localize("school.phone_mobile", "Mobile phone") + ": "), 2, row);
 								table.add(getSmallText(phoneMobile.getNumber()), 2, row);
 							}
+						}
+						catch (NoPhoneFoundException npf) {
+							log(npf);
+						}
+						
+						try {
+							Phone phoneWork = getCommuneUserBusiness(iwc).getUsersWorkPhone(parent);
 							if (phoneWork != null && phoneWork.getNumber() != null) {
 								table.add(new Break(), 2, row);
 								table.add(getSmallText(localize("school.phone_work", "Work phone") + ": "), 2, row);
 								table.add(getSmallText(phoneWork.getNumber()), 2, row);
 							}
+							
 						}
 						catch (NoPhoneFoundException npf) {
+							log(npf);
 						}
+						
 						try {
 							Email email = getCommuneUserBusiness(iwc).getUsersMainEmail(parent);
 							if (email != null && email.getEmailAddress() != null) {
@@ -486,16 +505,24 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			int pendingSchoolId = -1;
 			boolean showChangePlacementDate = false;
+			boolean isPlaced = false;
 			School oldSchool = null;
+			int oldSchoolId = -1;
 			SchoolClassMember schClMem = null;
+			SchoolClassMember preSchoolClMem = null;
 			String language = null;
 			SchoolYear schoolYear = null;
 			String schoolClass = null;
+			SchoolChoiceBusiness schBuiz;
+			int previousSeasonId = -1;
+			SchoolSeason preSchoolseason = null;
+			boolean started = false;
 			
 			if (!_showNoChoices) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
 				String extraChoice = null;
+				
 				
 				
 				IWCalendar calendar = null;
@@ -505,6 +532,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 					School school;
 					SchoolChoice choice;
+					SchoolSeason schSeason = null;
 					Iterator iter = choices.iterator();
 					while (iter.hasNext()) {
 						choice = (SchoolChoice) iter.next();
@@ -513,11 +541,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 							school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(choice.getChosenSchoolId()));
 							String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice.getCaseStatus(), iwc.getCurrentLocale()) + ")";
 							
-							try {
-								schClMem =  getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByUserAndSchoolAndSeason(_userID, ((Integer) school.getPrimaryKey()).intValue(), getSchoolCommuneSession(iwc).getSchoolSeasonID());	
-							}
-							catch (FinderException fe){
-								
+														
+							if (schClMem == null) {
+								try {								
+									schSeason = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));									
+									schClMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), schSeason);
+									
+								}
+								catch (FinderException fe){
+									log(fe);
+								}
 							}
 							
 							
@@ -525,14 +558,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 								if (pendingSchoolId == -1)
 									pendingSchoolId = choice.getChosenSchoolId();
 								//							table.add("gimmi flippari ", 2, row);
-								if (choice.getStatus().equalsIgnoreCase("PLAC") && schClMem != null){
-									//string = string + "&nbsp;&nbsp;" + schClMem.getSchoolYear().getName();
+								
+								if (choice.getStatus().equalsIgnoreCase("PLAC")){
+									isPlaced = true;
 									if (schClMem != null){
 										schoolClass = schClMem.getSchoolClass().getName();
 									}
 									
 								}
-								
 								
 							}
 							if (choice.getChosenSchoolId() == getSchoolCommuneSession(iwc).getSchoolID()) {
@@ -552,8 +585,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 						if (iter.hasNext())
 							table.add(new Break(), 2, row);
-						if (oldSchool == null)
+						if (oldSchool == null){
 							oldSchool = choice.getCurrentSchool();
+							oldSchoolId = choice.getCurrentSchoolId();
+						}
 						if (message == null)
 							message = choice.getMessage();
 						
@@ -561,14 +596,22 @@ public class SchoolAdminOverview extends CommuneBlock {
 							language = choice.getLanguageChoice();
 						}
 						if (schoolYear == null){
-							schoolYear = choice.getSchoolYear();
+							if (schClMem != null){
+								schoolYear = schClMem.getSchoolYear();								
+							}
+							else{
+								schoolYear = choice.getSchoolYear();
+							}
 						}
 						
-						
-						if (placementDate == null && choice.getPlacementDate() != null)
+						IWTimestamp today = IWTimestamp.RightNow();
+						if (placementDate == null && choice.getPlacementDate() != null) {
 							placementDate = new IWTimestamp(choice.getPlacementDate());
+							started = placementDate.getTimestamp().before(today.getDate());
+						}
 						calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
-					}
+								
+						}
 					row++;
 				}
 				
@@ -583,14 +626,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 				
 				if (calendar != null) {
-					table.add(getSmallHeader(localize("school.date", "Date")), 1, row);
+					table.add(getSmallHeader(localize("school.appl_date", "Application date")), 1, row);
 					table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), 2, row++);
 				}
-				/*if (language == null){
-				 language = schClMem.getLanguage();
-				 }
-				 */
-								
+				
 				if (language != null && language.length() > 0 && !language.equals("-1")) {
 					table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
 					table.add(getSmallText(localize(language, language)), 2, row++);
@@ -610,7 +649,35 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 			}
 
-			SchoolClassMember schoolClassMember = null;
+			// if not school change
+			if (preSchoolClMem == null && !showChangePlacementDate){
+				try {
+					previousSeasonId = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeasonID(getSchoolCommuneSession(iwc).getSchoolSeasonID());
+					preSchoolseason = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolSeasonHome().findByPrimaryKey(new Integer(previousSeasonId));
+					
+					preSchoolClMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategoryAndSeason(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryElementarySchool(), preSchoolseason);
+					
+					
+				} catch (FinderException fe){
+					log(fe);
+					if (preSchoolClMem == null) {
+						try {
+							/// if a member in childcare, season is not needed
+							preSchoolClMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findLatestByUserAndSchCategory(user, getSchoolCommuneBusiness(iwc).getSchoolBusiness().getCategoryChildcare());
+
+						}
+						catch (Exception fex){
+							log(fex);
+						}
+					}
+				}
+				
+				
+			}
+			
+			else if (preSchoolClMem == null && showChangePlacementDate){
+				preSchoolClMem = schClMem;
+			}
 			if (!_showNoChoices) {
 				if (oldSchool != null) {
 					table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
@@ -623,22 +690,35 @@ public class SchoolAdminOverview extends CommuneBlock {
 					 if (season != null) {
 					 schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
 					 if (schoolClassMember != null) {
-					 SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
+					 
 					 School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
 					 
 					 String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
 					 table.add(getSmallText(schoolString), 2, row);
 					 }
 					 }*/
-					table.add(getSmallText(oldSchool.getName()), 2, row);
+					
+					
+					//SchoolClassMember schoolClassMem = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSchoolAndSeason(_userID, oldSchool.getID(), getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
+		
+					if (preSchoolClMem != null && !isPlaced && !started) { // && schClMem != null){
+					
+							SchoolClass schoolClassOld = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(preSchoolClMem.getSchoolClassId()));
+							String schoolString = oldSchool.getName() + "&nbsp;" + localize("school.group", "Group") + ":&nbsp;" + schoolClassOld.getName();
+							//table.add(getSmallText(oldSchool.getName()), 2, row);
+							
+							table.add(getSmallText(schoolString), 2, row);
+						//}
+					}
 					row++;
+					
 				}
 			}
 			
-			SchoolClassMember schMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
+			SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 			
 			//show school year
-			if (null != schMember && schoolYear == null) {
+			if (null != schoolClassMember && schoolYear == null) {
 				SchoolYear scYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(schoolClassMember);
 				if (null != scYear) {
 					table.add(getSmallHeader(localize("school.school_choice_year", "School year")), 1, row);
@@ -659,8 +739,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 			// show language, if exists					
 			
-			if (schMember != null)
-				sLanguage = schMember.getLanguage();
+			if (schoolClassMember != null)
+				sLanguage = schoolClassMember.getLanguage();
 			if (sLanguage != null && language == null){
 				table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
 				table.add(getSmallText(localize(sLanguage, sLanguage)), 2, row++);
@@ -786,7 +866,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 			
-			if (_schoolClassMemberID > 0) {
+			if (_schoolClassMemberID > 0 && isCommuneAdmin) {
 				GenericButton editPlacementButton = (GenericButton) getStyledInterface(new GenericButton(localize("central_placement_editor.button_edit_placement", "Edit placement")));
 				editPlacementButton.addParameter(CentralPlacementEditLatestPlacement.PARAM_LATEST_PLACEMENT_ID, _schoolClassMemberID);
 				editPlacementButton.setWindowToOpen(CentralPlacementEditLatestPlacementWindow.class);
@@ -820,6 +900,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			email = mail.getEmailAddress();
 
 		String workphone = "";
+		Collection phones = null;
 		try {
 			Phone phone = getUserBusiness(iwc).getUsersWorkPhone(user);
 			workphone = phone.getNumber();
@@ -836,7 +917,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			choice = null;
 		}
 
-		Object[] arguments = {user.getName(), email, workphone, choice.getChild().getNameLastFirst(true), choice.getChosenSchool().getName()};
+		//Object[] arguments = {user.getName(), email, workphone, choice.getChild().getNameLastFirst(true), choice.getChosenSchool().getName()};
+		Object[] arguments = {user.getName(), email, workphone, choice.getChild().getName(), choice.getChosenSchool().getName()};
 
 		String message = MessageFormat.format(localize("school.reject_student_message", "We are sorry that we cannot offer {3} a place in {4} at present, if you have any questions, please contact {0} via either phone ({1}) or e-mail ({2})."), arguments);
 		try {
@@ -950,7 +1032,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		catch (FinderException e) {
 			choice = null;
 		}
-		DateInput input = new DateInput(PARAMETER_DATE);
+		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE));
 		if (choice != null && choice.getPlacementDate() != null)
 			input.setDate(choice.getPlacementDate());
 		else
@@ -961,6 +1043,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placement_date", "Change placement date"), PARAMETER_ACTION, String.valueOf(ACTION_CHANGE_PLACEMENT_DATE)));
 		table.add(changePlacementDate, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
+		
+		SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+		backButton.setValueOnClick(PARAMETER_ACTION, "-1");
+		table.add(backButton, 1, row);
+		
 		table.add(close, 1, row);
 		table.setHeight(row, Table.HUNDRED_PERCENT);
 		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
@@ -2239,7 +2326,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	 }
 	 }
 	 }*/
-
+	
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
 	}

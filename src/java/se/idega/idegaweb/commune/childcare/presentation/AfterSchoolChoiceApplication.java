@@ -457,6 +457,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t }");
 		message = localize("less_than_three_chosen", "You have chosen less than three choices.  An offer can not be guaranteed within three months.");
 		buffer.append("\n\t if(length < 3)\n\t\t return confirm('").append(message).append("');");
+		buffer.append("\n\t document.body.style.cursor = 'wait'");
 		buffer.append("\n\t return true;");
 		buffer.append("\n}\n");
 		return buffer.toString();

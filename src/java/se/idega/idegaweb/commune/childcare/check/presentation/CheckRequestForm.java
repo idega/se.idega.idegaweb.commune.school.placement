@@ -265,9 +265,18 @@ public class CheckRequestForm extends CommuneBlock {
 
 		DropdownMenu typeChoice = new DropdownMenu(PARAM_CHILD_CARE_TYPE);
 		Iterator iter = childCareTypes.iterator();
+		
 		while (iter.hasNext()) {
 			SchoolType st = (SchoolType) iter.next();
-			typeChoice.addMenuElement(st.getPrimaryKey().toString(), localize(st.getLocalizationKey(), st.getName()));
+			String localizationKey = st.getLocalizationKey();
+			String name = null;
+			if(localizationKey==null || localizationKey.equals("")){
+				name = st.getName();
+			}
+			else{
+				name = localize(localizationKey, st.getName());
+			}
+			typeChoice.addMenuElement(st.getPrimaryKey().toString(), name);
 		}
 		childCareTypeTable.add(typeChoice, 1, 1);
 

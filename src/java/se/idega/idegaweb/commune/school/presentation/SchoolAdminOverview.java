@@ -15,6 +15,8 @@ import java.util.Vector;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
+import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
@@ -22,6 +24,7 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.util.PIDChecker;
 
+import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
@@ -35,6 +38,8 @@ import com.idega.core.data.Address;
 import com.idega.core.data.Email;
 import com.idega.core.data.Phone;
 import com.idega.core.data.PostalCode;
+import com.idega.data.IDOQuery;
+import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
@@ -69,8 +74,10 @@ import com.idega.util.text.TextSoap;
  * To enable and disable the creation of type comments go to
  * Window>Preferences>Java>Code Generation.
  */
-public class SchoolAdminOverview extends CommuneBlock {
 
+public class SchoolAdminOverview extends CommuneBlock {
+  
+//*** Resource handling added by Göran Borgman 12.09.2003 ***
 	public static final String PARAMETER_ACTION = "sch_admin_action";
 	public static final String PARAMETER_METHOD = "sch_admin_method";
 	public static final String PARAMETER_USER_ID = "sch_user_id";
@@ -81,6 +88,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_PAGE_ID = "sch_page_id";
 	public static final String PARAMETER_COMMENT = "sch_comment";
 	public static final String PARAMETER_SCHOOL_CLASS_ID = "sch_class_id";
+  public static final String PARAMETER_RESOURCE_ID = "cacc_resource_id";
+  public static final String PARAMETER_RESOURCE_STARTDATE = "resource_startdate";  // by Göran Borgman 09.09.2003
+  public static final String PARAMETER_RESOURCE_ENDDATE = "resource_enddate";       // by Göran Borgman 09.09.2003
+  public static final String PARAMETER_RESOURCE_SEASON = "school_choice_season";   // by Göran Borgman 14.09.2003
+  public static final String PARAMETER_RESOURCE_STUDENT = "resource_student";    // by Göran Borgman 14.09.2003
+  public static final String PARAMETER_RESOURCE_CLASS_MEMBER = "resource_school_member";    // by Göran Borgman 14.09.2003
+  public static final String PARAMETER_RESOURCE_CHOICE_STATUS = "resource_school_choice_status";  // by Göran Borgman 14.09.2003
 
 	public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
@@ -92,6 +106,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_EDIT_STUDENT = 8;
 	public static final int METHOD_ADD_STUDENT = 9;
 	public static final int METHOD_CHANGE_PLACEMENT_DATE = 10;
+  public static final int METHOD_LIST_RESOURCES = 11;  // by Göran Borgman 09.09.2003
+  public static final int METHOD_NEW_RESOURCE = 12;    // by Göran Borgman 09.09.2003
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
@@ -103,6 +119,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int ACTION_ADD_STUDENT = 8;
 	public static final int ACTION_CREATE_STUDENT = 9;
 	public static final int ACTION_CHANGE_PLACEMENT_DATE = 10;
+  public static final int ACTION_SAVE_RESOURCE = 11;  // by Göran Borgman 09.09.2003
 
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -121,6 +138,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolID = -1;
 	private int _schoolClassID = -1;
 	private int _schoolYearID = -1;
+  private int _rsc_studentID = -1;
+  private int _rsc_seasonID = -1;
+  private int _rsc_classMemberID = -1;
+ private String _rsc_choiceStatus = null;
 
 	private boolean _protocol = true;
 	//private boolean _move = true;
@@ -171,6 +192,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 			case ACTION_CHANGE_PLACEMENT_DATE :
 				changePlacementDate(iwc);
 				break;
+      case ACTION_SAVE_RESOURCE :
+        saveResource(iwc);
+        break;
 		}
 
 		if (_method != -1)
@@ -252,6 +276,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 				headerTable.add(getHeader(localize("school.change_placement_date", "Change placement date")));
 				contentTable.add(getChangePlacementDateForm(iwc));
 				break;
+      case METHOD_LIST_RESOURCES :
+        headerTable.add(getHeader(localize("school.resources.current", "Current Resources")));
+        contentTable.add(getResourceList(iwc));
+        break;
+      case METHOD_NEW_RESOURCE :
+        headerTable.add(getHeader(localize("school.resources.new", "New Resource")));
+        contentTable.add(getResourceForm(iwc));
+        break;
 		}
 		
 		add(form);
@@ -436,6 +468,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
 			SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placment_date", "Change placement date"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_PLACEMENT_DATE)));
 			PrintButton print = (PrintButton) getStyledInterface(new PrintButton(localize("school.print","Print")));
+      // resources button by Göran Borgman 20030909
+      SubmitButton resources = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.resources", "Resources"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
 
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
@@ -458,7 +492,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(moveYear, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
-			
+      
+      // Göran Borgman 09.09.2003 - Resources button
+      if (_choiceID != -1 && !_showNoChoices) {
+        table.add(resources, 1, row);
+        table.add(Text.getNonBrakingSpace(), 1, row);
+      }
+      			
 			if (showChangePlacementDate) {
 				table.add(changePlacementDate, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
@@ -947,6 +987,90 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		return table;
 	}
+  
+  private Table getResourceList(IWContext iwc) throws RemoteException {
+    Table table = new Table();
+    table.setBorder(1);
+    table.setCellpadding(1);
+    table.setCellspacing(2);
+    table.setWidth(Table.HUNDRED_PERCENT);
+    table.setHeight(Table.HUNDRED_PERCENT);
+    
+    // Create Header row
+    table.setWidth(1, "70");
+    table.setWidth(2, "70");
+    table.setWidth(3, "70");
+    table.setWidth(4, "20");
+    table.setWidth(5, "20");    
+    table.add(getSmallHeader(localize("school.resource", "Resource")), 1, 1);
+    table.add(getSmallHeader(localize("school.startdate", "Startdate")), 2, 1);
+    table.add(getSmallHeader(localize("school.enddate", "Enddate")), 3, 1);
+    table.add(getSmallHeader(localize("school.finish", "Finish")), 4, 1);
+    table.add(getSmallHeader(localize("school.remove", "Remove")), 5, 1);
+    table.addText(Text.NON_BREAKING_SPACE, 6, 1);
+    table.setRowColor(1, getHeaderColor());
+    table.setColor(6, 1, "#FFFFFF");
+    table.setRowHeight(1, "7");
+    
+    // list resources
+    int row = 2;
+
+    SubmitButton newButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.new", "New"), PARAMETER_METHOD, String.valueOf(METHOD_NEW_RESOURCE)));
+
+    newButton.setValueOnClick(PARAMETER_METHOD, "-1");
+    table.add(newButton, 1, row);
+    table.add(Text.getNonBrakingSpace(), 1, row);
+    table.add(close, 1, row++);
+    // Last transparent row to fill up the page    
+    table.addText(Text.NON_BREAKING_SPACE, 1, row);
+    table.mergeCells(1, row, 5, row);
+    table.setRowHeight(row, "100%");
+    
+    return table;
+  }
+  
+  private Table getResourceForm(IWContext iwc) throws RemoteException {
+    Table table = new Table();
+    table.setBorder(1);
+    table.setCellpadding(1);
+    table.setCellspacing(2);
+
+    // *** Input labels ***
+    int row = 1;
+    table.add(getSmallHeader(localize("school.resource", "Resource")), 1, row++);
+    table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row++);
+    table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
+   
+    // *** Input fields ***
+    row = 1;
+    DropdownMenu rscDD = getAssignableResources(iwc);
+    table.add(rscDD, 2, row++);
+    DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+    table.add(startDate, 2, row++);
+    DateInput endDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+    table.add(endDate, 2, row++);
+    
+    // *** Button row ***
+    SubmitButton addButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.add", "Add"), PARAMETER_ACTION, String.valueOf(ACTION_SAVE_RESOURCE)));
+    table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
+    addButton.setValueOnClick(PARAMETER_METHOD, "-1");
+    table.add(addButton, 1, row);
+    SubmitButton cancelButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.rsc.cancel", "Cancel"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+    table.add(Text.getNonBrakingSpace(), 1, row);
+    table.add(cancelButton, 1, row++);
+    
+    // *** Bottom&Right table space ***
+    table.setWidth(Table.HUNDRED_PERCENT);
+    table.setHeight(Table.HUNDRED_PERCENT);
+    // Last transparent column to fill up the page
+    table.addText(Text.NON_BREAKING_SPACE, 3, 1);
+    // Last transparent row to fill up the page    
+    table.addText(Text.NON_BREAKING_SPACE, 1, row);
+    table.mergeCells(1, row, 3, row);
+    table.setRowHeight(row, "100%");
+    
+    return table;        
+  }
 
 	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
 		Table table = new Table(7, 1);
@@ -1165,7 +1289,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		if (iwc.isParameterSet(getSchoolCommuneSession(iwc).getParameterSchoolClassID()))
 			_schoolClassID = Integer.parseInt(iwc.getParameter(getSchoolCommuneSession(iwc).getParameterSchoolClassID()));
-
+    else if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_ID)) {
+        // link parameter from SchoolClassEditor  -  added by Göran
+      _schoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID));
+      new Integer(_schoolClassID);     
+    }
+    
 		if (iwc.isParameterSet(PARAMETER_SHOW_ONLY_OVERVIEW))
 			_showOnlyOverview = true;
 
@@ -1199,6 +1328,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 			
 		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();
+    
+    // Resource handling by Göran Borgman 14.09.2003
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_STUDENT))
+      _rsc_studentID = Integer.parseInt(iwc.getParameter(PARAMETER_RESOURCE_STUDENT));
+
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_SEASON))
+      _rsc_seasonID = Integer.parseInt(iwc.getParameter(PARAMETER_RESOURCE_SEASON));
+
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_CHOICE_STATUS))
+      _rsc_choiceStatus = iwc.getParameter(PARAMETER_RESOURCE_CHOICE_STATUS);
+
+    if (iwc.isParameterSet(PARAMETER_RESOURCE_CLASS_MEMBER))
+      _rsc_classMemberID = Integer.parseInt(iwc.getParameter(PARAMETER_RESOURCE_CLASS_MEMBER));
 
 		/** @todo LAGA... er ekki alveg rett */
 	}
@@ -1283,6 +1425,45 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		return (DropdownMenu) getStyledInterface(menu);
 	}
+  
+  private DropdownMenu getAssignableResources(IWContext iwc) throws RemoteException {
+    DropdownMenu DD = new DropdownMenu(PARAMETER_RESOURCE_ID);
+    Collection rscColl = null;
+    Integer providerGrpId = getProviderGrpId(iwc);
+    if (providerGrpId != null) {
+      rscColl = getResourceBusiness(iwc).getProviderAssignRightResources(providerGrpId);
+      for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
+				Resource currRsc = (Resource) iter.next();
+        DD.addMenuElement(currRsc.getPrimaryKey().toString(), currRsc.getResourceName());				
+			}
+    }
+    
+    return DD;
+  }
+  
+  private void saveResource(IWContext iwc) throws RemoteException, FinderException {
+    SchoolBusiness schBusyBean =  getSchoolCommuneBusiness(iwc).getSchoolBusiness();
+    String studentIdStr = iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID);
+    int studentId = 0;
+    int seasonId = 0;
+    SchoolClassMember placement = schBusyBean.getSchoolClassMemberHome().findByUserAndSeason(studentId, seasonId);
+    String rsdIdParam = iwc.getParameter(PARAMETER_RESOURCE_ID);
+    String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
+    String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
+    
+  }
+  
+  private Integer getProviderGrpId(IWContext iwc) {
+    /********************** Bundle properties ********************/
+    String BUNDLE_NAME_COMMUNE = "se.idega.idegaweb.commune";
+    String PROP_COMMUNE_PROVIDER_GRP_ID = "provider_administrators_group_id";
+
+    // Get group id from the commune bundle for the group Provider
+     IWBundle communeBundle = IWBundle.getBundle(BUNDLE_NAME_COMMUNE, iwc.getApplication());
+     String anordnareIdStr = communeBundle.getProperty(PROP_COMMUNE_PROVIDER_GRP_ID);
+
+    return new Integer(anordnareIdStr);
+  }
 
 	private void validateSchoolClass(IWContext iwc) throws RemoteException {
 		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(_schoolClassID));
@@ -1317,4 +1498,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private MemberFamilyLogic getMemberFamilyLogic(IWContext iwc) throws RemoteException {
 		return (MemberFamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, MemberFamilyLogic.class);
 	}
+  // Added by Göran Borgman 09.09.2003
+  private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {
+    return (ResourceBusiness) IBOLookup.getServiceInstance(iwc, ResourceBusiness.class);
+  }
 }

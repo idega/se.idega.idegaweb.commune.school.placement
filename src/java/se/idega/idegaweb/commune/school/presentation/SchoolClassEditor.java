@@ -180,7 +180,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.add(getSearchAndSortTable(), 2, 1);
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
-		table.add(getApplicationTable(iwc), 1, 5);
+    table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {
@@ -397,7 +397,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
 				link.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(choice.getChildId()));
 				link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, choice.getPrimaryKey().toString());
-
+        link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_SEASON, String.valueOf(choice.getSchoolSeasonId()));
+        link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_STUDENT, String.valueOf(choice.getChildId()));
+        link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CHOICE_STATUS, choice.getStatus());
+        link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CLASS_MEMBER, "-1");
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 				if (address != null && address.getStreetAddress() != null) {

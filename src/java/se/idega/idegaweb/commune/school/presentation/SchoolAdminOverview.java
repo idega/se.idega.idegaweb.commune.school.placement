@@ -775,7 +775,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(getSmallErrorText(localize("school.replace_date", "Replace date") + ":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 1, row);
 		table.add(input, 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":"), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":", false), 1, row++);
 
 		//if (_protocol)
 		table.add(getSmallHeader(localize("school.replace_reason", "Replace reason") + ":"), 1, row);
@@ -889,10 +889,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (_showNoChoices)
 			table.add(new HiddenInput(PARAMETER_SHOW_NO_CHOICES, "true"), 1, 1);
 		int row = 1;
+		
+		boolean isSubGroup = false;
+		SchoolClass group = getSchoolBusiness(iwc).findSchoolClass(new Integer(_schoolClassID));
+		if (group != null) {
+			isSubGroup = group.getIsSubGroup();
+		}
 
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":"), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":", isSubGroup), 1, row++);
 
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1534,7 +1540,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 	
 	
-	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
+	protected Table getNavigationTable(IWContext iwc, String heading, boolean showSubGroups) throws RemoteException {
 		Table table = new Table(4, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -1543,7 +1549,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		table.add(getSmallHeader(heading), 1, 1);
 		table.add(getSmallHeader(localize("school.year_class", "Year/Class") + ":" + Text.NON_BREAKING_SPACE), 3, 1);
-		table.add(getDropdown(iwc), 4, 1);
+		table.add(getDropdown(iwc, showSubGroups), 4, 1);
 		/*table.add(getSchoolYears(iwc), 4, 1);
 		table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 6, 1);
 		table.add(getSchoolClasses(iwc, setToSubmit), 7, 1);*/
@@ -1551,7 +1557,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
-	private SelectDropdownDouble getDropdown(IWContext iwc) throws RemoteException {
+	private SelectDropdownDouble getDropdown(IWContext iwc, boolean showSubGroups) throws RemoteException {
 		SchoolClassDropdownDouble dropdown = new SchoolClassDropdownDouble(getSchoolCommuneSession(iwc).getParameterSchoolYearID(), getSchoolCommuneSession(iwc).getParameterSchoolClassID());
 		dropdown.setSelectedValues(String.valueOf(getSchoolCommuneSession(iwc).getSchoolYearID()), String.valueOf(getSchoolCommuneSession(iwc).getSchoolClassID()));
 		
@@ -1559,7 +1565,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (getSchoolCommuneSession(iwc).getSchoolID() != -1) {
 				Collection years = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolYearsInSchool(getSchoolCommuneSession(iwc).getSchoolID());
 				if (!years.isEmpty()) {
-					Map yearGroupMap = getSchoolCommuneBusiness(iwc).getYearClassMap(years, _schoolID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), null);
+					Map yearGroupMap = getSchoolCommuneBusiness(iwc).getYearClassMap(years, _schoolID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), null, showSubGroups);
 					if (yearGroupMap != null) {
 						Iterator iter = yearGroupMap.keySet().iterator();
 						while (iter.hasNext()) {

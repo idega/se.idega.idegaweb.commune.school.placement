@@ -1380,7 +1380,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String date = iwc.getParameter(PARAMETER_DATE);
             
 			IWTimestamp stamp = new IWTimestamp(date);
-			SchoolClassMember member = getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
+			SchoolClassMember member = getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, _schoolYearID, stamp.getTimestamp(), ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
 			getSchoolCommuneBusiness(iwc).setStudentAsSpeciallyPlaced(member);
 			getSchoolCommuneBusiness(iwc).setNeedsSpecialAttention(member, getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID()), true);
 			if (_choiceID != -1)
@@ -1509,7 +1509,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	
 	private void addStudent(IWContext iwc) throws RemoteException {
 		if (_userID != -1) {
-			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), iwc.getParameter(PARAMETER_COMMENT));
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), getSchoolCommuneSession(iwc).getSchoolYearID(),  new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), iwc.getParameter(PARAMETER_COMMENT));
 			getParentPage().setParentToRedirect(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 			getParentPage().close();
 		}
@@ -1522,7 +1522,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			User user = getUserBusiness(iwc).createSpecialCitizenByPersonalIDIfDoesNotExist(searchString,null,null,searchString);
 			_userID = ((Integer) user.getPrimaryKey()).intValue();
             
-			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), getSchoolCommuneSession(iwc).getSchoolYearID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
 			_method = METHOD_EDIT_STUDENT;
 		}
 		catch (CreateException ce) {

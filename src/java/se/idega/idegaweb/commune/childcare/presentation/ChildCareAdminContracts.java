@@ -23,7 +23,6 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Text;
-//import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
@@ -48,21 +47,12 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	
 	private final static String PARAM_COMMENT = "prm_comment";
 	private final static String PARAM_GETBILL = "prm_getbill";
-	//private final static String PARAM_PROVIDER = "prm_provider";
 	private final static String PARAM_OPERATION = "prm_operation";
 	private final static String PARAM_GROUP = "prm_group";
-	//private final static String PARAM_PRESCHOOL = "prm_preschool";
 	private final static String PARAM_HOURS = "prm_hours";
-	//private final static String PARAM_PARENTHOME = "prm_parenthome";
 	private final static String PARAM_EMPLOYMENT = "prm_unemployed";
-	/*private final static String PARAM_EXTRA_CONTRACT_HOUR = "prm_ex_con_hour";
-	private final static String PARAM_EXTRA_CONTRACT_HOUR_ABOUT = "prm_ex_con_hour_about";
-	private final static String PARAM_EXTRA_CONTRACT_ALSO = "prm_ex_con_also";
-	private final static String PARAM_EXTRA_CONTRACT_ALSO_ABOUT = "prm_ex_con_also_about";*/
 	private final static String PARAM_PLACEMENT_DATE = "prm_plac_date";
-	//private final static String PARAM_ANSWER_DATE = "prm_answ_date";
-	
-	
+		
 	private final static String LABEL_COMMENT = "child_care.comment";
 	private final static String LABEL_CHILD = "child_care.child";
 	private final static String LABEL_USER_NAME = "child_care.name";
@@ -74,17 +64,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private final static String LABEL_PROVIDER_NAME = "child_care.provider_name";
 	private final static String LABEL_PROVIDER_OPERATION = "child_care.provider_operation";
 	private final static String LABEL_PROVIDER_GROUP = "child_care.provider_group";
-	//private final static String LABEL_PROVIDER_PRESCHOOL = "child_care.provider_preschool";
 	private final static String LABEL_HOURS = "child_care.hours_pr_week";
-	//private final static String LABEL_PARENT_AT_HOME = "child_care.parent_at_home";
 	private final static String LABEL_EMPLOYMENT = "child_care.no_job";
-	/*private final static String LABEL_EXTRA_CONTRACT_HOUR = "child_care.ext_cont_hour";
-	private final static String LABEL_EXTRA_CONTRACT_ALSO = "child_care.ext_cont_also";
-	private final static String LABEL_EXTRA_CONTRACT_ABOUT = "child_care.ext_cont_about";*/
 	private final static String LABEL_PLACEMENT_DATE = "child_care.placement_date";
-	//private final static String LABEL_ANSWER_DATE = "child_care.answer_date";
-	
-	//private final static String LABEL_NEW_PROVIDER = "child_care.new_provider";
 	
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_SAVE = 2;
@@ -312,7 +294,6 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			e1.printStackTrace();
 		}
 		
-		//TODO: Laddi - Put in link to create new provider
 		table.add(getLocalizedLabel(LABEL_PROVIDER_GROUP,"Group"),1,row);
 		try {
 			Collection school_classes = getSchoolBusiness(iwc).getSchoolClassHome().findBySchoolAndCategory(getSession().getChildCareID(), getSchoolBusiness(iwc).getCategoryChildcare().getCategory());
@@ -360,24 +341,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			e1.printStackTrace();
 		}
 		
-		/*CheckBox parentAtHome = getCheckBox(PARAM_PARENTHOME,"true");
-		parentAtHome.keepStatusOnAction(true);
-		table.add(getLocalizedLabel(LABEL_PARENT_AT_HOME,"Parent at home"),1,row);
-		table.add(parentAtHome,3,row++);
-		row++;*/
-
 		table.setHeight(row++, 12);
-		
-		/*t.add(getLocalizedLabel(LABEL_EXTRA_CONTRACT_HOUR,"Extra contract hour"),1,row);
-		t.add(getCheckBox(PARAM_EXTRA_CONTRACT_HOUR,"true"),2,row);
-		t.add(getLocalizedLabel(LABEL_EXTRA_CONTRACT_ABOUT,"About"),3,row);
-		t.add(getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_HOUR_ABOUT)),4,row++);
-		
-		t.add(getLocalizedLabel(LABEL_EXTRA_CONTRACT_ALSO,"Extra contract also"),1,row);
-		t.add(getCheckBox(PARAM_EXTRA_CONTRACT_ALSO,"true"),2,row);
-		t.add(getLocalizedLabel(LABEL_EXTRA_CONTRACT_ABOUT,"About"),3,row);
-		t.add(getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_ALSO_ABOUT)),4,row++);
-		row++;*/
 		
 		DateInput placementDate = (DateInput) getStyledInterface(new DateInput(PARAM_PLACEMENT_DATE));
 		placementDate.keepStatusOnAction(true);
@@ -396,8 +360,6 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(getLocalizedLabel(LABEL_COMMENT,"Comment"),1,row);
 		table.add(comment,3,row++);
 		
-		/*t.add(getLocalizedLabel(LABEL_ANSWER_DATE,"Answer date"),1,row);
-		t.add(getStyledInterface(new DateInput(PARAM_ANSWER_DATE)),2,row++);*/
 		table.setHeight(row++, 12);
 		
 		SubmitButton submit = (SubmitButton) getSubmitButton2(PARAM_SUBMIT, "true");
@@ -434,13 +396,13 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	 * @param groupPage The groupPage to set.
 	 */
 	public void setGroupPage(ICPage groupPage) {
-		this._groupPage = groupPage;
+		_groupPage = groupPage;
 	}
 	
 	/**
 	 * @param providerPage The providerPage to set.
 	 */
 	public void setProviderPage(ICPage providerPage) {
-		this._providerPage = providerPage;
+		_providerPage = providerPage;
 	}
 }

@@ -71,7 +71,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String CARE_FROM = "ccas_care_from";
 	private final static String APPLICATION_INSERTED = "ccas_application_ok";
 	private final static String APPLICATION_FAILURE = "ccas_application_failed";
-	private final static String SEND_TO_CHECK = "ccas_application_failed";
+	private final static String SEND_TO_CHECK = "ccas_send_to_check";
+	private final static String CHECK_MESSAGE = "ccas_check_message";
 	
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
@@ -292,6 +293,21 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		inputTable.setColumns(3);
 
 		int row = 1;
+
+		if (_showCheckOption) {
+			inputTable.mergeCells(1, row, inputTable.getColumns(), row);
+			inputTable.add(getSmallHeader(localize(CHECK_MESSAGE, "Please note that if you select a private provider, you have to fill out a check application as well.")), 1, row++);
+			inputTable.setHeight(row++, 6);
+			
+			CheckBox sendToCheck = getCheckBox(PARAM_SEND_TO_CHECK, "true");
+			inputTable.mergeCells(1, row, inputTable.getColumns(), row);
+			inputTable.add(sendToCheck, 1, row);
+			inputTable.add(Text.getNonBrakingSpace(), 1, row);
+			inputTable.add(getSmallHeader(localize(SEND_TO_CHECK, "Yes, send me to the check application.")), 1, row++);
+			
+			inputTable.setHeight(row++, 12);
+		}
+		
 		inputTable.mergeCells(1, 1, inputTable.getColumns(), row);
 		inputTable.add(getHeader(localize(PROVIDERS, "Providers")), 1, row++);
 
@@ -355,16 +371,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				inputTable.setHeight(row++, 12);
 			}
 
-			if (_showCheckOption) {
-				CheckBox sendToCheck = getCheckBox(PARAM_SEND_TO_CHECK, "true");
-				inputTable.mergeCells(1, row, inputTable.getColumns(), row);
-				inputTable.add(sendToCheck, 1, row);
-				inputTable.add(Text.getNonBrakingSpace(), 1, row);
-				inputTable.add(getSmallHeader(localize(SEND_TO_CHECK, "Yes, send me to the check application.")), 1, row++);
-				
-				inputTable.setHeight(row++, 6);
-			}
-			
 			TextArea messageArea = (TextArea) getStyledInterface(new TextArea(PARAM_MESSAGE));
 			messageArea.setRows(4);
 			messageArea.setWidth(Table.HUNDRED_PERCENT);

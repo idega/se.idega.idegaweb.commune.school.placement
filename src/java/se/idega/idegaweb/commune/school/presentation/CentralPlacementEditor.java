@@ -27,8 +27,6 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
 import se.idega.idegaweb.commune.childcare.presentation.ChildCareChildContracts;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
-
-import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.provider.business.ProviderSession;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
@@ -36,6 +34,7 @@ import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSessionBean;
+import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -77,10 +76,10 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/01/15 15:21:27 $ by $Author: goranb $
- * @version $Revision: 1.63 $
+ * Last modified: $Date: 2004/02/12 21:36:53 $ by $Author: laddi $
+ * @version $Revision: 1.64 $
  */
-public class CentralPlacementEditor extends CommuneBlock {
+public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
 	private static final String KP = "central_placement_editor.";
 	private static final String KEY_WINDOW_HEADING = KP + "window_heading";
@@ -226,10 +225,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private boolean _newPlacement = false;
 	private boolean _cancelNewPlacement = false;
 
-	public void main(IWContext iwc) throws Exception {
+	public void init(IWContext iwc) throws Exception {
 		iwrb = getResourceBundle(iwc);
 		form = new Form();
 		form.setName(FORM_NAME);
+		form.setEventListener(SchoolEventListener.class);
 		
 		// Parameter name returning chosen User from SearchUserModule
 		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
@@ -749,11 +749,17 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		
 		// School Category
-		table.add(getSmallHeader(localize(KEY_OPERATIONAL_FIELD_LABEL, "Operational field: "))
-																																, col++, row);
+		table.add(getSmallHeader(localize(KEY_OPERATIONAL_FIELD_LABEL, "Operational field: ")), col++, row);
 		table.add(getSchoolCategoriesDropdown(iwc), col, row);
 		table.mergeCells(col, row, col+1, row);
 		table.setRowHeight(row, rowHeight);
+		row++;
+		col = 1;
+		
+		// School season
+		table.add(getSmallHeader(localize("school_season", "School season:")), col++, row);
+		table.add(this.getSchoolSeasons(), col, row);
+		table.mergeCells(col, row, col+1, row);
 		row++;
 		col = 1;
 		
@@ -1362,7 +1368,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 			
 			SchoolSeason currentSeason = null;
 			try {
-				currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
+				//currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
+				currentSeason = getSchoolChoiceBusiness(iwc).getSchoolSeasonHome().findByPrimaryKey(new Integer(getSession().getSchoolSeasonID()));
 			}
 			catch (FinderException e) {
 				try {

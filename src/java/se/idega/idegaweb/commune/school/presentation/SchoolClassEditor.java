@@ -245,6 +245,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.setWidth(6,"12");
 		}
 
+		if (!showStudentTable) {
+			table.setColumns(table.getColumns()-1);
+		}
+
+
 		String[] validStatuses = new String[] {"PREL", "FLYT"};
 		//if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
 
@@ -383,27 +388,33 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 							column++;
 						}
 						table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
-						table.add(checkBox, column, row++);
+						if (showStudentTable) {
+							table.add(checkBox, column, row++);
+						}else {
+							++row;	
+						}
 					//}
 				}
 			}
 		//}
 
-		GenericButton selectAll = (GenericButton) getStyledInterface(new GenericButton());
-		selectAll.setValue(localize("school.select_all", "Select all"));
-		selectAll.setToCheckOnClick(checkBox, true, false);
-
-		GenericButton deselectAll = (GenericButton) getStyledInterface(new GenericButton());
-		deselectAll.setValue(localize("school.deselect_all", "Deselect all"));
-		deselectAll.setToCheckOnClick(checkBox, false);
-
-		table.add(selectAll, 1, row);
-		table.add(Text.NON_BREAKING_SPACE, 1, row);
-		table.add(deselectAll, 1, row);
-		table.mergeCells(1, row, table.getColumns(), row);
-		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		if (showStudentTable) {
+			GenericButton selectAll = (GenericButton) getStyledInterface(new GenericButton());
+			selectAll.setValue(localize("school.select_all", "Select all"));
+			selectAll.setToCheckOnClick(checkBox, true, false);
+	
+			GenericButton deselectAll = (GenericButton) getStyledInterface(new GenericButton());
+			deselectAll.setValue(localize("school.deselect_all", "Deselect all"));
+			deselectAll.setToCheckOnClick(checkBox, false);
+	
+			table.add(selectAll, 1, row);
+			table.add(Text.NON_BREAKING_SPACE, 1, row);
+			table.add(deselectAll, 1, row);
+			table.mergeCells(1, row, table.getColumns(), row);
+			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
+			table.setRowColor(row, "#FFFFFF");
+		}
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setRowColor(row, "#FFFFFF");
 
 		return table;
 	}

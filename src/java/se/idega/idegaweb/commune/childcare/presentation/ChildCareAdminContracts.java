@@ -283,6 +283,11 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 				RadioButton getBill = this.getRadioButton(PARAM_GETBILL, parent.getPrimaryKey().toString());
 				getBill.keepStatusOnAction(true);
 				getBill.setMustBeSelected(localize("child_care.must_select_billed_to", "You must select who to send the bill to."));
+				if (_application != null) {
+					if (_application.getOwner().equals(parent)) {
+						getBill.setSelected(true);
+					}
+				}
 				table.add(getBill,3,row++);
 				
 				row++;

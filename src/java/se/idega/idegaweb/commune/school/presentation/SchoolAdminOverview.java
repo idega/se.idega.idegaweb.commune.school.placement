@@ -1976,7 +1976,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
 		try {
-			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr);
+			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, !_viewAllResources);
 		}
 		catch (ResourceException re) {
 			errMsg = localize(re.getKey(), re.getDefTrans());

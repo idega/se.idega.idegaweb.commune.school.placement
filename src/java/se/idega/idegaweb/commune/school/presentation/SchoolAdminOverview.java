@@ -602,7 +602,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace", "Replace"), PARAMETER_METHOD, String.valueOf(METHOD_REPLACE)));
 			SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_METHOD, String.valueOf(METHOD_REJECT)));
-			SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
+			//SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
 			SubmitButton moveYear = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_year", "Change year"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
 			SubmitButton changeStudyPath = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_study_path", "Change Study Path"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_STUDY_PATH)));
 			SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
@@ -620,12 +620,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(Text.getNonBrakingSpace(), 1, row);
 				}
 
-				/** Gimmi 13.11.2002 _schoolID is NOT -1 so no need to check again.... */
-				/** was like this ---> if (_choiceID == -1 && _choiceID != _schoolID) { */
-				if (_choiceID == -1) {
+				/*if (_choiceID == -1) {
 					table.add(move, 1, row);
 					table.add(Text.getNonBrakingSpace(), 1, row);
-				}
+				}*/
 			}
 
 			if (_choiceID != -1 && !_showNoChoices) {

@@ -449,6 +449,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 
 		headerRow = row;
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, row, 12);
+			table.setCellpaddingRight(table.getColumns(), row, 12);
+		}
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
@@ -524,7 +528,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					else
 						table.setRowStyleClass(row, getLightRowClass());
 					table.setCellpaddingLeft(1, row, 12);
-					table.setCellpaddingRight(1, table.getColumns(), 12);
+					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
 
 				//String name = applicant.getNameLastFirst(true);
@@ -781,6 +785,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.gender", "Gender")), 3, row);
 		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
 		if (schoolAge >= 12) table.add(getSmallHeader(localize("school.language", "Language")), 5, row);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, row, 12);
+			table.setCellpaddingRight(table.getColumns(), row, 12);
+		}
 		row++;
 
 		User student;
@@ -853,7 +861,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					else
 						table.setRowStyleClass(row, getLightRowClass());
 					table.setCellpaddingLeft(1, row, 12);
-					table.setCellpaddingRight(1, table.getColumns(), 12);
+					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
 
 				if (hasMoveChoice) {
@@ -977,6 +985,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
 		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 5, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, row, 12);
+			table.setCellpaddingRight(table.getColumns(), row, 12);
+		}
 
 		Layer layerE = new Layer(Layer.DIV);
 		Layer layerD = new Layer(Layer.DIV);
@@ -1045,7 +1057,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					else
 						table.setRowStyleClass(row, getLightRowClass());
 					table.setCellpaddingLeft(1, row, 12);
-					table.setCellpaddingRight(1, table.getColumns(), 12);
+					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
 
 				if (hasMoveChoice) {

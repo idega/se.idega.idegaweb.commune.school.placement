@@ -915,21 +915,17 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 5, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row);
 		
-		/*Layer layerE = new Layer(Layer.DIV);
+		Layer layerE = new Layer(Layer.DIV);
 		Layer layerD = new Layer(Layer.DIV);
 		layerE.add(getSmallHeader(localize("school.placing_offer_alphabet_letter", "E")));
 		layerD.add(getSmallHeader(localize("school.placing_confirmed_alphabet_letter", "D")));
 		layerE.setToolTip(localize("school.placing_offer_tool_tip", "Tool tip E"));
 		layerD.setToolTip(localize("school.placing_confirmed_tool_tip", "Tool tip D"));
-		*/
+						
+		
+		table.add(layerE, 7, row);
+		table.add(layerD, 8, row++);
 				
-		String stringE = "<div title='" + localize("school.placing_offer_tool_tip", "Tool tip E") + "' >" + localize("school.placing_offer_alphabet_letter", "E") + "</div>";
-		String stringD = "<div title='" + localize("school.placing_confirmed_tool_tip", "Tool tip D") + "' >" + localize("school.placing_confirmed_alphabet_letter", "D") + "</div>";
-		table.add(getSmallHeader(stringE), 7, row);
-		table.add(getSmallHeader(stringD), 8, row++);
-		//table.add(getSmallHeader(localize("school.placing_offer_alphabet_letter", "E")), 7, row);
-		//table.add(getSmallHeader(localize("school.placing_confirmed_alphabet_letter", "D")), 8, row++);
-
 		User student;
 		Address address;
 		SchoolClassMember studentMember;

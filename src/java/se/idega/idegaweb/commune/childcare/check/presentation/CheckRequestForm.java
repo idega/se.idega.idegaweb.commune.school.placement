@@ -6,6 +6,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 
+import se.idega.idegaweb.commune.childcare.business.ChildCareSession;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
@@ -113,26 +114,29 @@ public class CheckRequestForm extends CommuneBlock {
 				} catch (Exception e) {
 					return false;
 				}
-			} else {
-				Integer childID = (Integer) iwc.getSessionAttribute(CitizenChildren.getChildIDParameterName());
-					try {
-						child = getCheckBusiness(iwc).getUserById(childID.intValue());
-						return true;
-					}
-					catch (Exception e) {
-						return false;
-					}
-			}
-		}
-		else {
-			Integer childID = (Integer) iwc.getSessionAttribute(CitizenChildren.getChildIDParameterName());
+			} 
+			else {
 				try {
-					child = getCheckBusiness(iwc).getUserById(childID.intValue());
-					return true;
+					child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
+					if (child != null)
+						return true;
+					return false;
 				}
 				catch (Exception e) {
 					return false;
 				}
+			}
+		}
+		else {
+			try {
+				child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
+				if (child != null)
+					return true;
+				return false;
+			}
+			catch (Exception e) {
+				return false;
+			}
 		}
 	}
 
@@ -538,6 +542,10 @@ public class CheckRequestForm extends CommuneBlock {
 
 	private CheckBusiness getCheckBusiness(IWContext iwc) throws Exception {
 		return (CheckBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, CheckBusiness.class);
+	}
+
+	private ChildCareSession getChildCareSession(IWContext iwc) throws Exception {
+		return (ChildCareSession) com.idega.business.IBOLookup.getSessionInstance(iwc, ChildCareSession.class);
 	}
 
 	private MemberFamilyLogic getMemberFamilyLogic(IWContext iwc) throws Exception {

@@ -229,6 +229,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
 				link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
+				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());
 				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
 

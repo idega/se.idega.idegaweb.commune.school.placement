@@ -1,5 +1,5 @@
 /*
- * $Id: PlacementBusinessBean.java,v 1.4 2005/02/08 13:21:42 laddi Exp $
+ * $Id: PlacementBusinessBean.java,v 1.5 2005/02/16 11:05:31 laddi Exp $
  * Created on Oct 15, 2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -430,7 +430,7 @@ public class PlacementBusinessBean extends IBOServiceBean  implements PlacementB
 				while (iter.hasNext()) {
 					SchoolChoice element = (SchoolChoice) iter.next();
 					if (element.getChoiceOrder() == (choice.getChoiceOrder() + 1) && !element.getStatus().equals("AVSL")) {
-						schoolChoiceBusiness.changeCaseStatus(element, schoolChoiceBusiness.getCaseStatusPreliminary().getStatus(), performer);
+						schoolChoiceBusiness.changeCaseStatus(element, schoolChoiceBusiness.getCaseStatusPreliminary().getStatus(), null);
 						schoolChoiceBusiness.sendMessageToParents(element, schoolChoiceBusiness.getPreliminaryMessageSubject(), schoolChoiceBusiness.getPreliminaryMessageBody(element),code, schoolChoiceBusiness.getPreliminaryMessageSubject(),schoolChoiceBusiness.getPreliminaryMessageBody(element),code,false);
 						continue;						
 					}

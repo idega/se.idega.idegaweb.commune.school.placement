@@ -1,5 +1,5 @@
 /*
- * $Id: PlacementBusinessBean.java,v 1.2 2005/01/07 14:24:59 laddi Exp $
+ * $Id: PlacementBusinessBean.java,v 1.3 2005/01/10 14:06:32 laddi Exp $
  * Created on Oct 15, 2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -352,7 +352,7 @@ public class PlacementBusinessBean extends IBOServiceBean  implements PlacementB
 				}
 				// Store newPlacement
 				newPlacement.store();
-				getSchoolBusiness().addToSchoolClassMemberLog(student, newPlacement.getSchoolClass(), new IWTimestamp(registerStamp).getDate(), null);
+				getSchoolBusiness().addToSchoolClassMemberLog(newPlacement, newPlacement.getSchoolClass(), new IWTimestamp(registerStamp).getDate(), null, iwc.getCurrentUser());
 			//	*** END - Store the rest of the parameters ***	
 			}
 			
@@ -361,7 +361,7 @@ public class PlacementBusinessBean extends IBOServiceBean  implements PlacementB
 				// Set removed date 
 				latestPlacement.setRemovedDate(dayBeforeRegStamp);
 				latestPlacement.store();
-				getSchoolBusiness().addToSchoolClassMemberLog(student, latestPlacement.getSchoolClass(), new IWTimestamp(dayBeforeRegStamp).getDate());
+				getSchoolBusiness().addToSchoolClassMemberLog(latestPlacement, latestPlacement.getSchoolClass(), new IWTimestamp(dayBeforeRegStamp).getDate(), iwc.getCurrentUser());
 				
 				// finish old resource placements
 				Collection rscPlaces = getResourceBusiness().getResourcePlacementsByMemberId(

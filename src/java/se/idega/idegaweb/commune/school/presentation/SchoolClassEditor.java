@@ -1358,7 +1358,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice());
 					if (member != null) {
 						getBusiness().importStudentInformationToNewClass(member, previousSeason);
-						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(choice.getChildId(), getSchoolClassID(), placementDate.getDate(), null);
+						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), placementDate.getDate(), null, iwc.getCurrentUser());
 					}
 				}
 			}
@@ -1371,7 +1371,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
-					getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(Integer.parseInt(students[a]), getSchoolClassID(), stamp.getDate(), null);
+					getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), stamp.getDate(), null, iwc.getCurrentUser());
 				}
 			}
 		}

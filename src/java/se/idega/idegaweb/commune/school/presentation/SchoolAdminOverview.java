@@ -2034,7 +2034,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 
 	private void moveGroup(IWContext iwc) throws RemoteException {
-		getSchoolCommuneBusiness(iwc).moveToGroup(_userID, _schoolClassID, getSchoolCommuneSession(iwc).getSchoolClassID(), _schoolYearID);
+		getSchoolCommuneBusiness(iwc).moveToGroup(_userID, _schoolClassID, getSchoolCommuneSession(iwc).getSchoolClassID(), _schoolYearID, iwc.getCurrentUser());
 		URLUtil URL = new URLUtil(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 		if (!_showNoChoices)
 			URL.addParameter(SchoolClassEditor.PARAMETER_ACTION, SchoolClassEditor.ACTION_SAVE);

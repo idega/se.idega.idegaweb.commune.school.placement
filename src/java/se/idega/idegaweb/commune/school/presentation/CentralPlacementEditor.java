@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/19 09:36:27 $ by $Author: goranb $
- * @version $Revision: 1.54 $
+ * Last modified: $Date: 2003/12/19 10:22:43 $ by $Author: goranb $
+ * @version $Revision: 1.55 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -602,8 +602,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 					row++;
 
 					// Resources
-					table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
-					table.mergeCells(col, row, col+2, row);
+					try {
+						table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
+						table.mergeCells(col, row, col+2, row);
+					} catch (Exception e) {}
 					row++;
 					
 					// Contract

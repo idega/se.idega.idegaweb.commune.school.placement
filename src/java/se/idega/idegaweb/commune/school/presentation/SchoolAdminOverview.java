@@ -14,6 +14,7 @@ import java.util.Vector;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
@@ -36,6 +37,7 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.HorizontalRule;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.CloseButton;
@@ -46,6 +48,7 @@ import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.Window;
+import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
@@ -217,6 +220,17 @@ public class SchoolAdminOverview extends CommuneBlock {
 					while (iter.hasNext()) {
 						User parent = (User) iter.next();
 						table.add(getSmallText(parent.getNameLastFirst(true)), 2, row);
+						try {
+							Email email = getCommuneUserBusiness(iwc).getUsersMainEmail(parent);
+							if (email != null) {
+								table.add(getSmallText(", "), 2, row);
+								Link emailLink = this.getSmallLink(email.getEmailAddress());
+								emailLink.setURL("mailto:"+email.getEmailAddress());
+								table.add(emailLink, 2, row);
+							}
+						}
+						catch (NoEmailFoundException nef) {
+						}
 						if (iter.hasNext())
 							table.add(new Break(), 2, row);
 					}
@@ -737,6 +751,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
+	}
+
+	private CommuneUserBusiness getCommuneUserBusiness(IWContext iwc) throws RemoteException {
+		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}
 
 	private SchoolCommuneSession getSchoolCommuneSession(IWContext iwc) throws RemoteException {

@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/04 13:23:52 $ by $Author: goranb $
- * @version $Revision: 1.51 $
+ * Last modified: $Date: 2003/12/10 15:41:14 $ by $Author: goranb $
+ * @version $Revision: 1.52 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -113,10 +113,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_RESOURCE_LABEL = KP + "resource_label";
 	private static final String KEY_COMMUNE_LABEL = KP + "commune_label";
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
-	private static final String KEY_PLACEMENT_PARAGRAPH_LABEL = KP + "placement_paragraph_label";
-	private static final String KEY_LATEST_INVOICE_DATE_LABEL = KP + "latest_placement_date_label";
-	private static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = KP + "payment_by_agreement";
-	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "invoice_interval";
+	public static final String KEY_PLACEMENT_PARAGRAPH_LABEL = KP + "placement_paragraph_label";
+	public static final String KEY_LATEST_INVOICE_DATE_LABEL = KP + "latest_placement_date_label";
+	public static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = KP + "payment_by_agreement";
+	public static final String KEY_INVOICE_INTERVAL_LABEL = KP + "invoice_interval";
 	private static final String KEY_PLACEMENT_DATE_LABEL = KP + "placement_date_label";
 	private static final String KEY_PARENT_LABEL = KP + "parent_label";
 	private static final String KEY_NEW_PROVIDER_LABEL = KP + "new_provider_label";
@@ -149,6 +149,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_BUTTON_CANCEL = KP + "button_cancel";
 	private static final String KEY_BUTTON_SEND = KP + "button_send";
 	private static final String KEY_BUTTON_NEW_PLACEMENT = KP + "button_new_placement";
+	private static final String KEY_BUTTON_EDIT_LATEST_PLC = KP + "button_edit_latest_placement";
 
 	// Http request parameters  
 	public static final String PARAM_ACTION = "param_action";
@@ -217,6 +218,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private SchoolClassMember latestPl = null;
 	private SchoolClassMember storedPlacement = null;
 	private Link pupilOverviewLinkButton = null;
+	private Link editLatestPlacementButton = null;
 	private ProviderSession _providerSession = null;
 
 	private int _action = -1;
@@ -542,6 +544,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_STARTDATE_LABEL, "Start date: ")), col, row);
 		table.add(getSmallHeader(localize(KEY_ENDDATE_LABEL, "End date: ")), col+2, row);
+		col = 5;
+		// Edit latest placement BUTTON
+		editLatestPlacementButton = getEditLatestPlacementButton();
+		table.add(editLatestPlacementButton, col, row);
+		table.setAlignment(col, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		
 		table.setRowHeight(row, rowHeight);
 			
 		// VALUES - Latest placement
@@ -612,7 +620,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 					col = 4;
 					// End date
 					if (latestPl.getRemovedDate() != null)
-						table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col, row);					
+						table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col, row);
+					// Edit latest placement BUTTON
+					activateEditLatestPlacementButton(latestPl);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1640,6 +1650,21 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return linkButton;
 	}
 
+	private Link getEditLatestPlacementButton() {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_EDIT_LATEST_PLC, "Edit placement")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(CentralPlacementEditLatestPlacementWindow.class);		
+		return linkButton;
+	}
+	
+	private void activateEditLatestPlacementButton(SchoolClassMember plc) {
+		if (plc != null) {
+			Integer plcPK = (Integer) plc.getPrimaryKey();
+			editLatestPlacementButton.setParameter(
+											CentralPlacementEditLatestPlacement.PARAM_LATEST_PLACEMENT_ID, 
+											plcPK.toString());
+		}
+	}
 	
 	private Link getProviderEditorButton() {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_NEW_PROVIDER, "New provider")));

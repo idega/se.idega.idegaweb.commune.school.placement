@@ -465,7 +465,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.setHeight(row++, 12);
 		
 		SubmitButton submit = (SubmitButton) getButton(new SubmitButton(localize("child_care.save", "Save"), PARAM_SUBMIT, "true"));
+		form.add(table);
 		table.add(submit,1,row);
+		form.setToDisableOnSubmit(submit, true);
 		
 		if (getResponsePage() != null) {
 			GenericButton cancel = getButton(new GenericButton("", localize("child_care.cancel", "Cancel")));
@@ -475,7 +477,6 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			table.mergeCells(1, row, table.getColumns(), row);
 		}
 												
-		form.add(table);
 		add(form);
 	}
 	

@@ -4,12 +4,10 @@ package se.idega.idegaweb.commune.childcare.presentation;
 
 import java.rmi.RemoteException;
 import java.sql.Date;
-import java.text.DateFormat;
 import java.util.Collection;
 import java.util.Iterator;
-
 import javax.ejb.EJBException;
-
+import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.business.AlreadyCreatedException;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
@@ -22,11 +20,15 @@ import se.idega.idegaweb.commune.childcare.presentation.admin.ContractRemoverWin
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementEditorConstants;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementProviderEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementSchoolGroupEditor;
-
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.data.School;
+import com.idega.block.school.data.SchoolClass;
+import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolClassMemberLog;
 import com.idega.block.school.presentation.SchoolGroupSelector;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBORuntimeException;
 import com.idega.core.location.data.Address;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -337,25 +339,101 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		}
 		if (!contracts.isEmpty()) {
 			Table contractTable = new Table();
-			DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, iwc.getCurrentLocale());
 			contractTable.add(getLocalizedSmallHeader("child_care.provider", "Provider"), 1, 1);
 			contractTable.add(getLocalizedSmallHeader("child_care.created", "Created"), 2, 1);
 			contractTable.add(getLocalizedSmallHeader("child_care.start", "Start"), 3, 1);
 			contractTable.add(getLocalizedSmallHeader("child_care.end", "End"), 4, 1);
 			contractTable.add(getLocalizedSmallHeader("child_care.care_time", "Care time"), 5, 1);
+			contractTable.add(getLocalizedSmallHeader("child_care.group", "Group"), 6, 1);
 			int crow = 2;
 			for (Iterator iter = contracts.iterator(); iter.hasNext();) {
 				ChildCareContract contract = (ChildCareContract) iter.next();
-				contractTable.add(getSmallText(contract.getApplication().getProvider().getName()), 1, crow);
-				if (contract.getCreatedDate() != null)
-					contractTable.add(getSmallText(dateFormat.format(contract.getCreatedDate())), 2, crow);
-				if (contract.getValidFromDate() != null)
-					contractTable.add(getSmallText(dateFormat.format(contract.getValidFromDate())), 3, crow);
-				if (contract.getTerminatedDate() != null)
-					contractTable.add(getSmallText(dateFormat.format(contract.getTerminatedDate())), 4, crow);
-				contractTable.add(getSmallText(getCareTime(contract.getCareTime())), 5, crow);
-				if (contract.getContractFileID() > 0)
-					contractTable.add(getPDFLink(contract.getContractFileID(), localize("child_care.view_contract", "View contract")), 6, crow);
+
+				School provider = contract.getApplication().getProvider();
+				IWTimestamp created = new IWTimestamp(contract.getCreatedDate());
+				IWTimestamp terminated = null;
+				IWTimestamp validFrom = null;
+				SchoolClassMember member = contract.getSchoolClassMember();
+				SchoolClass group = member.getSchoolClass();
+				
+				contractTable.add(getSmallText(provider.getName()), 1, crow);
+				contractTable.add(getSmallText(created.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), 2, crow);
+				
+				Collection logs = null;
+				String careTime = null;
+				if (contract.getTerminatedDate() != null) {
+					terminated = new IWTimestamp(contract.getTerminatedDate());
+				}
+				else {
+					terminated = null;
+				}
+				if (contract.getValidFromDate() != null) {
+					if (!iter.hasNext()) {
+						validFrom = new IWTimestamp(member.getRegisterDate());
+					}
+					else {
+						validFrom = new IWTimestamp(contract.getValidFromDate());
+					}
+					try {
+						logs = getBusiness().getSchoolBusiness().getSchoolClassMemberLogHome().findByPlacementAndDates(member, validFrom.getDate(), terminated != null ? terminated.getDate() : null);
+						if (logs.isEmpty()) {
+							SchoolClassMemberLog log = getBusiness().getSchoolBusiness().getSchoolClassMemberLogHome().findByPlacementAndDate(member, validFrom.getDate());
+							logs.add(log);
+						}
+					}
+					catch (FinderException fe) {
+						group = member.getSchoolClass();
+					}
+					catch (RemoteException re) {
+						throw new IBORuntimeException(re);
+					}
+				}
+				else {
+					validFrom = null;
+				}
+				careTime = getCareTime(contract.getCareTime());
+				contractTable.add(getSmallText(careTime), 5, crow);
+					
+				Link viewContract = getPDFLink(contract.getContractFileID(),localize("child_care.view_contract","View contract"));
+				contractTable.add(viewContract, 7, crow);
+
+				if (logs != null && !logs.isEmpty()) {
+					Iterator iterator = logs.iterator();
+					boolean first = true;
+					while (iterator.hasNext()) {
+						SchoolClassMemberLog log = (SchoolClassMemberLog) iterator.next();
+						IWTimestamp startDate = null;
+						IWTimestamp endDate = null;
+						if (!iterator.hasNext()) {
+							startDate = new IWTimestamp(contract.getValidFromDate());
+						}
+						else {
+							startDate = new IWTimestamp(log.getStartDate());
+						}
+						
+						if (first) {
+							if (contract.getTerminatedDate() != null) {
+								endDate = contract.getTerminatedDate() != null ? new IWTimestamp(contract.getTerminatedDate()) : null;
+							}
+							else {
+								endDate = log.getEndDate() != null ? new IWTimestamp(log.getEndDate()) : null;
+							}
+							first = false;
+						}
+						else {
+							endDate = log.getEndDate() != null ? new IWTimestamp(log.getEndDate()) : null;
+						}
+						
+						contractTable.add(getSmallText(startDate.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), 3, crow);
+						contractTable.add(getSmallText(endDate != null ? endDate.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT) : "-"), 4, crow);
+						contractTable.add(getSmallText(log.getSchoolClass().getName()), 6, crow);
+					}
+				}
+				else {
+					contractTable.add(getSmallText(validFrom.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), 3, crow);
+					contractTable.add(getSmallText(terminated != null ? terminated.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT) : "-"), 4, crow);
+					contractTable.add(getSmallText(group.getName()), 6, crow);
+				}
 
 				Link editLink = new Link(getEditIcon(localize("child_care.edit_contract", "Edit contract")));
 				editLink.setWindowToOpen(ContractEditorWindow.class);

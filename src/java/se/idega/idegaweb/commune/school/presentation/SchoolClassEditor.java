@@ -744,30 +744,27 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(Text.NON_BREAKING_SPACE, 1, row);
 
 		GenericButton groupReady = (GenericButton) getStyledInterface(new GenericButton("finalize", buttonLabel));
-		Link groupReadyLink = new Link(groupReady);
-		groupReadyLink.setWindowToOpen(SchoolAdminWindow.class);
-		groupReadyLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_FINALIZE_GROUP);
+		groupReady.setWindowToOpen(SchoolAdminWindow.class);
+		groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
+		//Link groupReadyLink = new Link(groupReady);
+		//groupReadyLink.setWindowToOpen(SchoolAdminWindow.class);
+		//groupReadyLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_FINALIZE_GROUP);
 		//groupReady.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_MANAGE));
 		//groupReady.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_FINALIZE_GROUP));
 		if (isReady) {
 			//groupReady.setSubmitConfirm(localize("school.confirm_group_locked", "Are you sure you want to set the group as locked and send out e-mails to all parents?"));
 			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date")) {
 				groupReady.setDisabled(true);
-				table.add(groupReady, 1, row);
 			}
-			else
-				table.add(groupReadyLink, 1, row);
 		}
 		else {
 			//groupReady.setSubmitConfirm(localize("school.confirm_group_ready", "Are you sure you want to set the group as ready and send out e-mails to all parents?"));
 			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date")) {
 				groupReady.setDisabled(true);
-				table.add(groupReady, 1, row);
 			}
-			else
-				table.add(groupReadyLink, 1, row);
 		}
 
+		table.add(groupReady, 1, row);
 		table.mergeCells(1, row, table.getColumns(), row);
 		table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);

@@ -16,7 +16,7 @@ import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusinessBean;
 import se.idega.idegaweb.commune.childcare.data.ChildCareContract;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
-import se.idega.idegaweb.commune.school.business.CentralPlacementBusinessBean;
+import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 
@@ -92,13 +92,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "Invoice interval: ";
 	private static final String KEY_PLACEMENT_DATE_LABEL = KP + "placement_date_label";
 
-	private static final String KEY_DROPDOWN_CHOSE = KP + "dropdown_chose";
-	private static final String KEY_DROPDOWN_YES = KP + "dropdown_yes";
-	private static final String KEY_DROPDOWN_NO = KP + "dropdown_no";
-	private static final String KEY_SCHOOL_YEAR = KP + "school_year";
-	private static final String KEY_SCHOOL_GROUP = KP + "school_group";
-	private static final String KEY_CENTRAL_ADMIN = KP + "central_admin";
-	private static final String KEY_PROVIDER_ADMIN = KP + "provider_admin";
+	public static final String KEY_DROPDOWN_CHOSE = KP + "dropdown_chose";
+	public static final String KEY_DROPDOWN_YES = KP + "dropdown_yes";
+	public static final String KEY_DROPDOWN_NO = KP + "dropdown_no";
+	public static final String KEY_SCHOOL_YEAR = KP + "school_year";
+	public static final String KEY_SCHOOL_GROUP = KP + "school_group";
+	public static final String KEY_CENTRAL_ADMIN = KP + "central_admin";
+	public static final String KEY_PROVIDER_ADMIN = KP + "provider_admin";
+	public static final String KEY_STORED_MSG_PRFX = KP + "stored_msg_prfx";
+	public static final String KEY_STORED_MSG_ERROR = KP + "stored_msg_error";
 	
 		// Button keys
 	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -142,6 +144,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String STYLE_UNDERLINED_SMALL_HEADER =
 		"font-style:normal;text-decoration:underline;color:#000000;"
 			+ "font-size:10px;font-family:Verdana,Arial,Helvetica;font-weight:bold;";
+	private static final  String STYLE_STORED_PLACEMENT_MSG =
+	"font-style:normal;color:#0000FF;"
+									+ "font-size:10px;font-family:Verdana,Arial,Helvetica;font-weight:normal;";
 	// Paths
 	private static final String PATH_TRANS_GIF =
 		"/idegaweb/bundles/com.idega.core.bundle/resources/transparentcell.gif";
@@ -154,23 +159,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 	// Instance variables
 	private IWResourceBundle iwrb;
-	//private IWBundle iwb;
 	private Form form;
 	private Table mainTable;
 	private User child;
 	private String uniqueUserSearchParam;
 	private Address address;
-	//private boolean hasChild = false;
-	//private ApplicationForm appForm;
 	private Image transGIF = new Image(PATH_TRANS_GIF);
 	private String errMsgMid = null;
-	//private String errMsgBottom = null;
-	// Form status variables
-	//private String categoryStatus = "-1";
-	//private String providerStatus = "-1";
-	//private String activityStatus = "-1";
-	//private String yearStatus = "-1";
-	//private String groupStatus = "-1";
+	private SchoolClassMember storedPlacement = null;
 
 	private int _action = -1;
 	private int _presentation = -1;
@@ -210,7 +206,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Perform actions according the _action input parameter
 		switch (_action) {
 			case ACTION_PLACE_PUPIL :
-				storePlacement(iwc);
+				storedPlacement = storePlacement(iwc);
 				break;
 			case ACTION_REMOVE_SESSION_CHILD :
 				removeSessionChild(iwc);
@@ -219,7 +215,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 
 		if (errMsgMid == null && (child == null || _presentation == PRESENTATION_SEARCH_FORM
-				|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX))) {
+				|| iwc.isParameterSet(SearchUserModule.SEARCH_COMMITTED + UNIQUE_SUFFIX)
+																										|| storedPlacement != null)) {
 			// show search form
 			setMainTableContent(getSearchTable(iwc));
 		} else {
@@ -264,10 +261,19 @@ public class CentralPlacementEditor extends CommuneBlock {
 		int col = 1;
 		int row = 1;
 
-		// *** HEADING Search pupil ***
 		Image space1 = (Image) transGIF.clone();
 		space1.setWidth(6);
-		//space1.setHeight(20);
+
+		if (storedPlacement != null) {
+			table.add(space1, col, row);
+			table.add(getStoredPlacementMsg(iwc), col, row);
+			table.setRowHeight(row, "20");
+			table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+			row++;
+			col = 1;
+		}
+
+		// *** HEADING Search pupil ***
 		table.add(space1, col, row);
 		Text pupilTxt = new Text(localize(KEY_SEARCH_PUPIL_HEADING, "Search pupil"));
 		pupilTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
@@ -515,25 +521,27 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_ADMIN_LABEL, "Administration: ")), col++, row);
 		// Provider values
-		School school = getCurrentProvider(iwc);
-		if (school != null && iwc.isParameterSet(PARAM_PROVIDER)) {
-			row--;row--;
-			col = 2;
-			// School Address value
-			table.add(school.getSchoolAddress()+", "+school.getSchoolZipCode()+" "
-																						+school.getSchoolZipArea(), col, row);
-			table.mergeCells(col, row, col+1, row);
-			col++; col++;
-			// Commune value
-			table.add(getCommuneName(school), col, row);
-			row++;
-			col = 2;
-			// Phone value
-			table.add(school.getSchoolPhone(), col, row);
-			row++;
-			// Administrator value
-			table.add(school.getCentralizedAdministration() ? localize(KEY_CENTRAL_ADMIN, "Central") :
-																	localize(KEY_PROVIDER_ADMIN, "Provider"), col, row);
+		if (iwc.isParameterSet(PARAM_PROVIDER)) {
+			School school = getCurrentProvider(iwc);
+			if (school != null) {
+				row--;row--;
+				col = 2;
+				// School Address value
+				table.add(school.getSchoolAddress()+", "+school.getSchoolZipCode()+" "
+																							+school.getSchoolZipArea(), col, row);
+				table.mergeCells(col, row, col+1, row);
+				col++; col++;
+				// Commune value
+				table.add(getCommuneName(school), col, row);
+				row++;
+				col = 2;
+				// Phone value
+				table.add(school.getSchoolPhone(), col, row);
+				row++;
+				// Administrator value
+				table.add(school.getCentralizedAdministration() ? localize(KEY_CENTRAL_ADMIN, "Central") :
+																		localize(KEY_PROVIDER_ADMIN, "Provider"), col, row);
+			}
 		}
 		table.add(getSmallHeader(localize(KEY_PAYMENT_BY_INVOICE_LABEL, "Payment by invoice: ")),
 																																++col, row);
@@ -580,7 +588,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Resource
 		table.add(getSmallHeader(localize(KEY_RESOURCE_LABEL, "Resource: ")), col++, row);
 		//  Resource input checkboxes
-		if (iwc.isParameterSet(PARAM_ACTIVITY) && iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
+		if (iwc.isParameterSet(PARAM_ACTIVITY) && 
+				!iwc.getParameter(PARAM_ACTIVITY).equals("-1") &&
+				iwc.isParameterSet(PARAM_SCHOOL_YEAR) && 
+				!iwc.getParameter(PARAM_SCHOOL_YEAR).equals("-1")) {
 			try {
 				Collection rscColl = getResourceBusiness(iwc).getAssignableResourcesByYearAndType(
 						iwc.getParameter(PARAM_SCHOOL_YEAR), iwc.getParameter(PARAM_ACTIVITY));
@@ -769,7 +780,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		DropdownMenu activities = new DropdownMenu(PARAM_ACTIVITY);
 		activities.setToSubmit(true);
 		activities.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (iwc.isParameterSet(PARAM_PROVIDER)) {
+		if (iwc.isParameterSet(PARAM_PROVIDER) && 
+																	!iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
 			try {
 				School school =
 					getSchoolBusiness(iwc).getSchool(new Integer(iwc.getParameter(PARAM_PROVIDER)));
@@ -799,7 +811,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		years.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		if (iwc.isParameterSet(PARAM_ACTIVITY)) {
 			try {
-				if (iwc.isParameterSet(PARAM_PROVIDER)) {
+				if (iwc.isParameterSet(PARAM_PROVIDER) && 
+																	!iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
 					String providerIdStr = iwc.getParameter(PARAM_PROVIDER);
 					School school = getSchoolBusiness(iwc).getSchool(new Integer(providerIdStr));
 					if (school != null) {
@@ -939,7 +952,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	 */
 	private School getCurrentProvider(IWContext iwc) {
 		School school = null;
-		if (iwc.isParameterSet(PARAM_PROVIDER)) {
+		if (iwc.isParameterSet(PARAM_PROVIDER) && 
+																	!iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
 			try {
 				school = getSchoolBusiness(iwc).
 													getSchool(new Integer(iwc.getParameter(PARAM_PROVIDER)));
@@ -959,13 +973,39 @@ public class CentralPlacementEditor extends CommuneBlock {
 	 * @param communePK
 	 * @return
 	 */
-	public String getCommuneName(School school) {
+	private String getCommuneName(School school) {
 		String comName = "";
 		Commune commune = school.getCommune();
 		if (commune != null)
 			comName = commune.getCommuneName();
 			
 		return comName;
+	}
+	
+	public Text getStoredPlacementMsg(IWContext iwc) {
+		Text txt = null;
+		StringBuffer buf = null;
+		if (storedPlacement != null) {
+			SchoolClassMember pl = storedPlacement;
+			buf = new StringBuffer();
+			buf.append(localize(KEY_STORED_MSG_PRFX, "Stored placement: "));
+			try {
+				buf.append(getUserBusiness(iwc).getUser(pl.getClassMemberId()).getNameLastFirst());
+				buf.append(", ");
+				SchoolClass schClass = getSchoolBusiness(iwc).getSchoolClassHome().
+																	findByPrimaryKey(new Integer(pl.getSchoolClassId()));
+				buf.append(schClass.getName() + ", ");
+				buf.append(schClass.getSchool().getName() + ", ");
+				IWTimestamp regStamp = new IWTimestamp(pl.getRegisterDate().getTime());
+				buf.append(regStamp.getDateString("yyyy-MM-dd"));							
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}				
+		txt = new Text(buf.toString());
+		txt.setFontStyle(STYLE_STORED_PLACEMENT_MSG);
+		return txt;
 	}
 
 	/**
@@ -1006,10 +1046,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		child = null;
 	}
 	
-	private CentralPlacementBusinessBean getCentralPlacementBusiness(IWContext iwc) 
+	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) 
 																										throws RemoteException {
-		return (CentralPlacementBusinessBean) 
-					IBOLookup.getServiceInstance(iwc, CentralPlacementBusinessBean.class);
+		return (CentralPlacementBusiness) 
+					IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
 	}
 
 

@@ -15,6 +15,7 @@ import java.util.Vector;
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.accounting.resource.business.ClassMemberException;
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
@@ -95,8 +96,10 @@ public class SchoolAdminOverview extends CommuneBlock {
   public static final String PARAMETER_RESOURCE_STUDENT = "resource_student";    // by Göran Borgman 14.09.2003
   public static final String PARAMETER_RESOURCE_CLASS_MEMBER = "resource_school_member";    // by Göran Borgman 14.09.2003
   public static final String PARAMETER_RESOURCE_CHOICE_STATUS = "resource_school_choice_status";  // by Göran Borgman 14.09.2003
-
-	public static final int METHOD_OVERVIEW = 1;
+  public static final String PARAMETER_RESOURCE_BEAN_INIT = "set_resource_java_bean";  
+  public static final String PARAMETER_SCHOOL_MEMBER_ID = "sch_member_id";
+  public static final String PARAMETER_SCHOOL_CLASS_MEMBER_ID = "sch_school_member_id"; //  // by Göran Borgman 14.09.2003
+  public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
 	public static final int METHOD_REPLACE = 3;
 	public static final int METHOD_MOVE = 4;
@@ -129,6 +132,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private static final String PARAMETER_DATE = "sch_date";
 	private static final String PARAMETER_FINALIZE_SUBJECT = "sch_admin_finalize_subject";
 	private static final String PARAMETER_FINALIZE_BODY = "sch_admin_finalize_body";
+  
+  private static final String KEY_SESSION_ATTRIBUTE_RSCTO = "rscTO";
 	
 	private int _method = -1;
 	private int _action = -1;
@@ -141,7 +146,8 @@ public class SchoolAdminOverview extends CommuneBlock {
   private int _rsc_studentID = -1;
   private int _rsc_seasonID = -1;
   private int _rsc_classMemberID = -1;
- private String _rsc_choiceStatus = null;
+  private String _rsc_choiceStatus = null;
+  private SchoolAdminOverviewTO _rscTO = new SchoolAdminOverviewTO();  // Transfer object to hold resource params in http session
 
 	private boolean _protocol = true;
 	//private boolean _move = true;
@@ -494,7 +500,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			}
       
       // Göran Borgman 09.09.2003 - Resources button
-      if (_choiceID != -1 && !_showNoChoices) {
+      if (_showOnlyOverview) {
         table.add(resources, 1, row);
         table.add(Text.getNonBrakingSpace(), 1, row);
       }
@@ -1045,9 +1051,12 @@ public class SchoolAdminOverview extends CommuneBlock {
     row = 1;
     DropdownMenu rscDD = getAssignableResources(iwc);
     table.add(rscDD, 2, row++);
+    long currentTime = new Date().getTime();
     DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+    startDate.setDate(new java.sql.Date(currentTime));
     table.add(startDate, 2, row++);
-    DateInput endDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+    DateInput endDate = new DateInput(PARAMETER_RESOURCE_ENDDATE);
+    endDate.setDate(new java.sql.Date(currentTime));
     table.add(endDate, 2, row++);
     
     // *** Button row ***
@@ -1289,12 +1298,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		if (iwc.isParameterSet(getSchoolCommuneSession(iwc).getParameterSchoolClassID()))
 			_schoolClassID = Integer.parseInt(iwc.getParameter(getSchoolCommuneSession(iwc).getParameterSchoolClassID()));
-    else if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_ID)) {
-        // link parameter from SchoolClassEditor  -  added by Göran
-      _schoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID));
-      new Integer(_schoolClassID);     
-    }
-    
+        
 		if (iwc.isParameterSet(PARAMETER_SHOW_ONLY_OVERVIEW))
 			_showOnlyOverview = true;
 
@@ -1329,18 +1333,18 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();
     
-    // Resource handling by Göran Borgman 14.09.2003
-    if (iwc.isParameterSet(PARAMETER_RESOURCE_STUDENT))
-      _rsc_studentID = Integer.parseInt(iwc.getParameter(PARAMETER_RESOURCE_STUDENT));
-
-    if (iwc.isParameterSet(PARAMETER_RESOURCE_SEASON))
-      _rsc_seasonID = Integer.parseInt(iwc.getParameter(PARAMETER_RESOURCE_SEASON));
-
-    if (iwc.isParameterSet(PARAMETER_RESOURCE_CHOICE_STATUS))
-      _rsc_choiceStatus = iwc.getParameter(PARAMETER_RESOURCE_CHOICE_STATUS);
-
-    if (iwc.isParameterSet(PARAMETER_RESOURCE_CLASS_MEMBER))
-      _rsc_classMemberID = Integer.parseInt(iwc.getParameter(PARAMETER_RESOURCE_CLASS_MEMBER));
+    // RESOURCE HANDLING by Göran Borgman 14.09.2003
+    if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_MEMBER_ID)) {
+      _rscTO = new SchoolAdminOverviewTO();
+      // populate TO
+      if (iwc.isParameterSet(PARAMETER_SCHOOL_CLASS_MEMBER_ID))
+        _rscTO.setClassMemberID(Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID)));
+      // put TO in session
+      iwc.setSessionAttribute(KEY_SESSION_ATTRIBUTE_RSCTO, _rscTO);      
+    } else {    
+      // Get rscTO from session
+      _rscTO = (SchoolAdminOverviewTO) iwc.getSessionAttribute(KEY_SESSION_ATTRIBUTE_RSCTO);
+    }   
 
 		/** @todo LAGA... er ekki alveg rett */
 	}
@@ -1441,16 +1445,23 @@ public class SchoolAdminOverview extends CommuneBlock {
     return DD;
   }
   
-  private void saveResource(IWContext iwc) throws RemoteException, FinderException {
-    SchoolBusiness schBusyBean =  getSchoolCommuneBusiness(iwc).getSchoolBusiness();
-    String studentIdStr = iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID);
-    int studentId = 0;
-    int seasonId = 0;
-    SchoolClassMember placement = schBusyBean.getSchoolClassMemberHome().findByUserAndSeason(studentId, seasonId);
-    String rsdIdParam = iwc.getParameter(PARAMETER_RESOURCE_ID);
-    String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
-    String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
+  private void saveResource(IWContext iwc) throws RemoteException, FinderException, ClassMemberException {
+    int rscID = -1;
+    int placementID = -1;
     
+    String rscIdStr = iwc.getParameter(PARAMETER_RESOURCE_ID);
+    if (rscIdStr != null) 
+      rscID = Integer.parseInt(rscIdStr);      
+    placementID = _rscTO.getClassMemberID();
+
+    // Save the resource placement
+    if (rscID != -1 && placementID != -1) {
+      String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
+      String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);        
+      getResourceBusiness(iwc).createResourcePlacement(rscID, placementID, startDateStr, endDateStr);
+    } else {
+      throw new ClassMemberException("school.no_valid_classmember", "No valid student placement could be found");
+    }    
   }
   
   private Integer getProviderGrpId(IWContext iwc) {

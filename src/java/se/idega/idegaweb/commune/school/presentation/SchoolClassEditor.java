@@ -214,7 +214,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		table.add(getApplicationTable(iwc), 1, 5);
 
-		table.add(getLegendTable(getSchoolID() < 1), 1, 5);
+		table.add(getLegendTable(true, getSchoolID() < 1), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
 		if (this.showStudentTable) {

@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/19 12:47:28 $ by $Author: goranb $
- * @version $Revision: 1.58 $
+ * Last modified: $Date: 2004/01/05 13:34:46 $ by $Author: goranb $
+ * @version $Revision: 1.59 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -587,6 +587,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 						// add school group
 						buf.append(", " + localize(KEY_SCHOOL_GROUP, "group") + " "
 											   + latestPl.getSchoolClass().getSchoolClassName());						
+					} catch (Exception e) {}
+					try {
+						// add study path
+						if (latestPl.getStudyPathId() != -1) {
+							SchoolStudyPathHome  home = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+							SchoolStudyPath sp = home.findByPrimaryKey(new Integer(latestPl.getStudyPathId()));
+							buf.append(", " + localize(KEY_STUDY_PATH_LABEL, "Study path") + sp.getCode());
+						}
 					} catch (Exception e) {}
 
 					table.add(getSmallText(buf.toString()), col, row);

@@ -175,10 +175,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setCellspacing(0);
 
 		int row = 1;
-		table.add(getHeader(localize("school.name", "Name")), 1, row);
-		table.add(getHeader(localize("school.personal_id", "Personal ID")), 2, row);
-		table.add(getHeader(localize("school.from_school", "From School")), 3, row);
-		table.add(getHeader(localize("school.date", "Date")), 4, row++);
+		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
+		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
+		table.add(getSmallHeader(localize("school.from_school", "From School")), 3, row);
+		table.add(getSmallHeader(localize("school.date", "Date")), 4, row++);
 
 		CheckBox checkBox = new CheckBox();
 		Link link;
@@ -266,10 +266,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setColumns(5);
 
 		int row = 1;
-		table.add(getHeader(localize("school.name", "Name")), 1, row);
-		table.add(getHeader(localize("school.personal_id", "Personal ID")), 2, row);
-		table.add(getHeader(localize("school.address", "Address")), 3, row);
-		table.add(getHeader(localize("school.class", "Class")), 4, row++);
+		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
+		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
+		table.add(getSmallHeader(localize("school.address", "Address")), 3, row);
+		table.add(getSmallHeader(localize("school.class", "Class")), 4, row++);
 
 		User student;
 		Address address;
@@ -347,10 +347,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setColumns(5);
 
 		int row = 1;
-		table.add(getHeader(localize("school.name", "Name")), 1, row);
-		table.add(getHeader(localize("school.personal_id", "Personal ID")), 2, row);
-		table.add(getHeader(localize("school.address", "Address")), 3, row);
-		table.add(getHeader(localize("school.class", "Class")), 4, row);
+		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
+		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
+		table.add(getSmallHeader(localize("school.address", "Address")), 3, row);
+		table.add(getSmallHeader(localize("school.class", "Class")), 4, row);
 		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), 5, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 5, row++);
 
@@ -414,7 +414,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 
-		table.add(getHeader(localize("school.previous_year_class", "Previous year class")), 1, 1);
+		table.add(getSmallHeader(localize("school.previous_year_class", "Previous year class")), 1, 1);
 		table.add(getSmallHeader(localize("school.class", "Class") + Text.NON_BREAKING_SPACE), 2, 1);
 		table.add(getPreviousSchoolClasses(classes), 2, 1);
 
@@ -428,10 +428,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 
-		table.add(getHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 1);
-		table.add(getHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID(), getBusiness().getGradeForYear(getSchoolYearID()) - 1))), 2, 1);
-		table.add(getHeader(" / "), 2, 1);
-		table.add(getHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID()))), 2, 1);
+		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 1);
+		table.add(getSmallHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID(), getBusiness().getGradeForYear(getSchoolYearID()) - 1))), 2, 1);
+		table.add(getSmallHeader(" / "), 2, 1);
+		table.add(getSmallHeader(String.valueOf(getBusiness().getSchoolChoiceBusiness().getNumberOfApplications(getSchoolID(), getSchoolSeasonID()))), 2, 1);
 
 		return table;
 	}

@@ -384,6 +384,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		IWTimestamp stamp = new IWTimestamp();
 		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE, true));
 		input.setToDisplayDayLast(true);
+		input.keepStatusOnAction(true);
 		input.setStyle("commune_"+STYLENAME_INTERFACE);
 		input.setYearRange(stamp.getYear(), stamp.getYear() - 5);
 		if (_protocol)
@@ -401,13 +402,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(new Break(),1,row);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_REPLACE_MESSAGE));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
+		textArea.setAsNotEmpty(localize("school.must_provide_reason_for_replacement","You must specify a reason for replacement."));
 		textArea.keepStatusOnAction(true);
 		textArea.setHeight(4);
 		table.add(textArea,1,row++);
 		
 		SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace","Replace"),PARAMETER_ACTION,String.valueOf(ACTION_REPLACE)));
 		replace.setValueOnClick(PARAMETER_METHOD, "-1");
-		replace.setToEnableWhenChecked(PARAMETER_PROTOCOL);
+		//replace.setToEnableWhenChecked(PARAMETER_PROTOCOL);
 		table.add(replace,1,row);
 		table.add(Text.NON_BREAKING_SPACE,1,row);
     table.add(close,1,row);
@@ -430,18 +432,18 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(getSmallHeader(localize("school.move_student_info","You have selected to move student: ")+user.getName()+"."),1,row++);
 		
 		table.add(getSmallHeader(localize("school.new_school","New school")+": "),1,row);
-		table.add(getSchools(iwc),1,row++);
+		DropdownMenu schools = getSchools(iwc);
+		schools.addMenuElementFirst("-1", localize("school.move_outside_of_nacka", "Outside of Nacka"));
+		table.add(schools,1,row++);
 		
 		table.add(getSmallHeader(localize("school.move_reason_text","The following message will be sent to the new school as the reason for move.")),1,row++);
 		
-		if (_move)
-			table.add(getSmallText(localize("school.move_reason","Move reason")+":"),1,row);
-		else
-			table.add(getSmallErrorText(localize("school.move_reason","Move reason")+":"),1,row);
+		table.add(getSmallText(localize("school.move_reason","Move reason")+":"),1,row);
 		table.add(new Break(),1,row);
 		TextArea textArea = (TextArea) getStyledInterface(new TextArea(PARAMETER_MOVE_MESSAGE));
 		textArea.setWidth(Table.HUNDRED_PERCENT);
 		textArea.setHeight(4);
+		textArea.setAsNotEmpty(localize("school.must_provide_reason_for_move","You must specify a reason for move."));
 		table.add(textArea,1,row++);
 		
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_ACTION,String.valueOf(ACTION_MOVE)));
@@ -516,7 +518,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String date = iwc.getParameter(PARAMETER_DATE);
 			
 			IWTimestamp stamp = new IWTimestamp(date);
-			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
+			SchoolClassMember member = getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
+			getSchoolCommuneBusiness(iwc).setStudentAsSpeciallyPlaced(member);
+			getSchoolCommuneBusiness(iwc).setNeedsSpecialAttention(member, getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID()),true);
 			if (_choiceID != -1)
 				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().groupPlaceAction(new Integer(_choiceID), iwc.getCurrentUser());
 			
@@ -535,38 +539,50 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
 			int schoolTypeID = -1;
-			try {
-				School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolID));
-				Collection Stypes = school.findRelatedSchoolTypes();
-				if (!Stypes.isEmpty()) {
-					SchoolType schoolType = (SchoolType) Stypes.iterator().next();
-					schoolTypeID = ((Integer) schoolType.getPrimaryKey()).intValue();
+			if (schoolID != -1) {
+				try {
+					School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolID));
+					Collection Stypes = school.findRelatedSchoolTypes();
+					if (!Stypes.isEmpty()) {
+						SchoolType schoolType = (SchoolType) Stypes.iterator().next();
+						schoolTypeID = ((Integer) schoolType.getPrimaryKey()).intValue();
+					}
 				}
-			}
-			catch (Exception e) {
-				schoolTypeID = -1;
+				catch (Exception e) {
+					schoolTypeID = -1;
+				}
 			}
 
 			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(getSchoolCommuneSession(iwc).getSchoolYearID()));
 			int grade = getSchoolCommuneBusiness(iwc).getGradeForYear(getSchoolCommuneSession(iwc).getSchoolYearID()) - 1;
 			User student = getUserBusiness(iwc).getUser(_userID);
+			Address studentAddress = getUserBusiness(iwc).getUserAddress1(_userID);
+			getSchoolCommuneBusiness(iwc).setNeedsSpecialAttention(_userID, getSchoolCommuneBusiness(iwc).getPreviousSchoolSeasonID(getSchoolCommuneSession(iwc).getSchoolSeasonID()),true);
 			
-			try {
-				User headmaster = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getHeadmaster(schoolID);
-				if (headmaster != null)
-					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster, localize("school.student_moved","Student moved to your school"), localize("school.student_moved_body","The following student has been moved to your school and will need to be handled accordingly: ") + student.getNameLastFirst(true));
+			if (schoolID != -1) {
+				try {
+					User headmaster = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getHeadmaster(schoolID);
+					if (headmaster != null) {
+						String address = "";
+						if (studentAddress != null) address = studentAddress.getStreetAddress();
+						Object[] arguments = { student.getNameLastFirst(true), PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale()), address };
+						String messageSubject = localize("school.student_moved","Student moved to your school");
+						String messageBody = localize("school.student_moved_body","The following student has been moved to your school and will need to be handled accordingly: ");
+						getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster, MessageFormat.format(messageSubject, arguments), MessageFormat.format(messageBody, arguments));
+					}
+				}
+				catch (Exception e) {
+				}
+					
+				IWTimestamp stamp = new IWTimestamp();
+				try {
+					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			catch (Exception e) {
-			}
-				
-			IWTimestamp stamp = new IWTimestamp();
-			try {
-				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().createSchoolChoice(((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), _userID, schoolTypeID, getSchoolCommuneSession(iwc).getSchoolID(), schoolID, grade, 1, 2, 1, 1, "", message, stamp.getTimestampRightNow(), true, false, false, true, false, getSchoolCommuneBusiness(iwc).getCaseStatus("FLYT"), null);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-			}
-			
+						
 			getParentPage().setParentToReload();
 			getParentPage().close();
 		}

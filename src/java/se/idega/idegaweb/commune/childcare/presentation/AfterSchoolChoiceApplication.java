@@ -450,7 +450,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			if (areas == null)
 				areas = getBusiness().getSchoolBusiness().findAllSchoolAreas();
 			if (providerMap == null)
-				providerMap = getBusiness().getProviderAreaMap(areas, locale, emptyString);
+				providerMap = getBusiness().getProviderAreaMap(areas, locale, emptyString, true);
 
 			if (areas != null && providerMap != null) {
 				Iterator iter = areas.iterator();

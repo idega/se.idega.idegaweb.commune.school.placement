@@ -4,7 +4,6 @@
 package se.idega.idegaweb.commune.childcare.presentation;
 
 import java.rmi.RemoteException;
-import java.sql.Date;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -55,7 +54,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String PARAMETER_ACTION = "ccas_action";
 	private final static String PARAM_FORM_SUBMIT = "ccas_submit";
 	private final static String PARAM_DATE = "ccas_date";
-	private final static String PARAM_QUEUE_DATE = "ccas_queue_date";
 	private final static String PARAM_AREA = "ccas_area";
 	private final static String PARAM_PROVIDER = "ccas_provider";
 	private final static String PARAM_MESSAGE = "ccas_message";
@@ -150,12 +148,11 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 
 	private void viewForm(IWContext iwc) {
-
 		if (child != null) {
-
 			Form form = new Form();
 			form.setOnSubmit("return checkApplication()");
 			form.maintainParameter(prmChildId);
+
 			Table table = new Table();
 			table.setWidth(getWidth());
 			table.setCellpadding(getCellpadding());
@@ -167,9 +164,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.setHeight(row++, 12);
 			table.add(getInputTable(iwc), 1, row++);
 			table.setHeight(row++, 12);
-
-			//GenericButton showPrognosis = getButton(new GenericButton("show_prognosis", localize("view_prognosis", "View prognosis")));
-			//showPrognosis.setWindowToOpen(ChildCarePrognosisWindow.class);
 
 			SubmitButton submit = (SubmitButton) getButton(new SubmitButton(localize(PARAM_FORM_SUBMIT, "Submit application"), PARAMETER_ACTION, String.valueOf(ACTION_SUBMIT)));
 			if (isAdmin) {
@@ -183,8 +177,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				}
 			}
 
-			//table.add(showPrognosis, 1, row);
-			//table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(submit, 1, row);
 
 			if (submit.getDisabled()) {
@@ -216,18 +208,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			int numberOfChoices = 3;
 			Integer[] providers = new Integer[numberOfChoices];
 			String[] dates = new String[numberOfChoices];
-			Date[] queueDates = new Date[numberOfChoices];
 
 			for (int i = 0; i < numberOfChoices; i++) {
 				providers[i] = iwc.isParameterSet(PARAM_PROVIDER + "_" + (i + 1)) ? Integer.valueOf(iwc.getParameter(PARAM_PROVIDER + "_" + (i + 1))) : null;
 				dates[i] = iwc.isParameterSet(PARAM_DATE + "_" + (i + 1)) ? iwc.getParameter(PARAM_DATE + "_" + (i + 1)) : null;
-				if (isAdmin) {
-					if (iwc.isParameterSet(PARAM_QUEUE_DATE + "_" + (i + 1))) {
-						queueDates[i] = new IWTimestamp(iwc.getParameter(PARAM_QUEUE_DATE + "_" + (i + 1))).getDate();
-					}
-					else
-						queueDates[i] = null;
-				}
 			}
 			String message = iwc.getParameter(PARAM_MESSAGE);
 
@@ -239,7 +223,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				parent = iwc.getCurrentUser();
 			}
 
-			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, null, null);
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, null);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {
@@ -275,7 +259,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		String strProvider = localize(PARAM_PROVIDER, "Provider");
 		Text labelProvider = getSmallHeader(strProvider);
 		Text labelFrom = getSmallHeader(localize(CARE_FROM, "From") + ":");
-		//Text lablequeueDateText = getSmallHeader(localize("child_care.queue_data", "Queue date") + ":");
 		IWTimestamp stamp = new IWTimestamp();
 
 		AfterSchoolChoice afterSchoolChoice = null;
@@ -320,7 +303,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				}
 				labelProvider = getSmallHeader(strProvider + Text.NON_BREAKING_SPACE + i + ":");
 				inputTable.add(labelProvider, 1, row);
-				//inputTable.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
 				inputTable.add(dropdown, 3, row++);
 
 				DateInput date = (DateInput) getStyledInterface(new DateInput(PARAM_DATE + "_" + i));
@@ -332,19 +314,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					date.setYearRange(stamp.getYear() - 5, stamp.getYear() + 5);
 				inputTable.add(labelFrom, 1, row);
 				inputTable.add(date, 3, row++);
-
-				/*
-				if (isAdmin) {
-					DateInput queueDate = (DateInput)getStyledInterface(new DateInput(PARAM_QUEUE_DATE + "_" + i));
-					if (choice != null)
-						queueDate.setDate(choice.getQueueDate());
-					else
-						queueDate.setToCurrentDate();
-					if (isAdmin)
-						queueDate.setYearRange(stamp.getYear() - 5, stamp.getYear() + 5);
-					//inputTable.add(queueDateText, 1, row);
-					//inputTable.add(queueDate, 3, row++);
-				}*/
 
 				inputTable.setHeight(row++, 12);
 			}
@@ -476,14 +445,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		return (AfterSchoolBusiness) IBOLookup.getServiceInstance(iwac, AfterSchoolBusiness.class);
 	}
 
-	//	private CheckBusiness getCheckBusiness(IWApplicationContext iwac) throws RemoteException {
-	//		return (CheckBusiness) IBOLookup.getServiceInstance(iwac, CheckBusiness.class);
-	//	}
 	/* (non-Javadoc)
 	 * @see se.idega.idegaweb.commune.presentation.CommuneBlock#localize(java.lang.String, java.lang.String)
 	 */
 	public String localize(String textKey, String defaultText) {
 		return super.localize(LOCALIZE_PREFIX + textKey, defaultText);
 	}
-
 }

@@ -21,7 +21,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.data.SchoolArea;
 import com.idega.business.IBOLookup;
-import com.idega.core.data.Address;
+import com.idega.core.location.data.Address;
 import com.idega.data.IDOCreateException;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;

@@ -12,8 +12,8 @@ import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
 import com.idega.block.school.data.SchoolType;
-import com.idega.core.data.Address;
-import com.idega.core.data.PostalCode;
+import com.idega.core.location.data.Address;
+import com.idega.core.location.data.PostalCode;
 import com.idega.presentation.ExceptionWrapper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;

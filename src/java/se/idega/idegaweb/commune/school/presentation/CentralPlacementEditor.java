@@ -17,6 +17,7 @@ import javax.ejb.EJBException;
 import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.accounting.business.AccountingSession;
+import se.idega.idegaweb.commune.accounting.invoice.presentation.RegularPaymentEntriesList;
 import se.idega.idegaweb.commune.accounting.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.accounting.resource.data.Resource;
 import se.idega.idegaweb.commune.accounting.resource.data.ResourceClassMember;
@@ -76,8 +77,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/19 12:31:45 $ by $Author: goranb $
- * @version $Revision: 1.40 $
+ * Last modified: $Date: 2003/11/20 13:00:40 $ by $Author: goranb $
+ * @version $Revision: 1.41 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -502,11 +503,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		// Placement
 		table.add(getSmallHeader(localize(KEY_PLACEMENT_LABEL, "Placement: ")), col, row);
-		// BUTTON Regular payment 
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-												KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")), 5, row);
-				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
+		// BUTTON Regular payment
+		/*Link regPaymentButton = getRegularPaymentTopButton(iwc);
+		table.add(regPaymentButton, 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		*/
 		row++;
 		col = 1;
 		// Resources
@@ -565,6 +566,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 					table.add(getSmallText(buf.toString()), col, row);
 					table.mergeCells(col, row, col+2, row);
+
+					// BUTTON Regular payment for Latest Placement					
+					if (!(iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) 
+							|| "-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY))) {
+						table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row);
+						table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+					}
 					row++;
 
 					// Resources
@@ -850,14 +858,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 		rowTable.add(getSmallHeader(localize(KEY_INVOICE_INTERVAL_LABEL, "Invoice interval: ")),
 																													tmpCol++, tmpRow);
 		rowTable.add(getInvoiceIntervalDropdown(iwc), tmpCol++, tmpRow);
-		// BUTTON Regular payment 
-		rowTable.add(new SubmitButton(
-				iwrb.getLocalizedImageButton(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment: ")),
-																														tmpCol, tmpRow);
-																											
-		//		PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), tmpCol, tmpRow);
-		rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_RIGHT);
-		rowTable.setWidthAndHeightToHundredPercent();
+		
+		// BUTTON Regular payment for New Placement					
+		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
+				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY)))) {
+			rowTable.add(getRegularPaymentBottomButton(iwc), tmpCol, tmpRow);																											
+			rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_RIGHT);
+			rowTable.setWidthAndHeightToHundredPercent();
+		}
 		// END row table
 
 		table.add(rowTable, col, row);
@@ -1477,11 +1485,66 @@ public class CentralPlacementEditor extends CommuneBlock {
 			linkButton.addParameter(PlacementHistoryViewer.PARAM_PUPIL_ID, PK.intValue());			
 		}
 		
-		/*linkButton.addParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
-		linkButton.addParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
-		linkButton.addParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
-		linkButton.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-		*/
+		return linkButton;
+	}
+
+	private Link getRegularPaymentTopButton(IWContext iwc, SchoolClassMember plc) throws RemoteException {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(CentralPlacementRegularPaymentEntriesList.class);
+
+		// Set parameters and session values to use as default in RegularPaymentEntriesList		
+			// SchoolCategoryID		
+		AccountingSession aSession = (AccountingSession) 
+												IBOLookup.getSessionInstance(iwc, AccountingSession.class);
+		if (aSession != null) {
+			try {
+				String opFieldID = (String) plc.getSchoolType().getCategory().getPrimaryKey();
+				aSession.setOperationalField(opFieldID);
+			} catch (Exception e) {
+			}						
+		}
+
+			// ProviderID
+		int providerID = -1;
+		try {
+			Integer provID = (Integer) plc.getSchoolClass().getSchool().getPrimaryKey();
+			providerID = provID.intValue();
+		} catch (Exception e) {			
+		}
+		if (providerID != -1)
+			linkButton.addParameter(RegularPaymentEntriesList.PAR_SELECTED_PROVIDER, providerID);
+
+		return linkButton;
+	}
+
+
+	private Link getRegularPaymentBottomButton(IWContext iwc) throws RemoteException {
+		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_REGULAR_PAYMENT, "Regular payment")));
+		linkButton.setAsImageButton(true);
+		linkButton.setWindowToOpen(CentralPlacementRegularPaymentEntriesList.class);
+
+		// Set parameters and session values to use as default in RegularPaymentEntriesList
+		
+			// SchoolCategoryID		
+		String categoryID = "-1";
+		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
+			categoryID = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
+		AccountingSession aSession = (AccountingSession) 
+												IBOLookup.getSessionInstance(iwc, AccountingSession.class);
+		if (aSession != null && !"-1".equals(categoryID))										
+			aSession.setOperationalField(categoryID); //iwc.getParameter(PARAM_SCHOOL_CATEGORY));
+
+
+		int providerID = -1;
+					
+		if (!categoryID.equals("-1") && iwc.isParameterSet(PARAM_PROVIDER))
+			providerID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
+		
+			// providerID
+		if (providerID != -1)
+			linkButton.addParameter(RegularPaymentEntriesList.PAR_SELECTED_PROVIDER, providerID);
+
 		return linkButton;
 	}
 
@@ -1527,8 +1590,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// SchoolCategoryID		
 		AccountingSession aSession = (AccountingSession) 
 												IBOLookup.getSessionInstance(iwc, AccountingSession.class);
-		if (aSession != null)										
-			aSession.setOperationalField(iwc.getParameter(PARAM_SCHOOL_CATEGORY));
+		if (aSession != null && !"-1".equals(categoryID)) {
+			aSession.setOperationalField(categoryID);											
+		}
 
 		// Only Bunadmin schools?
 		linkButton.addParameter(SchoolGroupEditorAdmin.PARAM_BUNADM, ""+false);

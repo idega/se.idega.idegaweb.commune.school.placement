@@ -239,7 +239,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				parent = iwc.getCurrentUser();
 			}
 
-			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices((Integer) parent.getPrimaryKey(), (Integer) child.getPrimaryKey(), providers, message, null, null);
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, null, null);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {

@@ -231,8 +231,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		boolean showLanguage = false;
 
 		SchoolYear year = getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID()));
-		if (year != null && year.getSchoolYearAge() == 12)
+		int schoolYearAge = getBusiness().getGradeForYear(getSession().getSchoolYearID()) - 1;
+		if (year != null && schoolYearAge == 12)
 			showLanguage = true;
+			
 			
 		if (showLanguage) {
 			table.setColumns(7);
@@ -241,11 +243,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		else {
 			table.setColumns(6);
 			table.setWidth(6,"12");
-		}
-
-		int schoolYearAge = -1;
-		if (year != null) {
-			schoolYearAge = year.getSchoolYearAge() - 1;	
 		}
 
 		String[] validStatuses = new String[] {"PREL", "FLYT"};
@@ -262,7 +259,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
 		}
 
-		
 		table.mergeCells(1, row, table.getColumns(), row);
 		
 		Table navigationTable = new Table(3,1);

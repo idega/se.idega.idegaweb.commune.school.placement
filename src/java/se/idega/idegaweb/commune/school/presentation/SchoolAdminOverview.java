@@ -504,10 +504,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
 			
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
-			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYear(getSchoolCommuneSession(iwc).getSchoolYearID());
-			int grade = 0;
-			if (year != null)
-				grade = year.getSchoolYearAge();
+			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolCommuneSession(iwc).getSchoolYearID()));
+			int grade = getSchoolCommuneBusiness(iwc).getGradeForYear(getSchoolCommuneSession(iwc).getSchoolYearID()) - 1;
 			User student = getUserBusiness(iwc).getUser(_userID);
 			
 			try {
@@ -516,7 +514,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster, localize("school.student_moved","Student moved to your school"), localize("school.student_moved_body","The following student has been moved to your school and will need to be handled accordingly: ") + student.getNameLastFirst(true));
 			}
 			catch (Exception e) {
-				e.printStackTrace();
 			}
 				
 			IWTimestamp stamp = new IWTimestamp();

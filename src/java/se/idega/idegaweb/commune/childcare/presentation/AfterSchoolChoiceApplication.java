@@ -47,7 +47,7 @@ import com.idega.util.PersonalIDFormatter;
 public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	private User child;
-//	private GrantedCheck check;
+	//	private GrantedCheck check;
 
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_SUBMIT = 2;
@@ -70,18 +70,18 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String APPLICATION_INSERTED = "ccas_application_ok";
 	private final static String APPLICATION_FAILURE = "ccas_application_failed";
 
-//	private final static String EMAIL_PROVIDER_SUBJECT = "child_care.application_received_subject";
-//	private final static String EMAIL_PROVIDER_MESSAGE = "child_care.application_received_body";
+	//	private final static String EMAIL_PROVIDER_SUBJECT = "child_care.application_received_subject";
+	//	private final static String EMAIL_PROVIDER_MESSAGE = "child_care.application_received_body";
 
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
 	private String prmChildId = CitizenChildren.getChildIDParameterName();
-//	private String prmParentId = CitizenChildren.getParentIDParameterName();
+	//	private String prmParentId = CitizenChildren.getParentIDParameterName();
 
 	private Collection areas;
 	private Map providerMap;
 
-//	private boolean _noCheckError = false;
+	//	private boolean _noCheckError = false;
 	private boolean isAdmin = false;
 
 	/**
@@ -89,7 +89,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	 */
 	public void init(IWContext iwc) throws Exception {
 		initChild(iwc);
-		if(child!=null){
+		if (child != null) {
 			parseAction(iwc);
 
 			switch (_action) {
@@ -101,7 +101,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					break;
 			}
 		}
-		else{
+		else {
 			add(getHeader(localize("no_student_id_provided", "No student provided")));
 		}
 	}
@@ -119,7 +119,6 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				e.printStackTrace();
 			}
 		}
-		
 
 	}
 
@@ -146,9 +145,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 
 	private void viewForm(IWContext iwc) {
-		
+
 		if (child != null) {
-			
+
 			Form form = new Form();
 			form.setOnSubmit("return checkApplication()");
 			form.maintainParameter(prmChildId);
@@ -164,15 +163,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.add(getInputTable(iwc), 1, row++);
 			table.setHeight(row++, 12);
 
-			GenericButton showPrognosis =
-				getButton(new GenericButton("show_prognosis",
-					localize("view_prognosis", "View prognosis")));
+			GenericButton showPrognosis = getButton(new GenericButton("show_prognosis", localize("view_prognosis", "View prognosis")));
 			showPrognosis.setWindowToOpen(ChildCarePrognosisWindow.class);
 
-			SubmitButton submit =
-				(SubmitButton) getButton(new SubmitButton(localize(PARAM_FORM_SUBMIT, "Submit application"),
-					PARAMETER_ACTION,
-					String.valueOf(ACTION_SUBMIT)));
+			SubmitButton submit = (SubmitButton) getButton(new SubmitButton(localize(PARAM_FORM_SUBMIT, "Submit application"), PARAMETER_ACTION, String.valueOf(ACTION_SUBMIT)));
 			if (isAdmin) {
 				try {
 					User parent = getBusiness().getUserBusiness().getCustodianForChild(child);
@@ -220,14 +214,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			Date[] queueDates = new Date[numberOfChoices];
 
 			for (int i = 0; i < numberOfChoices; i++) {
-				providers[i] =
-					iwc.isParameterSet(PARAM_PROVIDER + "_" + (i + 1))
-						? Integer.valueOf(iwc.getParameter(PARAM_PROVIDER + "_" + (i + 1)))
-						: null;
-				dates[i] =
-					iwc.isParameterSet(PARAM_DATE + "_" + (i + 1))
-						? iwc.getParameter(PARAM_DATE + "_" + (i + 1))
-						: null;
+				providers[i] = iwc.isParameterSet(PARAM_PROVIDER + "_" + (i + 1)) ? Integer.valueOf(iwc.getParameter(PARAM_PROVIDER + "_" + (i + 1))) : null;
+				dates[i] = iwc.isParameterSet(PARAM_DATE + "_" + (i + 1)) ? iwc.getParameter(PARAM_DATE + "_" + (i + 1)) : null;
 				if (isAdmin) {
 					if (iwc.isParameterSet(PARAM_QUEUE_DATE + "_" + (i + 1))) {
 						queueDates[i] = new IWTimestamp(iwc.getParameter(PARAM_QUEUE_DATE + "_" + (i + 1))).getDate();
@@ -236,44 +224,17 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 						queueDates[i] = null;
 				}
 			}
-			/*		
-				if (!isAdmin) {
-					Collection applications = getBusiness().getAfterSchoolChoiceHome().findApplicationByChild(child);
-					loop:
-					for (int i = 0; i < providers.length; i++){
-						Iterator apps = applications.iterator();
-						while(apps.hasNext()){
-							AfterSchoolChoice app = (AfterSchoolChoice) apps.next();
-							if (app.getProviderId().intValue() == providers[i].intValue()){
-								queueDates[i] = app.getQueueDate();
-								continue loop;
-							}
-						}
-					}
-				}
-					*/
 			String message = iwc.getParameter(PARAM_MESSAGE);
 
-			//String subject = localize(EMAIL_PROVIDER_SUBJECT, "Child care application received");
-			//String body = localize(EMAIL_PROVIDER_MESSAGE, "You have received a new childcare application");
 			User parent = null;
-			//boolean sendMessages = true;
 			if (isAdmin) {
 				parent = getBusiness().getUserBusiness().getCustodianForChild(child);
-				//sendMessages = false;
 			}
 			else {
 				parent = iwc.getCurrentUser();
 			}
 
-			choices =
-				getAfterSchoolBusiness(iwc).createAfterSchoolChoices(
-					(Integer) parent.getPrimaryKey(),
-					(Integer) child.getPrimaryKey(),
-					providers,
-					message,
-					null,
-					null);
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices((Integer) parent.getPrimaryKey(), (Integer) child.getPrimaryKey(), providers, message, null, null);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {
@@ -322,13 +283,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			for (int i = 1; i <= 3; i++) {
 
 				try {
-					afterSchoolChoice = getAfterSchoolBusiness(iwc).
-						getAfterSchoolChoiceHome().findByChildAndChoiceNumberAndSeason(
-							childID,
-							new Integer(i),
-							seasonID);
+					afterSchoolChoice = getAfterSchoolBusiness(iwc).findChoicesByChildAndChoiceNumberAndSeason(childID, i, seasonID);
 					if (afterSchoolChoice != null) {
-						schoolID = afterSchoolChoice.getProviderId().intValue();
+						schoolID = afterSchoolChoice.getProviderId();
 						areaID = afterSchoolChoice.getProvider().getSchoolAreaId();
 						message = afterSchoolChoice.getMessage();
 					}
@@ -340,13 +297,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				}
 				if (afterSchoolChoice == null) {
 					try {
-						schoolChoice =
-							getSchoolChoiceBusiness(iwc)
-								.getSchoolChoiceHome()
-								.findByChildAndChoiceNumberAndSeason(
-								childID,
-								new Integer(i),
-								seasonID);
+						schoolChoice = getSchoolChoiceBusiness(iwc).getSchoolChoiceHome().findByChildAndChoiceNumberAndSeason(childID, new Integer(i), seasonID);
 						if (schoolChoice != null) {
 							areaID = schoolChoice.getChosenSchool().getSchoolAreaId();
 						}
@@ -358,10 +309,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					}
 				}
 
-				ProviderDropdownDouble dropdown =
-					(ProviderDropdownDouble) getStyledInterface(getDropdown(iwc.getCurrentLocale(),
-						PARAM_AREA + "_" + i,
-						PARAM_PROVIDER + "_" + i));
+				ProviderDropdownDouble dropdown = (ProviderDropdownDouble) getStyledInterface(getDropdown(iwc.getCurrentLocale(), PARAM_AREA + "_" + i, PARAM_PROVIDER + "_" + i));
 				if (areaID > 0 && schoolID > 0) {
 					dropdown.setSelectedValues(String.valueOf(areaID), String.valueOf(schoolID));
 				}
@@ -429,14 +377,11 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		table.add(getSmallHeader(localize(ADDRESS, "Address") + ":"), 1, 3);
 
 		table.add(getSmallText(child.getNameLastFirst(true)), 3, 1);
-		String personalID =
-			PersonalIDFormatter.format(
-				child.getPersonalID(),
-				iwc.getApplication().getSettings().getApplicationLocale());
+		String personalID = PersonalIDFormatter.format(child.getPersonalID(), iwc.getApplication().getSettings().getApplicationLocale());
 		table.add(getSmallText(personalID), 3, 2);
 
 		try {
-			Address address = getUserBusiness(iwc).getUsersMainAddress(child);
+			Address address = getBusiness().getUserBusiness().getUsersMainAddress(child);
 			if (address != null)
 				table.add(getSmallText(address.getStreetAddress() + ", " + address.getPostalAddress()), 3, 3);
 		}
@@ -457,12 +402,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t var two = 0;");
 		buffer.append("\n\t var three = 0;");
 
-		buffer.append(
-			"\n\n\t if (dropOne.selectedIndex > 0) {\n\t\t one = dropOne.options[dropOne.selectedIndex].value;\n\t\t length++;\n\t }");
-		buffer.append(
-			"\n\t if (dropTwo.selectedIndex > 0) {\n\t\t two = dropTwo.options[dropTwo.selectedIndex].value;\n\t\t length++;\n\t }");
-		buffer.append(
-			"\n\t if (dropThree.selectedIndex > 0) {\n\t\t three = dropThree.options[dropThree.selectedIndex].value;\n\t\t length++;\n\t }");
+		buffer.append("\n\n\t if (dropOne.selectedIndex > 0) {\n\t\t one = dropOne.options[dropOne.selectedIndex].value;\n\t\t length++;\n\t }");
+		buffer.append("\n\t if (dropTwo.selectedIndex > 0) {\n\t\t two = dropTwo.options[dropTwo.selectedIndex].value;\n\t\t length++;\n\t }");
+		buffer.append("\n\t if (dropThree.selectedIndex > 0) {\n\t\t three = dropThree.options[dropThree.selectedIndex].value;\n\t\t length++;\n\t }");
 
 		buffer.append("\n\t if(length > 0){");
 		buffer.append("\n\t\t if(one > 0 && (one == two || one == three)){");
@@ -487,10 +429,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t\t alert('").append(message).append("');");
 		buffer.append("\n\t\t return false;");
 		buffer.append("\n\t }");
-		message =
-			localize(
-				"less_than_three_chosen",
-				"You have chosen less than three choices.  An offer can not be guaranteed within three months.");
+		message = localize("less_than_three_chosen", "You have chosen less than three choices.  An offer can not be guaranteed within three months.");
 		buffer.append("\n\t if(length < 3)\n\t\t return confirm('").append(message).append("');");
 		buffer.append("\n\t return true;");
 		buffer.append("\n}\n");
@@ -512,10 +451,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				Iterator iter = areas.iterator();
 				while (iter.hasNext()) {
 					SchoolArea area = (SchoolArea) iter.next();
-					dropdown.addMenuElement(
-						area.getPrimaryKey().toString(),
-						area.getSchoolAreaName(),
-						(Map) providerMap.get(area));
+					dropdown.addMenuElement(area.getPrimaryKey().toString(), area.getSchoolAreaName(), (Map) providerMap.get(area));
 				}
 			}
 		}
@@ -526,21 +462,17 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		return dropdown;
 	}
 
-	private CommuneUserBusiness getUserBusiness(IWApplicationContext iwac) throws RemoteException {
-		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwac, CommuneUserBusiness.class);
-	}
-	
-	private SchoolChoiceBusiness getSchoolChoiceBusiness(IWApplicationContext iwac)throws RemoteException{
-		return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwac,SchoolChoiceBusiness.class);
-	}
-	
-	private AfterSchoolBusiness getAfterSchoolBusiness(IWApplicationContext iwac) throws RemoteException{
-		return (AfterSchoolBusiness) IBOLookup.getServiceInstance(iwac,AfterSchoolBusiness.class);
+	private SchoolChoiceBusiness getSchoolChoiceBusiness(IWApplicationContext iwac) throws RemoteException {
+		return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwac, SchoolChoiceBusiness.class);
 	}
 
-//	private CheckBusiness getCheckBusiness(IWApplicationContext iwac) throws RemoteException {
-//		return (CheckBusiness) IBOLookup.getServiceInstance(iwac, CheckBusiness.class);
-//	}
+	private AfterSchoolBusiness getAfterSchoolBusiness(IWApplicationContext iwac) throws RemoteException {
+		return (AfterSchoolBusiness) IBOLookup.getServiceInstance(iwac, AfterSchoolBusiness.class);
+	}
+
+	//	private CheckBusiness getCheckBusiness(IWApplicationContext iwac) throws RemoteException {
+	//		return (CheckBusiness) IBOLookup.getServiceInstance(iwac, CheckBusiness.class);
+	//	}
 	/* (non-Javadoc)
 	 * @see se.idega.idegaweb.commune.presentation.CommuneBlock#localize(java.lang.String, java.lang.String)
 	 */

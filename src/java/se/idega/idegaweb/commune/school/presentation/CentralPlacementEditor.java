@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/18 14:06:24 $ by $Author: goranb $
- * @version $Revision: 1.65 $
+ * Last modified: $Date: 2004/02/18 14:32:28 $ by $Author: staffan $
+ * @version $Revision: 1.66 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -1410,7 +1410,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		}
 		return yesNo;
 	}
-	
+
+	/*	
 	private DateInput getLatestInvoiceDateInput(IWContext iwc) {
 		DateInput dInput = (DateInput) getStyledInterface(new DateInput(PARAM_LATEST_INVOICE_DATE, true));
 		dInput.setToDisplayDayLast(true);
@@ -1428,6 +1429,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		
 		return dInput;
 	}
+	*/
 	
 	private DropdownMenu getInvoiceIntervalDropdown(IWContext iwc) {
 		DropdownMenu drop = (DropdownMenu) getStyledInterface(

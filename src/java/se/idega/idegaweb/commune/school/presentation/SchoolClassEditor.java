@@ -14,6 +14,7 @@ import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
+import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
 
@@ -77,6 +78,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean showStudentTable = true;
 	private boolean searchEnabled = true;
 	private int applicationsPerPage = 10;
+	private boolean showStatistics = true;
 
 
 	public void init(IWContext iwc) throws RemoteException {
@@ -250,16 +252,17 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 
 
-		String[] validStatuses = new String[] {"PREL", "FLYT"};
+		String[] validStatuses = new String[] {SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
 		//if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("FLYT")) {
 
 		List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString));
+		int applicantsSize = applicants.size();
 
 		int row = 1;
 		int column = 1;
 		
 		int currPage = 0;
-		int maxPage = (int) Math.ceil( applicants.size() / applicationsPerPage );
+		int maxPage = (int) Math.ceil( applicantsSize / applicationsPerPage );
 		if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
 			currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
 		}
@@ -279,7 +282,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		Text prev = getSmallText(localize("previous","Previous"));
 		Text next = getSmallText(localize("next","Next"));
-		Text test = getSmallText("ApplSize : "+applicants.size()+" .... perPage"+ applicationsPerPage);
 		Text info = getSmallText(localize("page","Page") +" "+ (currPage +1) +" "+localize("of", "of") +" "+ (maxPage+1));
 		if (currPage > 0) {
 			Link lPrev = getSmallLink(localize("previous","Previous"));
@@ -351,7 +353,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 							name = applicant.getName();
 
-						if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase("FLYT"))
+						if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
 							table.setRowColor(row, "#FF3333");
 						else {
 							if (row % 2 == 0)
@@ -378,7 +380,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 							if (schoolName.length() > 20)
 								schoolName = schoolName.substring(0, 20) + "...";
 							table.add(getSmallText(schoolName), column, row);
-							if (choice.getStatus().equalsIgnoreCase("FLYT"))
+							if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
 								table.add(getSmallText(" ("+localize("school.moved","Moved")+")"),column,row);
 						}
 						column++;
@@ -397,6 +399,50 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				}
 			}
 		//}
+
+		if (showStatistics) {
+			System.out.println("[SchoolClassEditor] starting statistics  : "+IWTimestamp.RightNow().toString());
+	
+//			List totalApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, null, ""));
+//			int totalApplicantsSize = totalApplicants.size();
+			List firstApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[]{1}, validStatuses, ""));
+			int firstApplSize = firstApplicants.size();
+			List secondApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[]{2}, validStatuses, ""));
+			int secondApplSize = secondApplicants.size();
+			List thirdApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, new int[]{3}, validStatuses, ""));
+			int thirdApplSize = thirdApplicants.size();
+			List groupedApplicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), -1, null, new String[] {SchoolChoiceBMPBean.CASE_STATUS_GROUPED}, ""));
+			int groupedApplSize = thirdApplicants.size();
+
+			System.out.println("[SchoolClassEditor] done with statistics : "+IWTimestamp.RightNow().toString());
+			
+			
+			Table statTable = new Table();
+			int sRow = 1;
+			statTable.setCellpaddingAndCellspacing(0);
+//			statTable.add(getSmallText(localize("total_number_applications", "Total applications")+":"), 1, sRow);
+//			statTable.add(getSmallText(""+totalApplicantsSize), 2, sRow);
+//			if ( totalApplicantsSize != applicantsSize) {
+				statTable.add(getSmallText(localize("filtered_applications", "Filtered applications")+":"), 1, sRow);
+				statTable.add(getSmallText(""+applicantsSize), 2, sRow);
+//			}
+			++sRow;
+			statTable.add(getSmallText(localize("applications_on_first_choice", "Applcations on first choice")+":"), 1, sRow);
+			statTable.add(getSmallText(""+firstApplSize), 2, sRow);
+			++sRow;
+			statTable.add(getSmallText(localize("applications_on_second_choice", "Applcations on second choice")+":"), 1, sRow);
+			statTable.add(getSmallText(""+secondApplSize), 2, sRow);
+			++sRow;
+			statTable.add(getSmallText(localize("applications_on_third_choice", "Applcations on third choice")+":"), 1, sRow);
+			statTable.add(getSmallText(""+thirdApplSize), 2, sRow);
+			++sRow;
+			statTable.add(getSmallText(localize("grouped_applications", "Grouped applcations")+":"), 1, sRow);
+			statTable.add(getSmallText(""+groupedApplSize), 2, sRow);
+	
+			table.mergeCells(1, row, table.getColumns(), row);
+			table.add(statTable, 1, row);
+			++row;
+		}
 
 		if (showStudentTable) {
 			GenericButton selectAll = (GenericButton) getStyledInterface(new GenericButton());
@@ -744,5 +790,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 	public void setSearchEnabled(boolean searchEnabled) {
 		this.searchEnabled = searchEnabled;	
+	}
+	public void setShowStatistics(boolean show) {
+		this.showStatistics = show;	
 	}
 }

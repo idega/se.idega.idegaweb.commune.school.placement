@@ -156,7 +156,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		
 		try {
 			User owner = getBusiness().getUserBusiness().getUser(ownerID);
-			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, null, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), true, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
+			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, null, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), false, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
 		}
 		catch (RemoteException re) {
 			success = false;

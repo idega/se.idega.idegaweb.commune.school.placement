@@ -5,6 +5,7 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
+import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareSession;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
@@ -60,6 +61,7 @@ public class CheckRequestForm extends CommuneBlock {
 	private final static String PARAM_CHILDCARE_OTHER = "ccs_childcare_other";
 	//variable for use as admin
 	private boolean _useAsAdmin = false;
+	private boolean _isFreeTimeType = true;
 	
 	private boolean isError = false;
 	//private String errorMessage = null;
@@ -360,8 +362,14 @@ public class CheckRequestForm extends CommuneBlock {
 
 		childCareTypeTable.add(getSmallHeader(localize("check.request_regarding", "The request regards") + ":"), 1, row);
 		SchoolBusiness schBuiz = getSchoolCommuneBusiness(iwc).getSchoolBusiness();
-		Collection childCareTypes = schBuiz.findAllSchoolTypesInCategory(schBuiz.getChildCareSchoolCategory(),false);
-
+		Collection childCareTypes= null;
+		if (_isFreeTimeType){
+			childCareTypes = schBuiz.findAllSchoolTypesInCategoryFreeTime(schBuiz.getChildCareSchoolCategory());			
+		}else {
+			childCareTypes = schBuiz.findAllSchoolTypesInCategory(schBuiz.getChildCareSchoolCategory(),false);	
+		}
+				
+		
 		DropdownMenu typeChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_CHILD_CARE_TYPE));
 		Iterator iter = childCareTypes.iterator();
 		
@@ -594,15 +602,16 @@ public class CheckRequestForm extends CommuneBlock {
 		return (FamilyLogic) com.idega.business.IBOLookup.getServiceInstance(iwc, FamilyLogic.class);
 	}
 
-	/* Commented out since it is never used...
+	// Commented out since it is never used...
 	private ChildCareBusiness getChildCareBusiness(IWContext iwc) throws Exception {
 		return (ChildCareBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
 	}
-	*/
+
 
 	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) throws Exception {
 		return (SchoolCommuneBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolCommuneBusiness.class);
 	}
+	
 
 	/* Commented out since it is never used...
 	private Collection getProviders(IWContext iwc, String category) {
@@ -640,6 +649,14 @@ public class CheckRequestForm extends CommuneBlock {
 	 */
 	public void setUseAsAdmin(boolean isUseAsAdmin) {
 		this._useAsAdmin = isUseAsAdmin;
+	}
+	
+	/**
+	 * @param isFreeTimeType
+	 *          The isFreeTimeType to set.
+	 */
+	public void setIsFreeTimeType(boolean isFreeTimeType) {
+		this._isFreeTimeType = isFreeTimeType;
 	}
 
 }

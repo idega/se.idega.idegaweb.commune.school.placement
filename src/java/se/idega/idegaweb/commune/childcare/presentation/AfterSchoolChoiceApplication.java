@@ -169,8 +169,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.add(getInputTable(iwc), 1, row++);
 			table.setHeight(row++, 12);
 
-			GenericButton showPrognosis = getButton(new GenericButton("show_prognosis", localize("view_prognosis", "View prognosis")));
-			showPrognosis.setWindowToOpen(ChildCarePrognosisWindow.class);
+			//GenericButton showPrognosis = getButton(new GenericButton("show_prognosis", localize("view_prognosis", "View prognosis")));
+			//showPrognosis.setWindowToOpen(ChildCarePrognosisWindow.class);
 
 			SubmitButton submit = (SubmitButton) getButton(new SubmitButton(localize(PARAM_FORM_SUBMIT, "Submit application"), PARAMETER_ACTION, String.valueOf(ACTION_SUBMIT)));
 			if (isAdmin) {
@@ -184,8 +184,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				}
 			}
 
-			table.add(showPrognosis, 1, row);
-			table.add(Text.getNonBrakingSpace(), 1, row);
+			//table.add(showPrognosis, 1, row);
+			//table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(submit, 1, row);
 
 			if (submit.getDisabled()) {

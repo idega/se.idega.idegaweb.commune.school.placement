@@ -118,7 +118,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private int _schoolYearID = -1;
 
 	private boolean _protocol = true;
-	private boolean _move = true;
+	//private boolean _move = true;
 	private boolean _showOnlyOverview = false;
 	private boolean _showNoChoices = false;
 
@@ -948,7 +948,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			getParentPage().close();
 		}
 		else {
-			_move = false;
+			//_move = false;
 			_method = this.METHOD_MOVE;
 		}
 	}

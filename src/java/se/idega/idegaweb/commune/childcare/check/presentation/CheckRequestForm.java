@@ -57,7 +57,7 @@ public class CheckRequestForm extends CommuneBlock {
 	private final static String PARAM_CHILDCARE_OTHER = "ccs_childcare_other";
 
 	private boolean isError = false;
-	private String errorMessage = null;
+	//private String errorMessage = null;
 	//private boolean paramErrorMotherTongueMC = false;
 	//private boolean paramErrorMotherTongueFC = false;
 	//private boolean paramErrorMotherTongueP = false;
@@ -203,7 +203,7 @@ public class CheckRequestForm extends CommuneBlock {
 		
 		if (showErrors) {
 			if (isError) {
-				this.errorMessage = localize("check.incomplete_input", "You must fill in the information marked with red text.");
+				//this.errorMessage = localize("check.incomplete_input", "You must fill in the information marked with red text.");
 				viewForm(iwc);
 				return;
 			}

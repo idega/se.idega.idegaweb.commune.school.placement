@@ -946,7 +946,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		return table;
 	}
 
-	protected Table getPreviousHeader(Collection classes) throws RemoteException {
+	protected Table getPreviousHeader(Collection classes) {
 		Table table = new Table(2, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -975,7 +975,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		return table;
 	}
 
-	protected DropdownMenu getPreviousSchoolClasses(Collection classes) throws RemoteException {
+	protected DropdownMenu getPreviousSchoolClasses(Collection classes) {
 		DropdownMenu menu = new DropdownMenu(PARAMETER_PREVIOUS_CLASS_ID);
 		menu.setToSubmit();
 

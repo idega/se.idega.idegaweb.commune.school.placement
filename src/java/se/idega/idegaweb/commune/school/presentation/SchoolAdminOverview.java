@@ -2087,7 +2087,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return (ResourceBusiness) IBOLookup.getServiceInstance(iwc, ResourceBusiness.class);
 	}
 
-	private void changeStudyPath(final IWContext context) throws RemoteException {
+	private void changeStudyPath(final IWContext context) {
 		final SchoolClassMember student = (SchoolClassMember) context.getSessionAttribute(getClass() + PARAMETER_SCHOOL_CLASS_MEMBER_ID);
 		final int studyPathId = Integer.parseInt(context.getParameter("school_study_path"));
 		student.setStudyPathId(studyPathId);

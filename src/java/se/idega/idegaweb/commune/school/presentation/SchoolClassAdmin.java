@@ -88,7 +88,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		}
 	}
 
-	private void parseAction(IWContext iwc) throws RemoteException {
+	private void parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_ACTION))
 			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
 		else

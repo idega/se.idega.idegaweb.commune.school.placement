@@ -198,7 +198,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		mainTable.add(obj, col, mainTableRow++);
 	}
 
-	public Table getSearchTable(IWContext iwc) throws RemoteException {
+	public Table getSearchTable(IWContext iwc) {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setBorder(0);
@@ -226,7 +226,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		return table;
 	}
 	
-	public Table getPupilTable(IWContext iwc, User pupil) throws RemoteException {
+	public Table getPupilTable(IWContext iwc, User pupil) {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setWidth("100%");

@@ -82,7 +82,7 @@ public class SchoolChoicesStatistics extends SchoolCommuneBlock {
 		add(form);
 	}
 
-	private void parseAction(IWContext iwc) throws RemoteException {
+	private void parseAction(IWContext iwc) {
 		if (iwc.isParameterSet(PARAMETER_SORT))
 			sortChoicesBy = Integer.parseInt(iwc.getParameter(PARAMETER_SORT));
 		else

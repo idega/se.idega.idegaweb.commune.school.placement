@@ -147,10 +147,10 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		int action = process(iwc);
 
 		if (child != null) {
-			if (getBusiness().hasActiveApplication(((Integer) child.getPrimaryKey()).intValue())) {
-				add(this.getLocalizedHeader("child_care.child_has_active_placement", "Child has active placement."));
-			}
-			else {
+//			if (getBusiness().hasActiveApplication(((Integer) child.getPrimaryKey()).intValue())) {
+//				add(this.getLocalizedHeader("child_care.child_has_active_placement", "Child has active placement."));
+//			}
+//			else {
 				if (getBusiness().hasTerminationInFuture(((Integer) child.getPrimaryKey()).intValue())) {
 					earliestPossiblePlacementDate = getBusiness().getEarliestPossiblePlacementDate(((Integer) child.getPrimaryKey()).intValue());
 					if (earliestPossiblePlacementDate != null) {
@@ -166,7 +166,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 						save(iwc);
 						break;
 				}
-			}
+//			}
 		}
 		else {
 			add(this.getLocalizedHeader("child_care.no_child_or_application_found", "No child or application found."));

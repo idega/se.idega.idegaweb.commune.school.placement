@@ -775,7 +775,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(getSmallErrorText(localize("school.replace_date", "Replace date") + ":" + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 1, row);
 		table.add(input, 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":", false), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.replace_to", "Replace to") + ":", false, false), 1, row++);
 
 		//if (_protocol)
 		table.add(getSmallHeader(localize("school.replace_reason", "Replace reason") + ":"), 1, row);
@@ -898,7 +898,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		table.add(getSmallHeader(localize("school.move_group_info", "Select the new group for the student and click 'Move'.")), 1, row++);
 
-		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":", isSubGroup), 1, row++);
+		table.add(getNavigationTable(iwc, localize("school.move_to", "Move to") + ":", isSubGroup, true), 1, row++);
 
 		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_ACTION, String.valueOf(ACTION_MOVE_GROUP)));
 		move.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1540,7 +1540,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 	
 	
-	protected Table getNavigationTable(IWContext iwc, String heading, boolean showSubGroups) throws RemoteException {
+	protected Table getNavigationTable(IWContext iwc, String heading, boolean showSubGroups, boolean setDefaultValues) throws RemoteException {
 		Table table = new Table(4, 1);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
@@ -1549,7 +1549,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		table.add(getSmallHeader(heading), 1, 1);
 		table.add(getSmallHeader(localize("school.year_class", "Year/Class") + ":" + Text.NON_BREAKING_SPACE), 3, 1);
-		table.add(getDropdown(iwc, showSubGroups), 4, 1);
+		table.add(getDropdown(iwc, showSubGroups, setDefaultValues), 4, 1);
 		/*table.add(getSchoolYears(iwc), 4, 1);
 		table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 6, 1);
 		table.add(getSchoolClasses(iwc, setToSubmit), 7, 1);*/
@@ -1557,15 +1557,21 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
-	private SelectDropdownDouble getDropdown(IWContext iwc, boolean showSubGroups) throws RemoteException {
+	private SelectDropdownDouble getDropdown(IWContext iwc, boolean showSubGroups, boolean setDefaultValues) throws RemoteException {
 		SchoolClassDropdownDouble dropdown = new SchoolClassDropdownDouble(getSchoolCommuneSession(iwc).getParameterSchoolYearID(), getSchoolCommuneSession(iwc).getParameterSchoolClassID());
-		dropdown.setSelectedValues(String.valueOf(getSchoolCommuneSession(iwc).getSchoolYearID()), String.valueOf(getSchoolCommuneSession(iwc).getSchoolClassID()));
+		if (setDefaultValues) {
+			dropdown.setSelectedValues(String.valueOf(getSchoolCommuneSession(iwc).getSchoolYearID()), String.valueOf(getSchoolCommuneSession(iwc).getSchoolClassID()));
+		}
+		else {
+			dropdown.addEmptyElement(localize("school.year", "Year"), localize("school.group", "Group"));
+		}
+		dropdown.getSecondaryDropdown().setAsNotEmpty(localize("school.must_select_group", "You must select a group."));
 		
 		try {
 			if (getSchoolCommuneSession(iwc).getSchoolID() != -1) {
 				Collection years = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolYearsInSchool(getSchoolCommuneSession(iwc).getSchoolID());
 				if (!years.isEmpty()) {
-					Map yearGroupMap = getSchoolCommuneBusiness(iwc).getYearClassMap(years, _schoolID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), null, showSubGroups);
+					Map yearGroupMap = getSchoolCommuneBusiness(iwc).getYearClassMap(years, _schoolID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), localize("school.group", "Group"), showSubGroups);
 					if (yearGroupMap != null) {
 						Iterator iter = yearGroupMap.keySet().iterator();
 						while (iter.hasNext()) {

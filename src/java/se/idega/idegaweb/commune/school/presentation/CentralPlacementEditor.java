@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/20 16:49:00 $ by $Author: goranb $
- * @version $Revision: 1.67 $
+ * Last modified: $Date: 2004/02/24 12:22:37 $ by $Author: goranb $
+ * @version $Revision: 1.68 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -370,6 +370,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		if (errMsgSearch != null) {
 			row++;
 			col = 1;
+			table.add(Text.getNonBrakingSpace(4), col, row);
 			table.add(getSmallErrorText(errMsgSearch), col, row);
 		}
 		
@@ -488,7 +489,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setWidth("100%");
-		table.setBorder(0);
+		table.setBorder(1);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
@@ -555,6 +556,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		col = 1;		
 		// Contract
 		table.add(getSmallHeader(localize(KEY_CONTRACT_LABEL, "Contract: ")), col, row);
+		col = 3;
+		table.add(getSmallHeader(localize(KEY_PAYMENT_BY_AGREEMENT_LABEL, "Payment by agreement: ")), col, row);
 		// BUTTON Contract history 
 		table.add(getContractHistoryButton(), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
@@ -644,6 +647,16 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 							table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
 						}
 					} catch (Exception e) {}
+
+					// Payment by agreement
+					col = 4;
+					try {
+						if (latestPl.getHasCompensationByAgreement()) {
+							table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
+						}
+					} catch (Exception e) {}
+					
+					
 					
 					row++;
 					col = 2;

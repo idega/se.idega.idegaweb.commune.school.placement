@@ -230,7 +230,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 						choice = (SchoolChoice) iter.next();
 						school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(choice.getChosenSchoolId()));
 						String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice.getCaseStatus(),iwc.getCurrentLocale()) + ")";
-						if ( choice.getCaseStatus().getStatus().equals(choice.getCaseStatusPreliminary()) ) {
+						if (choice.getStatus().equalsIgnoreCase("PREL") || choice.getStatus().equalsIgnoreCase("PLAC") || choice.getStatus().equalsIgnoreCase("FLYT") ) {
+							if (pendingSchoolId == -1)
 								pendingSchoolId = choice.getChosenSchoolId();
 //							table.add("gimmi flippari ", 2, row);	
 						}
@@ -277,8 +278,6 @@ public class SchoolAdminOverview extends CommuneBlock {
       SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject","Reject"),PARAMETER_METHOD,String.valueOf(METHOD_REJECT)));
       SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_METHOD,String.valueOf(METHOD_MOVE)));
       
-      table.add(close,1,row);
-      table.add(Text.NON_BREAKING_SPACE,1,row);
       if (_schoolID != -1) {
 	      table.add(replace,1,row);
 	      table.add(Text.NON_BREAKING_SPACE,1,row);
@@ -292,9 +291,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 	      /** was like this --->  if (_choiceID == -1 && _choiceID != _schoolID) {  */
 	      if (_choiceID == -1) {
 	      	table.add(move,1,row);
+      		table.add(Text.NON_BREAKING_SPACE,1,row);
 	      }
       }
 
+      table.add(close,1,row);
 		}
 		
 		return table;
@@ -482,17 +483,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE)) {
 			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
-			int grade = getSchoolCommuneBusiness(iwc).getSchoolYear(getSchoolCommuneSession(iwc).getSchoolYearID()).getSchoolYearAge() + 1;
+			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYear(getSchoolCommuneSession(iwc).getSchoolYearID());
+			int grade = 0;
+			if (year != null)
+				grade = year.getSchoolYearAge();
 			User student = getUserBusiness(iwc).getUser(_userID);
 			
-			User headmaster = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getHeadmaster(schoolID);
-			if (headmaster != null) {
-				try {
+			try {
+				User headmaster = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getHeadmaster(schoolID);
+				if (headmaster != null)
 					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster, localize("school.student_moved","Student moved to your school"), localize("school.student_moved_body","The following student has been moved to your school and will need to be handled accordingly: ") + student.getNameLastFirst(true));
-				}
-				catch (CreateException ce) {
-					ce.printStackTrace();
-				}
+			}
+			catch (CreateException ce) {
+				ce.printStackTrace();
 			}
 				
 			IWTimestamp stamp = new IWTimestamp();

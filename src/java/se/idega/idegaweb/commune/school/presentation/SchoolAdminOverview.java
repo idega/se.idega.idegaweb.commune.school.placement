@@ -59,6 +59,7 @@ import com.idega.presentation.ui.CloseButton;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.GenericButton;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.PrintButton;
 import com.idega.presentation.ui.RadioButton;
@@ -360,6 +361,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String sLanguage = null;
 		
 		String schoolClassId = iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID);
+//		String schoolClassMemberId = iwc.getParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID);
 
 		if (_userID != -1) {
 			User user = getUserBusiness(iwc).getUser(_userID);
@@ -638,6 +640,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			// *** Resources START ***
 			if (_schoolClassMemberID != -1) {
+				try {
+					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByPrimaryKey(new Integer(_schoolClassMemberID));
+					table.add(getSmallHeader(localize("school.placement", "Placement")), 1, row);
+					table.add(getSmallText(CentralPlacementEditor.getPlacementString(scMember, user, getResourceBundle())));
+					++row;
+				} catch (FinderException e) {
+					e.printStackTrace();
+				}
+				
+				
 				table.add(new HiddenInput(PARAMETER_SCHOOL_CLASS_MEMBER_ID, String.valueOf(_schoolClassMemberID)), 1, row);
 				Integer providerGrpID = getProviderGrpId(iwc);
 				Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMbrIdOrderByRscName(new Integer(_schoolClassMemberID));
@@ -691,6 +703,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton resources = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.resources", "Resources"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
 			SubmitButton nativeLangButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.native_language", "Native language"), PARAMETER_METHOD, String.valueOf(METHOD_NATIVE_LANG_FORM)));
 			
+			
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
@@ -737,6 +750,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(changePlacementDate, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
+			
+			if (_schoolClassMemberID > 0) {
+				GenericButton editPlacementButton = (GenericButton) getStyledInterface(new GenericButton(localize("central_placement_editor.button_edit_placement", "Edit placement")));
+				editPlacementButton.addParameter(CentralPlacementEditLatestPlacement.PARAM_LATEST_PLACEMENT_ID, _schoolClassMemberID);
+				editPlacementButton.setWindowToOpen(CentralPlacementEditLatestPlacementWindow.class);
+				table.add(editPlacementButton, 1, row);
+				table.add(Text.getNonBrakingSpace(), 1, row);
+			}
 
 			table.add(print, 1, row);
 			table.add(Text.getNonBrakingSpace(), 1, row);
@@ -748,7 +769,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 		return table;
 	}
-
+	
 	private Table getRejectForm(IWContext iwc) throws RemoteException {
 		Table table = new Table();
 		table.setCellpadding(5);

@@ -109,9 +109,30 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	
 	private void save(IWContext iwc) {
 		int ownerID = Integer.parseInt(iwc.getParameter(PARAM_GETBILL));
-		int schoolTypeID = Integer.parseInt(iwc.getParameter(PARAM_OPERATION));
-		int careTime = Integer.parseInt(iwc.getParameter(PARAM_HOURS));
-		int employmentTypeID = Integer.parseInt(iwc.getParameter(PARAM_EMPLOYMENT));
+		int schoolTypeID = -1;
+		try {
+			schoolTypeID = Integer.parseInt(iwc.getParameter(PARAM_OPERATION));
+		}
+		catch (NumberFormatException nfe) {
+			schoolTypeID = -1;
+		}
+		
+		int careTime = -1;
+		try {
+			careTime = Integer.parseInt(iwc.getParameter(PARAM_HOURS));
+		}
+		catch (NumberFormatException nfe) {
+			careTime = -1;
+		}
+		
+		int employmentTypeID = -1;
+		try {
+			employmentTypeID = Integer.parseInt(iwc.getParameter(PARAM_EMPLOYMENT));
+		}
+		catch (NumberFormatException nfe) {
+			employmentTypeID = -1;
+		}
+		
 		IWTimestamp placementDate = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
 		IWTimestamp replyDate = null;
 		if (iwc.isParameterSet(PARAM_LAST_REPLY_DATE))
@@ -385,7 +406,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT, "Extra contract")), 1, row);
 		table.add(hasExtraContract, 3, row);
 		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
-		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_MESSAGE, "Message")), 1, row);
+		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_MESSAGE, "Message")), 3, row);
+		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
 		table.add(extraContractMessage, 3, row);
 		
 		BooleanInput hasExtraContractOther = (BooleanInput) getStyledInterface(new BooleanInput(PARAM_EXTRA_CONTRACT_OTHER));
@@ -397,7 +419,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER, "Extra contract other")), 1, row);
 		table.add(hasExtraContractOther, 3, row);
 		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
-		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER_MESSAGE, "Message")), 1, row);
+		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER_MESSAGE, "Message")), 3, row);
+		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
 		table.add(extraContractOtherMessage, 3, row);
 		
 		table.setHeight(row++, 12);

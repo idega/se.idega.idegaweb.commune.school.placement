@@ -1,5 +1,5 @@
 /*
- * $Id: BusinessLaunchButton.java,v 1.5 2004/12/08 10:28:24 laddi Exp $
+ * $Id: BusinessLaunchButton.java,v 1.6 2005/02/18 09:20:48 laddi Exp $
  *
  * Copyright (C) 2002 Idega hf. All Rights Reserved.
  *
@@ -13,6 +13,7 @@ package se.idega.idegaweb.commune.school.placement.presentation;
 import java.rmi.RemoteException;
 
 import se.idega.idegaweb.commune.business.NackaFixBusiness;
+import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock;
 
 import com.idega.business.IBOLookup;
@@ -32,6 +33,7 @@ public class BusinessLaunchButton extends ChildCareBlock {
 	protected static final String SUBMIT = "elementary_school";
 	protected static final String SUBMIT2 = "child_care";
 	protected static final String SUBMIT3 = "high_school";
+	protected static final String SUBMIT4 = "queue_update";
 	
 	protected void control(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(SUBMIT)) {
@@ -43,6 +45,9 @@ public class BusinessLaunchButton extends ChildCareBlock {
 		if (iwc.isParameterSet(SUBMIT3)) {
 			getBusiness(iwc).fixHighSchoolPlacements();
 		}
+		if (iwc.isParameterSet(SUBMIT4)) {
+			getChildCareBusiness(iwc).convertOldQueue();
+		}
 		
 		displayForm();			
 	}
@@ -52,9 +57,11 @@ public class BusinessLaunchButton extends ChildCareBlock {
 		SubmitButton button = new SubmitButton(SUBMIT,"Fix elementary school placements");
 		SubmitButton button2 = new SubmitButton(SUBMIT2,"Fix child care placements");
 		SubmitButton button3 = new SubmitButton(SUBMIT3,"Fix high school placements");
+		SubmitButton button4 = new SubmitButton(SUBMIT4,"Convert old queue to new queue");
 		form.add(button);
 		form.add(button2);
 		form.add(button3);
+		form.add(button4);
 		add(form);	
 	}
 
@@ -65,6 +72,15 @@ public class BusinessLaunchButton extends ChildCareBlock {
 	private NackaFixBusiness getBusiness(IWContext iwc) {
 		try {
 			return (NackaFixBusiness) IBOLookup.getServiceInstance(iwc, NackaFixBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+	
+	private ChildCareBusiness getChildCareBusiness(IWContext iwc) {
+		try {
+			return (ChildCareBusiness) IBOLookup.getServiceInstance(iwc, ChildCareBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);

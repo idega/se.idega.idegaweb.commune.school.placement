@@ -1113,32 +1113,35 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 	
 	private boolean livesOutsideDefaultCommune(IWContext iwc, User applicant) {
-		boolean showEraseButton = true;
-		try {
+		boolean showEraseButton = false;
+		try {			
+			int defComID = -1;
+			int homeComID = -1;
+			int mainAddrID = -1;
+
 			// Get default Commune primary key
 			CommuneHome cHome = (CommuneHome) IDOLookup.getHome(Commune.class);
 			Commune defCom = cHome.findDefaultCommune();
 			Integer defComPK = (Integer) defCom.getPrimaryKey();
+			defComID = defComPK.intValue();
 			
 			// Get applicants home Commune primary key
 			Address applicantAddr;
 			applicantAddr = getUserBusiness(iwc).getUsersMainAddress(applicant);
-			int homeComID = -1;
-			homeComID = applicantAddr.getCommuneID(); // return -1 if null in db
-			
-			int mainAddrID = -1;
-			if (applicantAddr != null)
+						
+			if (applicantAddr != null) {
+				homeComID = applicantAddr.getCommuneID(); // return -1 if null in db
 				mainAddrID = ((Integer) applicantAddr.getPrimaryKey()).intValue();
-			
+			}
 			
 			logWarning("*** OUTSIDE HOME COMMUNE ***\n" 
-							+ "Applicant:  " + ((Integer) applicantAddr.getPrimaryKey()).intValue() 
-							+ "HomeComPK: " + homeComID + "defComPK: " + defComPK.intValue() 
-							+ "MainAddressID: " + mainAddrID + "\n");
+							+ "Applicant:  " + ((Integer) applicant.getPrimaryKey()).intValue() 
+							+ " HomeComPK: " + homeComID + " defComPK: " + defComID 
+							+ " MainAddressID: " + mainAddrID + "\n");
 			
 			// If user doesn't live in default commune - return true
 			if (homeComID != -1 && defComPK.intValue() != homeComID)
-					showEraseButton = false;
+					showEraseButton = true;
 		} catch (Exception e) {}		
 		
 		return showEraseButton;

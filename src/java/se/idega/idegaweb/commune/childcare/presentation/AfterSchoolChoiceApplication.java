@@ -308,7 +308,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			inputTable.setHeight(row++, 12);
 		}
 		
-		inputTable.mergeCells(1, 1, inputTable.getColumns(), row);
+		inputTable.mergeCells(1, row, inputTable.getColumns(), row);
 		inputTable.add(getHeader(localize(PROVIDERS, "Providers")), 1, row++);
 
 		String message = null;

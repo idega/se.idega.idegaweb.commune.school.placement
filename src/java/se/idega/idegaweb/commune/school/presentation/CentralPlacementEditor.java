@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/17 12:51:17 $ by $Author: goranb $
- * @version $Revision: 1.38 $
+ * Last modified: $Date: 2003/11/18 11:16:16 $ by $Author: goranb $
+ * @version $Revision: 1.39 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1201,7 +1201,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 				String providerIdStr = iwc.getParameter(PARAM_PROVIDER);
 				School school = getSchoolBusiness(iwc).getSchool(new Integer(providerIdStr));
 				if (school != null) {
-					Collection yearColl = school.findRelatedSchoolYears();
+					Collection yearColl = school.findRelatedSchoolYearsSortedByName();
 					if (yearColl != null) {
 						for (Iterator iter = yearColl.iterator(); iter.hasNext();) {
 							SchoolYear year = (SchoolYear) iter.next();

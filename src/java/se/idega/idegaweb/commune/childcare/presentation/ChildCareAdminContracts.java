@@ -13,11 +13,12 @@ import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
+import se.idega.idegaweb.commune.school.presentation.CentralPlacementProviderEditor;
+import se.idega.idegaweb.commune.school.presentation.CentralPlacementSchoolGroupEditor;
 
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.business.IBOLookup;
-import com.idega.core.builder.data.ICPage;
 import com.idega.core.location.data.Address;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -71,9 +72,6 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_SAVE = 2;
 	
-	private ICPage _providerPage;
-	private ICPage _groupPage;
-	
 	/* (non-Javadoc)
 	 * @see com.idega.presentation.PresentationObject#main(com.idega.presentation.IWContext)
 	 */
@@ -106,7 +104,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		try {
 			groupID = Integer.parseInt(iwc.getParameter(PARAM_GROUP));
 		}
-		catch (NullPointerException npe) {
+		catch (NumberFormatException npe) {
 			groupID = -1;
 		}
 		boolean success;
@@ -225,7 +223,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		}
 		
 		if (parents != null) {
-			table.add(getLocalizedHeader("child_care.parents","Parents"), 1, row++);
+			table.add(getLocalizedHeader("child_care.custodians","Custodians"), 1, row++);
 
 			Iterator iter = parents.iterator();
 			while (iter.hasNext()) {
@@ -264,12 +262,10 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			
 			table.add(getStyledInterface(prov),3,row);
 
-			if (_providerPage != null) {
-				GenericButton createProvider = new GenericButton("", localize("child_care.create_provider", "Create provider"));
-				createProvider.setPageToOpen(_providerPage);
-				table.add(Text.getNonBrakingSpace(), 3, row);
-				table.add(createProvider, 3, row);
-			}
+			GenericButton createProvider = getButton(new GenericButton("", localize("child_care.create_provider", "Create provider")));
+			createProvider.setWindowToOpen(CentralPlacementProviderEditor.class);
+			table.add(Text.getNonBrakingSpace(), 3, row);
+			table.add(createProvider, 3, row);
 			row++;
 		}
 		catch (RemoteException e1) {
@@ -306,12 +302,10 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			}
 			table.add(getStyledInterface(op),3,row);
 			
-			if (_groupPage != null) {
-				GenericButton createGroup = new GenericButton("", localize("child_care.create_group", "Create group"));
-				createGroup.setPageToOpen(_groupPage);
-				table.add(Text.getNonBrakingSpace(), 3, row);
-				table.add(createGroup, 3, row);
-			}
+			GenericButton createGroup = getButton(new GenericButton("", localize("child_care.create_group", "Create group")));
+			createGroup.setWindowToOpen(CentralPlacementSchoolGroupEditor.class);
+			table.add(Text.getNonBrakingSpace(), 3, row);
+			table.add(createGroup, 3, row);
 			row++;
 		}
 		catch (RemoteException e1) {
@@ -345,6 +339,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		
 		DateInput placementDate = (DateInput) getStyledInterface(new DateInput(PARAM_PLACEMENT_DATE));
 		placementDate.keepStatusOnAction(true);
+		placementDate.setToDisplayDayLast(true);
+		placementDate.setAsNotEmpty(localize("child_care.must_select_placement_date", "You have to select a placement date"));
 		if (_application != null)
 			placementDate.setDate(_application.getFromDate());
 		table.add(getLocalizedLabel(LABEL_PLACEMENT_DATE,"Placement date"),1,row);
@@ -362,8 +358,15 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		
 		table.setHeight(row++, 12);
 		
-		SubmitButton submit = (SubmitButton) getSubmitButton2(PARAM_SUBMIT, "true");
-		table.add(submit,1,row++);				
+		SubmitButton submit = (SubmitButton) getButton(new SubmitButton(localize("child_care.save", "Save"), PARAM_SUBMIT, "true"));
+		table.add(submit,1,row);
+		
+		if (getResponsePage() != null) {
+			GenericButton cancel = getButton(new GenericButton("", localize("child_care.cancel", "Cancel")));
+			cancel.setPageToOpen(getResponsePage());
+			table.add(Text.getNonBrakingSpace(), 1, row);
+			table.add(cancel, 1, row);
+		}
 												
 		form.add(table);
 		add(form);
@@ -390,19 +393,5 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	 */
 	protected Text getLocalizedLabel(String textKey, String defaultText) {
 		return getSmallHeader(localize(textKey, defaultText) + ":");
-	}
-	
-	/**
-	 * @param groupPage The groupPage to set.
-	 */
-	public void setGroupPage(ICPage groupPage) {
-		_groupPage = groupPage;
-	}
-	
-	/**
-	 * @param providerPage The providerPage to set.
-	 */
-	public void setProviderPage(ICPage providerPage) {
-		_providerPage = providerPage;
 	}
 }

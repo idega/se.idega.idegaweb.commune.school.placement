@@ -47,6 +47,7 @@ import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.TextInput;
 import com.idega.presentation.ui.Window;
 import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
@@ -78,12 +79,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_MOVE = 4;
 	public static final int METHOD_MOVE_GROUP = 5;
 	public static final int METHOD_MOVE_YEAR = 6;
+	public static final int METHOD_FINALIZE_GROUP = 7;
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
 	public static final int ACTION_MOVE = 3;
 	public static final int ACTION_MOVE_GROUP = 4;
 	public static final int ACTION_MOVE_YEAR = 5;
+	public static final int ACTION_FINALIZE_GROUP = 6;
 
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -91,7 +94,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private static final String PARAMETER_PROTOCOL = "sch_admin_protocol";
 	private static final String PARAMETER_SCHOOL_ID = "sch_school_id";
 	private static final String PARAMETER_DATE = "sch_date";
-
+	private static final String PARAMETER_FINALIZE_SUBJECT = "sch_admin_finalize_subject";
+	private static final String PARAMETER_FINALIZE_BODY = "sch_admin_finalize_body";
+	
 	private int _method = -1;
 	private int _action = -1;
 
@@ -129,6 +134,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 				break;
 			case ACTION_MOVE_YEAR :
 				moveYear(iwc);
+				break;
+			case ACTION_FINALIZE_GROUP :
+				finalizeGroup(iwc);
 				break;
 		}
 
@@ -194,8 +202,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 				headerTable.add(getHeader(localize("school.student_move_year", "Change year of school choice")));
 				contentTable.add(getMoveYearForm(iwc));
 				break;
+			case METHOD_FINALIZE_GROUP :
+				headerTable.add(getHeader(localize("school.finalize_group", "Finalize group")));
+				contentTable.add(getFinalizeGroupForm(iwc));
+				break;
 		}
-
+		
 		add(form);
 	}
 
@@ -568,6 +580,65 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
+	private Table getFinalizeGroupForm(IWContext iwc) throws RemoteException {
+		Table table = new Table();
+		table.setCellpadding(5);
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
+		table.add(new HiddenInput(PARAMETER_METHOD, String.valueOf(METHOD_FINALIZE_GROUP)));
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_FINALIZE_GROUP)));
+		int row = 1;
+
+		String subject = null;
+		String body = null;
+		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
+		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
+		if (schoolClass != null) {
+			if (schoolClass.getReady()) {
+				subject = localize("school.finalize_subject", "");
+				body = localize("school.finalize_body", "");
+			}
+			else {
+				subject = localize("school.students_put_in_class_subject", "");
+				body = localize("school.students_put_in_class_body", "");
+			}
+
+			if (body != null) {
+				School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
+				Object[] arguments = { school.getName(), schoolClass.getName() };
+				body = MessageFormat.format(body, arguments);
+			}
+		}
+
+		table.add(getSmallHeader(localize("school.finalize_header", "Message headline") + ": "), 1, row);
+		TextInput header = (TextInput) getStyledInterface(new TextInput(PARAMETER_FINALIZE_SUBJECT));
+		header.setLength(40);
+		header.setAsNotEmpty(localize("school.not_empty_finalize_subject","Message subject can not be empty."));
+		if (subject != null)
+			header.setContent(subject);
+		table.add(header, 1, row++);
+		
+		table.add(getSmallHeader(localize("school.finalize_text", "Message body") + ":"), 1, row);
+		table.add(new Break(), 1, row);
+		TextArea text = (TextArea) getStyledInterface(new TextArea(PARAMETER_FINALIZE_BODY));
+		text.setWidth(Table.HUNDRED_PERCENT);
+		text.setRows(10);
+		text.setAsNotEmpty(localize("school.not_empty_finalize_body","Message body can not be empty."));
+		if (body != null)
+			text.setContent(body);
+		table.add(text, 1, row++);
+		
+		SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.send", "Send")));
+		move.setValueOnClick(PARAMETER_METHOD, "-1");
+		table.add(move, 1, row);
+		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		table.add(close, 1, row);
+		table.setHeight(row, Table.HUNDRED_PERCENT);
+		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+
+		return table;
+	}
+
 	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
 		Table table = new Table(7, 1);
 		table.setCellpadding(0);
@@ -685,6 +756,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 	private void moveYear(IWContext iwc) throws RemoteException {
 		getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().changeSchoolYearForChoice(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
+		getParentPage().setParentToReload();
+		getParentPage().close();
+	}
+
+	private void finalizeGroup(IWContext iwc) throws RemoteException {
+		String subject = iwc.getPreference(PARAMETER_FINALIZE_SUBJECT);
+		String body = iwc.getPreference(PARAMETER_FINALIZE_BODY);
+		
+		int schoolClassID = getSchoolCommuneSession(iwc).getSchoolClassID();
+		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
+		if (schoolClass != null) {
+			if (schoolClass.getReady()) {
+				getSchoolCommuneBusiness(iwc).markSchoolClassLocked(schoolClass);
+				getSchoolCommuneBusiness(iwc).finalizeGroup(schoolClass, subject, body, true);
+			}
+			else {
+				getSchoolCommuneBusiness(iwc).markSchoolClassReady(schoolClass);
+				getSchoolCommuneBusiness(iwc).finalizeGroup(schoolClass, subject, body, false);
+			}
+		}
+
 		getParentPage().setParentToReload();
 		getParentPage().close();
 	}

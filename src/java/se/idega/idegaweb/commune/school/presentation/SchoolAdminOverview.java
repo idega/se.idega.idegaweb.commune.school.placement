@@ -2,7 +2,9 @@ package se.idega.idegaweb.commune.school.presentation;
 
 import is.idega.block.family.business.FamilyLogic;
 import is.idega.block.family.business.NoCustodianFound;
+
 import java.rmi.RemoteException;
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,8 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
 import javax.ejb.CreateException;
 import javax.ejb.FinderException;
+
+import se.idega.idegaweb.commune.accounting.business.BatchDeadlineService;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.care.resource.business.ClassMemberException;
@@ -29,6 +34,7 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.placement.business.PlacementBusiness;
 import se.idega.util.PIDChecker;
+
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.business.SchoolBusinessBean;
 import com.idega.block.school.business.SchoolYearComparator;
@@ -74,6 +80,7 @@ import com.idega.util.Age;
 import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
+import com.idega.util.TimePeriod;
 import com.idega.util.URLUtil;
 import com.idega.util.text.Name;
 import com.idega.util.text.TextSoap;
@@ -1043,26 +1050,50 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(Text.getNonBrakingSpace(), 1, row);
 
 		IWTimestamp stamp = new IWTimestamp();
-		SchoolChoice choice = null;
+		/*SchoolChoice choice = null;
 		try {
 			choice = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getSchoolChoice(_choiceID);
 		}
 		catch (FinderException e) {
 			choice = null;
-		}
+		}*/
 		DateInput input = (DateInput) getStyledInterface(new DateInput(PARAMETER_DATE));
 		//vänta på svar från Nacka
 		SchoolSeason schSeason =  getSchoolBusiness(iwc).getSchoolSeason(new Integer (getSchoolCommuneSession(iwc).getSchoolSeasonID()));
 		input.setLatestPossibleDate(schSeason.getSchoolSeasonEnd(), localize("school.dates_not_in_season", "You can not choose a date outside of the season."));
 		
-		if (choice != null && choice.getPlacementDate() != null)
+		// adding  batch deadline checks (aron) 12.11.2004
+		BatchDeadlineService deadlineService = ((BatchDeadlineService)IBOLookup.getServiceInstance(iwc,BatchDeadlineService.class));
+		TimePeriod deadlinePeriod = null;
+		deadlinePeriod = deadlineService.getValidPeriod();
+		/*
+		if (choice != null && choice.getPlacementDate() != null){
 			input.setDate(choice.getPlacementDate());
-		else
+			input.setEarliestPossibleDate(stamp.getDate(), localize("school.dates_back_in_time_not_allowed", "You can not choose a date back in time."));
+		}*/
+		if(deadlinePeriod!=null && deadlinePeriod.getFirstTimestamp()!=null) {
+		    DateFormat format = DateFormat.getDateInstance(DateFormat.SHORT,iwc.getCurrentLocale());
+		    // deadline has passed
+		   
+		    if(deadlineService.hasDeadlinePassed()){
+		        input.setEarliestPossibleDate(deadlinePeriod.getFirstTimestamp().getDate(), localize("school.deadline_passed", "Deadline has passed earliest date possible is ")+format.format(deadlinePeriod.getFirstTimestamp().getDate()));
+		        input.setDate(deadlinePeriod.getFirstTimestamp().getDate()); 
+		    }
+		    // still within deadline
+		    else{
+		        input.setEarliestPossibleDate(deadlinePeriod.getFirstTimestamp().getDate(), localize("school.deadline_still_within", "You can not choose a date back in time."));
+		        input.setDate(deadlinePeriod.getFirstTimestamp().getDate());
+		    }
+		    
+		}
+		else{
 			input.setDate(stamp.getDate());
-		input.setEarliestPossibleDate(stamp.getDate(), localize("school.dates_back_in_time_not_allowed", "You can not choose a date back in time."));
-		
-		
+			input.setEarliestPossibleDate(stamp.getDate(), localize("school.dates_back_in_time_not_allowed", "You can not choose a date back in time."));
+		}
 		table.add(input, 1, row++);
+		
+		if(deadlineService.hasDeadlinePassed())
+		    table.add(getText(localize("school.deadline_msg_for_passedby_date","Chosen period has been invoiced. Earliest possible date is the first day of next month.")),1,row++);
 
 		SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placement_date", "Change placement date"), PARAMETER_ACTION, String.valueOf(ACTION_CHANGE_PLACEMENT_DATE)));
 		table.add(changePlacementDate, 1, row);

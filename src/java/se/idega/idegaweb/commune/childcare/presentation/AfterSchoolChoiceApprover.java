@@ -19,6 +19,7 @@ import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.Form;
 import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
@@ -80,7 +81,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		applicationTable.add(getLocalizedSmallHeader("child_care.personal_id","Personal ID"), column++, row);
 		applicationTable.add(getLocalizedSmallHeader("child_care.address","Address"), column++, row);
 		applicationTable.add(getLocalizedSmallHeader("child_care.phone","Phone"), column++, row++);
-				
+
+		boolean showMessage = false;
+
 		Collection applications = getApplicationCollection(iwc);
 		if (applications != null && !applications.isEmpty()) {
 			ChildCareApplication application;
@@ -88,6 +91,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			Address address;
 			Phone phone;
 			Link link;
+			boolean hasMessage = false;
 				
 			Iterator iter = applications.iterator();
 			while (iter.hasNext()) {
@@ -96,6 +100,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				child = application.getChild();
 				address = getBusiness().getUserBusiness().getUsersMainAddress(child);
 				phone = getBusiness().getUserBusiness().getChildHomePhone(child);
+				hasMessage = application.getMessage() != null;		
 						
 				if (application.getApplicationStatus() == getBusiness().getStatusAccepted()) {
 					applicationTable.setRowColor(row, ACCEPTED_COLOR);
@@ -120,6 +125,12 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				if (getResponsePage() != null)
 					link.setPage(getResponsePage());
 	
+				if (hasMessage) {
+					showMessage = true;
+					applicationTable.add(getSmallErrorText("&Delta;"), column, row);
+					applicationTable.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+				}
+
 				applicationTable.add(link, column++, row);
 				applicationTable.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 				if (address != null)
@@ -131,6 +142,14 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				else
 					applicationTable.add(getSmallText("-"), column++, row++);
 			}
+
+			if (showMessage) {
+				applicationTable.setHeight(row++, 2);
+				applicationTable.mergeCells(1, row, applicationTable.getColumns(), row);
+				applicationTable.add(getSmallErrorText("&Delta; "), 1, row);
+				applicationTable.add(getSmallText(localize("child_care.has_message_in_application","The application has a message attached")), 1, row++);
+			}
+			
 			applicationTable.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_CENTER);
 			applicationTable.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
 		}

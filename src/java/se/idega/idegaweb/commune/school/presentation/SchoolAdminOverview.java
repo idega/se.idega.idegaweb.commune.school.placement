@@ -509,7 +509,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			// *** Resources START ***			
 			if (_rscTO != null) {
 	            Integer providerGrpID = getProviderGrpId(iwc);
-	            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
+	            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMemberId(new Integer(_rscTO.getClassMemberID()));
 	            // Add resource label
 	            table.add(getSmallHeader(localize("school.resources", "Resources")), 1, row);
 	            if (rscColl.size() == 0)
@@ -1114,7 +1114,7 @@ public class SchoolAdminOverview extends CommuneBlock {
         // list resources
         int row = 2;
         Integer providerGrpID = getProviderGrpId(iwc);
-        Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
+        Collection rscColl = getResourceBusiness(iwc).getResourcePlacementsByMemberId(new Integer(_rscTO.getClassMemberID()));
         SubmitButton finish;
         SubmitButton delete;
         

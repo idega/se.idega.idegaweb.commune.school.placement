@@ -256,7 +256,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 				if (useStyleNames()) {
 					if (row % 2 == 0) {
-						table.setRowStyleClass(row, getLightRowClass());
+						table.setRowStyleClass(row, getDarkRowClass());
 					}
 					else {
 						table.setRowStyleClass(row, getLightRowClass());
@@ -363,11 +363,11 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				table.setCellpaddingLeft(1, row, 12);
 			}
 			table.add(getSmallHeader(localize("school.number_of_students", "Number of students") + ": " + String.valueOf(numberOfStudents)), 1, row++);
+			table.setRowColor(row, "#FFFFFF");
 		}
 
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setRowColor(row, "#FFFFFF");
 
 		return table;
 	}

@@ -63,55 +63,35 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	public static final String PARAMETER_ACTION = "sch_action";
 
 	private final String PARAMETER_METHOD = "sch_method";
-
 	private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
-
 	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
-
 	private final String PARAMETER_SORT = "sch_choice_sort";
-
 	private final String PARAMETER_SORT_PLACED = "sch_choice_sort_placed";
-
 	private final String PARAMETER_SEARCH = "scH_choise_search";
-
 	private final String PARAMETER_CURRENT_APPLICATION_PAGE = "sch_crrap_pg";
-
 	private final String PARAMETER_DELETE_CHOICE_ID = "delete_sch_choice";
 
 	private final int ACTION_MANAGE = 1;
-
 	public static final int ACTION_SAVE = 2;
-
 	private final int ACTION_FINALIZE_GROUP = 3;
-
 	private final int ACTION_DELETE = 4;
-
 	private final int ACTION_DELETE_SCHOOL_CHOICE = 5;
 
 	private int action = 0;
-
 	private int method = 0;
-
 	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
-
 	private int sortChoicesBy = SchoolClassMemberComparator.NAME_SORT;
-
 	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
-
 	private int sortPlacedUnplacedBy = -1;
 
 	private String searchString = "";
 
 	private int _previousSchoolClassID = -1;
-
 	private int _previousSchoolSeasonID = -1;
-
 	private int _previousSchoolYearID = -1;
-
 	private int _choiceForDeletion = -1;
 
 	private boolean multibleSchools = false;
-
 	private boolean showStudentTable = true;
 	private boolean showMessageTextButton = false;
 	private boolean searchEnabled = true;
@@ -119,11 +99,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private int applicationsPerPage = 10;
 
 	private boolean showStatistics = true;
-
 	private boolean showBunRadioButtons = false;
-
 	private boolean isOngoingSeason = false;
-
 	private boolean _useForTesting = false;
 
 	private SchoolClass _group;
@@ -231,27 +208,35 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setWidth(getWidth());
-		table.setHeight(2, "12");
-		table.setHeight(4, "6");
-		table.setHeight(6, "18");
-		table.setHeight(8, "6");
-		table.setHeight(10, "12");
+		table.setHeight(2, "6");
+		table.setHeight(4, "12");
+		table.setHeight(6, "3");
+		table.setHeight(8, "3");
+		table.setHeight(10, "18");
+		table.setHeight(12, "3");
+		table.setHeight(14, "3");
+		table.setHeight(16, "12");
 		form.add(table);
 
-		Table headerTable = new Table(1, 3);
-		headerTable.setWidth(Table.HUNDRED_PERCENT);
-		headerTable.setCellpaddingAndCellspacing(0);
-		headerTable.setHeight(1, 2, "4");
+		table.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
+		table.add(getSearchAndSortTable(), 1, 3);
+		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 5);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, 1, 12);
+			table.setCellpaddingLeft(1, 3, 12);
+			table.setCellpaddingLeft(1, 5, 12);
+			table.setCellpaddingRight(1, 1, 12);
+			table.setCellpaddingRight(1, 3, 12);
+			table.setCellpaddingRight(1, 5, 12);
+		}
 
-		table.add(headerTable, 1, 1);
+		table.add(getApplicationTable(iwc), 1, 7);
 
-		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
-		headerTable.add(getSearchAndSortTable(), 1, 3);
-
-		table.add(getApplicationTable(iwc), 1, 5);
-
-		table.add(getLegendTable(true, getSchoolID() < 1), 1, 5);
-		table.add(getChoiceHeader(), 1, 3);
+		table.add(getLegendTable(true, getSchoolID() < 1), 1, 9);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, 9, 12);
+			table.setCellpaddingRight(1, 9, 12);
+		}
 
 		if (this.showStudentTable) {
 			if (_previousSchoolYearID != -1 && !isOngoingSeason) {
@@ -259,9 +244,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 					validateSchoolClass(previousClasses);
 
-					table.add(getPreviousHeader(previousClasses), 1, 7);
-					table.add(getStudentTable(iwc), 1, 9);
-					table.add(getLegendTable(), 1, 9);
+					table.add(getPreviousHeader(previousClasses), 1, 11);
+					table.add(getStudentTable(iwc), 1, 13);
+					table.add(getLegendTable(), 1, 15);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, 11, 12);
+						table.setCellpaddingLeft(1, 15, 12);
+						table.setCellpaddingRight(1, 11, 12);
+						table.setCellpaddingRight(1, 15, 12);
+					}
 				}
 				catch (NullPointerException ne) {
 				}
@@ -271,8 +262,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				GenericButton report = getButton(new GenericButton("report", localize("school.show_student_info", "Student list")));
 				if (getResponsePage() != null) {
 					report.setPageToOpen(getResponsePage());
-					table.add(report, 1, 11);
-					table.add(Text.getNonBrakingSpace(), 1, 11);
+					table.add(report, 1, 17);
+					table.add(Text.getNonBrakingSpace(), 1, 17);
 				}
 			}
 
@@ -285,10 +276,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				form.setToDisableOnSubmit(submit, true);
 				SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
 				view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-				table.add(method, 1, 11);
-				table.add(submit, 1, 11);
-				table.add(Text.getNonBrakingSpace(), 1, 11);
-				table.add(view, 1, 11);
+				table.add(method, 1, 17);
+				table.add(submit, 1, 17);
+				table.add(Text.getNonBrakingSpace(), 1, 17);
+				table.add(view, 1, 17);
 			}
 		}
 
@@ -296,10 +287,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			GenericButton msgText = getButton(new GenericButton("messageText", localize("school.show_message_text", "Message Text")));
 			msgText.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_MESSAGE_TEXT);
 			msgText.setWindowToOpen(SchoolAdminWindow.class);
-			table.add(msgText, 1, 11);
-			table.add(Text.getNonBrakingSpace(), 1, 11);
+			table.add(Text.getNonBrakingSpace(), 1, 17);
+			table.add(msgText, 1, 17);
 		}
 		
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, 17, 12);
+			table.setCellpaddingRight(1, 17, 12);
+		}
 		
 		add(form);
 	}
@@ -325,9 +320,16 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 2, 1);
+		if (useStyleNames()) {
+			headerTable.setCellpaddingLeft(1, 1, 12);
+			headerTable.setCellpaddingRight(2, 1, 12);
+		}
 
 		if (getSchoolClassID() != -1) {
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
+			if (useStyleNames()) {
+				table.setCellpaddingRight(1, row, 12);
+			}
 			Link pdfLink = getPDFLink(SchoolClassWriter.class, getBundle().getImage("shared/pdf.gif"));
 			pdfLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			pdfLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
@@ -341,6 +343,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		table.add(getNewStudentTable(iwc), 1, row++);
 		table.add(getLegendTable(), 1, row);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, row, 12);
+			table.setCellpaddingRight(1, row, 12);
+		}
 
 		add(form);
 	}
@@ -512,6 +518,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					}
 				}
 
+				if (useStyleNames()) {
+					if (row % 2 == 0)
+						table.setRowStyleClass(row, getDarkRowClass());
+					else
+						table.setRowStyleClass(row, getLightRowClass());
+					table.setCellpaddingLeft(1, row, 12);
+					table.setCellpaddingRight(1, table.getColumns(), 12);
+				}
+
 				//String name = applicant.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(applicant, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = applicant.getName();
@@ -526,10 +541,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					table.setRowColor(row, HAS_MOVED_TO_COMMUNE_COLOR);
 				}
 				else {
-					if (row % 2 == 0)
-						table.setRowColor(row, getZebraColor1());
-					else
-						table.setRowColor(row, getZebraColor2());
+					if (!useStyleNames()) {
+						if (row % 2 == 0)
+							table.setRowColor(row, getZebraColor1());
+						else
+							table.setRowColor(row, getZebraColor2());
+					}
 				}
 
 				link = getSmallLink(name);
@@ -605,11 +622,17 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				table.setHeight(row++, 2);
 				if (showComment) {
 					table.mergeCells(1, row, table.getColumns(), row);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, row, 12);
+					}
 					table.add(getSmallErrorText("* "), 1, row);
 					table.add(getSmallText(localize("school_choice.has_comment", "Application has comment attached")), 1, row++);
 				}
 				if (showPlacement) {
 					table.mergeCells(1, row, table.getColumns(), row);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, row, 12);
+					}
 					table.add(getSmallErrorText("+ "), 1, row);
 					table.add(getSmallText(localize("school_choice.has_main_group_placement", "Student is placed in main group")), 1, row++);
 				}
@@ -716,9 +739,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.mergeCells(1, row, table.getColumns(), row);
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			table.setRowColor(row, "#FFFFFF");
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, row, 12);
+				table.setCellpaddingRight(1, row, 12);
+			}
 		}
 		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setRowColor(headerRow, getHeaderColor());
+		if (useStyleNames()) {
+			table.setRowStyleClass(headerRow, getHeaderRowClass());
+		}
+		else {
+			table.setRowColor(headerRow, getHeaderColor());
+		}
 		if (headerRow != 1) table.mergeCells(1, 1, table.getColumns(), 1);
 
 		if (!this.multibleSchools) {
@@ -815,6 +847,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				boolean hasChoice = getBusiness().hasChoicesForSeason(studentMember.getClassMemberId(), getSchoolSeasonID());
 				boolean hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 
+				if (useStyleNames()) {
+					if (row % 2 == 0)
+						table.setRowStyleClass(row, getDarkRowClass());
+					else
+						table.setRowStyleClass(row, getLightRowClass());
+					table.setCellpaddingLeft(1, row, 12);
+					table.setCellpaddingRight(1, table.getColumns(), 12);
+				}
+
 				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				}
@@ -825,10 +866,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				}
 				else {
-					if (row % 2 == 0)
-						table.setRowColor(row, getZebraColor1());
-					else
-						table.setRowColor(row, getZebraColor2());
+					if (!useStyleNames()) {
+						if (row % 2 == 0)
+							table.setRowColor(row, getZebraColor1());
+						else
+							table.setRowColor(row, getZebraColor2());
+					}
 				}
 
 				if (hasPlacement) {
@@ -859,6 +902,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			if (showPlacement) {
 				table.setHeight(row++, 2);
 				table.mergeCells(1, row, table.getColumns(), row);
+				if (useStyleNames()) {
+					table.setCellpaddingLeft(1, row, 12);
+				}
 				table.add(getSmallErrorText("+ "), 1, row);
 				table.add(getSmallText(localize("school_choice.has_main_group_placement", "Student is placed in main group")), 1, row++);
 			}
@@ -866,6 +912,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		}
 		if (numberOfStudents > 0) {
 			table.mergeCells(1, row, table.getColumns(), row);
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, row, 12);
+			}
 			table.add(getSmallHeader(localize("school.number_of_students", "Number of students") + ": " + String.valueOf(numberOfStudents)), 1, row++);
 		}
 
@@ -884,9 +933,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.mergeCells(1, row, 6, row);
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			table.setRowColor(row, "#FFFFFF");
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, row, 12);
+				table.setCellpaddingRight(1, row, 12);
+			}
 		}
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setRowColor(1, getHeaderColor());
+		if (useStyleNames()) {
+			table.setRowStyleClass(1, getHeaderRowClass());
+		}
+		else {
+			table.setRowColor(1, getHeaderColor());
+		}
 
 		return table;
 	}
@@ -981,6 +1039,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
 
+				if (useStyleNames()) {
+					if (row % 2 == 0)
+						table.setRowStyleClass(row, getDarkRowClass());
+					else
+						table.setRowStyleClass(row, getLightRowClass());
+					table.setCellpaddingLeft(1, row, 12);
+					table.setCellpaddingRight(1, table.getColumns(), 12);
+				}
+
 				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				}
@@ -991,10 +1058,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 				}
 				else {
-					if (row % 2 == 0)
-						table.setRowColor(row, getZebraColor1());
-					else
-						table.setRowColor(row, getZebraColor2());
+					if (!useStyleNames()) {
+						if (row % 2 == 0)
+							table.setRowColor(row, getZebraColor1());
+						else
+							table.setRowColor(row, getZebraColor2());
+					}
 				}
 
 				if (hasComment) {
@@ -1042,6 +1111,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			if (showComment) {
 				table.setHeight(row++, 2);
 				table.mergeCells(1, row, table.getColumns(), row);
+				if (useStyleNames()) {
+					table.setCellpaddingLeft(1, row, 12);
+				}
 				table.add(getSmallErrorText("* "), 1, row);
 				table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);
 			}
@@ -1049,6 +1121,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (numberOfStudents > 0) {
 			table.mergeCells(1, row, table.getColumns(), row);
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, row, 12);
+			}
 			table.add(getSmallHeader(localize("school.number_of_students", "Number of students") + ": " + String.valueOf(numberOfStudents)), 1, row++);
 		}
 
@@ -1057,6 +1132,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 			IWTimestamp readyDate = new IWTimestamp(newSchoolClass.getReadyDate());
 			table.mergeCells(1, row, table.getColumns(), row);
+			if (useStyleNames()) {
+				table.setCellpaddingLeft(1, row, 12);
+			}
 			table.add(getSmallHeader(localize("school.mark_ready_when", "School group was marked as ready") + ": " + readyDate.getLocaleDateAndTime(iwc.getCurrentLocale(), IWTimestamp.SHORT, IWTimestamp.SHORT)), 1, row++);
 			if (isLocked && newSchoolClass.getLockedDate() != null) {
 				IWTimestamp lockedDate = new IWTimestamp(newSchoolClass.getLockedDate());
@@ -1075,6 +1153,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			buttonLabel = localize("school.class_ready", "Class ready");
 
 		table.add(back, 1, row);
+		if (useStyleNames()) {
+			table.setCellpaddingLeft(1, row, 12);
+		}
 
 		if (!isSubGroup) {
 			table.add(Text.getNonBrakingSpace(), 1, row);
@@ -1102,7 +1183,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setColumnAlignment(7, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setColumnAlignment(8, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setRowColor(1, getHeaderColor());
+		if (useStyleNames()) {
+			table.setRowStyleClass(row, getHeaderRowClass());
+		}
+		else {
+			table.setRowColor(1, getHeaderColor());
+		}
 		table.setRowColor(row, "#FFFFFF");
 
 		return table;
@@ -1118,18 +1204,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.previous_year_class", "Previous year class")), 1, 1);
 		table.add(getSmallHeader(localize("school.class", "Class") + ":" + Text.NON_BREAKING_SPACE), 2, 1);
 		table.add(getPreviousSchoolClasses(classes), 2, 1);
-
-		return table;
-	}
-
-	protected Table getChoiceHeader() {
-		Table table = new Table(2, 1);
-		table.setCellpadding(0);
-		table.setCellspacing(0);
-		table.setWidth(Table.HUNDRED_PERCENT);
-		table.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
-
-		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 1);
 
 		return table;
 	}

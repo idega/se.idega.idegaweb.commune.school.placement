@@ -44,6 +44,7 @@ import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolClassMemberHome;
 import com.idega.block.school.data.SchoolSeason;
+import com.idega.block.school.data.SchoolSeasonHome;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolStudyPathHome;
 import com.idega.block.school.data.SchoolType;
@@ -76,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/03/01 14:16:02 $ by $Author: goranb $
- * @version $Revision: 1.71 $
+ * Last modified: $Date: 2004/03/01 16:25:20 $ by $Author: goranb $
+ * @version $Revision: 1.72 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -264,8 +265,13 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// Perform actions according the _action input parameter
 		switch (_action) {
 			case ACTION_PLACE_PUPIL :
-				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, currentSeason);
-				storedPlacement = storePlacement(iwc, child);
+				try {
+					SchoolSeason chosenSeason = getSchoolSeasonHome().
+						findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
+					latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, chosenSeason);
+					storedPlacement = storePlacement(iwc, child);
+				} 
+				catch (Exception e1) {log(e1);}			
 				break;
 			case ACTION_REMOVE_SESSION_CHILD :
 				removeSessionChild(iwc);
@@ -1886,8 +1892,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			}			
 		}
 		// Send messages to provider users
-		if (latestPl != null) {
-			
+		if (latestPl != null) {			
 			Collection users = getSchoolBusiness(iwc).getSchoolUsers(latestPl.getSchoolClass().getSchool());
 			String subject = localize(KEY_FINISHED_PLACEMENT, "Finished placement");
 			String body = null;
@@ -1998,8 +2003,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					for (Iterator iter = users.iterator(); iter.hasNext();) {
 						SchoolUser providerUser = (SchoolUser) iter.next();
 						User user = providerUser.getUser();
-						System.out.println("CPE New Message to School user: "+user.getNameLastFirst() + " -  id: "
-													+((Integer) user.getPrimaryKey()).toString());
+						/*System.out.println("CPE New Message to School user: "+user.getNameLastFirst() + " -  id: "
+												+((Integer) user.getPrimaryKey()).toString()); */
 						getMessageBusiness(iwc).createUserMessage(user, subject, body, false);
 					}			
 				}				
@@ -2057,6 +2062,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	
 	public SchoolStudyPathHome getStudyPathHome() throws java.rmi.RemoteException {
 		return (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+	}
+	
+	public SchoolSeasonHome getSchoolSeasonHome() throws RemoteException {
+		return (SchoolSeasonHome) IDOLookup.getHome(SchoolSeason.class);
 	}
 	
 	public SchoolClassMemberHome getSchoolClassMemberHome() throws RemoteException {

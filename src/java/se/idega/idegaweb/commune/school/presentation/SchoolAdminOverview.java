@@ -272,7 +272,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 				if (language != null && language.length() > 0) {
 					table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
-					table.add(getSmallText(language), 2, row++);
+					table.add(getSmallText(localize(language,language)), 2, row++);
 				}
 				if (message != null) {
 					table.add(getSmallHeader(localize("school.school_choice_message", "Applicant message")), 1, row);
@@ -544,12 +544,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private void move(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(PARAMETER_MOVE_MESSAGE)) {
 			String message = iwc.getParameter(PARAMETER_MOVE_MESSAGE);
+			String schoolName = localize("school.outside_commune","a school outside of the commune");
 
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAMETER_SCHOOL_ID));
 			int schoolTypeID = -1;
 			if (schoolID != -1) {
 				try {
 					School school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolID));
+					schoolName = school.getSchoolName();
 					Collection Stypes = school.findRelatedSchoolTypes();
 					if (!Stypes.isEmpty()) {
 						SchoolType schoolType = (SchoolType) Stypes.iterator().next();
@@ -567,22 +569,23 @@ public class SchoolAdminOverview extends CommuneBlock {
 			Address studentAddress = getUserBusiness(iwc).getUserAddress1(_userID);
 			getSchoolCommuneBusiness(iwc).setNeedsSpecialAttention(_userID, getSchoolCommuneBusiness(iwc).getPreviousSchoolSeasonID(getSchoolCommuneSession(iwc).getSchoolSeasonID()), true);
 
-			if (schoolID != -1) {
+			//if (schoolID != -1) {
 				try {
 					User headmaster = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getHeadmaster(schoolID);
-					if (headmaster != null) {
-						String address = "";
-						if (studentAddress != null)
-							address = studentAddress.getStreetAddress();
-						Object[] arguments = { student.getNameLastFirst(true), PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale()), address };
-						String messageSubject = localize("school.student_moved", "Student moved to your school");
-						String messageBody = localize("school.student_moved_body", "The following student has been moved to your school and will need to be handled accordingly: ");
-						getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster, MessageFormat.format(messageSubject, arguments), MessageFormat.format(messageBody, arguments));
-					}
+					//if (headmaster != null) {
+					String address = "";
+					if (studentAddress != null)
+						address = studentAddress.getStreetAddress();
+					Object[] arguments = { student.getNameLastFirst(true), PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale()), address, schoolName };
+					String messageSubject = localize("school.student_moved", "Student moved to your school");
+					String messageBody = localize("school.student_moved_body", "The following student has been moved to your school and will need to be handled accordingly: ");
+					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().sendMessageToCommuneAdministrators(MessageFormat.format(messageSubject, arguments), MessageFormat.format(messageBody, arguments));
+					if (headmaster != null)
+						getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getMessageBusiness().createUserMessage(headmaster,MessageFormat.format(messageSubject, arguments), MessageFormat.format(messageBody, arguments));
 				}
 				catch (Exception e) {
 				}
-			}
+			//}
 
 			IWTimestamp stamp = new IWTimestamp();
 			try {

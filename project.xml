@@ -40,6 +40,13 @@
       <organization>idega software</organization>
       <roles/>
     </developer>
+    <developer>
+      <name>Anders Lindman</name>
+      <id>anders</id>
+      <email>anders.lindman@ncmedia.com</email>
+      <organization>AguraIT</organization>
+      <roles/>
+    </developer>
   </developers>
   <dependencies>
     <dependency>

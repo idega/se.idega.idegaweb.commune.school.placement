@@ -79,6 +79,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_SHOW_NO_CHOICES = "sch_show_no_choices";
 	public static final String PARAMETER_SEARCH = "sch_search";
 	public static final String PARAMETER_PAGE_ID = "sch_page_id";
+	public static final String PARAMETER_COMMENT = "sch_comment";
+	public static final String PARAMETER_SCHOOL_CLASS_ID = "sch_class_id";
 
 	public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
@@ -261,6 +263,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setWidth(Table.HUNDRED_PERCENT);
 		table.setHeight(Table.HUNDRED_PERCENT);
 		int row = 1;
+		
+		String schoolClassId = iwc.getParameter(PARAMETER_SCHOOL_CLASS_ID);
 
 		if (_userID != -1) {
 			User user = getUserBusiness(iwc).getUser(_userID);
@@ -277,7 +281,25 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(getSmallText(address.getStreetAddress() + ", " + address.getPostalAddress()), 2, row++);
 			else
 				row++;
-
+				
+			table.add(getSmallHeader(localize("school.comment", "Comment")), 1, row);
+			if (schoolClassId != null) {
+				try {
+					SchoolClassMember scMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassMember(_userID, Integer.parseInt(schoolClassId));
+					if (scMember != null) {
+						String notes = scMember.getNotes();
+						if (notes != null) {
+							table.add(getSmallText(notes), 2, row);
+						}
+						++row;
+					}
+				} catch (Exception e) {
+					++row;
+				}
+			} else {
+				++row;
+			}
+				
 			try {
 				Collection parents = getMemberFamilyLogic(iwc).getCustodiansFor(user);
 				table.add(getSmallHeader(localize("school.custodians", "Custodians")), 1, row);
@@ -833,7 +855,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.add(getSmallHeader(localize("commune.enter_search_string","Enter search string")+":"), 1, row);
 		
 		TextInput searchInput = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH));
-		searchInput.setLength(40);
+		searchInput.setWidth("200");
 		searchInput.setMininumLength(6, localize("commune.search_string_too_short","Search string must be at least six characters."));
 		searchInput.keepStatusOnAction(true);
 		table.add(searchInput, 2, row++);
@@ -887,7 +909,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 						}
 					}
 				
+					userTable.setHeight(userRow++, 12);
+
+					userTable.add(getSmallHeader(localize("commune.enter_comment","Enter comment")+":"), 1, userRow++);
+
 					userTable.setHeight(userRow++, 6);
+					TextArea freeText = (TextArea) getStyledInterface(new TextArea(PARAMETER_COMMENT));
+					freeText.setWidth(Table.HUNDRED_PERCENT);
+					freeText.setHeight("60");
+					freeText.setWrap(true);
+					userTable.add(freeText, 1, userRow++);
+
+					userTable.setHeight(userRow++, 6);
+
 					if (addSubmit) {
 						SubmitButton addButton = (SubmitButton) getButton(new SubmitButton(localize("school.add_student","Add student"), PARAMETER_ACTION, String.valueOf(ACTION_ADD_STUDENT)));
 						addButton.setValueOnClick(PARAMETER_METHOD, "-1");
@@ -1092,7 +1126,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	
 	private void addStudent(IWContext iwc) throws RemoteException {
 		if (_userID != -1) {
-			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), iwc.getParameter(PARAMETER_COMMENT));
 			getParentPage().setParentToRedirect(BuilderLogic.getInstance().getIBPageURL(iwc, _pageID));
 			getParentPage().close();
 		}

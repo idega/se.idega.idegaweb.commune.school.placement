@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/20 15:00:27 $ by $Author: goranb $
- * @version $Revision: 1.42 $
+ * Last modified: $Date: 2003/11/20 22:49:19 $ by $Author: goranb $
+ * @version $Revision: 1.43 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -116,9 +116,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
 	private static final String KEY_PLACEMENT_PARAGRAPH_LABEL = KP + "placement_paragraph_label";
 	private static final String KEY_LATEST_INVOICE_DATE_LABEL = KP + "latest_placement_date_label";
-	private static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = 
-																								KP + "Payment by agreement: ";
-	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "Invoice interval: ";
+	private static final String KEY_PAYMENT_BY_AGREEMENT_LABEL = KP + "payment_by_agreement";
+	private static final String KEY_INVOICE_INTERVAL_LABEL = KP + "invoice_interval";
 	private static final String KEY_PLACEMENT_DATE_LABEL = KP + "placement_date_label";
 	private static final String KEY_PARENT_LABEL = KP + "parent_label";
 	private static final String KEY_NEW_PROVIDER_LABEL = KP + "new_provider_label";
@@ -593,6 +592,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+		} else {
+			// BUTTON Regular payment for Latest Placement					
+			if (!(iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) 
+					|| "-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY))) {
+				table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row-3);
+				table.setAlignment(5, row-3, Table.HORIZONTAL_ALIGN_RIGHT);
 			}
 		}
 		row++;

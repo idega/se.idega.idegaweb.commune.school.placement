@@ -174,7 +174,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.add(getSearchAndSortTable(), 2, 1);
 		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
-		students = getBusiness().getStudentList(getBusiness().getSchoolClassMemberBusiness().findStudentsBySchoolAndSeason(getSchoolID(), getSchoolSeasonID()));
+		students = getBusiness().getStudentList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeason(getSchoolID(), getSchoolSeasonID()));
 
 		table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
@@ -182,7 +182,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (this.showStudentTable) {
 			if (_previousSchoolYearID != -1) {
 				try {
-					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolSeasonBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID())));
+					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 					validateSchoolClass(previousClasses);
 		
 					table.add(getPreviousHeader(previousClasses), 1, 7);
@@ -250,7 +250,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setCellspacing(getCellspacing());
 		boolean showLanguage = false;
 
-		SchoolYear year = getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID()));
+		SchoolYear year = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int schoolYearAge = getBusiness().getGradeForYear(getSession().getSchoolYearID()) - 1;
 		if (year != null && schoolYearAge == 13)
 			showLanguage = true;
@@ -498,9 +498,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		List formerStudents = new Vector();
 		if (_previousSchoolClassID != -1)
-			formerStudents = new Vector(getBusiness().getSchoolClassMemberBusiness().findStudentsInClass(_previousSchoolClassID));
+			formerStudents = new Vector(getBusiness().getSchoolBusiness().findStudentsInClass(_previousSchoolClassID));
 		else
-			formerStudents = new Vector(getBusiness().getSchoolClassMemberBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), _previousSchoolSeasonID, _previousSchoolYearID));
+			formerStudents = new Vector(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), _previousSchoolSeasonID, _previousSchoolYearID));
 
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
@@ -511,7 +511,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			while (iter.hasNext()) {
 				studentMember = (SchoolClassMember) iter.next();
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
-				schoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
+				schoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
 				if (students.containsValue(student))
@@ -580,7 +580,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private Table getNewStudentTable(IWContext iwc) throws RemoteException {
 		boolean isReady = false;
-		SchoolClass newSchoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(getSession().getSchoolClassID()));
+		SchoolClass newSchoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSession().getSchoolClassID()));
 		if (newSchoolClass != null)
 			isReady = newSchoolClass.getReady();
 		
@@ -609,7 +609,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		Link move;
 		int numberOfStudents = 0;
 
-		List formerStudents = new Vector(getBusiness().getSchoolClassMemberBusiness().findStudentsInClass(getSchoolClassID()));
+		List formerStudents = new Vector(getBusiness().getSchoolBusiness().findStudentsInClass(getSchoolClassID()));
 
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
@@ -619,7 +619,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			while (iter.hasNext()) {
 				studentMember = (SchoolClassMember) iter.next();
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
-				schoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
+				schoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				delete = (SubmitButton) getStyledInterface(new SubmitButton(getDeleteIcon(localize("school.delete_from_group","Click to remove student from group"))));
 				delete.setDescription(localize("school.delete_from_group","Click to remove student from group"));
@@ -788,14 +788,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
 				StringTokenizer tokens = new StringTokenizer(applications[a],",");
-				getBusiness().getSchoolClassMemberBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), stamp.getTimestamp(), userID);
+				getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(tokens.nextToken()), getSchoolClassID(), stamp.getTimestamp(), userID);
 				getBusiness().getSchoolChoiceBusiness().groupPlaceAction(new Integer(tokens.nextToken()), iwc.getCurrentUser());
 			}
 		}
 
 		if (students != null && students.length > 0) {
 			for (int a = 0; a < students.length; a++) {
-				getBusiness().getSchoolClassMemberBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), stamp.getTimestamp(), userID);
+				getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), stamp.getTimestamp(), userID);
 			}
 		}
 	}
@@ -803,7 +803,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private void delete(IWContext iwc) throws RemoteException {
 		String student = iwc.getParameter(PARAMETER_APPLICANT_ID);
 		if (student != null && student.length() > 0) {
-			getBusiness().getSchoolClassMemberBusiness().removeSchoolClassMember(Integer.parseInt(student));
+			getBusiness().getSchoolBusiness().removeSchoolClassMember(Integer.parseInt(student));
 			SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
 			if (choice != null)
 				getBusiness().getSchoolChoiceBusiness().setAsPreliminary(choice, iwc.getCurrentUser());
@@ -812,7 +812,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	
 	private void finalize(IWContext iwc) throws RemoteException {
 		int schoolClassID = getSession().getSchoolClassID();
-		SchoolClass schoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(schoolClassID));
+		SchoolClass schoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(schoolClassID));
 		if (schoolClass != null) {
 			if (schoolClass.getReady()) {
 				getBusiness().markSchoolClassLocked(schoolClass);
@@ -826,7 +826,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 
 	private void validateSchoolClass(Collection previousClasses) throws RemoteException {
-		SchoolClass previousClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(_previousSchoolClassID));
+		SchoolClass previousClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(_previousSchoolClassID));
 		if (previousClass != null && !previousClasses.contains(previousClass))
 			_previousSchoolClassID = -1;
 	}

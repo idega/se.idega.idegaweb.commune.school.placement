@@ -275,11 +275,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.add(getSmallHeader(localize("school.current_shool","Current school")),1,row);
 			SchoolSeason season = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
       if (season != null) {
-		    SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolClassMemberBusiness().findByStudentAndSeason(user,season);
+		    SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user,season);
 		    if (schoolClassMember != null) {
-		      SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolClassBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
+		      SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
 		      School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
-		      SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolYearBusiness().getSchoolYear(new Integer(schoolClass.getSchoolYearId()));
+		      SchoolYear schoolYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(schoolClass.getSchoolYearId()));
 		      
 		      String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
 		      table.add(getSmallText(schoolString),2,row);
@@ -516,7 +516,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			String date = iwc.getParameter(PARAMETER_DATE);
 			
 			IWTimestamp stamp = new IWTimestamp(date);
-			getSchoolCommuneBusiness(iwc).getSchoolClassMemberBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, _schoolClassID, stamp.getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue(), message);
 			if (_choiceID != -1)
 				getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().groupPlaceAction(new Integer(_choiceID), iwc.getCurrentUser());
 			
@@ -547,7 +547,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				schoolTypeID = -1;
 			}
 
-			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolCommuneSession(iwc).getSchoolYearID()));
+			SchoolYear year = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(getSchoolCommuneSession(iwc).getSchoolYearID()));
 			int grade = getSchoolCommuneBusiness(iwc).getGradeForYear(getSchoolCommuneSession(iwc).getSchoolYearID()) - 1;
 			User student = getUserBusiness(iwc).getUser(_userID);
 			
@@ -648,7 +648,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			_schoolYearID = getSchoolCommuneSession(iwc).getSchoolYearID();
 		
 		if ( getSchoolCommuneSession(iwc).getSchoolID() != -1 && getSchoolCommuneSession(iwc).getSchoolSeasonID() != -1 && _schoolYearID != -1 ) {
-			Collection classes = getSchoolCommuneBusiness(iwc).getSchoolClassBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
+			Collection classes = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
 			if ( !classes.isEmpty() ) {
 				Iterator iter = classes.iterator();
 				while (iter.hasNext()) {
@@ -691,9 +691,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 		
 	private void validateSchoolClass(IWContext iwc) throws RemoteException {
-		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolClassBusiness().findSchoolClass(new Integer(_schoolClassID));
+		SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(_schoolClassID));
 		if ( schoolClass.getSchoolYearId() != _schoolYearID ) {
-			Collection schoolClasses = getSchoolCommuneBusiness(iwc).getSchoolClassBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
+			Collection schoolClasses = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClassesBySchoolAndSeasonAndYear(getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID(), _schoolYearID);
 			if ( !schoolClasses.isEmpty() ) {
 				Iterator iter = schoolClasses.iterator();
 				while (iter.hasNext()) {

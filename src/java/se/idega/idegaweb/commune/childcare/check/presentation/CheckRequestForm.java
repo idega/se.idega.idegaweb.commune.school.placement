@@ -1,24 +1,35 @@
 package se.idega.idegaweb.commune.childcare.check.presentation;
 
-import com.idega.block.school.business.*;
-import com.idega.block.school.data.*;
-import com.idega.builder.data.*;
-import com.idega.core.data.*;
-import com.idega.presentation.*;
-import com.idega.presentation.text.*;
-import com.idega.presentation.ui.*;
-import com.idega.user.Converter;
-import com.idega.user.data.*;
-import com.idega.util.IWTimestamp;
-
-import is.idega.idegaweb.member.business.*;
-import java.rmi.*;
-import java.util.*;
+import is.idega.idegaweb.member.business.MemberFamilyLogic;
+import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.Iterator;
 
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
-import se.idega.idegaweb.commune.childcare.check.business.*;
-import se.idega.idegaweb.commune.presentation.*;
+import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
+import se.idega.idegaweb.commune.presentation.CitizenChildren;
+import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
+
+import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.data.School;
+import com.idega.block.school.data.SchoolType;
+import com.idega.builder.data.IBPage;
+import com.idega.core.data.Address;
+import com.idega.core.data.PostalCode;
+import com.idega.presentation.ExceptionWrapper;
+import com.idega.presentation.IWContext;
+import com.idega.presentation.Table;
+import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.DropdownMenu;
+import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.RadioButton;
+import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.TextArea;
+import com.idega.presentation.ui.TextInput;
+import com.idega.user.Converter;
+import com.idega.user.data.User;
 
 /**
  * Title:
@@ -313,8 +324,7 @@ public class CheckRequestForm extends CommuneBlock {
 
 		childCareTypeTable.add(getSmallHeader(localize("check.request_regarding", "The request regards") + ":"), 1, row);
 		
-		SchoolTypeBusiness schoolTypeBusiness = (SchoolTypeBusiness) com.idega.business.IBOLookup.getServiceInstance(iwc, SchoolTypeBusiness.class);
-		Collection childCareTypes = schoolTypeBusiness.findAllSchoolTypesForChildCare();
+		Collection childCareTypes = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolTypesForChildCare();
 
 		DropdownMenu typeChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_CHILD_CARE_TYPE));
 		Iterator iter = childCareTypes.iterator();
@@ -440,7 +450,6 @@ public class CheckRequestForm extends CommuneBlock {
 
 		for (int i = 1; i < 4; i++) {
 			DropdownMenu providerDrop = getProviderDrop(PARAM_PROVIDER + "_" + i, providers);
-			providerDrop.setAttribute("style", getSmallTextFontStyle());
 			providerText = getSmallHeader(provider + " " + i + ":");
 			providersTable.add(providerText, 1, row);
 			providersTable.add(providerDrop, 2, row++);
@@ -477,7 +486,7 @@ public class CheckRequestForm extends CommuneBlock {
 
 	private DropdownMenu getProviderDrop(String name, Collection providers) {
 //		try {
-			DropdownMenu drp = new DropdownMenu(name);
+			DropdownMenu drp = (DropdownMenu) getStyledInterface(new DropdownMenu(name));
 			drp.setAsNotEmpty(localize("check.incomplete_providers","Must fill out all providers"), "-1");
 			drp.addMenuElement("-1", localize("cca_provider", "Provider"));
 			Iterator iter = providers.iterator();

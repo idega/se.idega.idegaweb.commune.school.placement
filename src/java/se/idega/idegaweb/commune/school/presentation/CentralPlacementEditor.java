@@ -76,8 +76,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/02/18 14:32:28 $ by $Author: staffan $
- * @version $Revision: 1.66 $
+ * Last modified: $Date: 2004/02/20 16:49:00 $ by $Author: goranb $
+ * @version $Revision: 1.67 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -90,6 +90,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private static final String KEY_STORED_PLACEMENT_HEADING = KP + "stored_placement_heading";
 	private static final String KEY_MSG_OF_NEW_PLACEMENT_HEADING = KP 
 																							+ "message of new placement heading";
+	private static final String KEY_SEARCH_NO_PUPIL_FOUND = KP + "search_no_pupil_found";
 		// Label keys
 	private static final String KEY_PERSONAL_ID_LABEL = KP + "personal_id_label";
 	private static final String KEY_FIRST_NAME_LABEL = KP + "first_name_label";
@@ -214,6 +215,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private User child;
 	private String uniqueUserSearchParam;
 	private Image transGIF = new Image(PATH_TRANS_GIF);
+	private String errMsgSearch = null;
 	private String errMsgMid = null;
 	private SchoolClassMember latestPl = null;
 	private SchoolClassMember storedPlacement = null;
@@ -356,12 +358,20 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			User oneChild = searchModule.getUser();
 			if (oneChild != null) {
 				iwc.getSession().setAttribute(SESSION_KEY_CHILD, oneChild);
+			} else {
+				errMsgSearch = localize(KEY_SEARCH_NO_PUPIL_FOUND, "No pupil found");
 			}
 		} catch (Exception e) {}		
 		table.add(searchModule, col++, row);
 		
 		// Get current pupil from session attribute
 		child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);		
+		
+		if (errMsgSearch != null) {
+			row++;
+			col = 1;
+			table.add(getSmallErrorText(errMsgSearch), col, row);
+		}
 		
 		return table;
 	}

@@ -463,7 +463,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					name = applicant.getName();
 
 				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
-					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
+					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR_THIS_SCHOOL);
 				} else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());

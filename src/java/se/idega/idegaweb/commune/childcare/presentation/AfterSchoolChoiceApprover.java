@@ -10,6 +10,9 @@ import java.util.Iterator;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
+import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
+import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 
 import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
@@ -20,7 +23,11 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
 
@@ -32,32 +39,178 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	/* (non-Javadoc)
 	 * @see se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock#init(com.idega.presentation.IWContext)
 	 */
+	
+	public static final String PARAMETER_ACTION = "sch_action";
+	
+	private int action = 0;
+	private int method = 0;
+	private String sortStudentsBy = "c.QUEUE_DATE";
+	private String sortChoicesBy = "";
+	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
+	private int sortPlacedUnplacedBy = -1;
+
+	
+	
+	private String searchString = "";
+	private boolean searchEnabled = true;
+	
+	
+	private final String PARAMETER_METHOD = "sch_method";
+	private final String PARAMETER_APPLICANT_ID = "sch_applicant_id";
+	private final String PARAMETER_PREVIOUS_CLASS_ID = "sch_prev_class_id";
+	private final String PARAMETER_SORT = "sch_choice_sort";
+	private final String PARAMETER_SORT_PLACED = "sch_choice_sort_placed";
+	private final String PARAMETER_SEARCH = "scH_choise_search";	
+	
+	private final int ACTION_MANAGE = 1;
+	public static final int ACTION_SAVE = 2;
+	
 	public void init(IWContext iwc) throws Exception {
-		Table table = new Table(1,5);
-		table.setWidth(getWidth());
-		table.setHeight(2, 12);
-		table.setHeight(4, 6);
+			
+		////
+		if (iwc.isLoggedOn()) {
+			parseAction(iwc);
+
+			switch (action) {
+			case ACTION_MANAGE:
+				drawForm(iwc);
+				break;
+			//case ACTION_SAVE:
+			//	drawNewGroupForm(iwc);
+			//	break;
+
+			}
+		}
+		else {
+			add(super.getSmallHeader(localize("not_logged_on", "Not logged on")));
+		}
+		
+	
+	}
+	
+	private void parseAction(IWContext iwc) throws RemoteException {
+		//isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
+
+		if (iwc.isParameterSet(PARAMETER_METHOD))
+			method = Integer.parseInt(iwc.getParameter(PARAMETER_METHOD));
+		else
+			method = 0;
+
+		if (iwc.isParameterSet(PARAMETER_ACTION))
+			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		else
+			action = ACTION_MANAGE;
+		
+		if (iwc.isParameterSet(PARAMETER_SORT))
+			sortChoicesBy = iwc.getParameter(PARAMETER_SORT);
+		else
+			sortChoicesBy = "c.QUEUE_DATE";
+			sortStudentsBy = sortChoicesBy;
+			
+	}
+	
+	private void drawForm(IWContext iwc) throws RemoteException {
+		Form form = new Form();
+		form.setEventListener(SchoolEventListener.class);
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+
+		Table table = new Table(3, 17);
+				
 		table.setCellpadding(0);
 		table.setCellspacing(0);
-		add(table);
 		
-		table.add(getNavigationTable(), 1, 1);
-		table.add(getApplicationTable(iwc), 1, 3);
-		table.add(getLegendTable(), 1, 5);
+		table.mergeCells(1, 2, 3, 2);
+		table.mergeCells(1, 3, 3, 3);
+		table.mergeCells(1, 4, 3, 4);
+		table.mergeCells(1, 5, 3, 5);
+		table.mergeCells(1, 6, 3, 6);
+		table.mergeCells(1, 7, 3, 7);
+		table.mergeCells(1, 8, 3, 8);
+		table.mergeCells(1, 9, 3, 9);
+		table.mergeCells(1, 10, 3, 10);
+		table.mergeCells(1, 11, 3, 11);
+		table.mergeCells(1, 12, 3, 12);
+		table.mergeCells(1, 13, 3, 13);
 		
+		table.setWidth(2, 1, 12);
+		table.setWidth(3, 1, "100%");
+		
+		table.setWidth(getWidth());
+		table.setHeight(2, "6");
+		table.setHeight(4, "12");
+		table.setHeight(6, "3");
+		table.setHeight(8, "3");
+		table.setHeight(10, "18");
+		table.setHeight(12, "3");
+		table.setHeight(14, "3");
+		table.setHeight(16, "12");
+		form.add(table);
+
 		if (useStyleNames()) {
 			table.setCellpaddingLeft(1, 1, 12);
+			table.setCellpaddingLeft(1, 3, 12);
 			table.setCellpaddingLeft(1, 5, 12);
 			table.setCellpaddingRight(1, 1, 12);
+			table.setCellpaddingRight(1, 3, 12);
 			table.setCellpaddingRight(1, 5, 12);
+			table.setCellpaddingLeft(1, 9, 12);
+			table.setCellpaddingRight(1, 9, 12);
+			table.setCellpaddingLeft(1, 17, 12);
+			table.setCellpaddingRight(1, 17, 12);
 		}
+
+		table.add(getNavigationTable(), 1, 1);
+		table.add(getSearchAndSortTable(), 3, 1);
+		table.add(getApplicationTable(iwc), 1, 5);
+		table.add(getLegendTable(), 1, 7);
+		
+		add(form);
 	}
+	
+	
 	
 	private Collection getApplicationCollection(IWApplicationContext iwac) throws RemoteException {
 		Collection applications = getAfterSchoolBusiness(iwac).findChoicesByProvider(getSession().getChildCareID());
 		return applications;
 	}
 
+	
+	///malin
+	private Collection getApplicationCollection(IWApplicationContext iwac, String sorting) throws RemoteException {
+		Collection applications = getAfterSchoolBusiness(iwac).findChoicesByProvider(getSession().getChildCareID(), sorting);
+		return applications;
+	}
+	
+	protected Form getSearchAndSortTable() throws RemoteException {
+		Form form = new Form();
+		form.setEventListener(SchoolEventListener.class);
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+		
+		Table table = new Table(4, 1);
+		table.setCellpadding(0);
+		table.setCellspacing(0);
+		table.setBorder(0);
+		
+		
+		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":"), 1, 1);
+
+		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
+		menu.addMenuElement("c.QUEUE_DATE", localize("childcare.sort_queuedate", "Queue date"));
+		menu.addMenuElement("iu.LAST_NAME", localize("childcare.sort_name", "Name"));
+		menu.addMenuElement("iu.PERSONAL_ID", localize("childcare.sort_personal_id", "Personal ID"));
+		
+		menu.setSelectedElement(sortChoicesBy);
+		menu.setToSubmit();		
+		table.setWidth(2, 4);
+		table.add(menu, 3, 1);
+		
+		
+		form.add(table);
+		
+		return form;
+	}
+	
+	///
 	private Form getNavigationTable() throws RemoteException {
 		Form form = new Form();
 		form.setEventListener(ChildCareEventListener.class);
@@ -67,7 +220,6 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		form.add(table);
-		
 		table.add(getSmallHeader(localize("child_care.season", "Season") + ":"), 1, 1);
 		table.add(getSeasons(), 3, 1);
 		
@@ -100,7 +252,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 
 		boolean showMessage = false;
 
-		Collection applications = getApplicationCollection(iwc);
+		Collection applications = getApplicationCollection(iwc, sortStudentsBy);
 		if (applications != null && !applications.isEmpty()) {
 			ChildCareApplication application;
 			User child;
@@ -200,5 +352,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		catch (RemoteException e) {
 			throw new IBORuntimeException(e.getMessage());
 		}
+	}
+	
+	public void setSearchEnabled(boolean searchEnabled) {
+		this.searchEnabled = searchEnabled;
 	}
 }

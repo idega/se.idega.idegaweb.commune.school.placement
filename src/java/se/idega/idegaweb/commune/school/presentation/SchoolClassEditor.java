@@ -220,6 +220,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				catch (NullPointerException ne) {
 				}
 			}
+			
+			if (getSchoolSeasonID() != -1) {
+				GenericButton report = getButton(new GenericButton("report", localize("school.show_student_info", "Student list")));
+				if (getResponsePage() != null) {
+					report.setPageToOpen(getResponsePage());
+					table.add(report, 1, 11);
+					table.add(Text.getNonBrakingSpace(), 1, 11);
+				}
+			}
 
 			if (getSchoolClassID() != -1) {
 				HiddenInput method = new HiddenInput(PARAMETER_METHOD, "0");

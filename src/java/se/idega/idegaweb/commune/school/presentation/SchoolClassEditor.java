@@ -66,6 +66,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private int _previousSchoolClassID = -1;
 	private int _previousSchoolSeasonID = -1;
 	private int _previousSchoolYearID = -1;
+	private boolean multibleSchools = false;
+	private boolean showStudentTable = true;
 
 
 	public void init(IWContext iwc) throws RemoteException {
@@ -143,37 +145,40 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.add(headerTable,1,1);
 		
-		headerTable.add(getNavigationTable(true), 1, 1);
+		headerTable.add(getNavigationTable(true, multibleSchools), 1, 1);
 		headerTable.add(getSortTable(), 2, 1);
+		headerTable.setVerticalAlignment(2, 1, Table.VERTICAL_ALIGN_BOTTOM);
 
 		students = getBusiness().getStudentList(getBusiness().getSchoolClassMemberBusiness().findStudentsBySchoolAndSeason(getSchoolID(), getSchoolSeasonID()));
 
 		table.add(getApplicationTable(iwc), 1, 5);
 		table.add(getChoiceHeader(), 1, 3);
 
-		if (_previousSchoolYearID != -1) {
-			try {
-				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolSeasonBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID())));
-				validateSchoolClass(previousClasses);
+		if (this.showStudentTable) {
+			if (_previousSchoolYearID != -1) {
+				try {
+					Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolSeasonBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolYearBusiness().getSchoolYear(new Integer(getSchoolYearID())));
+					validateSchoolClass(previousClasses);
+		
+					table.add(getPreviousHeader(previousClasses), 1, 7);
+					table.add(getStudentTable(iwc), 1, 9);
+				}
+				catch (NullPointerException ne) {
+				}
+			}
 	
-				table.add(getPreviousHeader(previousClasses), 1, 7);
-				table.add(getStudentTable(iwc), 1, 9);
+			if (getSchoolClassID() != -1) {
+				HiddenInput method = new HiddenInput(PARAMETER_METHOD, "0");
+				SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
+				submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
+				submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+				SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
+				view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+				table.add(method, 1, 11);
+				table.add(submit, 1, 11);
+				table.add(Text.NON_BREAKING_SPACE,1,11);
+				table.add(view, 1, 11);
 			}
-			catch (NullPointerException ne) {
-			}
-		}
-
-		if (getSchoolClassID() != -1) {
-			HiddenInput method = new HiddenInput(PARAMETER_METHOD, "0");
-			SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
-			submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
-			submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-			SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
-			view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-			table.add(method, 1, 11);
-			table.add(submit, 1, 11);
-			table.add(Text.NON_BREAKING_SPACE,1,11);
-			table.add(view, 1, 11);
 		}
 
 		add(form);
@@ -601,5 +606,15 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
+	}
+	
+	
+	
+	/** setters */
+	public void setMultipleSchools(boolean multiple) {
+		this.multibleSchools = multiple;	
+	}
+	public void setShowStudentTable(boolean show) {
+		this.showStudentTable = show;	
 	}
 }

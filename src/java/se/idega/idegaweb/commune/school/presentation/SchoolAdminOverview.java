@@ -482,7 +482,6 @@ public class SchoolAdminOverview extends CommuneBlock {
             SchoolClassMember schoolClassMember = null;
 			if (!_showNoChoices) {
 				table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
-				table.add(getSmallHeader(localize("school.study_path", "Study Path")), 1, row + 1);
 				SchoolSeason season = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				if (season != null) {
 					schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
@@ -492,19 +491,22 @@ public class SchoolAdminOverview extends CommuneBlock {
                         
 						String schoolString = currentSchool.getName() + " - " + schoolClass.getName();
 						table.add(getSmallText(schoolString), 2, row);
-                        
-                        // Show study path if exists
-                        final SchoolStudyPath studyPath
-                                = getSchoolCommuneBusiness (iwc)
-                                .getStudyPath (schoolClassMember);
-                        if (null != studyPath) {
-                            table.add (getSmallText(studyPath.getCode ()), 2,
-                                       row + 1);
-                        }
-					}
+                    }
 				}
-				row += 2;
+				row++;
 			}
+
+            // show study path, if exists
+            if (null != schoolClassMember) {
+                final SchoolStudyPath studyPath = getSchoolCommuneBusiness (iwc)
+                        .getStudyPath (schoolClassMember);
+                if (null != studyPath) {
+                    table.add(getSmallHeader(localize("school.study_path",
+                                                      "Study Path")), 1, row);
+                    table.add (getSmallText(studyPath.getCode ()), 2, row);
+                    row++;
+                }
+            }
 
 			// *** Resources START ***			
 			if (_rscTO != null) {

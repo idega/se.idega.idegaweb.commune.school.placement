@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/02 16:45:30 $ by $Author: goranb $
- * @version $Revision: 1.47 $
+ * Last modified: $Date: 2003/12/03 12:49:50 $ by $Author: laddi $
+ * @version $Revision: 1.48 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -185,7 +185,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final int ACTION_SEND_MESSAGES = 3;
 	
 	// Presentations
-	private static final int PRESENTATION_SEARCH_FORM = 1;
+	//private static final int PRESENTATION_SEARCH_FORM = 1;
 	public static final String FORM_NAME = "central_placement_editor_form";
 
 	// CSS styles   

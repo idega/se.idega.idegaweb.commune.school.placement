@@ -441,7 +441,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 							}
 							if (choice.getChosenSchoolId() == getSchoolCommuneSession(iwc).getSchoolID()) {
 								if (choice.getStatus().equalsIgnoreCase("FLYT")) {
-									hasMoveChoice = true;
 									showChangePlacementDate = true;
 								}
 								table.add(this.getSmallHeader(string), 2, row);

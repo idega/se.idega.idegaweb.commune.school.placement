@@ -1,5 +1,5 @@
 /*
- * $Id: BusinessLaunchButton.java,v 1.3 2004/12/07 21:22:20 laddi Exp $
+ * $Id: BusinessLaunchButton.java,v 1.4 2004/12/07 21:54:11 laddi Exp $
  *
  * Copyright (C) 2002 Idega hf. All Rights Reserved.
  *
@@ -29,8 +29,9 @@ import com.idega.presentation.ui.SubmitButton;
  * @version 1.0
  */
 public class BusinessLaunchButton extends ChildCareBlock {
-	protected static final String SUBMIT = "detonate";
-	protected static final String SUBMIT2 = "checks";
+	protected static final String SUBMIT = "elementary_school";
+	protected static final String SUBMIT2 = "child_care";
+	protected static final String SUBMIT3 = "high_school";
 	
 	protected void control(IWContext iwc) throws RemoteException {
 		if (iwc.isParameterSet(SUBMIT)) {
@@ -39,16 +40,21 @@ public class BusinessLaunchButton extends ChildCareBlock {
 		if (iwc.isParameterSet(SUBMIT2)) {
 			getBusiness(iwc).fixChildCarePlacements();
 		}
+		if (iwc.isParameterSet(SUBMIT3)) {
+			getBusiness(iwc).fixHighSchoolPlacements();
+		}
 		
 		displayForm();			
 	}
 
 	protected void displayForm() {
 		Form form = new Form();
-		SubmitButton button = new SubmitButton(SUBMIT,"Fix school placements");
+		SubmitButton button = new SubmitButton(SUBMIT,"Fix elementary school placements");
 		SubmitButton button2 = new SubmitButton(SUBMIT2,"Fix child care placements");
+		SubmitButton button3 = new SubmitButton(SUBMIT2,"Fix high school placements");
 		form.add(button);
 		form.add(button2);
+		form.add(button3);
 		add(form);	
 	}
 

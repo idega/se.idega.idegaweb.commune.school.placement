@@ -198,7 +198,9 @@ public class CheckRequestForm extends CommuneBlock {
 			
 			if (createChoices()) {
 				SchoolSeason season = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().getCurrentSeason();
-				String[] date = { IWTimestamp.RightNow().toString(), IWTimestamp.RightNow().toString(), IWTimestamp.RightNow().toString() };
+				String date = IWTimestamp.RightNow().toString();
+				if (season != null)
+					date = new IWTimestamp(season.getSchoolSeasonStart()).toString();
 				for (int a = 0; a < 3; a++) {
 					int providerID = iwc.isParameterSet(PARAM_PROVIDER + "_" + (a + 1)) ? Integer.parseInt(iwc.getParameter(PARAM_PROVIDER + "_" + (a + 1))) : -1;
 					if (providerID == -1) {
@@ -207,8 +209,6 @@ public class CheckRequestForm extends CommuneBlock {
 						return;
 					}
 					providerIDs[a] = providerID;
-					if (season != null)
-						date[a] = new IWTimestamp(season.getSchoolSeasonStart()).toString();
 				}
 				getChildCareBusiness(iwc).insertApplications(iwc.getCurrentUser(), providerIDs, date, checkID, ((Integer) child.getPrimaryKey()).intValue(), "", "", true);
 			}

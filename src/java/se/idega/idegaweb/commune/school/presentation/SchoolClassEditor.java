@@ -1,6 +1,7 @@
 package se.idega.idegaweb.commune.school.presentation;
 
 import java.rmi.RemoteException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,7 +12,7 @@ import java.util.Vector;
 
 import javax.ejb.FinderException;
 
-import se.idega.idegaweb.commune.school.business.ClassWriter;
+import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolClassMemberComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -580,6 +581,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 
 	private Table getNewStudentTable(IWContext iwc) throws RemoteException {
+		boolean isReady = false;
+		SchoolClass newSchoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(getSession().getSchoolClassID()));
+		if (newSchoolClass != null)
+			isReady = newSchoolClass.getLocked();
+		
 		Table table = new Table();
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
@@ -648,10 +654,19 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		SubmitButton back = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.back", "Back")));
 		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_MANAGE));
 		
-		SubmitButton groupReady = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.class_ready", "Class ready")));
+		String buttonLabel = "";
+		if (isReady)
+			buttonLabel = localize("school.class_locked", "Class locked");
+		else
+			buttonLabel = localize("school.class_ready", "Class ready");
+		
+		SubmitButton groupReady = (SubmitButton) getStyledInterface(new SubmitButton(buttonLabel));
 		groupReady.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_MANAGE));
 		groupReady.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_FINALIZE_GROUP));
-		groupReady.setSubmitConfirm(localize("school.confirm_group_ready","Are you sure you want to set the group as ready and send out e-mails to all parents?"));
+		if (isReady)
+			groupReady.setSubmitConfirm(localize("school.confirm_group_locked","Are you sure you want to set the group as locked and send out e-mails to all parents?"));
+		else
+			groupReady.setSubmitConfirm(localize("school.confirm_group_ready","Are you sure you want to set the group as ready and send out e-mails to all parents?"));
 
 		table.add(back, 1, row);
 		table.add(Text.NON_BREAKING_SPACE, 1, row);
@@ -782,7 +797,17 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	
 	private void finalize(IWContext iwc) throws RemoteException {
 		int schoolClassID = getSession().getSchoolClassID();
-		getBusiness().finalizeGroup(schoolClassID, localize("school.finalize_subject",""), localize("school.finalize_body",""));
+		SchoolClass schoolClass = getBusiness().getSchoolClassBusiness().findSchoolClass(new Integer(schoolClassID));
+		if (schoolClass != null) {
+			if (schoolClass.getReady()) {
+				getBusiness().markSchoolClassLocked(schoolClass);
+				getBusiness().finalizeGroup(schoolClassID, localize("school.finalize_subject",""), localize("school.finalize_body",""));
+			}
+			else {
+				getBusiness().markSchoolClassReady(schoolClass);
+				getBusiness().finalizeGroup(schoolClassID, localize("school.students_put_in_class_subject",""), localize("school.students_put_in_class_body",""));
+			}
+		}
 	}
 
 	private void validateSchoolClass(Collection previousClasses) throws RemoteException {
@@ -798,18 +823,18 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
  public Link getPDFLink(Image image) throws RemoteException {
     Link link = new Link(image);
     link.setWindow(getFileWindow());
-    link.addParameter(ClassWriter.prmClassId, getSession().getSchoolClassID());
-    link.addParameter(ClassWriter.prmPrintType,ClassWriter.PDF);
-    link.addParameter(ClassWriter.PRM_WRITABLE_CLASS,IWMainApplication.getEncryptedClassName(ClassWriter.class));
+    link.addParameter(SchoolClassWriter.prmClassId, getSession().getSchoolClassID());
+    link.addParameter(SchoolClassWriter.prmPrintType,SchoolClassWriter.PDF);
+    link.addParameter(SchoolClassWriter.PRM_WRITABLE_CLASS,IWMainApplication.getEncryptedClassName(SchoolClassWriter.class));
     return link;
   }
 
   public Link getXLSLink(Image image) throws RemoteException {
     Link link = new Link(image);
     link.setWindow(getFileWindow());
-    link.addParameter(ClassWriter.prmClassId, getSession().getSchoolClassID());
-    link.addParameter(ClassWriter.prmPrintType,ClassWriter.XLS);
-    link.addParameter(ClassWriter.PRM_WRITABLE_CLASS,IWMainApplication.getEncryptedClassName(ClassWriter.class));
+    link.addParameter(SchoolClassWriter.prmClassId, getSession().getSchoolClassID());
+    link.addParameter(SchoolClassWriter.prmPrintType,SchoolClassWriter.XLS);
+    link.addParameter(SchoolClassWriter.PRM_WRITABLE_CLASS,IWMainApplication.getEncryptedClassName(SchoolClassWriter.class));
     return link;
   }
 

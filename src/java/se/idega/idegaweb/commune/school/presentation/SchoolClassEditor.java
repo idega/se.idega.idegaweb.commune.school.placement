@@ -570,7 +570,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (headerRow != 1)
 			table.mergeCells(1, 1, table.getColumns(), 1);
 
-		if (this.multibleSchools) {
+		if (!this.multibleSchools) {
 			table.mergeCells(1, 1, table.getColumns(), 1);
 			table.setAlignment(1, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 			Link excelLink = getChoicesXLSLink(SchoolChoiceWriter.class, getBundle().getImage("shared/xls.gif"));

@@ -506,39 +506,41 @@ public class SchoolAdminOverview extends CommuneBlock {
 				row += 2;
 			}
 
-            // *** Resources START ***
-            Integer providerGrpID = getProviderGrpId(iwc);
-            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
-            // Add resource label
-            table.add(getSmallHeader(localize("school.resources", "Resources")), 1, row);
-            if (rscColl.size() == 0)
-                row++;
-            // Loop resources
-            for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
-                ResourceClassMember mbr = (ResourceClassMember) iter.next();
-                int rscId = mbr.getResourceFK();
-                Resource rsc = getResourceBusiness(iwc).getResourceByPrimaryKey(new Integer(rscId));
-                ResourcePermission perm = getResourceBusiness(iwc).getRscPermByRscAndGrpId((Integer) rsc.getPrimaryKey(), providerGrpID);
-                
-                // Show resource row only if a provider permission with view rights exists 
-                if (perm != null && perm.getPermitViewResource()) {
-                    Date startDate = mbr.getStartDate();
-                    Date endDate = mbr.getEndDate();
-                    // Build resource name date String
-                    StringBuffer buf = new StringBuffer();
-                    buf.append(rsc.getResourceName() + " (");
-                    if (startDate != null)
-                        buf.append(startDate.toString());
-                    buf.append(" - ");
-                    if (endDate != null)
-                        buf.append(endDate.toString());
-                    buf.append(")");
-                    table.add(getSmallText(buf.toString()), 2, row);
-                    row++;
-                }
-            }            
-            //*** Resources END ***
-
+			// *** Resources START ***			
+			if (_rscTO != null) {
+	            Integer providerGrpID = getProviderGrpId(iwc);
+	            Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
+	            // Add resource label
+	            table.add(getSmallHeader(localize("school.resources", "Resources")), 1, row);
+	            if (rscColl.size() == 0)
+	                row++;
+	            // Loop resources
+	            for (Iterator iter = rscColl.iterator(); iter.hasNext();) {
+	                ResourceClassMember mbr = (ResourceClassMember) iter.next();
+	                int rscId = mbr.getResourceFK();
+	                Resource rsc = getResourceBusiness(iwc).getResourceByPrimaryKey(new Integer(rscId));
+	                ResourcePermission perm = getResourceBusiness(iwc).getRscPermByRscAndGrpId((Integer) rsc.getPrimaryKey(), providerGrpID);
+	                
+	                // Show resource row only if a provider permission with view rights exists 
+	                if (perm != null && perm.getPermitViewResource()) {
+	                    Date startDate = mbr.getStartDate();
+	                    Date endDate = mbr.getEndDate();
+	                    // Build resource name date String
+	                    StringBuffer buf = new StringBuffer();
+	                    buf.append(rsc.getResourceName() + " (");
+	                    if (startDate != null)
+	                        buf.append(startDate.toString());
+	                    buf.append(" - ");
+	                    if (endDate != null)
+	                        buf.append(endDate.toString());
+	                    buf.append(")");
+	                    table.add(getSmallText(buf.toString()), 2, row);
+	                    row++;
+	                }
+	            }            
+			}
+			//*** Resources END ***
+						
 			table.setColumnVerticalAlignment(1, Table.VERTICAL_ALIGN_TOP);
 			table.mergeCells(1, row, table.getColumns(), row);
 			table.setHeight(row, Table.HUNDRED_PERCENT);

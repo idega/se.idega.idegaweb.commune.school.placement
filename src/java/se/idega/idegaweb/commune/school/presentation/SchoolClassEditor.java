@@ -229,9 +229,13 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		if (getSchoolClassID() != -1) {
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
-			table.add(getPDFLink(getBundle().getImage("shared/pdf.gif")), 1, row);
+			Link pdfLink = getPDFLink(SchoolClassWriter.class,getBundle().getImage("shared/pdf.gif"));
+			pdfLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
+			table.add(pdfLink, 1, row);
+			Link excelLink = getXLSLink(SchoolClassWriter.class,getBundle().getImage("shared/xls.gif"));
+			excelLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			table.add(Text.NON_BREAKING_SPACE, 1, row);
-			table.add(getXLSLink(getBundle().getImage("shared/xls.gif")), 1, row++);
+			table.add(excelLink, 1, row++);
 		}
 
 		table.add(getNewStudentTable(iwc), 1, row);
@@ -357,7 +361,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					name = applicant.getName();
 
 				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
-					table.setRowColor(row, "#FF3333");
+					table.setRowColor(row, "#FFEAEA");
 				else {
 					if (row % 2 == 0)
 						table.setRowColor(row, getZebraColor1());
@@ -521,11 +525,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					checkBox.setDisabled(true);
 					boolean[] hasChoices = getBusiness().hasSchoolChoices(studentMember.getClassMemberId(), getSchoolSeasonID());
 					if (hasChoices[0] && hasChoices[1])
-						table.setRowColor(row, "#FF3333");
+						table.setRowColor(row, "#FFEAEA");
 					else if (hasChoices[0] && !hasChoices[1])
-						table.setRowColor(row, "#33FF33");
+						table.setRowColor(row, "#EAFFEE");
 					else
-						table.setRowColor(row, "#3333FF");
+						table.setRowColor(row, "#EAF1FF");
 					link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, String.valueOf(getBusiness().getChosenSchoolID((Collection) studentChoices.get(new Integer(studentMember.getClassMemberId())))));
 				}
 				else {
@@ -859,33 +863,6 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
-	}
-
-	public Link getPDFLink(Image image) throws RemoteException {
-		Link link = new Link(image);
-		link.setWindow(getFileWindow());
-		link.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
-		link.addParameter(SchoolClassWriter.prmPrintType, SchoolClassWriter.PDF);
-		link.addParameter(SchoolClassWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(SchoolClassWriter.class));
-		return link;
-	}
-
-	public Link getXLSLink(Image image) throws RemoteException {
-		Link link = new Link(image);
-		link.setWindow(getFileWindow());
-		link.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
-		link.addParameter(SchoolClassWriter.prmPrintType, SchoolClassWriter.XLS);
-		link.addParameter(SchoolClassWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(SchoolClassWriter.class));
-		return link;
-	}
-
-	public Window getFileWindow() {
-		Window w = new Window(localize("school.class", "School class"), getIWApplicationContext().getApplication().getMediaServletURI());
-		w.setResizable(true);
-		w.setMenubar(true);
-		w.setHeight(400);
-		w.setWidth(500);
-		return w;
 	}
 
 	/** setters */

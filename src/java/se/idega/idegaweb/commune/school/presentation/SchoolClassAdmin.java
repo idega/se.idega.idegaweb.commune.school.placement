@@ -171,8 +171,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize("school.address", "Address")), 4, row);
 		table.add(getSmallHeader(localize("school.class", "Class")), 5, row);
 		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), 6, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 7, row++);
-
+		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 7, row);
+		table.setRowColor(row++, getHeaderColor());
+		
 		User student;
 		Address address;
 		SchoolClassMember studentMember;
@@ -270,7 +271,6 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 
 		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setColumnAlignment(5, Table.HORIZONTAL_ALIGN_CENTER);
-		table.setRowColor(2, getHeaderColor());
 		table.setRowColor(row, "#FFFFFF");
 
 		return table;

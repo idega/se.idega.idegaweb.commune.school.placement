@@ -1557,10 +1557,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 				Collection years = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolYearsInSchool(getSchoolCommuneSession(iwc).getSchoolID());
 				if (!years.isEmpty()) {
 					Map yearGroupMap = getSchoolCommuneBusiness(iwc).getYearClassMap(years, _schoolID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), null);
-					Iterator iter = yearGroupMap.keySet().iterator();
-					while (iter.hasNext()) {
-						SchoolYear year = (SchoolYear) iter.next();
-						dropdown.addMenuElement(year.getPrimaryKey().toString(), year.getSchoolYearName(), (Map) yearGroupMap.get(year));
+					if (yearGroupMap != null) {
+						Iterator iter = yearGroupMap.keySet().iterator();
+						while (iter.hasNext()) {
+							SchoolYear year = (SchoolYear) iter.next();
+							dropdown.addMenuElement(year.getPrimaryKey().toString(), year.getSchoolYearName(), (Map) yearGroupMap.get(year));
+						}
 					}
 				}
 			}

@@ -161,7 +161,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			form.maintainParameter(prmChildId);
 
 			Table table = new Table();
-			table.setWidth(getWidth());
+			//table.setWidth(getWidth());
 			table.setCellpadding(getCellpadding());
 			table.setCellspacing(getCellspacing());
 			form.add(table);
@@ -183,7 +183,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					submit.setDisabled(true);
 				}
 			}
+			table.setBorder(0);
 			table.add(submit, 1, row);
+			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			submit.setOnSubmitFunction("checkApplication", getSubmitCheckScript());
 			form.setToDisableOnSubmit(submit, true);
 			

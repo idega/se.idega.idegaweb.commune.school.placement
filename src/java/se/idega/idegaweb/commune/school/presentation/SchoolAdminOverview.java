@@ -80,29 +80,30 @@ import com.idega.util.text.TextSoap;
 public class SchoolAdminOverview extends CommuneBlock {
     
     //*** Resource handling added by Göran Borgman 12.09.2003 ***
-	public static final String PARAMETER_ACTION = "sch_admin_action";
-	public static final String PARAMETER_METHOD = "sch_admin_method";
-	public static final String PARAMETER_USER_ID = "sch_user_id";
-	public static final String PARAMETER_CHOICE_ID = "sch_choice_id";
-	public static final String PARAMETER_SHOW_ONLY_OVERVIEW = "sch_show_only_overview";
-	public static final String PARAMETER_SHOW_NO_CHOICES = "sch_show_no_choices";
-	public static final String PARAMETER_SEARCH = "sch_search";
-	public static final String PARAMETER_PAGE_ID = "sch_page_id";
-	public static final String PARAMETER_COMMENT = "sch_comment";
-	public static final String PARAMETER_SCHOOL_CLASS_ID = "sch_class_id";
+    public static final String PARAMETER_ACTION = "sch_admin_action";
+    public static final String PARAMETER_CHOICE_ID = "sch_choice_id";
+    public static final String PARAMETER_COMMENT = "sch_comment";
+    public static final String PARAMETER_DELETE_RESOURCE_PLACEMENT = "delete_resource_placement"; // by Göran Borgman 17.09.2003
+    public static final String PARAMETER_METHOD = "sch_admin_method";
+    public static final String PARAMETER_PAGE_ID = "sch_page_id";
+    //public static final String PARAMETER_RESOURCE_BEAN_INIT = "set_resource_java_bean";  
+    public static final String PARAMETER_RESOURCE_CHOICE_STATUS = "resource_school_choice_status";  // by Göran Borgman 14.09.2003
+    public static final String PARAMETER_RESOURCE_CLASS_MEMBER = "resource_school_member";    // by Göran Borgman 14.09.2003
+    public static final String PARAMETER_RESOURCE_ENDDATE = "resource_enddate";       // by Göran Borgman 09.09.2003
     public static final String PARAMETER_RESOURCE_ID = "cacc_resource_id";
     public static final String PARAMETER_RESOURCE_NAME = "sch_resource_name";
-    public static final String PARAMETER_RESOURCE_STARTDATE = "resource_startdate";  // by Göran Borgman 09.09.2003
-    public static final String PARAMETER_RESOURCE_ENDDATE = "resource_enddate";       // by Göran Borgman 09.09.2003
     public static final String PARAMETER_RESOURCE_SEASON = "school_choice_season";   // by Göran Borgman 14.09.2003
+    public static final String PARAMETER_RESOURCE_STARTDATE = "resource_startdate";  // by Göran Borgman 09.09.2003
     public static final String PARAMETER_RESOURCE_STUDENT = "resource_student";    // by Göran Borgman 14.09.2003
-    public static final String PARAMETER_RESOURCE_CLASS_MEMBER = "resource_school_member";    // by Göran Borgman 14.09.2003
-    public static final String PARAMETER_RESOURCE_CHOICE_STATUS = "resource_school_choice_status";  // by Göran Borgman 14.09.2003
-    public static final String PARAMETER_DELETE_RESOURCE_PLACEMENT = "delete_resource_placement"; // by Göran Borgman 17.09.2003
-    //public static final String PARAMETER_RESOURCE_BEAN_INIT = "set_resource_java_bean";  
-    public static final String PARAMETER_SCHOOL_MEMBER_ID = "sch_member_id";
+    public static final String PARAMETER_SCHOOL_CLASS_ID = "sch_class_id";
     public static final String PARAMETER_SCHOOL_CLASS_MEMBER_ID = "sch_class_member_id"; //  // by Göran Borgman 14.09.2003
     public static final String PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE = "sch_class_member_removed";
+    public static final String PARAMETER_SCHOOL_MEMBER_ID = "sch_member_id";
+    public static final String PARAMETER_SEARCH = "sch_search";
+    public static final String PARAMETER_SHOW_NO_CHOICES = "sch_show_no_choices";
+    public static final String PARAMETER_SHOW_ONLY_OVERVIEW = "sch_show_only_overview";
+    public static final String PARAMETER_USER_ID = "sch_user_id";
+
     public static final int METHOD_OVERVIEW = 1;
 	public static final int METHOD_REJECT = 2;
 	public static final int METHOD_REPLACE = 3;
@@ -116,6 +117,7 @@ public class SchoolAdminOverview extends CommuneBlock {
     public static final int METHOD_LIST_RESOURCES = 11;  // by Göran Borgman 09.09.2003
     public static final int METHOD_NEW_RESOURCE = 12;    // by Göran Borgman 09.09.2003
     public static final int METHOD_FINISH_RESOURCE = 13;  // by Göran Borgman 09.09.2003
+    public static final int METHOD_CHANGE_STUDY_PATH = 14;
     
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
@@ -130,6 +132,7 @@ public class SchoolAdminOverview extends CommuneBlock {
     public static final int ACTION_SAVE_RESOURCE = 11;  // by Göran Borgman 09.09.2003
     public static final int ACTION_DELETE_RESOURCE = 12;  // by Göran Borgman 17.09.2003
     public static final int ACTION_FINISH_RESOURCE = 13;  // by Göran Borgman 17.09.2003
+    public static final int ACTION_CHANGE_STUDY_PATH = 14;
     
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -218,6 +221,9 @@ public class SchoolAdminOverview extends CommuneBlock {
                 resourceErrorMsg = finishResource(iwc);
                 if (resourceErrorMsg != null)
                     _method = METHOD_FINISH_RESOURCE;
+                break;
+            case ACTION_CHANGE_STUDY_PATH :
+                changeStudyPath (iwc);
                 break;
 		}
         
@@ -311,6 +317,10 @@ public class SchoolAdminOverview extends CommuneBlock {
             case METHOD_FINISH_RESOURCE :
                 headerTable.add(getHeader(localize("school.resources.finish", "Finish Resource")), 1, 1);
                 contentTable.add(getFinishResourceForm(iwc), 1, 1);
+                break;
+            case METHOD_CHANGE_STUDY_PATH :
+                headerTable.add(getHeader(localize("school.change_study_path", "Change Study Path")), 1, 1);
+                contentTable.add(getChangeStudyPathForm(iwc), 1, 1);
                 break;
 		}
 		
@@ -468,13 +478,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(getSmallText(message), 2, row++);
 				}
 			}
-            
+
+            SchoolClassMember schoolClassMember = null;
 			if (!_showNoChoices) {
 				table.add(getSmallHeader(localize("school.current_shool", "Current school")), 1, row);
 				table.add(getSmallHeader(localize("school.study_path", "Study Path")), 1, row + 1);
 				SchoolSeason season = getSchoolCommuneBusiness(iwc).getPreviousSchoolSeason(getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				if (season != null) {
-					SchoolClassMember schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
+					schoolClassMember = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findByStudentAndSeason(user, season);
 					if (schoolClassMember != null) {
 						SchoolClass schoolClass = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findSchoolClass(new Integer(schoolClassMember.getSchoolClassId()));
 						School currentSchool = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(schoolClass.getSchoolId()));
@@ -494,7 +505,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				}
 				row += 2;
 			}
-            
+
             // *** Resources START ***
             Integer providerGrpID = getProviderGrpId(iwc);
             Collection rscColl = getResourceBusiness(iwc).getResourcePlacementByMemberId(new Integer(_rscTO.getClassMemberID()));
@@ -527,7 +538,7 @@ public class SchoolAdminOverview extends CommuneBlock {
                 }
             }            
             //*** Resources END ***
-            
+
 			table.setColumnVerticalAlignment(1, Table.VERTICAL_ALIGN_TOP);
 			table.mergeCells(1, row, table.getColumns(), row);
 			table.setHeight(row, Table.HUNDRED_PERCENT);
@@ -537,6 +548,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject", "Reject"), PARAMETER_METHOD, String.valueOf(METHOD_REJECT)));
 			SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move", "Move"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE)));
 			SubmitButton moveYear = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_year", "Change year"), PARAMETER_METHOD, String.valueOf(METHOD_MOVE_YEAR)));
+			SubmitButton changeStudyPath = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_study_path", "Change Study Path"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_STUDY_PATH)));
 			SubmitButton editStudent = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.edit_student", "Edit student"), PARAMETER_METHOD, String.valueOf(METHOD_EDIT_STUDENT)));
 			SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placment_date", "Change placement date"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_PLACEMENT_DATE)));
 			PrintButton print = (PrintButton) getStyledInterface(new PrintButton(localize("school.print","Print")));
@@ -564,6 +576,14 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(moveYear, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
+
+            if (null != schoolClassMember) {
+				table.add(changeStudyPath, 1, row);
+				table.add(Text.getNonBrakingSpace(), 1, row);
+                iwc.setSessionAttribute
+                        (getClass () + PARAMETER_SCHOOL_CLASS_MEMBER_ID,
+                         schoolClassMember);
+            }
             
             // Göran Borgman 09.09.2003 - Resources button
             if (_showOnlyOverview) {
@@ -1768,4 +1788,52 @@ public class SchoolAdminOverview extends CommuneBlock {
     private ResourceBusiness getResourceBusiness(IWContext iwc) throws RemoteException {
         return (ResourceBusiness) IBOLookup.getServiceInstance(iwc, ResourceBusiness.class);
     }
+
+    private void changeStudyPath (final IWContext context)
+        throws RemoteException  {
+        final SchoolClassMember student
+                = (SchoolClassMember) context.getSessionAttribute
+                (getClass () + PARAMETER_SCHOOL_CLASS_MEMBER_ID);
+        final int studyPathId
+                = Integer.parseInt (context.getParameter ("school_study_path"));
+        getSchoolCommuneBusiness (context).setStudyPath (student, studyPathId);
+    }
+
+    private Table getChangeStudyPathForm (final IWContext context)
+        throws RemoteException {
+        Table table = new Table();
+        table.setBorder(0);
+        table.setCellpadding(1);
+        table.setCellspacing(2);
+		final DropdownMenu studyPathDropdown
+                = new DropdownMenu ("school_study_path");
+		studyPathDropdown.setToSubmit (false);
+        final SchoolStudyPath [] studyPaths
+                = getSchoolCommuneBusiness (context).getAllStudyPaths ();
+        for (int i = 0; i < studyPaths.length; i++) {
+            studyPathDropdown.addMenuElement
+                    (studyPaths [i].getPrimaryKey ().toString (),
+                     studyPaths [i].getCode ());
+        }
+        table.add (studyPathDropdown, 1, 1);
+        final SubmitButton submit = (SubmitButton) getStyledInterface
+                (new SubmitButton (localize("school.change", "Change"),
+                                   PARAMETER_METHOD,
+                                   String.valueOf (METHOD_OVERVIEW)));
+        table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf
+                                  (ACTION_CHANGE_STUDY_PATH)), 1, 2);
+        table.add(submit, 1, 2);
+        table.add(Text.getNonBrakingSpace(), 1, 2);
+        table.add(close, 1, 2);
+        table.mergeCells(1, 2, 2, 2);
+        table.setWidth(Table.HUNDRED_PERCENT);
+        table.setHeight(Table.HUNDRED_PERCENT);
+        table.addText(Text.NON_BREAKING_SPACE, 3, 1);
+        table.addText(Text.NON_BREAKING_SPACE, 1, 2);
+        table.mergeCells(1, 3, 3, 3);
+        table.setRowHeight(3, "100%");
+
+        return table;
+    }
+    
 }

@@ -54,6 +54,8 @@ import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.contact.data.Phone;
+import com.idega.core.localisation.data.ICLanguage;
+import com.idega.core.localisation.data.ICLanguageHome;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.Commune;
 import com.idega.data.IDOLookup;
@@ -78,8 +80,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/03/18 15:08:12 $ by $Author: anders $
- * @version $Revision: 1.73 $
+ * Last modified: $Date: 2004/06/01 14:13:07 $ by $Author: malin $
+ * @version $Revision: 1.74 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -112,6 +114,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private static final String KEY_SCHOOL_YEAR_LABEL = KP + "school_year_label";
 	private static final String KEY_SCHOOL_GROUP_LABEL = KP + "school_group_label";
 	private static final String KEY_STUDY_PATH_LABEL = KP + "study_path_label";
+	private static final String KEY_NATIVE_LANGUAGE_LABEL = KP + "native_language_label";
+	private static final String KEY_LANGUAGE_LABEL = KP + "language_label";
+	private static final String KEY_STUDENT = KP + "student";
 	private static final String KEY_RESOURCE_LABEL = KP + "resource_label";
 	private static final String KEY_COMMUNE_LABEL = KP + "commune_label";
 	private static final String KEY_PAYMENT_BY_INVOICE_LABEL = KP + "payment_by_invoice_label";
@@ -139,6 +144,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	public static final String KEY_NEW_PLACEMENT_FOR = KP + "new_placement_for";
 	public static final String KEY_START_DATE = KP + "start_date";
 	public static final String KEY_STUDY_PATH = KP + "study_path";
+	public static final String KEY_LANGUAGE = KP + "language";
+	public static final String KEY_NATIVE_LANGUAGE = KP + "native_language";
 	
 		// Button keys
 //	private static final String KEY_BUTTON_SEARCH = KP + "button_search";
@@ -162,6 +169,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	public static final String PARAM_PROVIDER = "param_provider";
 	public static final String PARAM_PROVIDER_CHANGED = "param_provider_changed";
 	public static final String PARAM_SCHOOL_TYPE = "param_school_type";
+	public static final String PARAM_NATIVE_LANGUAGE = "param_native_language";
+	public static final String PARAM_LANGUAGE = "param_language";
 	public static final String PARAM_SCHOOL_TYPE_CHANGED = "param_school_type_changed";
 	public static final String PARAM_SCHOOL_YEAR = "param_school_year";
 	public static final String PARAM_SCHOOL_YEAR_CHANGED = "param_school_year_changed";
@@ -552,7 +561,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setRowHeight(row, rowHeight);
-		
+			
 		row++;
 		col = 1;
 		// Placement
@@ -629,7 +638,21 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 							buf.append(", " + localize(KEY_STUDY_PATH, "Study path") + " "+ sp.getCode());
 						}
 					} catch (Exception e) {}
+					
+					try {
+						// add language
+						if (latestPl.getLanguage() != null) {
+							buf.append(", " + localize(KEY_LANGUAGE, "Language") + " "+ localize(latestPl.getLanguage(), ""));
+						}
+					} catch (Exception e) {}
 
+					try {
+						// add native language
+						if (child.getNativeLanguage() != null) {
+							buf.append(", " + localize(KEY_NATIVE_LANGUAGE, "Native language") + " "+ child.getNativeLanguage());
+						}
+					} catch (Exception e) {}
+					
 					table.add(getSmallText(buf.toString()), col, row);
 					table.mergeCells(col, row, col+2, row);
 
@@ -755,6 +778,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		//table.setWidth(5, row, "104");
 		table.setRowHeight(row, rowHeight);
 
+		//table.setBorder(1);
+		
 		// Hidden inputs
 		table.add(new HiddenInput(PARAM_SCHOOL_CATEGORY_CHANGED, "-1"), 1, 1);
 		table.add(new HiddenInput(PARAM_PROVIDER_CHANGED, "-1"), 1, 1);
@@ -779,6 +804,18 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.add(newPlacementTxt, col++, row);
 		table.setRowHeight(row, rowHeight);
 		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		row++;
+		col = 1;
+		
+		//Student name
+		child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);
+		table.add(getSmallHeader(localize(KEY_STUDENT, "Student: ")), col++, row);
+		if (child != null) {
+			table.add(child.getNameLastFirst()+ ",&nbsp;&nbsp;", col, row);
+			table.add(child.getPersonalID(), col, row);			
+		}
+		table.mergeCells(col, row, col+2, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		
@@ -898,6 +935,18 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// Study Path input
 		table.add(getSmallHeader(localize(KEY_STUDY_PATH_LABEL, "Study path: ")), col++, row);
 		table.add(getStudyPathsDropdown(iwc), col++, row);
+		row++;
+		col = 1;
+		
+		//Native language input
+		table.add(getSmallHeader(localize(KEY_NATIVE_LANGUAGE_LABEL, "Native language: ")), col++, row);
+		table.add(getNativeLanguagesDropdown(iwc), col++, row);
+		row++;
+		col = 1;
+		
+		//Language input
+		table.add(getSmallHeader(localize(KEY_LANGUAGE_LABEL, "Language: ")), col++, row);
+		table.add(getLanguageDropdown(iwc), col++, row);
 		row++;
 		col = 1;
 		
@@ -1260,7 +1309,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 	private DropdownMenu getSchoolTypesDropdown(IWContext iwc) {
 		DropdownMenu drop = (DropdownMenu) getStyledInterface(
-																				new DropdownMenu(PARAM_SCHOOL_TYPE));
+		new DropdownMenu(PARAM_SCHOOL_TYPE));
 		drop.setValueOnChange(PARAM_SCHOOL_TYPE_CHANGED, "1");
 		drop.setToSubmit(true);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
@@ -1303,6 +1352,49 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		return drop;
 	}
 
+	private DropdownMenu getNativeLanguagesDropdown(IWContext iwc) {
+		DropdownMenu drop = (DropdownMenu) getStyledInterface(
+		new DropdownMenu(PARAM_NATIVE_LANGUAGE));
+		
+		drop.addMenuElement("-1", localize("school.drp_chose_native_lang", "- Choose languge -"));
+		try {
+			Collection langs = getICLanguageHome().findAll();
+			if (langs != null) {
+				for (Iterator iter = langs.iterator(); iter.hasNext();) {
+					ICLanguage aLang = (ICLanguage) iter.next();
+					int langPK = ((Integer) aLang.getPrimaryKey()).intValue();
+					drop.addMenuElement(langPK, aLang.getName());
+				}
+				if (storedPlacement == null && iwc.isParameterSet(PARAM_NATIVE_LANGUAGE)) {
+					drop.setSelectedElement(iwc.getParameter(PARAM_NATIVE_LANGUAGE));
+				}
+			}
+		}
+		catch (RemoteException re) {
+			re.printStackTrace();
+		}
+		catch (FinderException fe) {
+
+		}
+		return drop;
+	}
+	
+	private DropdownMenu getLanguageDropdown(IWContext iwc) {
+		DropdownMenu txtLangChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_LANGUAGE));
+		txtLangChoice.addMenuElement(-1, localize("school.language", "Language"));
+		txtLangChoice.addMenuElement("school.language_german", localize("school.language_german", "German"));
+		txtLangChoice.addMenuElement("school.language_french", localize("school.language_french", "French"));
+		txtLangChoice.addMenuElement("school.language_spanish", localize("school.language_spanish", "Spanish"));
+		txtLangChoice.addMenuElement("school.language_swedish_english", localize("school.language_swedish_english", "Swedish/English"));
+		
+		if (storedPlacement == null && iwc.isParameterSet(PARAM_LANGUAGE)) {
+			txtLangChoice.setSelectedElement(iwc.getParameter(PARAM_LANGUAGE));
+		}
+		
+		return txtLangChoice;
+	}
+	
+	
 	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
 		DropdownMenu studyPaths = (DropdownMenu) getStyledInterface(
 																				new DropdownMenu(PARAM_STUDY_PATH));
@@ -1334,6 +1426,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		}	
 		return studyPaths;
 	}
+	
+	
 
 	private DropdownMenu getSchoolYearsDropdown(IWContext iwc) {
 		DropdownMenu years = (DropdownMenu) getStyledInterface(
@@ -2021,6 +2115,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		}		
 	}
 
+	
+	private ICLanguageHome getICLanguageHome() throws RemoteException {
+		return (ICLanguageHome) IDOLookup.getHome(ICLanguage.class);
+	}
 	
 	protected ProviderSession getCentralPlacementProviderSession(IWUserContext iwuc) {
 		try {

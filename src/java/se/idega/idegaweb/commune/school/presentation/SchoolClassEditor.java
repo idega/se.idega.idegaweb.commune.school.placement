@@ -661,23 +661,25 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				statTable.add(getSmallText("&nbsp;"), 1, sRow);
 				statTable.add(getSmallText("&nbsp;"), 2, sRow++);
 
-				statTable.add(getSmallText(localize("applications_all_new_citizens", "All applications new citizens") + ":"), 1, sRow);
-				statTable.add(getSmallText("" + allApplSizeNewCitizens), 2, sRow++);
-
-				statTable.add(getSmallText(localize("applications_handled_new_citizens", "Handled applications new citizens") + ":"), 1, sRow);
-				statTable.add(getSmallText("" + handledApplSizeNewCitizens), 2, sRow++);
-
-				statTable.add(getSmallText(localize("applications_on_first_choice_new_citizens", "Applications on first choice new citizens") + ":"), 1, sRow);
-				statTable.add(getSmallText("" + firstApplSizeNewCitizens), 2, sRow++);
-
-				statTable.add(getSmallText(localize("applications_on_second_choice_new_citizens", "Applications on second choice new citizens") + ":"), 1, sRow);
-				statTable.add(getSmallText("" + secondApplSizeNewCitizens), 2, sRow++);
-
-				statTable.add(getSmallText(localize("applications_on_third_choice_new_citizens", "Applications on third choice new citizens") + ":"), 1, sRow);
-				statTable.add(getSmallText("" + thirdApplSizeNewCitizens), 2, sRow++);
-				
-				statTable.add(getSmallText("&nbsp;"), 1, sRow);
-				statTable.add(getSmallText("&nbsp;"), 2, sRow++);
+				if (currentSeason) {
+					statTable.add(getSmallText(localize("applications_all_new_citizens", "All applications new citizens") + ":"), 1, sRow);
+					statTable.add(getSmallText("" + allApplSizeNewCitizens), 2, sRow++);
+	
+					statTable.add(getSmallText(localize("applications_handled_new_citizens", "Handled applications new citizens") + ":"), 1, sRow);
+					statTable.add(getSmallText("" + handledApplSizeNewCitizens), 2, sRow++);
+	
+					statTable.add(getSmallText(localize("applications_on_first_choice_new_citizens", "Applications on first choice new citizens") + ":"), 1, sRow);
+					statTable.add(getSmallText("" + firstApplSizeNewCitizens), 2, sRow++);
+	
+					statTable.add(getSmallText(localize("applications_on_second_choice_new_citizens", "Applications on second choice new citizens") + ":"), 1, sRow);
+					statTable.add(getSmallText("" + secondApplSizeNewCitizens), 2, sRow++);
+	
+					statTable.add(getSmallText(localize("applications_on_third_choice_new_citizens", "Applications on third choice new citizens") + ":"), 1, sRow);
+					statTable.add(getSmallText("" + thirdApplSizeNewCitizens), 2, sRow++);
+					
+					statTable.add(getSmallText("&nbsp;"), 1, sRow);
+					statTable.add(getSmallText("&nbsp;"), 2, sRow++);
+				}
 
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(statTable, 1, row);

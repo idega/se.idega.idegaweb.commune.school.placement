@@ -579,11 +579,13 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(extraContractOtherMessage, 3, row);
 
 		table.setHeight(row++, 12);
-
+		IWTimestamp stamp = new IWTimestamp();
 		DateInput placementDate = (DateInput) getStyledInterface(new DateInput(PARAM_PLACEMENT_DATE));
 		placementDate.keepStatusOnAction(true);
 		placementDate.setToDisplayDayLast(true);
 		placementDate.setAsNotEmpty(localize("child_care.must_select_placement_date", "You have to select a placement date"));
+		placementDate.setYearRange(stamp.getYear() - 1, stamp.getYear() + 3);
+	
 		if (application != null) {
 			placementDate.setDate(application.getFromDate());
 		}
@@ -596,6 +598,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		DateInput terminationDate = (DateInput) getStyledInterface(new DateInput(PARAM_TERMINATION_DATE));
 		terminationDate.keepStatusOnAction(true);
 		terminationDate.setToDisplayDayLast(true);
+		terminationDate.setYearRange(stamp.getYear() - 1, stamp.getYear() + 3);
 		table.add(getLocalizedLabel(LABEL_TERMINATION_DATE, "Termination date"), 1, row);
 		table.add(terminationDate, 3, row++);
 
@@ -635,7 +638,6 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		add(form);
 	}
-
 	private CommuneUserBusiness getUserService(IWContext iwc) throws RemoteException {
 		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}

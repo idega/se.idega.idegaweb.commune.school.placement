@@ -392,7 +392,6 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setRowColor(row, getHeaderColor());
 				
 
-		table.setVerticalAlignment(Table.VERTICAL_ALIGN_MIDDLE);
 		table.setRowHeight(row, "18");
 		row++;
 		

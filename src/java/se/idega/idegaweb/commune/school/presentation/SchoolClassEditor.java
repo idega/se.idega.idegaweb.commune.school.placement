@@ -23,6 +23,7 @@ import se.idega.util.PIDChecker;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
@@ -672,10 +673,16 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		SubmitButton groupReady = (SubmitButton) getStyledInterface(new SubmitButton(buttonLabel));
 		groupReady.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_MANAGE));
 		groupReady.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_FINALIZE_GROUP));
-		if (isReady)
+		if (isReady) {
 			groupReady.setSubmitConfirm(localize("school.confirm_group_locked","Are you sure you want to set the group as locked and send out e-mails to all parents?"));
-		else
+			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date"))
+				groupReady.setDisabled(true);
+		}
+		else {
 			groupReady.setSubmitConfirm(localize("school.confirm_group_ready","Are you sure you want to set the group as ready and send out e-mails to all parents?"));
+			if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date"))
+				groupReady.setDisabled(true);
+		}
 
 		table.add(back, 1, row);
 		table.add(Text.NON_BREAKING_SPACE, 1, row);

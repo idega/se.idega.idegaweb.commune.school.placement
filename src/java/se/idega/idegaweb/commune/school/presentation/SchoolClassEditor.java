@@ -349,18 +349,19 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		headerRow = row;
 		table.add(getSmallHeader(localize("school.name", "Name")), column++, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
+		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
 		if (showLanguage)
-			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
-		table.add(getSmallHeader(localize("school.date", "Date")), column, row++);
-
+			table.add(getSmallHeader(localize("school.language", "Language")), column, row);
+		row++;
+		
 		CheckBox checkBox = new CheckBox();
 		Link link;
 
 		if (!applicants.isEmpty()) {
-			Map studentMap = getBusiness().getUserMapFromChoices(applicants);
-			//Map addressMap = null;
+			//Map studentMap = getBusiness().getUserMapFromChoices(applicants);
+			//Map addressMap = getBusiness().getUserAddressesMapFromChoices(applicants);
 			//if (sortChoicesBy == SchoolChoiceComparator.ADDRESS_SORT)
 			//	addressMap = getBusiness().getUserAddressesMapFromChoices(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolQuery(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy));
 			//System.out.println("Sorting: "+(System.currentTimeMillis() - currentTime)+"ms");
@@ -368,7 +369,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			SchoolChoice choice;
 			School school;
 			User applicant;
-			IWCalendar calendar;
+			Address address;
+			//IWCalendar calendar;
 
 			Iterator iter = applicants.iterator();
 
@@ -376,10 +378,14 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			while (iter.hasNext()) {
 				column = 1;
 				choice = (SchoolChoice) iter.next();
-				applicant = (User) studentMap.get(new Integer(choice.getChildId()));
+				//applicant = (User) studentMap.get(new Integer(choice.getChildId()));
+				applicant = getUserBusiness(iwc).getUser(choice.getChildId());
 				school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
 				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, String.valueOf(choice.getChildId()) + "," + choice.getPrimaryKey().toString());
-				calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
+				//calendar = new IWCalendar(iwc.getCurrentLocale(), choice.getCreated());
+				//address = (Address) addressMap.get(new Integer(choice.getChildId()));
+				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
+				
 				if (students.containsValue(applicant))
 					checkBox.setDisabled(true);
 
@@ -404,6 +410,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
+				if (address != null && address.getStreetAddress() != null) {
+					table.add(getSmallText(address.getStreetAddress()), column, row);
+				}
+				column++;
 				if (PIDChecker.getInstance().isFemale(applicant.getPersonalID()))
 					table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
 				else
@@ -423,14 +433,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.add(getSmallText(localize(choice.getLanguageChoice(),"")), column, row);
 					column++;
 				}
-				table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
+				//table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row);
 				if (showStudentTable && getSchoolClassID() != -1) {
 					table.setWidth(column, "12");
-					table.add(checkBox, column, row++);
+					table.add(checkBox, column, row);
 				}
-				else {
-					++row;
-				}
+				row++;
 			}
 		}
 
@@ -500,7 +508,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			table.setRowColor(row, "#FFFFFF");
 		}
-		table.setColumnAlignment(3, Table.HORIZONTAL_ALIGN_CENTER);
+		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
 		table.setRowColor(headerRow, getHeaderColor());
 		table.mergeCells(1, 1, table.getColumns(), 1);
 

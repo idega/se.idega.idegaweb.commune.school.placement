@@ -93,6 +93,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private boolean _useForTesting = false;
 	
 	private SchoolClass _group;
+	private int _languageAge = 12;
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -307,7 +308,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		int schoolYearAge = getBusiness().getGradeForYear(getSchoolYearID());
 		if (!isOngoingSeason)
 			schoolYearAge--;
-		if (year != null && schoolYearAge >= 12)
+		if (year != null && schoolYearAge >= _languageAge)
 			showLanguage = true;
 		
 		if (showLanguage)
@@ -1346,5 +1347,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	 */
 	public void setUseForTesting(boolean useForTesting) {
 		this._useForTesting = useForTesting;
+	}
+
+	/**
+	 * @param languageAge The languageAge to set.
+	 */
+	public void setLanguageAge(int languageAge) {
+		this._languageAge = languageAge;
 	}
 }

@@ -49,6 +49,7 @@ import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.HiddenInput;
 import com.idega.presentation.ui.Parameter;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
@@ -58,8 +59,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/27 11:51:35 $ by $Author: goranb $
- * @version $Revision: 1.24 $
+ * Last modified: $Date: 2003/10/28 14:00:33 $ by $Author: goranb $
+ * @version $Revision: 1.25 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -75,7 +76,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_LAST_NAME_LABEL = KP + "last_name_label";
 	private static final String KEY_ADDRESS_LABEL = KP + "address_label";
 	private static final String KEY_PHONE_LABEL = KP + "telephone_label";
-	private static final String KEY_ACTIVITY_LABEL = KP + "activity_label";
+	private static final String KEY_SCHOOL_TYPE_LABEL = KP + "school_type_label";
 	private static final String KEY_PLACEMENT_LABEL = KP + "placement_label";
 	private static final String KEY_RESOURCES_LABEL = KP + "resources_label";
 	private static final String KEY_CONTRACT_LABEL = KP + "contract_label";
@@ -83,7 +84,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_STARTDATE_LABEL = KP + "startdate_label";
 	private static final String KEY_ENDDATE_LABEL = KP + "enddate_label";
 	private static final String KEY_PROVIDER_LABEL = KP + "provider_label";
-	private static final String KEY_MAIN_ACTIVITY_LABEL = KP + "main_activity";
+	private static final String KEY_OPERATIONAL_FIELD_LABEL = KP + "main_activity";
 	private static final String KEY_ADMIN_LABEL = KP + "admin_label";
 	private static final String KEY_SCHOOL_YEAR_LABEL = KP + "school_year_label";
 	private static final String KEY_SCHOOL_GROUP_LABEL = KP + "school_group_label";
@@ -122,9 +123,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 	public static final String PARAM_ACTION = "param_action";
 	public static final String PARAM_PRESENTATION = "param_presentation";
 	public static final String PARAM_SCHOOL_CATEGORY = "param_school_category";
+	public static final String PARAM_SCHOOL_CATEGORY_CHANGED = "param_school_category_changed";
 	public static final String PARAM_PROVIDER = "param_provider";
-	public static final String PARAM_ACTIVITY = "param_activity";
+	public static final String PARAM_PROVIDER_CHANGED = "param_provider_changed";
+	public static final String PARAM_SCHOOL_TYPE = "param_school_type";
+	public static final String PARAM_SCHOOL_TYPE_CHANGED = "param_school_type_changed";
 	public static final String PARAM_SCHOOL_YEAR = "param_school_year";
+	public static final String PARAM_SCHOOL_YEAR_CHANGED = "param_school_year_changed";
 	public static final String PARAM_SCHOOL_GROUP = "param_school_group";
 	//private static final String PARAM_STUDY_PATH = "param_study_path";
 	public static final String PARAM_PLACEMENT_DATE = "param_placement_date";
@@ -444,7 +449,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		row++;
 		col = 1;
 		// Activity
-		table.add(getSmallHeader(localize(KEY_ACTIVITY_LABEL, "Activity: ")), col, row);
+		table.add(getSmallHeader(localize(KEY_SCHOOL_TYPE_LABEL, "School type: ")), col, row);
 		// BUTTON Pupil overview 
 		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
 												KEY_BUTTON_PUPIL_OVERVIEW, "Pupil overview")), 5, row);
@@ -544,9 +549,6 @@ public class CentralPlacementEditor extends CommuneBlock {
 
 		return table;
 	}
-	
-	
-	//*********************************************************************************
 
 	public Table getNewPlacementTable(IWContext iwc) throws RemoteException {
 		// *** Search Table *** START - the uppermost table
@@ -572,6 +574,17 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//table.setWidth(4, row, "70");
 		//table.setWidth(5, row, "104");
 
+		/*String cat = iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED);
+		String pro = iwc.getParameter(PARAM_PROVIDER_CHANGED);
+		String typ = iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED);
+		String yer = iwc.getParameter(PARAM_SCHOOL_YEAR_CHANGED);
+		*/
+		// Hidden inputs
+		table.add(new HiddenInput(PARAM_SCHOOL_CATEGORY_CHANGED, "-1"), 1, 1);
+		table.add(new HiddenInput(PARAM_PROVIDER_CHANGED, "-1"), 1, 1);
+		table.add(new HiddenInput(PARAM_SCHOOL_TYPE_CHANGED, "-1"), 1, 1);
+		table.add(new HiddenInput(PARAM_SCHOOL_YEAR_CHANGED, "-1"), 1, 1);
+
 		row++;
 		col = 1;
 
@@ -585,7 +598,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		col = 1;
 		
 		// School Category
-		table.add(getSmallHeader(localize(KEY_MAIN_ACTIVITY_LABEL, "Main activity: ")), col++, row);
+		table.add(getSmallHeader(localize(KEY_OPERATIONAL_FIELD_LABEL, "Operational field: "))
+																																, col++, row);
 		table.add(getSchoolCategoriesDropdown(iwc), col++, row);
 		row++;
 		col = 1;
@@ -593,6 +607,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Provider labels
 		table.add(getSmallHeader(localize(KEY_PROVIDER_LABEL, "Provider: ")), col++, row);
 		table.add(getProvidersDropdown(iwc), col++, row);
+		table.mergeCells(col, row, col+2, row);
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_ADDRESS_LABEL, "Address: ")), col++, row);
@@ -605,15 +620,23 @@ public class CentralPlacementEditor extends CommuneBlock {
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_ADMIN_LABEL, "Administration: ")), col++, row);
-		// Provider values
-		if (iwc.isParameterSet(PARAM_PROVIDER)) {
+		// Compensation by invoice
+		table.add(getSmallHeader(localize(KEY_PAYMENT_BY_INVOICE_LABEL, "Payment by invoice: ")),
+																																	++col, row);
+
+		// Provider values		
+		if (iwc.isParameterSet(PARAM_PROVIDER) && !("-1".equals(iwc.getParameter(PARAM_PROVIDER))) 
+								&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) ) {
 			School school = getCurrentProvider(iwc);
 			if (school != null) {
 				row--;row--;
 				col = 2;
 				// School Address value
-				table.add(school.getSchoolAddress()+", "+school.getSchoolZipCode()+" "
-																							+school.getSchoolZipArea(), col, row);
+				try {
+					String addr = school.getSchoolAddress()+", "+school.getSchoolZipCode()+" "
+																					 +school.getSchoolZipArea();
+					table.add(getSmallText(addr), col, row);					
+				} catch (Exception e) {}
 				table.mergeCells(col, row, col+1, row);
 				col++; col++;
 				// Commune value
@@ -621,21 +644,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 				row++;
 				col = 2;
 				// Phone value
-				table.add(school.getSchoolPhone(), col, row);
+				table.add(getSmallText(school.getSchoolPhone()), col, row);
 				row++;
 				// Administrator value
-				table.add(school.getCentralizedAdministration() ? localize(KEY_CENTRAL_ADMIN, "Central") :
-																	localize(KEY_PROVIDER_ADMIN, "Provider"), col, row);
+				String adm = school.getCentralizedAdministration() ? 
+					localize(KEY_CENTRAL_ADMIN, "Central") : localize(KEY_PROVIDER_ADMIN, "Provider");
+				table.add(getSmallText(adm), col, row);
 			}
-		}
-		// Compensation by invoice
-		table.add(getSmallHeader(localize(KEY_PAYMENT_BY_INVOICE_LABEL, "Payment by invoice: ")),
-																																	++col, row);
-			// value if provider is set
-		if (iwc.isParameterSet(PARAM_PROVIDER) 
-															&& !(iwc.getParameter(PARAM_PROVIDER).equals("-1"))) {													
-			final Provider provider = new Provider
-				   											(Integer.parseInt (iwc.getParameter(PARAM_PROVIDER)));           	
+			final Provider provider = new Provider(
+																Integer.parseInt (iwc.getParameter(PARAM_PROVIDER)));           	
 			if (provider != null) {
 				boolean hasCompByInv = provider.getPaymentByInvoice ();
 				Text txt = getSmallText(hasCompByInv ? localize(KEY_DROPDOWN_YES, "Yes") 
@@ -643,20 +660,20 @@ public class CentralPlacementEditor extends CommuneBlock {
 				table.add(txt, ++col, row);											
 			}
 		}
-		
+
 		row++;
 		col = 2;
 		table.add(transGIF, col, row); // EMPTY SPACE ROW
 		table.setRowHeight(row, "10");
 		row++;
 		col = 1;
-		// Activity input
-		table.add(getSmallHeader(localize(KEY_ACTIVITY_LABEL, "Activity:")), col++, row);
-		table.add(getActivitiesDropdown(iwc), col++, row);
+		//  input
+		table.add(getSmallHeader(localize(KEY_SCHOOL_TYPE_LABEL, "School type:")), col++, row);
+		table.add(getSchoolTypesDropdown(iwc), col++, row);
 		table.add(
 			getSmallHeader(localize(KEY_PLACEMENT_PARAGRAPH_LABEL, "Placement paragraph: ")),
 			col++, row);
-		table.add(getPlacementParagraphTextInput(), col, row);
+		table.add(getPlacementParagraphTextInput(iwc), col, row);
 		table.mergeCells(col, row, col+1, row);
 		table.setAlignment(col, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
@@ -668,8 +685,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getSmallHeader(localize(KEY_SCHOOL_GROUP_LABEL, "School group: ")), col++, row);
 		table.add(getSchoolGroups(iwc), col++, row);
 		// BUTTON New group
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-																KEY_BUTTON_NEW_GROUP, "New group")), 5, row);
+		SubmitButton newGroupBut = new SubmitButton(iwrb.getLocalizedImageButton(
+																					KEY_BUTTON_NEW_GROUP, "New group"));
+		newGroupBut.setValueOnClick(PARAM_SCHOOL_CATEGORY_CHANGED, "1");
+		table.add(newGroupBut, 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		row++;
@@ -686,14 +705,21 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// Resource
 		table.add(getSmallHeader(localize(KEY_RESOURCE_LABEL, "Resource: ")), col++, row);
 		//  Resource input checkboxes
-		if (iwc.isParameterSet(PARAM_ACTIVITY) && 
-				!iwc.getParameter(PARAM_ACTIVITY).equals("-1") &&
-				iwc.isParameterSet(PARAM_SCHOOL_YEAR) && 
-				!iwc.getParameter(PARAM_SCHOOL_YEAR).equals("-1")) {
+		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
+				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED))) 
+				&& iwc.isParameterSet(PARAM_SCHOOL_TYPE) 
+				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE))) 
+				&& iwc.isParameterSet(PARAM_SCHOOL_YEAR) 
+				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_YEAR)))) {
 			try {
 				Collection rscColl = getResourceBusiness(iwc).getAssignableResourcesByYearAndType(
-						iwc.getParameter(PARAM_SCHOOL_YEAR), iwc.getParameter(PARAM_ACTIVITY));
+						iwc.getParameter(PARAM_SCHOOL_YEAR), iwc.getParameter(PARAM_SCHOOL_TYPE));
 				CheckBox typeRscBox = new CheckBox(PARAM_RESOURCES);
+				String[] rscArr = null;
+				if (iwc.isParameterSet(PARAM_RESOURCES)) {
+					rscArr = iwc.getParameterValues(PARAM_RESOURCES);
+				}
 				Integer primaryKey;
 				Iterator loop = rscColl.iterator();
 				while (loop.hasNext()) {
@@ -701,16 +727,18 @@ public class CentralPlacementEditor extends CommuneBlock {
 					Resource rsc = (Resource) loop.next();
 					CheckBox cBox = (CheckBox) typeRscBox.clone();
 					primaryKey = (Integer) rsc.getPrimaryKey();
-					cBox.setValue(primaryKey.intValue());
-
-					// Set related school types to checked
-					/* if (theRsc != null) {
-					   Map typeMap = busyBean.getRelatedSchoolTypes(theRsc);
-					   Set typeKeys = typeMap.keySet();
-					   if (typeKeys.contains(primaryKey)) {
-					     cBox.setChecked(true);
-					   }
-					 } */
+					int intPK = primaryKey.intValue();
+					cBox.setValue(intPK);
+					boolean isChecked = false;
+					if (rscArr != null) {
+						for (int i = 0; i < rscArr.length; i++) {
+							if (intPK == Integer.parseInt(rscArr[i])) {
+								isChecked = true;
+								break;
+							}							
+						}
+					}
+					cBox.setChecked(isChecked);
 					table.add(cBox, col++, row);
 					table.add(getSmallText(rsc.getResourceName()), col++, row);
 					row++;
@@ -734,7 +762,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		rowTable.add(
 			getSmallHeader(localize(KEY_PAYMENT_BY_AGREEMENT_LABEL, "Payment by agreement: ")),
 			tmpCol++, tmpRow);
-		rowTable.add(getYesNoDropdown(PARAM_PAYMENT_BY_AGREEMENT), tmpCol, tmpRow);
+		rowTable.add(getPaymentByAgreementDropdown(iwc, PARAM_PAYMENT_BY_AGREEMENT)
+																														, tmpCol, tmpRow);
 		rowTable.setWidth(tmpCol++, tmpRow, 100);
 		// Invoice interval
 		rowTable.add(getSmallHeader(localize(KEY_INVOICE_INTERVAL_LABEL, "Invoice interval: ")),
@@ -825,8 +854,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private DropdownMenu getSchoolCategoriesDropdown(IWContext iwc) {
 		// Get dropdown for school categories
 		DropdownMenu schoolCats = new DropdownMenu(PARAM_SCHOOL_CATEGORY);
-		schoolCats.setToSubmit(true);
 		schoolCats.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
+		schoolCats.setValueOnChange(PARAM_SCHOOL_CATEGORY_CHANGED, "1");
+		schoolCats.setToSubmit(true);
 		try {
 			SchoolCategoryHome schCatHome = getSchoolBusiness(iwc).getSchoolCategoryHome();
 			SchoolCategory elementary = schCatHome.findElementarySchoolCategory();
@@ -848,11 +878,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private DropdownMenu getProvidersDropdown(IWContext iwc) {
 		// Get dropdown for providers
 		DropdownMenu providers = new DropdownMenu(PARAM_PROVIDER);
+		providers.setValueOnChange(PARAM_PROVIDER_CHANGED, "1");
 		providers.setToSubmit(true);
 		providers.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		try {
 			// Get school category from topmost dropdown
-			if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) {
+			if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
+					&& !("-1".equals(PARAM_SCHOOL_CATEGORY))) {
 				// Get schooltypes in category
 				Collection schTypes =
 					getSchoolBusiness(iwc).findAllSchoolTypesInCategory(
@@ -865,8 +897,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 					int schoolID = ((Integer) tmpSchool.getPrimaryKey()).intValue();
 					providers.addMenuElement(schoolID, tmpSchool.getSchoolName());
 				}
-				if (iwc.isParameterSet(PARAM_PROVIDER))
-					providers.setSelectedElement(iwc.getParameter(PARAM_PROVIDER));
+				if ("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) {
+					providers.setSelectedElement("-1");
+				} else if (iwc.isParameterSet(PARAM_PROVIDER)) {
+					providers.setSelectedElement(iwc.getParameter(PARAM_PROVIDER));					
+				}
+			} else {
+				providers.setSelectedElement("-1");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -874,12 +911,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return providers;
 	}
 
-	private DropdownMenu getActivitiesDropdown(IWContext iwc) {
-		DropdownMenu activities = new DropdownMenu(PARAM_ACTIVITY);
-		activities.setToSubmit(true);
-		activities.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (iwc.isParameterSet(PARAM_PROVIDER) && 
-																	!iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
+	private DropdownMenu getSchoolTypesDropdown(IWContext iwc) {
+		DropdownMenu drop = new DropdownMenu(PARAM_SCHOOL_TYPE);
+		drop.setValueOnChange(PARAM_SCHOOL_TYPE_CHANGED, "1");
+		drop.setToSubmit(true);
+		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
+		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
+				&& iwc.isParameterSet(PARAM_PROVIDER) 
+				&& !iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
 			try {
 				School school =
 					getSchoolBusiness(iwc).getSchool(new Integer(iwc.getParameter(PARAM_PROVIDER)));
@@ -888,52 +927,64 @@ public class CentralPlacementEditor extends CommuneBlock {
 					for (Iterator iter = schTypes.iterator(); iter.hasNext();) {
 						SchoolType type = (SchoolType) iter.next();
 						int typeID = ((Integer) type.getPrimaryKey()).intValue();
-						activities.addMenuElement(typeID, type.getName());
+						drop.addMenuElement(typeID, type.getName());
 					}
-					if (iwc.isParameterSet(PARAM_ACTIVITY)) {
-						activities.setSelectedElement(iwc.getParameter(PARAM_ACTIVITY));
+					if ("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED))) {
+						drop.setSelectedElement("-1");
+					} else if (iwc.isParameterSet(PARAM_SCHOOL_TYPE)) {
+						drop.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_TYPE));
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
+		} else {
+			
 		}
 
-		return activities;
+		return drop;
 	}
 
 	private DropdownMenu getSchoolYearsDropdown(IWContext iwc) {
 		DropdownMenu years = new DropdownMenu(PARAM_SCHOOL_YEAR);
+		years.setValueOnChange(PARAM_SCHOOL_YEAR_CHANGED, "1");
 		years.setToSubmit(true);
 		years.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (iwc.isParameterSet(PARAM_ACTIVITY)) {
+		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
+				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
+				&& iwc.isParameterSet(PARAM_SCHOOL_TYPE)
+				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE)))
+				&& iwc.isParameterSet(PARAM_PROVIDER) 
+				&& !("-1".equals(iwc.getParameter(PARAM_PROVIDER)))) {
+
 			try {
-				if (iwc.isParameterSet(PARAM_PROVIDER) && 
-																	!iwc.getParameter(PARAM_PROVIDER).equals("-1")) {
-					String providerIdStr = iwc.getParameter(PARAM_PROVIDER);
-					School school = getSchoolBusiness(iwc).getSchool(new Integer(providerIdStr));
-					if (school != null) {
-						Collection yearColl = school.findRelatedSchoolYears();
-						if (yearColl != null) {
-							for (Iterator iter = yearColl.iterator(); iter.hasNext();) {
-								SchoolYear year = (SchoolYear) iter.next();
-								int paramTypeID =
-									Integer.parseInt(iwc.getParameter(PARAM_ACTIVITY));
-								if (year.getSchoolTypeId() == paramTypeID) {
-									int yearID = ((Integer) year.getPrimaryKey()).intValue();
-									years.addMenuElement(yearID, year.getName());
-								}
+				String providerIdStr = iwc.getParameter(PARAM_PROVIDER);
+				School school = getSchoolBusiness(iwc).getSchool(new Integer(providerIdStr));
+				if (school != null) {
+					Collection yearColl = school.findRelatedSchoolYears();
+					if (yearColl != null) {
+						for (Iterator iter = yearColl.iterator(); iter.hasNext();) {
+							SchoolYear year = (SchoolYear) iter.next();
+							int paramTypeID =
+								Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_TYPE));
+							if (year.getSchoolTypeId() == paramTypeID) {
+								int yearID = ((Integer) year.getPrimaryKey()).intValue();
+								years.addMenuElement(yearID, year.getName());
 							}
-							if (iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
-								years.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_YEAR));
-							}
+						}
+						if ("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED))) {
+							years.setSelectedElement("-1");
+						} else if (iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
+							years.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_YEAR));
 						}
 					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else {
+			years.setSelectedElement("-1");
 		}
 
 		return years;
@@ -943,35 +994,49 @@ public class CentralPlacementEditor extends CommuneBlock {
 		DropdownMenu groups = new DropdownMenu(PARAM_SCHOOL_GROUP);
 		groups.setToSubmit(true);
 		groups.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (iwc.isParameterSet(PARAM_PROVIDER) && iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
+			
+		if (!("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
+				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
+				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED)))
+				&& iwc.isParameterSet(PARAM_PROVIDER) 
+				&& iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
 			int schoolID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
 			int yearID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR));
-			try {
+			try {				
 				SchoolSeason currentSeason = getSchoolChoiceBusiness(iwc).getCurrentSeason();
 				int seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
 				Collection groupColl = getSchoolBusiness(iwc)
-									.findSchoolClassesBySchoolAndSeasonAndYear(schoolID, seasonID, yearID);
+							.findSchoolClassesBySchoolAndSeasonAndYear(schoolID, seasonID, yearID);
 				if (groupColl != null) {
 					for (Iterator iter = groupColl.iterator(); iter.hasNext();) {
 						SchoolClass group = (SchoolClass) iter.next();
 						int groupID = ((Integer) group.getPrimaryKey()).intValue();
 						groups.addMenuElement(groupID, group.getName());
 					}
-					if (iwc.isParameterSet(PARAM_SCHOOL_GROUP))
+					if ("1".equals(iwc.getParameter(PARAM_SCHOOL_YEAR_CHANGED))) {
+						groups.setSelectedElement("-1");
+					} else if (iwc.isParameterSet(PARAM_SCHOOL_GROUP)) {
 						groups.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_GROUP));
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else {
+			groups.setSelectedElement("-1");
 		}
+
 		return groups;
 	}
 	
-	private DropdownMenu getYesNoDropdown(String param) {
+	private DropdownMenu getPaymentByAgreementDropdown(IWContext iwc, String param) {
 		DropdownMenu yesNo = new DropdownMenu(param);
 		yesNo.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		yesNo.addMenuElement(KEY_DROPDOWN_NO, localize(KEY_DROPDOWN_NO, "No"));
-		yesNo.addMenuElement(KEY_DROPDOWN_YES, localize(KEY_DROPDOWN_YES, "Yes"));		
+		yesNo.addMenuElement(KEY_DROPDOWN_YES, localize(KEY_DROPDOWN_YES, "Yes"));
+		if (iwc.isParameterSet(PARAM_PAYMENT_BY_AGREEMENT)) {
+			yesNo.setSelectedElement(iwc.getParameter(PARAM_PAYMENT_BY_AGREEMENT));
+		}
 		return yesNo;
 	}
 	
@@ -985,7 +1050,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 					String intervalKey = (String) iter.next();
 					drop.addMenuElement(intervalKey, localize(intervalKey, intervalKey));					
 				}
-			}			
+			}
+			if (iwc.isParameterSet(PARAM_INVOICE_INTERVAL)) {
+				drop.setSelectedElement(iwc.getParameter(PARAM_INVOICE_INTERVAL));		
+			}
 		} catch (RemoteException re) {
 			re.printStackTrace();
 		}
@@ -994,11 +1062,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 	
 	private DropdownMenu getStudyPathsDropdown(IWContext iwc) {
-		DropdownMenu studyPath = new DropdownMenu(PARAM_STUDY_PATH);
-		studyPath.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
+		DropdownMenu studyPaths = new DropdownMenu(PARAM_STUDY_PATH);
+		studyPaths.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 
 		String schoolIdStr = iwc.getParameter(PARAM_PROVIDER);
-		String schTypeIdStr = iwc.getParameter(PARAM_ACTIVITY);		
+		String schTypeIdStr = iwc.getParameter(PARAM_SCHOOL_TYPE);		
 		if (schoolIdStr != null && !schoolIdStr.equals("-1") && schTypeIdStr != null && 
 																										!schTypeIdStr.equals("-1")) {
 			Integer schTypePK = new Integer(schTypeIdStr);
@@ -1008,18 +1076,27 @@ public class CentralPlacementEditor extends CommuneBlock {
 				for (Iterator iter = coll.iterator(); iter.hasNext();) {
 					SchoolStudyPath element = (SchoolStudyPath) iter.next();
 					int studyPathID = ((Integer) element.getPrimaryKey()).intValue();
-					studyPath.addMenuElement(studyPathID, element.getCode());
+					studyPaths.addMenuElement(studyPathID, element.getCode());
+				}
+				if ("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))
+						|| "1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED))) {
+					studyPaths.setSelectedElement("-1");					
+				} else if (iwc.isParameterSet(PARAM_STUDY_PATH)) {
+					studyPaths.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_GROUP));
 				}		
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}	
-		return studyPath;
+		return studyPaths;
 	}
 	
-	private TextInput getPlacementParagraphTextInput() {
+	private TextInput getPlacementParagraphTextInput(IWContext iwc) {
 		TextInput txt = new TextInput(PARAM_PLACEMENT_PARAGRAPH);
 		txt.setLength(25);
+		if (iwc.isParameterSet(PARAM_PLACEMENT_PARAGRAPH)) {
+			txt.setContent(iwc.getParameter(PARAM_PLACEMENT_PARAGRAPH));
+		}
 		return txt;
 	}
 	
@@ -1132,9 +1209,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 	}
 	
 	private String getDateString(Timestamp stamp) {
-		IWTimestamp iwts = new IWTimestamp(stamp);
+		IWTimestamp iwts = null;
 		String dateStr = "";
 		if (stamp != null) {
+			iwts = new IWTimestamp(stamp);
 			dateStr = iwts.getDateString("yyyy-MM-dd");
 		}
 		return dateStr;

@@ -544,7 +544,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			}
 
 			if (showComment || showPlacement) {
-				table.setHeight(2, row++);
+				table.setHeight(row++, 2);
 				if (showComment) {
 					table.mergeCells(1, row, table.getColumns(), row);
 					table.add(getSmallErrorText("* "), 1, row);
@@ -799,7 +799,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			}
 
 			if (showPlacement) {
-				table.setHeight(2, row++);
+				table.setHeight(row++, 2);
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(getSmallErrorText("+ "), 1, row);
 				table.add(getSmallText(localize("school_choice.has_main_group_placement", "Student is placed in main group")), 1, row++);
@@ -965,7 +965,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			}
 
 			if (showComment) {
-				table.setHeight(2, row++);
+				table.setHeight(row++, 2);
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(getSmallErrorText("* "), 1, row);
 				table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);

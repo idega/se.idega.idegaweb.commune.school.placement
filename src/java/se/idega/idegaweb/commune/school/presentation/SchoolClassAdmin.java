@@ -282,7 +282,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 			}
 
 			if (showComment) {
-				table.setHeight(2, row++);
+				table.setHeight(row++, 2);
 				table.mergeCells(1, row, table.getColumns(), row);
 				table.add(getSmallErrorText("* "), 1, row);
 				table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);

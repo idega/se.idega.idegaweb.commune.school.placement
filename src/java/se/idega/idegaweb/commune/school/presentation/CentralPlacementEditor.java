@@ -7,13 +7,16 @@
 package se.idega.idegaweb.commune.school.presentation;
 
 import is.idega.block.family.business.NoParentFound;
+
 import java.rmi.RemoteException;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
+
 import javax.ejb.EJBException;
 import javax.ejb.FinderException;
+
 import se.idega.idegaweb.commune.accounting.invoice.presentation.RegularPaymentEntriesList;
 import se.idega.idegaweb.commune.accounting.school.data.Provider;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
@@ -30,10 +33,10 @@ import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSessionBean;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.idegaweb.commune.school.placement.business.PlacementBusiness;
+
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolCategory;
@@ -79,8 +82,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/22 12:57:49 $ by $Author: thomas $
- * @version $Revision: 1.95 $
+ * Last modified: $Date: 2004/10/29 13:02:08 $ by $Author: laddi $
+ * @version $Revision: 1.96 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -2119,10 +2122,6 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 	private SchoolBusiness getSchoolBusiness(IWContext iwc) throws RemoteException {
 		return (SchoolBusiness) IBOLookup.getServiceInstance(iwc, SchoolBusiness.class);
-	}
-
-	private SchoolChoiceBusiness getSchoolChoiceBusiness(IWContext iwc) throws RemoteException {
-		return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwc, SchoolChoiceBusiness.class);
 	}
 
 	public ChildCareContractHome getChildCareContractHome() {

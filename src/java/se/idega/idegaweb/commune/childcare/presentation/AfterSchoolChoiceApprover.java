@@ -122,6 +122,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				link.setEventListener(ChildCareEventListener.class);
 				link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
 				link.setParameter(getSession().getParameterApplicationID(), application.getPrimaryKey().toString());
+				link.setParameter(getSession().getParameterCaseCode(), getBusiness().getAfterSchoolCareCaseCode());
 				if (getResponsePage() != null)
 					link.setPage(getResponsePage());
 	

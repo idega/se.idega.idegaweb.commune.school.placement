@@ -1,10 +1,6 @@
 package se.idega.idegaweb.commune.school.presentation;
 
-import java.rmi.RemoteException;
-
 import com.idega.presentation.IWContext;
-import com.idega.presentation.Table;
-import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.Window;
 
 /**

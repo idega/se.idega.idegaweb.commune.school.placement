@@ -1,6 +1,7 @@
 package se.idega.idegaweb.commune.childcare.check.presentation;
 
 import is.idega.idegaweb.member.business.MemberFamilyLogic;
+
 import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -8,7 +9,6 @@ import java.util.Iterator;
 
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
-import se.idega.idegaweb.commune.childcare.check.data.Check;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;

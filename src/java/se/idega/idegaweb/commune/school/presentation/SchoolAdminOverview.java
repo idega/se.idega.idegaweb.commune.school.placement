@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -58,6 +59,7 @@ import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
 import com.idega.user.business.UserBusiness;
 import com.idega.user.data.User;
+import com.idega.util.Age;
 import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -762,6 +764,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		TextInput searchInput = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH));
 		searchInput.setLength(40);
+		searchInput.setMininumLength(6, localize("commune.search_string_too_short","Search string must be at least six characters."));
 		searchInput.keepStatusOnAction(true);
 		table.add(searchInput, 2, row++);
 		
@@ -777,32 +780,54 @@ public class SchoolAdminOverview extends CommuneBlock {
 					userTable.setCellspacing(0);
 					userTable.setWidth(Table.HUNDRED_PERCENT);
 					table.add(userTable, 1, row);
+					table.mergeCells(1, row, 2, row);
 		
 					User user;
+					Age age;
+					Date d;
 					RadioButton radio;
 					int userRow = 1;
+					boolean addSubmit = false;
 				
-					userTable.add(getSmallHeader(localize("commune.found_users","Found users")+":"), 1, row++);
-					userTable.setHeight(row++, 6);
+					userTable.add(getSmallHeader(localize("commune.found_users","Found users")+":"), 1, userRow++);
+					userTable.setHeight(userRow++, 6);
 				
 					Iterator iter = users.iterator();
 					while (iter.hasNext()) {
 						user = (User) iter.next();
-						radio = getRadioButton(PARAMETER_USER_ID, user.getPrimaryKey().toString());
-						if (row == 2)
-							radio.setSelected();
-					
-						userTable.add(radio, 1, row);
-						userTable.add(Text.NON_BREAKING_SPACE, 1, row);
-						userTable.add(getSmallText(user.getNameLastFirst(true)), 1, row);
-						userTable.add(getSmallText(" ("), 1, row);
-						userTable.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())+")"), 1, row++);
+						d = user.getDateOfBirth();
+						if (d == null) {
+							if (user.getPersonalID() != null) {
+								d = PIDChecker.getInstance().getDateFromPersonalID(user.getPersonalID());
+							}
+							if (d == null)
+								d = new Date();
+						}
+						age = new Age(d);
+						
+						if (age.getYears() <= 18) {
+							addSubmit = true;
+							radio = getRadioButton(PARAMETER_USER_ID, user.getPrimaryKey().toString());
+							if (row == 2)
+								radio.setSelected();
+						
+							userTable.add(radio, 1, userRow);
+							userTable.add(Text.NON_BREAKING_SPACE, 1, userRow);
+							userTable.add(getSmallText(user.getNameLastFirst(true)), 1, userRow);
+							userTable.add(getSmallText(" ("), 1, userRow);
+							userTable.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())+")"), 1, userRow++);
+						}
 					}
 				
 					userTable.setHeight(row++, 6);
-					SubmitButton login = (SubmitButton) getButton(new SubmitButton(localize("school.add_student","Add student"), PARAMETER_ACTION, String.valueOf(ACTION_ADD_STUDENT)));
-					login.setValueOnClick(PARAMETER_METHOD, "-1");
-					userTable.add(login, 1, row);
+					if (addSubmit) {
+						SubmitButton login = (SubmitButton) getButton(new SubmitButton(localize("school.add_student","Add student"), PARAMETER_ACTION, String.valueOf(ACTION_ADD_STUDENT)));
+						login.setValueOnClick(PARAMETER_METHOD, "-1");
+						userTable.add(login, 1, userRow);
+					}
+					else {
+						userTable.add(getSmallHeader(localize("school.no_student_found","No student found")), 1, userRow++);
+					}
 				}
 				else {
 					table.add(getSmallHeader(localize("school.no_student_found","No student found")), 1, row++);

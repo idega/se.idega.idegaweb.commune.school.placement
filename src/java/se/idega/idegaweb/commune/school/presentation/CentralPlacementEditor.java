@@ -57,8 +57,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/24 11:29:18 $ by $Author: laddi $
- * @version $Revision: 1.21 $
+ * Last modified: $Date: 2003/10/24 11:31:09 $ by $Author: laddi $
+ * @version $Revision: 1.22 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1124,10 +1124,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 			_action = Integer.parseInt(actionStr);
 
 		}
-		if (iwc.isParameterSet(PARAM_PRESENTATION)) {
+		/*if (iwc.isParameterSet(PARAM_PRESENTATION)) {
 			String presStr = iwc.getParameter(PARAM_PRESENTATION);
 			_presentation = Integer.parseInt(presStr);
-		}
+		}*/
 	}
 
 	// *** ACTIONS ***

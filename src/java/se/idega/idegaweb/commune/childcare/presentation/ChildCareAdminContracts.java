@@ -9,10 +9,10 @@ import java.util.Iterator;
 
 import javax.ejb.FinderException;
 
+import se.idega.idegaweb.commune.accounting.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.accounting.childcare.data.ChildCareApplication;
 import se.idega.idegaweb.commune.block.importer.business.AlreadyCreatedException;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
-import se.idega.idegaweb.commune.childcare.check.business.CheckBusiness;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementProviderEditor;

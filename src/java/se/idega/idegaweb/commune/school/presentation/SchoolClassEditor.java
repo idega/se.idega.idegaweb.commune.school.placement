@@ -468,9 +468,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (hasComment) {
 					showComment = true;
 					table.add(getSmallErrorText("*"), column, row);
-				}
-				if (showComment)
 					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+				}
 
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column, row);
@@ -816,6 +815,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		int numberOfStudents = 0;
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
+		boolean hasComment = false;
+		boolean showComment = false;
 
 		List formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 
@@ -830,6 +831,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				hasComment = studentMember.getNotes() != null;
 
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")), "delete_student_" + String.valueOf(new Integer(studentMember.getClassMemberId())));
 				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
@@ -857,6 +859,12 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 						table.setRowColor(row, getZebraColor1());
 					else
 						table.setRowColor(row, getZebraColor2());
+				}
+
+				if (hasComment) {
+					showComment = true;
+					table.add(getSmallErrorText("*"), 1, row);
+					table.add(getSmallText(Text.NON_BREAKING_SPACE), 1, row);
 				}
 
 				link = getSmallLink(name);
@@ -894,6 +902,13 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					}
 				}
 				row++;
+			}
+
+			if (showComment) {
+				table.setHeight(2, row++);
+				table.mergeCells(1, row, table.getColumns(), row);
+				table.add(getSmallErrorText("* "), 1, row);
+				table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);
 			}
 		}
 

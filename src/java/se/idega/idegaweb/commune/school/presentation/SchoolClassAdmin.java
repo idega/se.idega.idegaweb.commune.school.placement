@@ -1,7 +1,5 @@
 /**
- * Created on 1.2.2003
- *
- * This class does something very clever.
+ * Created on 1.2.2003 This class does something very clever.
  */
 package se.idega.idegaweb.commune.school.presentation;
 
@@ -36,12 +34,10 @@ import com.idega.user.data.User;
 import com.idega.util.PersonalIDFormatter;
 
 /**
- * @author laddi
- *
- * To change this generated comment edit the template variable "typecomment":
- * Window>Preferences>Java>Templates.
- * To enable and disable the creation of type comments go to
- * Window>Preferences>Java>Code Generation.
+ * @author laddi To change this generated comment edit the template variable
+ *         "typecomment": Window>Preferences>Java>Templates. To enable and
+ *         disable the creation of type comments go to
+ *         Window>Preferences>Java>Code Generation.
  */
 public class SchoolClassAdmin extends SchoolCommuneBlock {
 
@@ -57,9 +53,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 	private int action = 0;
 	private int method = 0;
 	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
-	
+
 	private boolean multipleSchools = false;
-	private boolean showBunRadioButtons = false;	
+	private boolean showBunRadioButtons = false;
 
 	/**
 	 * @see se.idega.idegaweb.commune.school.presentation.SchoolCommuneBlock#init(com.idega.presentation.IWContext)
@@ -116,7 +112,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.setCellspacing(0);
 		table.setWidth(getWidth());
 		table.setHeight(2, "12");
-		
+
 		form.add(table);
 
 		Table headerTable = new Table(1, 3);
@@ -146,26 +142,24 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.setWidth(6, "12");
 		//table.setWidth(7, "12");
 		int row = 1;
-		
-		/*
-		Table addTable = new Table(3,1);
-		addTable.setCellpadding(0);
-		addTable.setCellspacing(0);
-		addTable.setWidth(2, "4");
-		table.add(addTable, 1, row++);
-		
-		Link addLink = new Link(getEditIcon(localize("school.add_student", "Add student")));
-		addLink.setWindowToOpen(SchoolAdminWindow.class);
-		addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
-		addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-		addTable.add(addLink, 1, 1);
 
-		Link addLinkText = getSmallLink(localize("school.add_student", "Add student"));
-		addLinkText.setWindowToOpen(SchoolAdminWindow.class);
-		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_ADD_STUDENT);
-		addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-		addTable.add(addLinkText, 3, 1);
-		*/
+		/*
+		 * Table addTable = new Table(3,1); addTable.setCellpadding(0);
+		 * addTable.setCellspacing(0); addTable.setWidth(2, "4");
+		 * table.add(addTable, 1, row++); Link addLink = new
+		 * Link(getEditIcon(localize("school.add_student", "Add student")));
+		 * addLink.setWindowToOpen(SchoolAdminWindow.class);
+		 * addLink.addParameter(SchoolAdminOverview.PARAMETER_METHOD,
+		 * SchoolAdminOverview.METHOD_ADD_STUDENT);
+		 * addLink.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID,
+		 * getParentPage().getPageID()); addTable.add(addLink, 1, 1); Link
+		 * addLinkText = getSmallLink(localize("school.add_student", "Add
+		 * student")); addLinkText.setWindowToOpen(SchoolAdminWindow.class);
+		 * addLinkText.addParameter(SchoolAdminOverview.PARAMETER_METHOD,
+		 * SchoolAdminOverview.METHOD_ADD_STUDENT);
+		 * addLinkText.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID,
+		 * getParentPage().getPageID()); addTable.add(addLinkText, 3, 1);
+		 */
 
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), 2, row);
@@ -175,7 +169,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), 6, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), 6, row);
 		table.setRowColor(row++, getHeaderColor());
-		
+
 		User student;
 		Address address;
 		SchoolClassMember studentMember;
@@ -187,6 +181,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
 		boolean hasSpecialPlacement = false;
+		boolean hasComment = false;
+		boolean showComment = false;
 
 		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 
@@ -203,14 +199,23 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasSpecialPlacement = studentMember.getSpeciallyPlaced();
+				hasComment = studentMember.getNotes() != null;
 
-				/*        
-				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")),"delete_student_"+String.valueOf(new Integer(studentMember.getClassMemberId())));
-				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
-				delete.setValueOnClick(PARAMETER_STUDENT_ID, String.valueOf(studentMember.getClassMemberId()));
-				delete.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE));
-				delete.setSubmitConfirm(localize("school.confirm_student_delete","Are you sure you want to remove the student from this class?"));
-				*/
+				/*
+				 * delete = new
+				 * SubmitButton(getDeleteIcon(localize("school.delete_from_group",
+				 * "Click to remove student from
+				 * group")),"delete_student_"+String.valueOf(new
+				 * Integer(studentMember.getClassMemberId())));
+				 * delete.setDescription(localize("school.delete_from_group",
+				 * "Click to remove student from group"));
+				 * delete.setValueOnClick(PARAMETER_STUDENT_ID,
+				 * String.valueOf(studentMember.getClassMemberId()));
+				 * delete.setValueOnClick(PARAMETER_METHOD,
+				 * String.valueOf(ACTION_DELETE));
+				 * delete.setSubmitConfirm(localize("school.confirm_student_delete","Are
+				 * you sure you want to remove the student from this class?"));
+				 */
 				move = new Link(getEditIcon(localize("school.move_to_another_group", "Move this student to another group")));
 				move.setWindowToOpen(SchoolAdminWindow.class);
 				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
@@ -221,10 +226,11 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
-				
+
 				if (hasSpecialPlacement) {
 					table.setRowColor(row, IS_SPECIALLY_PLACED_COLOR);
-				} else if (hasChoice || hasMoveChoice) {
+				}
+				else if (hasChoice || hasMoveChoice) {
 					if (hasChoice)
 						table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
 					if (hasMoveChoice)
@@ -237,6 +243,12 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 						table.setRowColor(row, getZebraColor2());
 				}
 
+				if (hasComment) {
+					showComment = true;
+					table.add(getSmallErrorText("*"), 1, row);
+					table.add(getSmallText(Text.NON_BREAKING_SPACE), 1, row);
+				}
+
 				link = getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
@@ -244,11 +256,10 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
 				link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());        
-        link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, ((Integer) studentMember.getPrimaryKey()).toString());
-        if (studentMember.getRemovedDate() != null)
-          link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, studentMember.getRemovedDate().toString());
-         
+				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());
+				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, ((Integer) studentMember.getPrimaryKey()).toString());
+				if (studentMember.getRemovedDate() != null)
+					link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, studentMember.getRemovedDate().toString());
 
 				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
@@ -265,6 +276,13 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				table.add(move, 6, row);
 				//table.add(delete, 7, row);
 				row++;
+			}
+
+			if (showComment) {
+				table.setHeight(2, row++);
+				table.mergeCells(1, row, table.getColumns(), row);
+				table.add(getSmallErrorText("* "), 1, row);
+				table.add(getSmallText(localize("school.has_notes", "Placment has comment attached")), 1, row++);
 			}
 		}
 
@@ -310,9 +328,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 	private void delete(IWContext iwc) throws RemoteException {
 		String student = iwc.getParameter(PARAMETER_STUDENT_ID);
 		if (student != null && student.length() > 0) {
-			getBusiness().getSchoolBusiness().removeSchoolClassMemberFromClass(Integer.parseInt(student),getSchoolClassID());
+			getBusiness().getSchoolBusiness().removeSchoolClassMemberFromClass(Integer.parseInt(student), getSchoolClassID());
 			SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
-			getBusiness().setNeedsSpecialAttention(Integer.parseInt(student), getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID()),false);
+			getBusiness().setNeedsSpecialAttention(Integer.parseInt(student), getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID()), false);
 			if (choice != null) {
 				if (choice.getCaseStatus().equals("PLAC"))
 					getBusiness().getSchoolChoiceBusiness().setAsPreliminary(choice, iwc.getCurrentUser());
@@ -323,19 +341,22 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 	private UserBusiness getUserBusiness(IWContext iwc) throws RemoteException {
 		return (UserBusiness) IBOLookup.getServiceInstance(iwc, UserBusiness.class);
 	}
-	
+
 	/* Setters */
 	/**
 	 * Turns on/of view of drop down showing providers
 	 */
 	public void setMultipleSchools(boolean multiple) {
 		multipleSchools = multiple;
-	}	
+	}
+
 	/**
-	 * Turns on/off view of radiobuttons for showing BUN administrated shools or not
+	 * Turns on/off view of radiobuttons for showing BUN administrated shools
+	 * or not
+	 * 
 	 * @param show
 	 */
-	public void setShowBunRadioButtons(boolean show){
-		showBunRadioButtons = show;		
+	public void setShowBunRadioButtons(boolean show) {
+		showBunRadioButtons = show;
 	}
 }

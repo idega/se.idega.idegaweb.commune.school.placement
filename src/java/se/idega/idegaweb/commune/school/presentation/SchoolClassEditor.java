@@ -308,6 +308,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 
 		SchoolYear year = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int schoolYearAge = getBusiness().getGradeForYear(getSchoolYearID());
+		boolean currentSeason = getBusiness().getCurrentSchoolSeasonID() == getSchoolSeasonID();
 		if (!isOngoingSeason)
 			schoolYearAge--;
 		if (year != null && schoolYearAge >= _languageAge)
@@ -454,7 +455,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (getBusiness().isAlreadyInSchool(choice.getChildId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
 					hasPlacement = true;
 					if (_group != null && _group.getIsSubGroup()) {
-						if (getBusiness().getSchoolBusiness().hasGroupPlacement(choice.getChildId(), getSchoolClassID())) {
+						if (getBusiness().getSchoolBusiness().hasGroupPlacement(choice.getChildId(), getSchoolClassID(), _group.getIsSubGroup())) {
 							checkBox.setDisabled(true);
 						}
 					}
@@ -479,7 +480,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				else if (choice.getChoiceOrder() > 1) {
 					table.setRowColor(row, HAS_REJECTED_FIRST_CHOICE_COLOR);
 				}
-				else if (choice.getSchoolChoiceDate().before(from) || choice.getSchoolChoiceDate().after(to)) {
+				else if ((choice.getSchoolChoiceDate().before(from) || choice.getSchoolChoiceDate().after(to)) && currentSeason) {
 					table.setRowColor(row, HAS_MOVED_TO_COMMUNE_COLOR);
 				}
 				else {
@@ -957,7 +958,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				move = new Link(getEditIcon(localize("school.move_to_another_group", "Move this student to another group")));
 				move.setWindowToOpen(SchoolAdminWindow.class);
 				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
-				move.setParameter(getSchoolCommuneSession(iwc).getParameterSchoolClassID(), String.valueOf(studentMember.getSchoolClassId()));
+				move.setParameter(getSchoolCommuneSession(iwc).getParameterSchoolClassID(), String.valueOf(getSchoolClassID()));
 				move.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
 				move.setParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 

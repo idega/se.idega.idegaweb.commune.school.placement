@@ -13,9 +13,9 @@ import java.util.Map;
 import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
-import se.idega.idegaweb.commune.childcare.data.AfterSchoolChoice;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
+import se.idega.idegaweb.commune.school.data.AfterSchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 
 import com.idega.block.navigation.presentation.UserHomeLink;

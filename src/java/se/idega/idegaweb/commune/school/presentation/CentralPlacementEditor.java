@@ -76,12 +76,12 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/15 18:51:44 $ by $Author: goranb $
- * @version $Revision: 1.36 $
+ * Last modified: $Date: 2003/11/15 19:21:19 $ by $Author: goranb $
+ * @version $Revision: 1.37 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
-	private static final String KP = "central_placing_editor.";
+	private static final String KP = "central_placement_editor.";
 	private static final String KEY_WINDOW_HEADING = KP + "window_heading";
 	private static final String KEY_SEARCH_PUPIL_HEADING = KP + "search_pupil_heading";
 	private static final String KEY_PUPIL_HEADING = KP + "pupil_heading";

@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/03 12:49:50 $ by $Author: laddi $
- * @version $Revision: 1.48 $
+ * Last modified: $Date: 2003/12/03 18:06:35 $ by $Author: goranb $
+ * @version $Revision: 1.49 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -321,7 +321,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		mainTable.add(obj, col, mainTableRow++);
 	}
 
-	public Table getSearchTable(IWContext iwc) throws RemoteException {
+	public Table getSearchTable(IWContext iwc) {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setBorder(0);
@@ -350,7 +350,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		return table;
 	}
 	
-	public Table getPupilTable(IWContext iwc, User child) throws RemoteException {
+	public Table getPupilTable(IWContext iwc, User child) {
 		// *** Search Table *** START - the uppermost table
 		Table table = new Table();
 		table.setWidth("100%");
@@ -587,11 +587,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 					table.mergeCells(col, row, col+2, row);
 
 					// BUTTON Regular payment for Latest Placement					
-					if (!(iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) 
-							|| "-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY))) {
+					//if (!(iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) 
+					//		|| "-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY))) {
 						table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row);
 						table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
-					}
+					//}
 					row++;
 
 					// Resources
@@ -928,12 +928,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_CENTER);
 		tmpCol++; // 5		
 		// BUTTON Regular payment for New Placement					
-		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
-				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY)))) {
+		//if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
+				//&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY)))) {
 			rowTable.add(getRegularPaymentBottomButton(iwc), tmpCol, tmpRow);																											
 			rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_RIGHT);
 			rowTable.setWidthAndHeightToHundredPercent();
-		}
+		//}
 
 		// END row table
 

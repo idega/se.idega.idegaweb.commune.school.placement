@@ -191,7 +191,7 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
-				
+        
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")),"delete_student_"+String.valueOf(new Integer(studentMember.getClassMemberId())));
 				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
 				delete.setValueOnClick(PARAMETER_STUDENT_ID, String.valueOf(studentMember.getClassMemberId()));
@@ -229,7 +229,9 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 				link.setParameter(SchoolAdminOverview.PARAMETER_SHOW_NO_CHOICES, "true");
 				link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
-				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());
+				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());        
+        link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_MEMBER_ID, ((Integer) studentMember.getPrimaryKey()).toString());
+
 				table.add(link, 1, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), 2, row);
 

@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.ejb.CreateException;
+import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
+import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 
 import com.idega.block.school.business.SchoolYearComparator;
 import com.idega.block.school.data.School;
@@ -28,6 +30,7 @@ import com.idega.business.IBOLookup;
 import com.idega.core.data.Address;
 import com.idega.core.data.Email;
 import com.idega.core.data.Phone;
+import com.idega.data.IDOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
@@ -84,6 +87,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	
 	private int _userID = -1;
 	private int _choiceID = -1;
+	private int _schoolID = -1;
 	private int _schoolClassID = -1;
 	private int _schoolYearID = -1;
 	
@@ -176,6 +180,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		Table table = new Table();
 		table.setCellpadding(5);
 		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
 		int row = 1;
 		
 		if (_userID != -1) {
@@ -210,6 +215,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			}
 			catch (NoCustodianFound ncf) {}
 			
+			int pendingSchoolId = -1;
+			
 			if (_choiceID != -1) {
 				Collection choices = getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().findByStudentAndSeason(_userID, getSchoolCommuneSession(iwc).getSchoolSeasonID());
 				String message = null;
@@ -223,10 +230,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 						choice = (SchoolChoice) iter.next();
 						school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(choice.getChosenSchoolId()));
 						String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice.getCaseStatus(),iwc.getCurrentLocale()) + ")";
-						if (choice.getChosenSchoolId() == getSchoolCommuneSession(iwc).getSchoolID())
+						if ( choice.getCaseStatus().getStatus().equals(choice.getCaseStatusPreliminary()) ) {
+								pendingSchoolId = choice.getChosenSchoolId();
+//							table.add("gimmi flippari ", 2, row);	
+						}
+						if (choice.getChosenSchoolId() == getSchoolCommuneSession(iwc).getSchoolID()) {
 							table.add(this.getSmallHeader(string),2,row);
-						else
+						}else {
 							table.add(getSmallText(string),2,row);
+						}
 						
 						if (iter.hasNext())
 							table.add(new Break(),2,row);
@@ -260,21 +272,29 @@ public class SchoolAdminOverview extends CommuneBlock {
       table.setColumnVerticalAlignment(1, Table.VERTICAL_ALIGN_TOP);
       table.mergeCells(1, row, table.getColumns(), row);
       
-      CloseButton close = (CloseButton) getStyledInterface(new CloseButton(localize("back","Back")));
+      CloseButton close = (CloseButton) getStyledInterface(new CloseButton(localize("close_window","Close")));
       SubmitButton replace = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.replace","Replace"),PARAMETER_METHOD,String.valueOf(METHOD_REPLACE)));
       SubmitButton reject = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.reject","Reject"),PARAMETER_METHOD,String.valueOf(METHOD_REJECT)));
       SubmitButton move = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.move","Move"),PARAMETER_METHOD,String.valueOf(METHOD_MOVE)));
       
       table.add(close,1,row);
       table.add(Text.NON_BREAKING_SPACE,1,row);
-      table.add(replace,1,row);
-      table.add(Text.NON_BREAKING_SPACE,1,row);
-      if (_choiceID != -1 && _choiceID == getSchoolCommuneSession(iwc).getSchoolID()) {
-      	table.add(reject,1,row);
+      if (_schoolID != -1) {
+	      table.add(replace,1,row);
 	      table.add(Text.NON_BREAKING_SPACE,1,row);
+
+				if (_schoolID == pendingSchoolId) {
+	      	table.add(reject,1,row);
+		      table.add(Text.NON_BREAKING_SPACE,1,row);
+				}
+
+				/** Gimmi 13.11.2002 _schoolID is NOT -1 so no need to check again....    */
+	      /** was like this --->  if (_choiceID == -1 && _choiceID != _schoolID) {  */
+	      if (_choiceID == -1) {
+	      	table.add(move,1,row);
+	      }
       }
-      if (_choiceID == -1 && _choiceID != getSchoolCommuneSession(iwc).getSchoolID())
-      	table.add(move,1,row);
+
 		}
 		
 		return table;
@@ -519,6 +539,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		if ( _schoolClassID != -1 && _schoolYearID != -1 )
 			validateSchoolClass(iwc);
+			
+		_schoolID = getSchoolCommuneSession(iwc).getSchoolID();	
+		
+		/** @todo LAGA... er ekki alveg rett */
 	}
 
 	protected DropdownMenu getSchoolYears(IWContext iwc) throws RemoteException {

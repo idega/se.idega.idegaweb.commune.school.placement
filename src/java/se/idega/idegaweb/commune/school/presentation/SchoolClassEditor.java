@@ -71,6 +71,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private int _previousSchoolYearID = -1;
 	private boolean multibleSchools = false;
 	private boolean showStudentTable = true;
+	private boolean searchEnabled = true;
 
 
 	public void init(IWContext iwc) throws RemoteException {
@@ -246,7 +247,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		if (year != null) {
 			schoolYearAge = year.getSchoolYearAge() - 1;	
 		}
-			System.out.println("[SchoolClassEditor] : reppis before getting applicants ..,. searchString : "+searchString);
+//			System.out.println("[SchoolClassEditor] par getSchoolYearID()    = "+iwc.getParameter(session.getParameterSchoolYearID()));
+//			System.out.println("[SchoolClassEditor] par getSchoolSeasonID()  = "+iwc.getParameter(session.getParameterSchoolSeasonID()));
+//			System.out.println("[SchoolClassEditor] schoolYearAge            = "+schoolYearAge);
+//			System.out.println("[SchoolClassEditor] getSchoolYearID()        = "+getSchoolYearID());
+//			System.out.println("[SchoolClassEditor] getSchoolSeasonID()      = "+getSchoolSeasonID());
 			List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, searchString));
 //			List applicants = new Vector(getBusiness().getSchoolChoiceBusiness().getApplicantsForSchoolAndSeasonAndGrade(getSchoolID(), getSchoolSeasonID(), year.getSchoolYearAge() - 1));
 			if (!applicants.isEmpty()) {
@@ -554,19 +559,20 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 	
 	protected Table getSearchAndSortTable() {
-		Table table = new Table(2,2);
+		Table table = new Table(2,3);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 
-		table.add(getSmallHeader(localize("school.search_for","Search for")+":"+Text.NON_BREAKING_SPACE),1,1);
+		if (searchEnabled) {
+			table.add(getSmallHeader(localize("school.search_for","Search for")+":"+Text.NON_BREAKING_SPACE),1,1);
+			
+			TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH, searchString));
+			table.add(tiSearch, 2, 1);
+			
+			table.setHeight(2, "2");
+		}
 		
-		TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH, searchString));
-		table.add(tiSearch, 2, 1);
-		
-
-
-		
-		table.add(getSmallHeader(localize("school.sort_by","Sort by")+":"+Text.NON_BREAKING_SPACE),1,2);
+		table.add(getSmallHeader(localize("school.sort_by","Sort by")+":"+Text.NON_BREAKING_SPACE),1,3);
 		
 		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
 		menu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name","Name"));
@@ -576,7 +582,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language","Language"));
 		menu.setSelectedElement(sortChoicesBy);
 		menu.setToSubmit();
-		table.add(menu,2,2);
+		table.add(menu,2,3);
 		
 		table.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_RIGHT);
 		
@@ -638,5 +644,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	}
 	public void setShowStudentTable(boolean show) {
 		this.showStudentTable = show;	
+	}
+	public void setSearchEnabled(boolean searchEnabled) {
+		this.searchEnabled = searchEnabled;	
 	}
 }

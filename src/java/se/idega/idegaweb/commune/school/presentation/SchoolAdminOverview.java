@@ -645,7 +645,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 			
-			if (_showOnlyOverview) {
+			if (_showOnlyOverview && _schoolClassMemberID != -1) {
 				table.add(nativeLangButton, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
@@ -1805,8 +1805,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_PERMISSION) 
-				&& iwc.getParameter(PARAMETER_RESOURCE_PERMISSION).equals(PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN))
+				&& iwc.getParameter(PARAMETER_RESOURCE_PERMISSION).equals(PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN)) {
 			_viewAllResources = true;
+		}
 		
 		if (iwc.isParameterSet(PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR)) {
 			if ("true".equals(iwc.getParameter(PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR))) {

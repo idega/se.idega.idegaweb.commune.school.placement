@@ -574,7 +574,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
 				}
 				column++;
-				if (showLanguage) { //malin, lägg till schoolclassmember language
+				if (showLanguage) { 
 					if (choice.getLanguageChoice() != null) table.add(getSmallText(localize(choice.getLanguageChoice(), "")), column, row);
 					column++;
 				}
@@ -798,7 +798,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					}
 				}
 
-				String name = student.getNameLastFirst(true);
+				//String name = student.getNameLastFirst(true);
+				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
 
 				link = getSmallLink(name);

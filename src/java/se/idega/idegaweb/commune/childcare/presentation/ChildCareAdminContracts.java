@@ -4,24 +4,34 @@ package se.idega.idegaweb.commune.childcare.presentation;
 
 import java.rmi.RemoteException;
 import java.sql.Date;
+import java.text.DateFormat;
 import java.util.Collection;
 import java.util.Iterator;
-import javax.ejb.FinderException;
+
+import javax.ejb.EJBException;
+
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.business.AlreadyCreatedException;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.care.data.ChildCareApplication;
+import se.idega.idegaweb.commune.care.data.ChildCareContract;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
+import se.idega.idegaweb.commune.childcare.presentation.admin.ContractEditor;
+import se.idega.idegaweb.commune.childcare.presentation.admin.ContractEditorWindow;
+import se.idega.idegaweb.commune.childcare.presentation.admin.ContractRemoverWindow;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementEditorConstants;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementProviderEditor;
 import se.idega.idegaweb.commune.school.presentation.CentralPlacementSchoolGroupEditor;
+
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.presentation.SchoolGroupSelector;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
+import com.idega.presentation.text.Link;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.BooleanInput;
 import com.idega.presentation.ui.DateInput;
@@ -32,7 +42,6 @@ import com.idega.presentation.ui.RadioButton;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
-import com.idega.presentation.ui.util.SelectorUtility;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
@@ -318,6 +327,65 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		else
 			table.add(getSmallText(localize("child_care.yes", "Yes")), 3, row++);
 		table.setHeight(row++, 12);
+		
+		Collection contracts = null;
+		try {
+            contracts = getBusiness().getLatestContractsForChild(((Integer)child.getPrimaryKey()).intValue(),3);
+        } catch (RemoteException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
+        } catch (EJBException e3) {
+            // TODO Auto-generated catch block
+            e3.printStackTrace();
+        }
+		if(!contracts.isEmpty()){
+		    Table contractTable = new Table();
+		    DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, iwc.getCurrentLocale());
+		    contractTable.add(getLocalizedSmallHeader("child_care.provider","Provider"),1,1);
+		    contractTable.add(getLocalizedSmallHeader("child_care.created","Created"),2,1);
+		    contractTable.add(getLocalizedSmallHeader("child_care.start","Start"),3,1);
+		    contractTable.add(getLocalizedSmallHeader("child_care.end","End"),4,1);
+		    contractTable.add(getLocalizedSmallHeader("child_care.care_time","Care time"),5,1);
+		    int crow = 2;
+		    for (Iterator iter = contracts.iterator(); iter.hasNext();) {
+		        ChildCareContract contract = (ChildCareContract) iter.next();
+		        contractTable.add(getSmallText(contract.getApplication().getProvider().getName()),1,crow);
+		        if(contract.getCreatedDate()!=null)
+		            contractTable.add(getSmallText(dateFormat.format(contract.getCreatedDate())),2,crow);
+		        if(contract.getValidFromDate()!=null)
+		            contractTable.add(getSmallText(dateFormat.format(contract.getValidFromDate())),3,crow);
+		        if(contract.getTerminatedDate()!=null)
+		            contractTable.add(getSmallText(dateFormat.format(contract.getTerminatedDate())),4,crow);
+		        contractTable.add(getSmallText(String.valueOf(contract.getCareTime())),5,crow);
+		        if(contract.getContractFileID()>0)
+		            contractTable.add(getPDFLink(contract.getContractFileID(),localize("child_care.view_contract","View contract")),6,crow);
+		        
+		        Link editLink = new Link(getEditIcon(localize("child_care.edit_contract", "Edit contract")));
+		        editLink.setWindowToOpen(ContractEditorWindow.class);
+		        editLink.addParameter(ContractEditor.PARAMETER_APPLICATION_ID,contract.getApplicationID());
+			    editLink.addParameter(ContractEditor.PARAMETER_CONTRACT_ID,contract.getPrimaryKey().toString());
+				
+				Link editLink2 = new Link(getEditIcon(localize("child_care.alter_contract","Alter contract")));
+				editLink2.setWindowToOpen(ChildCareWindow.class);
+				editLink2.addParameter(ChildCareAdminWindow.PARAMETER_METHOD,ChildCareAdminWindow.METHOD_ALTER_CARE_TIME);
+				editLink2.addParameter(ChildCareAdminWindow.PARAMETER_APPLICATION_ID,contract.getApplicationID());
+				
+				Link deleteLink = new Link(getDeleteIcon(localize("child_care.delete_contract","Delete contract")));
+				deleteLink.setWindowToOpen(ContractRemoverWindow.class);
+				deleteLink.addParameter(ContractRemoverWindow.PARAMETER_CONTRACT_ID, contract.getPrimaryKey().toString());
+				
+				contractTable.add(editLink,7,crow);
+				contractTable.add(editLink2,8,crow);
+				contractTable.add(deleteLink,9,crow);
+				crow++;
+		        
+            }
+		    contractTable.setRowColor(1,getHeaderColor());
+		    table.add(getLocalizedHeader("child_care.latest_contracts_for_child", "Latest contracts for child"), 1, row++);
+		    table.mergeCells(1,row,3,row);
+		    table.add(contractTable,1,row++);
+
+		}
 
 		Collection parents;
 		try {
@@ -357,8 +425,39 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.setHeight(row++, 12);
 
 		table.add(getLocalizedHeader(LABEL_PROVIDER, "Provider"), 1, row++);
-		table.add(getLocalizedLabel(LABEL_PROVIDER_NAME, "Name"), 1, row);
+		
+		
+		SchoolGroupSelector groupSelector = new SchoolGroupSelector();
+		table.add(groupSelector);
 		try {
+            groupSelector.setSchoolCategory(getSchoolBusiness(iwc).getCategoryChildcare());
+        } catch (RemoteException e4) {
+            // TODO Auto-generated catch block
+            e4.printStackTrace();
+        }
+        
+        
+        table.add(getLocalizedLabel(LABEL_PROVIDER_OPERATION, "Operation"), 1, row);
+		/*try {*/
+		    /*
+			Collection school_types = getSchoolBusiness(iwc).getSchoolTypeHome().findAllByCategory(getSchoolBusiness(iwc).getCategoryChildcare().getCategory());
+			SelectorUtility sel = new SelectorUtility();
+			DropdownMenu op = (DropdownMenu) sel.getSelectorFromIDOEntities(new DropdownMenu(PARAM_OPERATION), school_types, "getName");
+			op.keepStatusOnAction(true);
+			*/
+		    DropdownMenu op = groupSelector.getTypeDropdown();
+			table.add(getStyledInterface(op), 3, row++);
+		/*}
+		catch (RemoteException e1) {
+			e1.printStackTrace();
+		}
+		catch (FinderException e1) {
+			e1.printStackTrace();
+		}*/
+		
+			table.add(getLocalizedLabel(LABEL_PROVIDER_NAME, "Name"), 1, row);
+		/*try */{
+		    /*
 			Collection schools = getSchoolBusiness(iwc).getSchoolHome().findAllByCategory(getSchoolBusiness(iwc).getCategoryChildcare());
 			SelectorUtility sel = new SelectorUtility();
 			DropdownMenu prov = (DropdownMenu) sel.getSelectorFromIDOEntities(new DropdownMenu(getSession().getParameterChildCareID()), schools, "getName");
@@ -367,7 +466,8 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			prov.setAsNotEmpty(localize("child_care.must_select_provider", "You must select a provider."));
 			if (application != null) prov.setSelectedElement(application.getProviderId());
 			if (getSession().getChildCareID() != -1) prov.setSelectedElement(getSession().getChildCareID());
-
+			*/
+		    DropdownMenu prov = groupSelector.getSchoolDropdown();
 			table.add(getStyledInterface(prov), 3, row);
 
 			GenericButton createProvider = getButton(new GenericButton("", localize("child_care.create_provider", "Create provider")));
@@ -377,30 +477,19 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			table.setNoWrap(3, row);
 			row++;
 		}
+		/*
 		catch (RemoteException e1) {
 			e1.printStackTrace();
 		}
 		catch (FinderException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 
-		table.add(getLocalizedLabel(LABEL_PROVIDER_OPERATION, "Operation"), 1, row);
-		try {
-			Collection school_types = getSchoolBusiness(iwc).getSchoolTypeHome().findAllByCategory(getSchoolBusiness(iwc).getCategoryChildcare().getCategory());
-			SelectorUtility sel = new SelectorUtility();
-			DropdownMenu op = (DropdownMenu) sel.getSelectorFromIDOEntities(new DropdownMenu(PARAM_OPERATION), school_types, "getName");
-			op.keepStatusOnAction(true);
-			table.add(getStyledInterface(op), 3, row++);
-		}
-		catch (RemoteException e1) {
-			e1.printStackTrace();
-		}
-		catch (FinderException e1) {
-			e1.printStackTrace();
-		}
+		
 
 		table.add(getLocalizedLabel(LABEL_PROVIDER_GROUP, "Group"), 1, row);
-		try {
+		/*try {*/
+		    /*
 			Collection school_classes = getSchoolBusiness(iwc).getSchoolClassHome().findBySchoolAndCategory(getSession().getChildCareID(), getSchoolBusiness(iwc).getCategoryChildcare().getCategory());
 			SelectorUtility sel = new SelectorUtility();
 			DropdownMenu op = (DropdownMenu) sel.getSelectorFromIDOEntities(new DropdownMenu(PARAM_GROUP), school_classes, "getName");
@@ -411,20 +500,22 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 				op.addMenuElementFirst("-1", "");
 				op.keepStatusOnAction(true);
 			}
-			table.add(getStyledInterface(op), 3, row);
+			*/
+		    DropdownMenu gr = groupSelector.getGroupDropdown();
+			table.add(getStyledInterface(gr), 3, row);
 
 			GenericButton createGroup = getButton(new GenericButton("", localize("child_care.create_group", "Create group")));
 			createGroup.setWindowToOpen(CentralPlacementSchoolGroupEditor.class);
 			table.add(Text.getNonBrakingSpace(), 3, row);
 			table.add(createGroup, 3, row);
 			row++;
-		}
+		/*}
 		catch (RemoteException e1) {
 			e1.printStackTrace();
 		}
 		catch (FinderException e1) {
 			e1.printStackTrace();
-		}
+		}*/
 
 		table.add(getSmallHeader(localize("child_care.pre_school", "Specify pre-school:")), 1, row);
 		TextInput preSchool = (TextInput) getStyledInterface(new TextInput(PARAM_PRE_SCHOOL));
@@ -536,7 +627,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		add(form);
 	}
-
+	
 	private CommuneUserBusiness getUserService(IWContext iwc) throws RemoteException {
 		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);
 	}

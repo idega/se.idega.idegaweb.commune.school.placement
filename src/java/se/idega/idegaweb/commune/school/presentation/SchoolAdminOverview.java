@@ -214,7 +214,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 				
 				if (message != null) {
 					table.add(getSmallHeader(localize("school.school_choice_message","Applicant message")),1,row);
-					table.add(getSmallText(message),1,row++);
+					table.add(getSmallText(message),2,row++);
 				}
 			}
 			

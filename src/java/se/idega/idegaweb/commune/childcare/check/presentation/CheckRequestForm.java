@@ -11,6 +11,8 @@ import com.idega.presentation.*;
 import com.idega.presentation.text.*;
 import com.idega.presentation.ui.*;
 import com.idega.builder.data.IBPage;
+import com.idega.block.school.data.*;
+import com.idega.block.school.business.*;
 
 /**
  * Title:
@@ -46,10 +48,6 @@ public class CheckRequestForm extends CommuneBlock {
   private IBPage formResponsePage = null;
 
   public CheckRequestForm() {
-  }
-
-  public String getBundleIdentifier(){
-    return IW_BUNDLE_IDENTIFIER;
   }
 
   public void main(IWContext iwc){
@@ -89,8 +87,8 @@ public class CheckRequestForm extends CommuneBlock {
     nameTable.setCellpadding(4);
     nameTable.setColor(1,1,getBackgroundColor());
     nameTable.setColor(2,1,getBackgroundColor());
-    nameTable.add(getLocalizedSmallText("chk_last_name","Last name"),1,1);
-    nameTable.add(getLocalizedSmallText("chk_first_name","First name"),2,1);
+    nameTable.add(getLocalizedSmallText("check.last_name","Last name"),1,1);
+    nameTable.add(getLocalizedSmallText("check.first_name","First name"),2,1);
     nameTable.add(getText("Mickelin"),1,2);
     nameTable.add(getText("Henrik"),2,2);
     add(nameTable);
@@ -101,8 +99,8 @@ public class CheckRequestForm extends CommuneBlock {
     addressTable.setCellpadding(4);
     addressTable.setColor(1,1,getBackgroundColor());
     addressTable.setColor(2,1,getBackgroundColor());
-    addressTable.add(getLocalizedSmallText("chk_street","Street address"),1,1);
-    addressTable.add(getLocalizedSmallText("chk_postnumber_city","Postnumber and city"),2,1);
+    addressTable.add(getLocalizedSmallText("check.street","Street address"),1,1);
+    addressTable.add(getLocalizedSmallText("check.postnumber.city","Postnumber and city"),2,1);
     addressTable.add(getText("Odenvägen 2C"),1,2);
     addressTable.add(getText("133 38 SALTSJÖBADEN"),2,2);
     add(addressTable);
@@ -121,29 +119,35 @@ public class CheckRequestForm extends CommuneBlock {
     formTable.setCellpadding(14);
     formTable.setColor(getBackgroundColor());
 
-    formTable.add(getLocalizedHeader("chk_request_regarding","The request regards"));
+    formTable.add(getLocalizedHeader("check.request_regarding","The request regards"));
     formTable.add(new Break(2));
     Table childCareTypeTable = new Table(1,2);
     childCareTypeTable.setWidth("100%");
     childCareTypeTable.setCellspacing(0);
     childCareTypeTable.setCellpadding(4);
+
+    SchoolTypeBusiness schoolTypeBusiness = (SchoolTypeBusiness)com.idega.business.IBOLookup.getServiceInstance(iwc,SchoolTypeBusiness.class);
+    Collection childCareTypes = schoolTypeBusiness.findAllSchoolTypesInCategory(SchoolType.CHILDCARE);
+
     DropdownMenu typeChoice = new DropdownMenu(PARAM_CHILD_CARE_TYPE);
-    typeChoice.addMenuElement(1,"Förskoleverksamhet");
-    typeChoice.addMenuElement(2,"Femårsverksamhet");
-    typeChoice.addMenuElement(3,"Fritidsverksamhet");
+    Iterator iter = childCareTypes.iterator();
+    while(iter.hasNext()){
+      SchoolType st = (SchoolType)iter.next();
+      typeChoice.addMenuElement(st.getPrimaryKey().toString(),localize(st.getLocalizationKey(),st.getName()));
+    }
     childCareTypeTable.add(typeChoice,1,1);
     formTable.add(childCareTypeTable);
     formTable.add(new Break());
 
-    formTable.add(getLocalizedHeader("chk_custodians","Custodians"));
+    formTable.add(getLocalizedHeader("check.custodians","Custodians"));
     formTable.add(new Break(2));
-    Table custodianTable = new Table(4,2);
+    Table custodianTable = new Table(4,5);
     custodianTable.setWidth("100%");
     custodianTable.setCellspacing(0);
-    custodianTable.setCellpadding(4);
-    custodianTable.add(getLocalizedSmallText("chk_last_and_first_name","Last and first name"),1,1);
-    custodianTable.add(getLocalizedSmallText("chk_phone_daytime","Phone daytime"),2,1);
-    custodianTable.add(getLocalizedSmallText("chk_civil_status","Civil status"),3,1);
+    custodianTable.setCellpadding(3);
+    custodianTable.add(getLocalizedSmallText("check.last_and_first_name","Last and first name"),1,1);
+    custodianTable.add(getLocalizedSmallText("check.phone_daytime","Phone daytime"),2,1);
+    custodianTable.add(getLocalizedSmallText("check.civil_status","Civil status"),3,1);
     custodianTable.add(getText("Mickelin Maria Cecilia"),1,2);
     custodianTable.add(getText("08-633 54 67"),2,2);
     custodianTable.add(getText("Gift"),3,2);
@@ -156,18 +160,13 @@ public class CheckRequestForm extends CommuneBlock {
       workSituationChoice.setSelectedElement(paramWorkSituation1);
     }
     custodianTable.add(workSituationChoice,4,2);
-    formTable.add(custodianTable);
 
-    custodianTable = new Table(4,2);
-    custodianTable.setWidth("100%");
-    custodianTable.setCellspacing(0);
-    custodianTable.setCellpadding(4);
-    custodianTable.add(getLocalizedSmallText("chk_last_and_first_name","Last and first name"),1,1);
-    custodianTable.add(getLocalizedSmallText("chk_phone_daytime","Phone daytime"),2,1);
-    custodianTable.add(getLocalizedSmallText("chk_civil_status","Civil status"),3,1);
-    custodianTable.add(getText("Mickelin Harry"),1,2);
-    custodianTable.add(getText("0709-432133"),2,2);
-    custodianTable.add(getText("Gift"),3,2);
+    custodianTable.add(getLocalizedSmallText("check.last_and_first_name","Last and first name"),1,4);
+    custodianTable.add(getLocalizedSmallText("check.phone_daytime","Phone daytime"),2,4);
+    custodianTable.add(getLocalizedSmallText("check.civil_status","Civil status"),3,4);
+    custodianTable.add(getText("Mickelin Harry"),1,5);
+    custodianTable.add(getText("0709-432133"),2,5);
+    custodianTable.add(getText("Gift"),3,5);
     workSituationChoice = new DropdownMenu(PARAM_WORK_SITUATION_2);
     workSituationChoice.addMenuElement(1,"Arbetar");
     workSituationChoice.addMenuElement(2,"Studerar");
@@ -176,29 +175,29 @@ public class CheckRequestForm extends CommuneBlock {
     if(paramWorkSituation2!=null){
       workSituationChoice.setSelectedElement(paramWorkSituation2);
     }
-    custodianTable.add(workSituationChoice,4,2);
+    custodianTable.add(workSituationChoice,4,5);
     formTable.add(custodianTable);
     formTable.add(new Break(2));
 
-    formTable.add(getLocalizedHeader("chk_mother_tongue","Mother tongue"));
+    formTable.add(getLocalizedHeader("check.mother_tongue","Mother tongue"));
     formTable.add(new Break(2));
     Table motherTongueTable = new Table(3,2);
     motherTongueTable.setWidth("100%");
     motherTongueTable.setCellspacing(0);
     motherTongueTable.setCellpadding(4);
-    String title = localize("chk_mother_child","Mother - child");
+    String title = localize("check.mother_child","Mother - child");
     if(this.paramErrorMotherTongueMC){
       motherTongueTable.add(getSmallErrorText(title),1,1);
     }else{
       motherTongueTable.add(getSmallText(title),1,1);
     }
-    title = localize("chk_father_child","Father - child");
+    title = localize("check.father_child","Father - child");
     if(this.paramErrorMotherTongueFC){
       motherTongueTable.add(getSmallErrorText(title),2,1);
     }else{
       motherTongueTable.add(getSmallText(title),2,1);
     }
-    title = localize("chk_parents","Parents");
+    title = localize("check.parents","Parents");
     if(this.paramErrorMotherTongueP){
       motherTongueTable.add(getSmallErrorText(title),3,1);
     }else{
@@ -228,7 +227,7 @@ public class CheckRequestForm extends CommuneBlock {
     Table submitTable = new Table(1,1);
     submitTable.setWidth("100%");
     submitTable.setAlignment(1,1,"right");
-    Link submitButton = getLocalizedLink("chk_send_request","Send request");
+    Link submitButton = getLocalizedLink("check.send_request","Send request");
     submitButton.setAsImageButton(true);
     submitButton.setToFormSubmit(f);
     submitTable.add(submitButton,1,1);
@@ -261,7 +260,7 @@ public class CheckRequestForm extends CommuneBlock {
       this.paramErrorMotherTongueP = true;
     }
     if(isError){
-      this.errorMessage = localize("chk_incomplete_input","You must fill in the information marked with red text.");
+      this.errorMessage = localize("check.incomplete_input","You must fill in the information marked with red text.");
       viewForm(iwc);
       return;
     }

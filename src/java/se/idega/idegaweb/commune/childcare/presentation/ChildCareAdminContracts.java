@@ -176,12 +176,16 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		String careTime = iwc.getParameter(PARAM_HOURS);
 
 		int employmentTypeID = -1;
-		try {
-			employmentTypeID = Integer.parseInt(iwc.getParameter(PARAM_EMPLOYMENT));
+		
+		if (iwc.isParameterSet(PARAM_EMPLOYMENT)){
+			try {
+				employmentTypeID = Integer.parseInt(iwc.getParameter(PARAM_EMPLOYMENT));
+			}
+			catch (NumberFormatException nfe) {
+				employmentTypeID = -1;
+			}
 		}
-		catch (NumberFormatException nfe) {
-			employmentTypeID = -1;
-		}
+		
 
 		IWTimestamp placementDate = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
 		IWTimestamp terminationDate = null;

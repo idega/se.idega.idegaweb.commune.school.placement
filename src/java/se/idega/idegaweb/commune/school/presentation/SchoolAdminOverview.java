@@ -583,12 +583,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
 
+
             if (null != schoolClassMember) {
-				table.add(changeStudyPath, 1, row);
-				table.add(Text.getNonBrakingSpace(), 1, row);
-                iwc.setSessionAttribute
-                        (getClass () + PARAMETER_SCHOOL_CLASS_MEMBER_ID,
-                         schoolClassMember);
+                try {
+                    final String placementCategory
+                            = schoolClassMember.getSchoolType ()
+                            .getSchoolCategory ();
+                    final String highschoolCatgeory =
+                            getSchoolBusiness (iwc).getCategoryHighSchool ()
+                            .getCategory ();
+                    if (placementCategory.equals (highschoolCatgeory)) {
+                        table.add(changeStudyPath, 1, row);
+                        table.add(Text.getNonBrakingSpace(), 1, row);
+                        iwc.setSessionAttribute
+                                (getClass () + PARAMETER_SCHOOL_CLASS_MEMBER_ID,
+                                 schoolClassMember);
+                    }
+                } catch (final NullPointerException e) {
+                    logWarning ("Category error in school class member "
+                                + schoolClassMember.getPrimaryKey ());
+                    log (e);
+                }
             }
             
             if (_showOnlyOverview && _schoolClassMemberID != -1) {

@@ -57,8 +57,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/24 11:18:04 $ by $Author: goranb $
- * @version $Revision: 1.20 $
+ * Last modified: $Date: 2003/10/24 11:29:18 $ by $Author: laddi $
+ * @version $Revision: 1.21 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -170,7 +170,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private SchoolClassMember storedPlacement = null;
 
 	private int _action = -1;
-	private int _presentation = -1;
+	//private int _presentation = -1;
 
 	public void main(IWContext iwc) throws Exception {
 		iwrb = getResourceBundle(iwc);

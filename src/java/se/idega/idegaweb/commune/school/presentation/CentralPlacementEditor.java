@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/12/04 10:24:31 $ by $Author: goranb $
- * @version $Revision: 1.50 $
+ * Last modified: $Date: 2003/12/04 13:23:52 $ by $Author: goranb $
+ * @version $Revision: 1.51 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1550,8 +1550,9 @@ public class CentralPlacementEditor extends CommuneBlock {
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
 		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_RESOURCE_PERMISSION, 
 																  SchoolAdminOverview.PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN);
+		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR, "true");
 		if (plc.getRemovedDate() != null)
-		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
+			pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
 	}
 
 	private Link getPlacementHistoryButton() {

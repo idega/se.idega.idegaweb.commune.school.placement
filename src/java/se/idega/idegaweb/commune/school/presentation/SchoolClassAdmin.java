@@ -206,7 +206,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 
 		if (!students.isEmpty()) {
 			numberOfStudents = students.size();
-			Map studentMap = getBusiness().getStudentList(students);
+			Map studentMap = getCareBusiness().getStudentList(students);
 			Collections.sort(students, new SchoolClassMemberComparator(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = students.iterator();
 			while (iter.hasNext()) {

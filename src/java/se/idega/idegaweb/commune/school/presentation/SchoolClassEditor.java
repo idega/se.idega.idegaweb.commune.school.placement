@@ -820,7 +820,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
-			Map studentMap = getBusiness().getStudentList(formerStudents);
+			Map studentMap = getCareBusiness().getStudentList(formerStudents);
 
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSchoolSeasonID());
 			Collections.sort(formerStudents, new SchoolClassMemberComparator(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
@@ -1046,7 +1046,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
-			Map studentMap = getBusiness().getStudentList(formerStudents);
+			Map studentMap = getCareBusiness().getStudentList(formerStudents);
 			Collections.sort(formerStudents, new SchoolClassMemberComparator(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {

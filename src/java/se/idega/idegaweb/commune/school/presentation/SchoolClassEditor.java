@@ -900,6 +900,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				move = new Link(getEditIcon(localize("school.move_to_another_group", "Move this student to another group")));
 				move.setWindowToOpen(SchoolAdminWindow.class);
 				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
+				move.setParameter(getSchoolCommuneSession(iwc).getParameterSchoolClassID(), String.valueOf(studentMember.getSchoolClassId()));
 				move.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
 				move.setParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 

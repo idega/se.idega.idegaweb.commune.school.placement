@@ -146,7 +146,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 			submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
 			submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 			SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
-			submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
+			view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 			table.add(method, 1, 11);
 			table.add(submit, 1, 11);
 			table.add(Text.NON_BREAKING_SPACE,1,11);
@@ -320,6 +320,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				if (getBusiness().hasChosenOtherSchool((Collection)studentChoices.get(new Integer(studentMember.getClassMemberId())), getSession().getSchoolID())) {
 					checkBox.setDisabled(true);
 					table.setRowColor(row, "#FF3333");
+					link.setParameter(SchoolAdminOverview.PARAMETER_CHOICE_ID, String.valueOf(getBusiness().getChosenSchoolID((Collection)studentChoices.get(new Integer(studentMember.getClassMemberId())))));
 				}
 				else {
 					if (row % 2 == 0)
@@ -364,8 +365,9 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		table.setColumns(5);
+		table.setColumns(6);
 		table.setWidth(5,"12");
+		table.setWidth(6,"12");
 
 		int row = 1;
 		table.add(getSmallHeader(localize("school.name", "Name")), 1, row);
@@ -380,6 +382,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 		SchoolClassMember studentMember;
 		SchoolClass schoolClass = null;
 		SubmitButton delete;
+		Link move;
 
 		List formerStudents = new Vector(getBusiness().getSchoolClassMemberBusiness().findStudentsInClass(getSchoolClassID()));
 
@@ -396,7 +399,11 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				delete.setDescription(localize("school.delete_from_group","Click to remove student from group"));
 				delete.setValueOnClick(PARAMETER_APPLICANT_ID, String.valueOf(studentMember.getClassMemberId()));
 				delete.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE));
-
+				move = new Link(getEditIcon(localize("school.move_to_another_group","Move this student to another group")));
+				move.setWindowToOpen(SchoolAdminWindow.class);
+				move.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_MOVE_GROUP));
+				move.setParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(studentMember.getClassMemberId()));
+				
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
@@ -407,7 +414,8 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 					table.add(getSmallText(address.getStreetAddress()), 3, row);
 				if (schoolClass != null)
 					table.add(getSmallText(schoolClass.getName()), 4, row);
-				table.add(delete, 5, row++);
+				table.add(move, 5, row);
+				table.add(delete, 6, row++);
 			}
 		}
 

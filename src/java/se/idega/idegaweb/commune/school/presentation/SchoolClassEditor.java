@@ -192,7 +192,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				}
 			}
 
-			if (getSchoolYearID() != -1 && getSchoolClassID() != -1) {
+			if (getSchoolClassID() != -1) {
 				HiddenInput method = new HiddenInput(PARAMETER_METHOD, "0");
 				SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
 				submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));

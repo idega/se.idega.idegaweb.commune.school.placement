@@ -35,6 +35,7 @@ import com.idega.core.location.data.Commune;
 import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Table;
@@ -1089,7 +1090,7 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 	private Link getChoicesXLSLink(Class classToUse, Image image) throws RemoteException {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
-		link.addParameter(SchoolChoiceWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
+		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
 		link.addParameter(SchoolChoiceWriter.prmSchoolId, getSession().getSchoolID());
 		link.addParameter(SchoolChoiceWriter.prmSeasonId, getSession().getSchoolSeasonID());
 		return link;

@@ -22,6 +22,7 @@ import se.idega.idegaweb.commune.care.resource.data.Resource;
 import se.idega.idegaweb.commune.care.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.care.resource.data.ResourcePermission;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
+import se.idega.idegaweb.commune.school.accounting.business.PlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneSession;
@@ -1945,7 +1946,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	private void reject(IWContext iwc) throws RemoteException {
 		String messageHeader = localize("school.reject_message_header", "School choice rejected.");
 		String messageBody = iwc.getParameter(PARAMETER_REJECT_MESSAGE);
-		getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().rejectApplication(_choiceID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), iwc.getCurrentUser(), messageHeader, messageBody);
+		getPlacementBusiness(iwc).rejectApplication(_choiceID, getSchoolCommuneSession(iwc).getSchoolSeasonID(), iwc.getCurrentUser(), messageHeader, messageBody);
 
 		if (iwc.isParameterSet(PARAMETER_SET_AS_DEFAULT)) {
 			try {
@@ -2355,6 +2356,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 	 }
 	 }
 	 }*/
+	
+	
+	private PlacementBusiness getPlacementBusiness(IWContext iwc) throws RemoteException {
+		return (PlacementBusiness) IBOLookup.getServiceInstance(iwc, PlacementBusiness.class);
+	}
+
 	
 	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) throws RemoteException {
 		return (CentralPlacementBusiness) IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);

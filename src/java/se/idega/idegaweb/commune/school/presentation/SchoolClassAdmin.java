@@ -176,6 +176,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 		Link move;
 		Link link;
 		int numberOfStudents = 0;
+		boolean hasChoice = false;
+		boolean hasMoveChoice = false;
 
 		List students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClass(getSchoolClassID()));
 
@@ -189,6 +191,8 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				schoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(studentMember.getSchoolClassId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
+				hasChoice = getBusiness().hasChoiceToThisSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
+				hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 				
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")),"delete_student_"+String.valueOf(new Integer(studentMember.getClassMemberId())));
 				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
@@ -207,8 +211,11 @@ public class SchoolClassAdmin extends SchoolCommuneBlock {
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
 					name = student.getName();
 
-				if (getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID())) {
-					table.setRowColor(row, "#FFEAEA");
+				if (hasChoice || hasMoveChoice) {
+					if (hasChoice)
+						table.setRowColor(row, "#EAFFEE");
+					if (hasMoveChoice)
+						table.setRowColor(row, "#FFEAEA");
 				}
 				else {
 					if (row % 2 == 0)

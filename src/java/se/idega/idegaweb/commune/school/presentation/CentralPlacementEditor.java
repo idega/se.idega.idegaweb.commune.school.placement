@@ -78,8 +78,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/11/21 11:20:45 $ by $Author: goranb $
- * @version $Revision: 1.44 $
+ * Last modified: $Date: 2003/11/24 20:06:54 $ by $Author: goranb $
+ * @version $Revision: 1.45 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -207,6 +207,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private Form form;
 	private Table mainTable;
 	private int mainTableRow;
+	private String mainRowHeight  = null;
 	private User child;
 	private String uniqueUserSearchParam;
 	private Image transGIF = new Image(PATH_TRANS_GIF);
@@ -317,6 +318,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setBorder(0);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
+		String rowHeight = "25";
 
 		int col = 1;
 		int row = 1;
@@ -329,8 +331,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		Text pupilTxt = new Text(localize(KEY_SEARCH_PUPIL_HEADING, "Search pupil"));
 		pupilTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
 		table.add(pupilTxt, col++, row);
-		table.setRowHeight(row, "20");
-		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		table.setRowHeight(row, rowHeight);
+		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		col = 1;
 		row++;
 		// User search module - configure and add 
@@ -348,7 +350,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
 		transGIF.setWidth("1");
-
+		String rowHeight = "20";
+		
+		if (mainRowHeight != null)
+			rowHeight = mainRowHeight;
+			
 		int row = 1;
 		int col = 1;
 		// add empty space row
@@ -363,7 +369,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//table.setWidth(3, row, "70");
 		//table.setWidth(4, row, "70");
 		//table.setWidth(5, row, "104");
-
+		table.setRowHeight(row, "1");
+		
 		row++;
 		col = 1;
 
@@ -371,8 +378,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		Text pupilTxt = new Text(localize(KEY_PUPIL_HEADING, "Pupil"));
 		pupilTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
 		table.add(pupilTxt, col++, row);
-		table.setRowHeight(row, "20");
-		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		table.setRowHeight(row, rowHeight);
+		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 
 		// BUTTON Search new child 
 		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_SEARCH, "Search"),
@@ -384,6 +391,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getSmallHeader(localize(KEY_PERSONAL_ID_LABEL, "Personal id: ")), col++, row);
 		if (child != null)
 			table.add(getSmallText(child.getPersonalID()), col++, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		// Last Name
@@ -404,11 +412,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 		nameTable.setWidth(3, 1, "100");
 		table.add(nameTable, 2, row);
 		table.mergeCells(2, row, 5, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 
 		// Address and Phone
 		table.add(getSmallHeader(localize(KEY_ADDRESS_LABEL, "Address: ")), col++, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_PHONE_LABEL, "Phone: ")), col++, row);
@@ -454,7 +464,11 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
 		transGIF.setWidth("1");
+		String rowHeight = "20";
 
+		if (mainRowHeight != null)
+			rowHeight = mainRowHeight;
+		
 		int row = 1;
 		int col = 1;
 		// add empty space row
@@ -462,14 +476,14 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(transGIF, col++, row);
 		table.add(transGIF, col++, row);
 		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
+		table.add(transGIF, col++, row); 
 		// Set COLUMN WIDTH for column 1 to 5
 		table.setWidth(1, row, "100");
-		//table.setWidth(2, row, "100");
+		table.setWidth(2, row, "100");
 		//table.setWidth(3, row, "70");
 		//table.setWidth(4, row, "70");
 		//table.setWidth(5, row, "104");
-
+		table.setRowHeight(row, rowHeight);		
 		row++;
 		col = 1;
 
@@ -478,17 +492,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 			new Text(localize(KEY_LATEST_PLACEMENT_HEADING, "Latest placement"));
 		latestPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
 		table.add(latestPlacementTxt, col, row);
-		table.setRowHeight(row, "20");
-		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		table.setRowHeight(row, rowHeight);
+		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		table.mergeCells(col, row, col+1, row);	
+
 		// BUTTON Placement history 
 		col = 5;
-		/*table.add(new SubmitButton(iwrb.getLocalizedImageButton(
-												KEY_BUTTON_PLACEMENT_HISTORY, "Placement history")), col, row);*/
 		table.add(getPlacementHistoryButton(), col, row);
-		
-						//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5,row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		// School type
@@ -498,20 +510,18 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(pupilOverviewLinkButton, 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setRowHeight(row, rowHeight);
 		
 		row++;
 		col = 1;
 		// Placement
 		table.add(getSmallHeader(localize(KEY_PLACEMENT_LABEL, "Placement: ")), col, row);
-		// BUTTON Regular payment
-		/*Link regPaymentButton = getRegularPaymentTopButton(iwc);
-		table.add(regPaymentButton, 5, row);
-		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		*/
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		// Resources
 		table.add(getSmallHeader(localize(KEY_RESOURCES_LABEL, "Resources: ")), col, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;		
 		// Contract
@@ -519,10 +529,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		// BUTTON Contract history 
 		table.add(getContractHistoryButton(), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_STARTDATE_LABEL, "Start date: ")), col, row);
 		table.add(getSmallHeader(localize(KEY_ENDDATE_LABEL, "End date: ")), col+2, row);
+		table.setRowHeight(row, rowHeight);
 
 		// VALUES - Latest placement
 		if (child != null) {
@@ -587,8 +599,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 					}
 					row++;
 					col = 2;
+					// Start date
 					table.add(getSmallText(getDateString(latestPl.getRegisterDate())), col, row);
-					table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col+2, row);					
+					col = 4;
+					// End date
+					if (latestPl.getRemovedDate() != null)
+						table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col, row);					
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -623,6 +639,10 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.setCellspacing(0);
 		transGIF.setHeight("1");
 		transGIF.setWidth("1");
+		String rowHeight = "20";
+
+		if (mainRowHeight != null)
+			rowHeight = mainRowHeight;
 
 		int row = 1;
 		int col = 1;
@@ -638,13 +658,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		//table.setWidth(3, row, "70");
 		//table.setWidth(4, row, "70");
 		//table.setWidth(5, row, "104");
+		table.setRowHeight(row, rowHeight);
 
-		/*String cat = iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED);
-		String pro = iwc.getParameter(PARAM_PROVIDER_CHANGED);
-		String typ = iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED);
-		String yer = iwc.getParameter(PARAM_SCHOOL_YEAR_CHANGED);
-		*/
-		
 		// Hidden inputs
 		table.add(new HiddenInput(PARAM_SCHOOL_CATEGORY_CHANGED, "-1"), 1, 1);
 		table.add(new HiddenInput(PARAM_PROVIDER_CHANGED, "-1"), 1, 1);
@@ -658,8 +673,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		Text newPlacementTxt = new Text(localize(KEY_NEW_PLACEMENT_HEADING, "New placement"));
 		newPlacementTxt.setFontStyle(STYLE_UNDERLINED_SMALL_HEADER);
 		table.add(newPlacementTxt, col++, row);
-		table.setRowHeight(row, "20");
-		table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
+		table.setRowHeight(row, rowHeight);
+		//table.setRowVerticalAlignment(row, Table.VERTICAL_ALIGN_BOTTOM);
 		row++;
 		col = 1;
 		
@@ -668,6 +683,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 																																, col++, row);
 		table.add(getSchoolCategoriesDropdown(iwc), col, row);
 		table.mergeCells(col, row, col+1, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		
@@ -676,27 +692,26 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getProvidersDropdown(iwc), col, row);
 		table.mergeCells(col, row, col+1, row);
 			// New Provider BUTTON
-		//Link tmpLink = new Link(getSmallText(localize(KEY_BUTTON_NEW_PROVIDER, "New provider")));
-		//tmpLink.setAsImageButton(true);
-		//tmpLink.setWindowToOpen(ProviderAdminWindow.class);
-		//Link mtdLink = getProviderEditorButton();
 		table.add(getProviderEditorButton(), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
-		//table.add(tmpLink, 5, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_ADDRESS_LABEL, "Address: ")), col++, row);
+		table.setRowHeight(row, rowHeight);
 		col++; col++;
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_PHONE_LABEL, "Phone: ")), col++, row);
 		table.add(getSmallHeader(localize(KEY_COMMUNE_LABEL, "Commune: ")), ++col, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		table.add(getSmallHeader(localize(KEY_ADMIN_LABEL, "Administration: ")), col++, row);
 		// Compensation by invoice
 		table.add(getSmallHeader(localize(KEY_PAYMENT_BY_INVOICE_LABEL, "Payment by invoice: ")),
 																																	++col, row);
+		table.setRowHeight(row, rowHeight);
 
 		// Provider values		
 		if (storedPlacement == null && iwc.isParameterSet(PARAM_PROVIDER) 
@@ -722,7 +737,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 				col++; col++;
 				
 				// Commune value
-				table.add(getCommuneName(school), col, row);
+				table.add(getSmallText(getCommuneName(school)), col, row);
 				table.mergeCells(col, row, col+1, row);
 				row++;
 				col = 2;
@@ -743,10 +758,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 			}
 		}
 
-		row++;
+/*		row++;
 		col = 2;
 		table.add(transGIF, col, row); // EMPTY SPACE ROW
 		table.setRowHeight(row, "10");
+*/
+
 		row++;
 		col = 1;
 		//  input
@@ -758,6 +775,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getPlacementParagraphTextInput(iwc), col, row);
 		table.mergeCells(col, row, col+1, row);
 		table.setAlignment(col, row, Table.HORIZONTAL_ALIGN_LEFT);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		// School Year input
@@ -770,6 +788,7 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getGroupEditorButton(iwc), 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		// Study Path input
@@ -777,10 +796,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 		table.add(getStudyPathsDropdown(iwc), col++, row);
 		row++;
 		col = 1;
-		table.add(transGIF, col, row); // EMPTY SPACE ROW
+		
+	/*	table.add(transGIF, col, row); // EMPTY SPACE ROW
 		table.setRowHeight(row, "10");
 		row++;
 		col = 1;
+*/
 		// Resource
 		table.add(getSmallHeader(localize(KEY_RESOURCE_LABEL, "Resource: ")), col++, row);
 		//  Resource input checkboxes
@@ -822,48 +843,59 @@ public class CentralPlacementEditor extends CommuneBlock {
 					cBox.setChecked(isChecked);
 					table.add(cBox, col++, row);
 					table.add(getSmallText(rsc.getResourceName()), col++, row);
+					table.setRowHeight(row, rowHeight);
 					row++;
 				}
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
 		}
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 
-		table.add(transGIF, col, row); // EMPTY SPACE ROW
-		table.setRowHeight(row, "10");
+/*		table.add(transGIF, col, row); // EMPTY SPACE ROW
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
-		
+*/		
 		// Latest invoice date
 		table.add(getSmallHeader(localize(KEY_LATEST_INVOICE_DATE_LABEL, "Latest invoice date")), 
 																																col++, row);
 		table.add(getLatestInvoiceDateInput(iwc), col, row);
 		table.mergeCells(col, row, col+2, row);
+		table.setRowHeight(row, rowHeight);
 
 		row++;
-		col = 1;		
+		col = 1;
+				
 		// START row table
-		Table rowTable = new Table();
+		Table rowTable = new Table(5, 1);
 		rowTable.setCellpadding(0);
 		rowTable.setCellspacing(0);
 		int tmpRow = 1;
 		int tmpCol = 1;
 		rowTable.setBorder(0);
 		
-		// Payment by agreement
+		// 1 Payment by agreement
 		rowTable.add(
 			getSmallHeader(localize(KEY_PAYMENT_BY_AGREEMENT_LABEL, "Payment by agreement: ")),
-			tmpCol++, tmpRow);
+			tmpCol, tmpRow);
+		rowTable.setWidth(tmpCol, tmpRow, "137");
+		tmpCol++; // 2
 		rowTable.add(getPaymentByAgreementDropdown(iwc, PARAM_PAYMENT_BY_AGREEMENT)
 																														, tmpCol, tmpRow);
-		rowTable.setWidth(tmpCol++, tmpRow, 100);
+		rowTable.setWidth(tmpCol, tmpRow, 70);
+		rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_CENTER);
+		tmpCol++; // 3
 		// Invoice interval
 		rowTable.add(getSmallHeader(localize(KEY_INVOICE_INTERVAL_LABEL, "Invoice interval: ")),
-																													tmpCol++, tmpRow);
-		rowTable.add(getInvoiceIntervalDropdown(iwc), tmpCol++, tmpRow);
-		
+																													tmpCol, tmpRow);
+		tmpCol++; // 4
+		rowTable.add(getInvoiceIntervalDropdown(iwc), tmpCol, tmpRow);
+		rowTable.setWidth(tmpCol, tmpRow, 90);
+		rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_CENTER);
+		tmpCol++; // 5		
 		// BUTTON Regular payment for New Placement					
 		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
 				&& !("-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY)))) {
@@ -871,10 +903,12 @@ public class CentralPlacementEditor extends CommuneBlock {
 			rowTable.setAlignment(tmpCol, tmpRow, Table.HORIZONTAL_ALIGN_RIGHT);
 			rowTable.setWidthAndHeightToHundredPercent();
 		}
+
 		// END row table
 
 		table.add(rowTable, col, row);
 		table.mergeCells(col, row, col + 4, row);
+		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
 		
@@ -883,13 +917,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 			getSmallHeader(localize(KEY_PLACEMENT_DATE_LABEL, "Placement date: ")), col++, row);
 		table.add(getPlacementDateInput(iwc), col, row);
 		table.mergeCells(col, row, col + 2, row);
+		table.setRowHeight(row, rowHeight);
 		col = 1;
 		row++;
 
 		// empty space row
 		Image trans1 = (Image) transGIF.clone();
 		table.add(trans1, col, row);
-
+		table.setRowHeight(row, rowHeight);
+		
 		col = 1;
 		row++;		
 		// BOTTOM BUTTONS
@@ -899,8 +935,13 @@ public class CentralPlacementEditor extends CommuneBlock {
 			// Cancel		
 		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel"),
 						PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), col++, row);
-
-
+		col = 1;
+		row++;		
+		
+		// empty space row
+		table.add(trans1, col, row);
+		table.setRowHeight(row, rowHeight);
+		
 		return table;
 	}
 	

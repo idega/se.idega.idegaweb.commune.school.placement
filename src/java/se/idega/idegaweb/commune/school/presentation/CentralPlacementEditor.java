@@ -27,6 +27,7 @@ import se.idega.idegaweb.commune.care.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.message.business.MessageBusiness;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
+import se.idega.idegaweb.commune.school.accounting.business.PlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
 import se.idega.idegaweb.commune.school.business.CentralPlacementException;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
@@ -78,8 +79,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/15 10:19:46 $ by $Author: thomas $
- * @version $Revision: 1.89 $
+ * Last modified: $Date: 2004/10/15 14:45:12 $ by $Author: thomas $
+ * @version $Revision: 1.90 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -1984,7 +1985,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		if (child != null)
 			childID = ((Integer) child.getPrimaryKey()).intValue();
 		try {
-			mbr = getCentralPlacementBusiness(iwc).storeSchoolClassMember(iwc, childID);			
+			mbr = getPlacementBusiness(iwc).storeSchoolClassMember(iwc, childID);			
 			sendEndedPlacementMessageToProvider(iwc);
 		} catch (CentralPlacementException cpe) {
 			errMsgMid = localize(cpe.getKey(), cpe.getDefTrans());
@@ -2148,11 +2149,12 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		}
 	}
 
+	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) throws RemoteException {
+		return (CentralPlacementBusiness) IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
+	}
 	
-	private CentralPlacementBusiness getCentralPlacementBusiness(IWContext iwc) 
-																										throws RemoteException {
-		return (CentralPlacementBusiness) 
-											IBOLookup.getServiceInstance(iwc, CentralPlacementBusiness.class);
+	private PlacementBusiness getPlacementBusiness(IWContext iwc) throws RemoteException {
+		return (PlacementBusiness) IBOLookup.getServiceInstance(iwc, PlacementBusiness.class);
 	}
 
 
@@ -2169,13 +2171,6 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		return (SchoolChoiceBusiness) IBOLookup.getServiceInstance(iwc, SchoolChoiceBusiness.class);
 	}
 
-/*	private SchoolCommuneBusiness getSchoolCommuneBusiness(IWContext iwc) 
-																										throws RemoteException {
-		return (SchoolCommuneBusiness) IBOLookup.getServiceInstance(iwc, 
-																								SchoolCommuneBusiness.class);
-	}
-*/
-	
 	public ChildCareContractHome getChildCareContractHome() {
 		try {
 			return (ChildCareContractHome) IDOLookup.getHome(ChildCareContract.class);

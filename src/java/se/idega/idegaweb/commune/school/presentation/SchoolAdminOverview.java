@@ -43,8 +43,10 @@ import com.idega.business.IBOLookup;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.localisation.data.ICLanguage;
+import com.idega.core.localisation.data.ICLanguageHome;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
+import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -103,7 +105,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final String PARAMETER_SHOW_ONLY_OVERVIEW = "sch_show_only_overview";
 	public static final String PARAMETER_USER_ID = "sch_user_id";
 	public static final String PARAMETER_SET_AS_DEFAULT = "rem_rej_m";
+	public static final String PARAMETER_NATIVE_LANG = "sch_native_lang";
 
+	public static final String PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR = "from_central_placement_editor";
 	public static final String PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN = "resource_perm_central_admin";
 	public static final Integer VIEW_ALL_RESOURCES_GRP_ID = new Integer("-7");
 	
@@ -121,6 +125,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int METHOD_NEW_RESOURCE = 12;
 	public static final int METHOD_FINISH_RESOURCE = 13;
 	public static final int METHOD_CHANGE_STUDY_PATH = 14;
+	public static final int METHOD_NATIVE_LANG_FORM = 15;
 
 	public static final int ACTION_REJECT = 1;
 	public static final int ACTION_REPLACE = 2;
@@ -136,6 +141,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 	public static final int ACTION_DELETE_RESOURCE = 12;
 	public static final int ACTION_FINISH_RESOURCE = 13;
 	public static final int ACTION_CHANGE_STUDY_PATH = 14;
+	public static final int ACTION_SAVE_NATIVE_LANGUAGE = 15;
 
 	private static final String PARAMETER_REJECT_MESSAGE = "sch_admin_reject_message";
 	private static final String PARAMETER_REPLACE_MESSAGE = "sch_admin_replace_message";
@@ -160,7 +166,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 	//private boolean _move = true;
 	private boolean _showOnlyOverview = false;
 	private boolean _showNoChoices = false;
-	private boolean viewAllResources = false;
+	private boolean _viewAllResources = false;
+	private boolean _fromCentralPlacementEditor = false;
 
 	private CloseButton close;
 	private String searchString;
@@ -223,6 +230,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 			case ACTION_CHANGE_STUDY_PATH :
 				changeStudyPath(iwc);
 				break;
+			case ACTION_SAVE_NATIVE_LANGUAGE :
+				saveNativeLanguage(iwc);
+				break;
 		}
 
 		if (_method != -1)
@@ -236,6 +246,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 		form.maintainParameter(PARAMETER_PAGE_ID);
 		form.maintainParameter(PARAMETER_SCHOOL_CLASS_MEMBER_ID);
 		form.maintainParameter(PARAMETER_RESOURCE_PERMISSION);
+		form.maintainParameter(PARAMETER_SHOW_NO_CHOICES);
+		form.maintainParameter(PARAMETER_SHOW_ONLY_OVERVIEW);
+		form.maintainParameter(PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR);
 		form.setStyleAttribute("height:100%");
 
 		Table table = new Table(3, 5);
@@ -322,6 +335,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 				headerTable.add(getHeader(localize("school.change_study_path", "Change Study Path")), 1, 1);
 				contentTable.add(getChangeStudyPathForm(iwc), 1, 1);
 				break;
+			case METHOD_NATIVE_LANG_FORM :
+				headerTable.add(getHeader(localize("school.native_language", "Native language")), 1, 1);
+				contentTable.add(getNativeLanguageForm(iwc), 1, 1);
 		}
 
 		add(form);
@@ -548,7 +564,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 					boolean providerViewRights = (perm != null && perm.getPermitViewResource());
 					
 					// Show resource according to permissions					
-					if (viewAllResources || providerViewRights){
+					if (_viewAllResources || providerViewRights){
 						Date startDate = mbr.getStartDate();
 						Date endDate = mbr.getEndDate();
 						// Build resource name date String
@@ -584,7 +600,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton changePlacementDate = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.change_placment_date", "Change placement date"), PARAMETER_METHOD, String.valueOf(METHOD_CHANGE_PLACEMENT_DATE)));
 			PrintButton print = (PrintButton) getStyledInterface(new PrintButton(localize("school.print", "Print")));
 			SubmitButton resources = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.resources", "Resources"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
-
+			SubmitButton nativeLangButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.native_language", "Native language"), PARAMETER_METHOD, String.valueOf(METHOD_NATIVE_LANG_FORM)));
+			
 			if (_schoolID != -1 && !_showOnlyOverview) {
 				table.add(replace, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
@@ -627,6 +644,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(resources, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
+			
+			if (_showOnlyOverview) {
+				table.add(nativeLangButton, 1, row);
+				table.add(Text.getNonBrakingSpace(), 1, row);
+			}
 
 			if (showChangePlacementDate) {
 				table.add(changePlacementDate, 1, row);
@@ -640,7 +662,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 			table.add(print, 1, row);
 			table.add(Text.getNonBrakingSpace(), 1, row);
-			table.add(close, 1, row);
+			
+			// If Overview is used from central_placement_editor no close button should be visible
+			if (!_fromCentralPlacementEditor)
+				table.add(close, 1, row);
 		}
 
 		return table;
@@ -1173,11 +1198,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setHeight(Table.HUNDRED_PERCENT);
 
 		// Create Header row
-		table.setWidth(1, "70");
-		table.setWidth(2, "70");
-		table.setWidth(3, "70");
-		table.setWidth(4, "20");
-		table.setWidth(5, "20");
+		table.setWidth(1, "150");
+		table.setWidth(2, "90");
+		table.setWidth(3, "90");
+		table.setWidth(4, "120");
+		table.setWidth(5, "50");
 		table.add(getSmallHeader(localize("school.resource", "Resource")), 1, 1);
 		table.add(getSmallHeader(localize("school.startdate", "Startdate")), 2, 1);
 		table.add(getSmallHeader(localize("school.enddate", "Enddate")), 3, 1);
@@ -1212,7 +1237,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			boolean hasProviderRights = (perm != null && perm.getPermitViewResource());
 			
 			// Show all resources according to permissions
-			if (viewAllResources || hasProviderRights) {				
+			if (_viewAllResources || hasProviderRights) {				
 				// Row buttons
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_resource_placement", "Click to remove resource placement from student")), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES));
 				delete.setDescription(localize("school.delete_resource_placement", "Click to remove resource placement from student"));
@@ -1245,18 +1270,28 @@ public class SchoolAdminOverview extends CommuneBlock {
 				row++;
 			}
 		}
+		// Add space row
+		table.add(Text.NON_BREAKING_SPACE, 1, row);
+		row++;	
+		
 		SubmitButton newButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("sch.button.new", "New"), PARAMETER_METHOD, String.valueOf(METHOD_NEW_RESOURCE)));
 		SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
-		backButton.setValueOnClick(PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		//backButton.setValueOnClick(PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 
 		table.add(newButton, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
 		table.add(backButton, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
-		table.add(close, 1, row++);
+		
+		if (!_fromCentralPlacementEditor) {
+			table.add(close, 1, row);
+		}
+		
+		table.mergeCells(1, row, table.getColumns(), row);
+		row++;
 		// Last transparent row to fill up the page
 		table.addText(Text.NON_BREAKING_SPACE, 1, row);
-		table.mergeCells(1, row, 5, row);
+		table.mergeCells(1, row, table.getColumns(), row);
 		table.setRowHeight(row, "100%");
 
 		return table;
@@ -1309,18 +1344,20 @@ public class SchoolAdminOverview extends CommuneBlock {
 		// *** Button row ***
 		SubmitButton addButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.add", "Add"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
 		addButton.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE_RESOURCE));
-		addButton.setValueOnClick(PARAMETER_SHOW_ONLY_OVERVIEW, "true");
+		//addButton.setValueOnClick(PARAMETER_SHOW_ONLY_OVERVIEW, "true");
 		table.add(addButton, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
 
 		SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
 		table.add(backButton, 1, row);
 		table.add(Text.getNonBrakingSpace(), 1, row);
-
-		table.add(close, 1, row);
+		
+		if (!_fromCentralPlacementEditor) {
+			table.add(close, 1, row);
+		}
 		table.mergeCells(1, row, 3, row++);
 
-		table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, ""), 1, row);
+		//table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, ""), 1, row);
 		table.add(new HiddenInput(PARAMETER_ACTION, "-1"), 1, row);
 
 		// *** Bottom&Right table space ***
@@ -1336,7 +1373,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
-	private Table getFinishResourceForm(IWContext iwc) throws RemoteException {
+	private Table getFinishResourceForm(IWContext iwc) {
 		Table table = new Table();
 		table.setBorder(0);
 		table.setCellpadding(1);
@@ -1409,6 +1446,77 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
+	private Table getNativeLanguageForm(IWContext iwc) {
+		Table table = new Table();
+		table.setBorder(0);
+		table.setCellpadding(1);
+		table.setCellspacing(2);
+
+		int row = 1;
+		
+		// *** Native language ***
+		table.add(getSmallHeader(localize("school.native_language", "Native language")), 1, row);
+		table.add(getNativeLanguagesDropdown(iwc), 2, row);
+		row++;
+		table.add(Text.getNonBrakingSpace(), 1, row);
+		row++;
+		
+		// *** Button row ***
+		SubmitButton setButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.set", "Set"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+		table.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(ACTION_SAVE_NATIVE_LANGUAGE)), 1, row);
+		table.add(setButton, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
+
+		SubmitButton backButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.button.back", "Back"), PARAMETER_METHOD, String.valueOf(METHOD_OVERVIEW)));
+		backButton.setValueOnClick(PARAMETER_ACTION, "-1");
+		table.add(backButton, 1, row);
+		table.add(Text.getNonBrakingSpace(), 1, row);
+		
+		row++;
+		// *** Bottom&Right table space ***
+		table.setWidth(Table.HUNDRED_PERCENT);
+		table.setHeight(Table.HUNDRED_PERCENT);
+		// Last transparent column to fill up the page
+		table.addText(Text.NON_BREAKING_SPACE, 3, 1);
+		// Last transparent row to fill up the page
+		table.addText(Text.NON_BREAKING_SPACE, 1, row);
+		table.mergeCells(1, row, 3, row);
+		table.setRowHeight(row, "100%");
+
+		return table;
+	}
+	
+	private DropdownMenu getNativeLanguagesDropdown(IWContext iwc) {
+		DropdownMenu drop = new DropdownMenu(PARAMETER_NATIVE_LANG);
+		drop.addMenuElement("-1", localize("school.drp_chose_native_lang", "- Chose languge -"));
+		try {
+			ICLanguageHome lHome = (ICLanguageHome) IDOLookup.getHome(ICLanguage.class);
+			Collection langs = lHome.findAll();
+			if (langs != null) {
+				for (Iterator iter = langs.iterator(); iter.hasNext();) {
+					ICLanguage aLang = (ICLanguage) iter.next();
+					int langPK = ((Integer) aLang.getPrimaryKey()).intValue();
+					drop.addMenuElement(langPK, aLang.getName());					
+				}
+			}
+			
+			// Set selected lang if pupil has chosen one
+			User pupil = getUserBusiness(iwc).getUser(_userID);
+			ICLanguage lang = pupil.getNativeLanguage();
+			if (lang != null) {
+			 	Integer langPK = (Integer) lang.getPrimaryKey();
+			 	int langID = langPK.intValue();
+			 	drop.setSelectedElement(langID);
+			}
+		} catch (RemoteException re) {
+			re.printStackTrace();
+		} catch (FinderException fe) {
+			
+		}	
+		return drop;		
+	}
+	
+	
 	protected Table getNavigationTable(IWContext iwc, String heading) throws RemoteException {
 		Table table = new Table(7, 1);
 		table.setCellpadding(0);
@@ -1698,8 +1806,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 		
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_PERMISSION) 
 				&& iwc.getParameter(PARAMETER_RESOURCE_PERMISSION).equals(PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN))
-			viewAllResources = true;
-			
+			_viewAllResources = true;
+		
+		if (iwc.isParameterSet(PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR)) {
+			if ("true".equals(iwc.getParameter(PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR))) {
+				_fromCentralPlacementEditor = true;
+			}
+		}
 	}
 
 	protected DropdownMenu getSchoolYears(IWContext iwc) throws RemoteException {
@@ -1792,7 +1905,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		int classMemberId = 0;
 		classMemberId = _schoolClassMemberID;
 		if (providerGrpId != null && classMemberId != 0) {
-			if (viewAllResources)
+			if (_viewAllResources)
 				// central administration is using this block, and has permission to see all resources
 				rscColl = getResourceBusiness(iwc).getAssignableResourcesForPlacement(VIEW_ALL_RESOURCES_GRP_ID, new Integer(classMemberId));
 			else
@@ -1809,7 +1922,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return DD;
 	}
 
-	private String saveResource(IWContext iwc) throws RemoteException, FinderException {
+	private String saveResource(IWContext iwc) throws RemoteException {
 		int rscID = -1;
 		String errMsg = null;
 
@@ -1861,6 +1974,18 @@ public class SchoolAdminOverview extends CommuneBlock {
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void saveNativeLanguage(IWContext iwc) throws RemoteException {
+		if (_userID != -1) {
+			User pupil = getUserBusiness(iwc).getUser(_userID);
+			if (iwc.isParameterSet(PARAMETER_NATIVE_LANG)) {
+				String nLangIdStr = iwc.getParameter(PARAMETER_NATIVE_LANG);
+				int langID = Integer.parseInt(nLangIdStr);
+				pupil.setNativeLanguage(langID);
+				pupil.store();
 			}
 		}
 	}

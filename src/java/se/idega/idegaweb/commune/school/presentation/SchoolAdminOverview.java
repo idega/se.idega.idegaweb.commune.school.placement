@@ -485,7 +485,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 							String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice.getCaseStatus(), iwc.getCurrentLocale()) + ")";
 							
 							try {
-								schClMem =  getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByUserAndSchool(_userID, ((Integer) school.getPrimaryKey()).intValue());	
+								schClMem =  getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolClassMemberHome().findByUserAndSchoolAndSeason(_userID, ((Integer) school.getPrimaryKey()).intValue(), getSchoolCommuneSession(iwc).getSchoolSeasonID());	
 							}
 							catch (FinderException fe){
 								
@@ -496,7 +496,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 								if (pendingSchoolId == -1)
 									pendingSchoolId = choice.getChosenSchoolId();
 								//							table.add("gimmi flippari ", 2, row);
-								if (choice.getStatus().equalsIgnoreCase("PLAC")){
+								if (choice.getStatus().equalsIgnoreCase("PLAC") && schClMem != null){
 									//string = string + "&nbsp;&nbsp;" + schClMem.getSchoolYear().getName();
 									string = string + "&nbsp;&nbsp;" + schClMem.getSchoolClass().getName();
 									

@@ -1408,6 +1408,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		table.add(getSmallText(iwc.getParameter(PARAMETER_RESOURCE_NAME)), 2, row++);
 		DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
+		startDate.setToDisplayDayLast(true);
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_STARTDATE)) {
 			startDate.setContent(iwc.getParameter(PARAMETER_RESOURCE_STARTDATE));
 			startDate.setDisabled(true);
@@ -1999,7 +2000,8 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
 		try {
-			getResourceBusiness(iwc).finishResourceClassMember(classMemberID, startDateStr, endDateStr);
+			getResourceBusiness(iwc).finishResourceClassMember(new Integer(_schoolClassMemberID), 
+																						classMemberID, startDateStr, endDateStr);
 		}
 		catch (DateException de) {
 			errMsg = localize(de.getKey(), de.getDefTrans());

@@ -22,7 +22,6 @@ import com.idega.block.school.data.SchoolClassMember;
 import com.idega.business.IBOLookup;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
-import com.idega.idegaweb.IWResourceBundle;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.PresentationObject;
@@ -116,7 +115,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private static final String UNIQUE_SUFFIX = "chosen_user";
 
 	// Instance variables
-	private IWResourceBundle iwrb;
+	//private IWResourceBundle iwrb;
 	private Form form;
 	private Table mainTable;
 	private int mainTableRow;
@@ -127,7 +126,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 
 
 	public void main(IWContext iwc) throws Exception {
-		iwrb = getResourceBundle(iwc);
+		//iwrb = getResourceBundle(iwc);
 		form = new Form();
 	
 		// Parameter name returning chosen User from SearchUserModule

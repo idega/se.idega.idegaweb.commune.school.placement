@@ -24,6 +24,7 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.BooleanInput;
 import com.idega.presentation.ui.DateInput;
 import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
@@ -53,7 +54,13 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private final static String PARAM_HOURS = "prm_hours";
 	private final static String PARAM_EMPLOYMENT = "prm_unemployed";
 	private final static String PARAM_PLACEMENT_DATE = "prm_plac_date";
-		
+	private final static String PARAM_PRE_SCHOOL = "prm_pre_school";
+	private final static String PARAM_LAST_REPLY_DATE = "prm_reply_date";
+	private final static String PARAM_EXTRA_CONTRACT = "prm_extra_contract";
+	private final static String PARAM_EXTRA_CONTRACT_OTHER = "prm_extra_contract_other";
+	private final static String PARAM_EXTRA_CONTRACT_MESSAGE = "prm_extra_contract_message";
+	private final static String PARAM_EXTRA_CONTRACT_OTHER_MESSAGE = "prm_extra_contract_other_message";
+	
 	private final static String LABEL_COMMENT = "child_care.comment";
 	private final static String LABEL_CHILD = "child_care.child";
 	private final static String LABEL_USER_NAME = "child_care.name";
@@ -68,9 +75,16 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	private final static String LABEL_HOURS = "child_care.hours_pr_week";
 	private final static String LABEL_EMPLOYMENT = "child_care.no_job";
 	private final static String LABEL_PLACEMENT_DATE = "child_care.placement_date";
+	private final static String LABEL_LAST_REPLY_DATE = "child_care.last_reply_date";
+	private final static String LABEL_EXTRA_CONTRACT = "child_care.extra_contract";
+	private final static String LABEL_EXTRA_CONTRACT_OTHER = "child_care.extra_contract_other";
+	private final static String LABEL_EXTRA_CONTRACT_MESSAGE = "child_care.extra_contract_message";
+	private final static String LABEL_EXTRA_CONTRACT_OTHER_MESSAGE = "child_care.extra_contract_other_message";
 	
 	private final static int ACTION_VIEW_FORM = 1;
 	private final static int ACTION_SAVE = 2;
+	private boolean _isUpdate = false;
+	private boolean _finalize = false;
 	
 	/* (non-Javadoc)
 	 * @see com.idega.presentation.PresentationObject#main(com.idega.presentation.IWContext)
@@ -99,7 +113,15 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		int careTime = Integer.parseInt(iwc.getParameter(PARAM_HOURS));
 		int employmentTypeID = Integer.parseInt(iwc.getParameter(PARAM_EMPLOYMENT));
 		IWTimestamp placementDate = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
+		IWTimestamp replyDate = null;
+		if (iwc.isParameterSet(PARAM_LAST_REPLY_DATE))
+			replyDate = new IWTimestamp(iwc.getParameter(PARAM_LAST_REPLY_DATE));
 		String comment = iwc.getParameter(PARAM_COMMENT);
+		String preSchool = iwc.getParameter(PARAM_PRE_SCHOOL);
+		String extraContractMessage = iwc.getParameter(PARAM_EXTRA_CONTRACT_MESSAGE);
+		String extraContractMessageOther = iwc.getParameter(PARAM_EXTRA_CONTRACT_OTHER_MESSAGE);
+		boolean extraContract = BooleanInput.getBooleanReturnValue(iwc.getParameter(PARAM_EXTRA_CONTRACT));
+		boolean extraContractOther = BooleanInput.getBooleanReturnValue(iwc.getParameter(PARAM_EXTRA_CONTRACT_OTHER));
 		int groupID = -1;
 		try {
 			groupID = Integer.parseInt(iwc.getParameter(PARAM_GROUP));
@@ -111,7 +133,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		
 		try {
 			User owner = getBusiness().getUserBusiness().getUser(ownerID);
-			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, null, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), true);
+			success = getBusiness().importChildToProvider(getSession().getApplicationID(), getSession().getChildID(), getSession().getChildCareID(), groupID, careTime, employmentTypeID, schoolTypeID, comment, placementDate, null, iwc.getCurrentLocale(), owner, iwc.getCurrentUser(), true, replyDate, preSchool, extraContract, extraContractMessage, extraContractOther, extraContractMessageOther);
 		}
 		catch (RemoteException re) {
 			success = false;
@@ -151,6 +173,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			if (getSession().getApplicationID() != -1) {
 				_application = getBusiness().getApplication(getSession().getApplicationID());
 				_child = _application.getChild();
+				_isUpdate = true;
+				if (_application.getApplicationStatus() == getBusiness().getStatusContract())
+					_finalize = true;
 			}
 			else if (getSession().getChildID() != -1) {
 				_child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
@@ -297,7 +322,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			SelectorUtility sel = new SelectorUtility();
 			DropdownMenu op = (DropdownMenu) sel.getSelectorFromIDOEntities(new DropdownMenu(PARAM_GROUP), school_classes, "getName");
 			if (!op.isEmpty()) {
-				op.setAsNotEmpty(localize("child_care.must_select_group","You must select a group."), "-1");
+				if (!_isUpdate || _finalize) {
+					op.setAsNotEmpty(localize("child_care.must_select_group","You must select a group."), "-1");
+				}
 				op.addMenuElementFirst("-1", "");
 				op.keepStatusOnAction(true);
 			}
@@ -315,26 +342,63 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		catch (FinderException e1) {
 			e1.printStackTrace();
 		}
+
+		table.add(getSmallHeader(localize("child_care.pre_school", "Specify pre-school:")), 1, row);
+		TextInput preSchool = (TextInput) getStyledInterface(new TextInput(PARAM_PRE_SCHOOL));
+		preSchool.setLength(40);
+		if (_application.getPreSchool() != null)
+			preSchool.setContent(_application.getPreSchool());
+		table.add(preSchool, 3, row++);
 		table.setHeight(row++, 12);
 		
 		TextInput hoursWeek = (TextInput) getStyledInterface(new TextInput(PARAM_HOURS));
 		hoursWeek.keepStatusOnAction(true);
 		hoursWeek.setLength(2);
-		hoursWeek.setAsNotEmpty(localize("child_care.child_care_time_required","You must fill in the child care time."));
-		hoursWeek.setAsIntegers(localize("child_care.only_integers_allowed","Not a valid child care time."));
+		if (!_isUpdate || _finalize) {
+			hoursWeek.setAsNotEmpty(localize("child_care.child_care_time_required","You must fill in the child care time."));
+			hoursWeek.setAsIntegers(localize("child_care.only_integers_allowed","Not a valid child care time."));
+		}
 		table.add(getLocalizedLabel(LABEL_HOURS,"Hours pr. week"),1,row);
 		table.add(hoursWeek,3,row++);
 		
 		try {
 			DropdownMenu employment = this.getEmploymentTypes(PARAM_EMPLOYMENT, -1);
 			employment.keepStatusOnAction(true);
-			employment.setAsNotEmpty(localize("child_care.must_select_employment_type","You must select employment type."), "-1");
+			if (!_isUpdate || _finalize) {
+				employment.setAsNotEmpty(localize("child_care.must_select_employment_type","You must select employment type."), "-1");
+			}
 			table.add(getLocalizedLabel(LABEL_EMPLOYMENT,"Employment"),1,row);
 			table.add(employment,3,row++);
 		}
 		catch (RemoteException e1) {
 			e1.printStackTrace();
 		}
+		
+		table.setHeight(row++, 12);
+		
+		BooleanInput hasExtraContract = (BooleanInput) getStyledInterface(new BooleanInput(PARAM_EXTRA_CONTRACT));
+		if (_application != null)
+			hasExtraContract.setSelected(_application.getHasExtraContract());
+		TextInput extraContractMessage = (TextInput) getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_MESSAGE));
+		if (_application.getExtraContractMessage() != null)
+			extraContractMessage.setContent(_application.getExtraContractMessage());
+		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT, "Extra contract")), 1, row);
+		table.add(hasExtraContract, 3, row);
+		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
+		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_MESSAGE, "Message")), 1, row);
+		table.add(extraContractMessage, 3, row);
+		
+		BooleanInput hasExtraContractOther = (BooleanInput) getStyledInterface(new BooleanInput(PARAM_EXTRA_CONTRACT_OTHER));
+		if (_application != null)
+			hasExtraContractOther.setSelected(_application.getHasExtraContractOther());
+		TextInput extraContractOtherMessage = (TextInput) getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_OTHER_MESSAGE));
+		if (_application.getExtraContractMessageOther() != null)
+			extraContractOtherMessage.setContent(_application.getExtraContractMessageOther());
+		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER, "Extra contract other")), 1, row);
+		table.add(hasExtraContractOther, 3, row);
+		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
+		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER_MESSAGE, "Message")), 1, row);
+		table.add(extraContractOtherMessage, 3, row);
 		
 		table.setHeight(row++, 12);
 		
@@ -346,6 +410,15 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			placementDate.setDate(_application.getFromDate());
 		table.add(getLocalizedLabel(LABEL_PLACEMENT_DATE,"Placement date"),1,row);
 		table.add(placementDate,3,row++);
+		
+		if (_application != null) {
+			DateInput replyDate = (DateInput) getStyledInterface(new DateInput(PARAM_LAST_REPLY_DATE));
+			replyDate.keepStatusOnAction(true);
+			replyDate.setToDisplayDayLast(true);
+			replyDate.setAsNotEmpty(localize("child_care.must_select_last_reply_date", "You have to select a last reply date"));
+			table.add(getLocalizedLabel(LABEL_LAST_REPLY_DATE,"Last reply date"),1,row);
+			table.add(replyDate,3,row++);
+		}
 		
 		TextArea comment = (TextArea) getStyledInterface(new TextArea(PARAM_COMMENT));
 		comment.keepStatusOnAction(true);

@@ -12,6 +12,7 @@ import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
+import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.SchoolType;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
@@ -360,8 +361,8 @@ public class CheckRequestForm extends CommuneBlock {
 		int row = 1;
 
 		childCareTypeTable.add(getSmallHeader(localize("check.request_regarding", "The request regards") + ":"), 1, row);
-		
-		Collection childCareTypes = getSchoolCommuneBusiness(iwc).getSchoolBusiness().findAllSchoolTypesForChildCare();
+		SchoolBusiness schBuiz = getSchoolCommuneBusiness(iwc).getSchoolBusiness();
+		Collection childCareTypes = schBuiz.findAllSchoolTypesInCategory(schBuiz.getChildCareSchoolCategory(),false);
 
 		DropdownMenu typeChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_CHILD_CARE_TYPE));
 		Iterator iter = childCareTypes.iterator();

@@ -77,8 +77,8 @@ import com.idega.util.IWTimestamp;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/01/05 13:43:07 $ by $Author: goranb $
- * @version $Revision: 1.60 $
+ * Last modified: $Date: 2004/01/07 13:27:58 $ by $Author: goranb $
+ * @version $Revision: 1.61 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -1460,6 +1460,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 		today.setAsDate();
 		java.sql.Date todayDate = today.getDate();
 		dInput.setToDisplayDayLast(true);
+		int thisYear = today.getYear();
+		dInput.setYearRange(thisYear - 1, thisYear + 1);
 		if (storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_DATE)) {
 			IWTimestamp placeStamp = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
 			java.sql.Date placeDate = placeStamp.getDate();

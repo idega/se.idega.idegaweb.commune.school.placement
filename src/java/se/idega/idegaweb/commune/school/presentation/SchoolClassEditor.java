@@ -677,8 +677,10 @@ public class SchoolClassEditor extends SchoolCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
-				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(),getSession().getSchoolID(), getSession().getSchoolSeasonID()))
-					checkBox.setDisabled(true);
+				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(),getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
+					continue;
+					//checkBox.setDisabled(true);
+				}
 
 				String name = student.getNameLastFirst(true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))

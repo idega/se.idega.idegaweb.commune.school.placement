@@ -7,6 +7,7 @@
 package se.idega.idegaweb.commune.school.presentation;
 
 import java.rmi.RemoteException;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -57,8 +58,8 @@ import com.idega.util.IWTimestamp;
 /**
  * @author 
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2003/10/24 15:40:05 $ by $Author: goranb $
- * @version $Revision: 1.23 $
+ * Last modified: $Date: 2003/10/27 11:51:35 $ by $Author: goranb $
+ * @version $Revision: 1.24 $
  */
 public class CentralPlacementEditor extends CommuneBlock {
 	// *** Localization keys ***
@@ -79,6 +80,8 @@ public class CentralPlacementEditor extends CommuneBlock {
 	private static final String KEY_RESOURCES_LABEL = KP + "resources_label";
 	private static final String KEY_CONTRACT_LABEL = KP + "contract_label";
 	private static final String KEY_CONTRACT_YES = KP + "contract_yes";
+	private static final String KEY_STARTDATE_LABEL = KP + "startdate_label";
+	private static final String KEY_ENDDATE_LABEL = KP + "enddate_label";
 	private static final String KEY_PROVIDER_LABEL = KP + "provider_label";
 	private static final String KEY_MAIN_ACTIVITY_LABEL = KP + "main_activity";
 	private static final String KEY_ADMIN_LABEL = KP + "admin_label";
@@ -469,45 +472,61 @@ public class CentralPlacementEditor extends CommuneBlock {
 												KEY_BUTTON_CONTRACT_HISTORY, "Contract history")), 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
+		row++;
+		col = 1;
+		table.add(getSmallHeader(localize(KEY_STARTDATE_LABEL, "Start date: ")), col, row);
+		table.add(getSmallHeader(localize(KEY_ENDDATE_LABEL, "End date: ")), col+2, row);
 
-		// Values - Latest placement
+		// VALUES - Latest placement
 		if (child != null) {
 			try {
 				SchoolClassMember latestPl = getCentralPlacementBusiness(iwc).getLatestPlacement(child);
 				if (latestPl != null) {
-					row--; row--;row--;
+					row--;row--;row--;row--;
 					col = 2;
 					// Activity
-					table.add(getSmallText(latestPl.getSchoolClass().getSchoolType().getName()), col, row);
+					try {
+						table.add(getSmallText(latestPl.getSchoolClass().getSchoolType().getName()), col, row);						
+					} catch (Exception e) {}
 					row++;
 
 					// Placement
-					StringBuffer buf =
-						new StringBuffer(latestPl.getSchoolClass().getSchool().getName());
-					buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
-							+ latestPl.getSchoolClass().getSchoolYear().getName() + ", "
-							+ localize(KEY_SCHOOL_GROUP, "group") + " "
-							+ latestPl.getSchoolClass().getSchoolClassName());
+					StringBuffer buf = new StringBuffer("");
+					try {
+						// add school name
+						buf.append(latestPl.getSchoolClass().getSchool().getName());						
+					} catch (Exception e) {}
+					try {
+						// school year
+						buf.append(", " + localize(KEY_SCHOOL_YEAR, "school year") + " "
+											   + latestPl.getSchoolClass().getSchoolYear().getName());						
+					} catch (Exception e) {}
+					try {
+						// add school group
+						buf.append(", " + localize(KEY_SCHOOL_GROUP, "group") + " "
+											   + latestPl.getSchoolClass().getSchoolClassName());						
+					} catch (Exception e) {}
+
 					table.add(getSmallText(buf.toString()), col, row);
 					table.mergeCells(col, row, col+2, row);
 					row++;
 
 					// Resources
 					table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
+					table.mergeCells(col, row, col+2, row);
 					row++;
-
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			// Contract	  
-			try {
-				ChildCareContract contract =
-					getChildCareBusiness(iwc).getValidContractByChild(
-						((Integer) child.getPrimaryKey()).intValue());
-				if (contract != null) {
-					table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
+					
+					// Contract
+					ChildCareContract contract =
+						getChildCareBusiness(iwc).getValidContractByChild(
+							((Integer) child.getPrimaryKey()).intValue());
+					if (contract != null) {
+						table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
+					}
+					row++;
+					col = 2;
+					table.add(getSmallText(getDateString(latestPl.getRegisterDate())), col, row);
+					table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col+2, row);					
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1110,6 +1129,15 @@ public class CentralPlacementEditor extends CommuneBlock {
 		}
 				
 		return buf.toString();
+	}
+	
+	private String getDateString(Timestamp stamp) {
+		IWTimestamp iwts = new IWTimestamp(stamp);
+		String dateStr = "";
+		if (stamp != null) {
+			dateStr = iwts.getDateString("yyyy-MM-dd");
+		}
+		return dateStr;
 	}
 
 	/**

@@ -231,6 +231,7 @@ public class CheckRequestForm extends CommuneBlock {
 		childTable.add(nameTable, 1, 1);
 
 		Address address = getCheckBusiness(iwc).getUserAddress(iwc, child);
+		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(iwc, child);
 		if (address != null) {
 			Table addressTable = new Table(2, 2);
 			addressTable.setWidth(400);
@@ -241,7 +242,8 @@ public class CheckRequestForm extends CommuneBlock {
 			addressTable.add(getLocalizedSmallText("check.street", "Street address"), 1, 1);
 			addressTable.add(getLocalizedSmallText("check.postnumber.city", "Postnumber and city"), 2, 1);
 			addressTable.add(getText(address.getStreetName() + " " + address.getStreetNumber()), 1, 2);
-			addressTable.add(getText(getCheckBusiness(iwc).getUserPostalCode(iwc, child) + " " + address.getStreetNumber()), 1, 2);
+			if ( code != null )
+				addressTable.add(getText(code.getPostalCode() + " " + code.getName()), 2, 2);
 
 			childTable.setRows(2);
 			childTable.add(addressTable, 1, 2);

@@ -13,7 +13,9 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareConstants;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 
+import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolSeason;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.contact.data.Phone;
@@ -283,26 +285,31 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				while (iterPlac.hasNext()) {
 					column = 1;
 					member = (SchoolClassMember) iterPlac.next();
+					SchoolClass group = member.getSchoolClass();
+					SchoolSeason season = group.getSchoolSeason();
 					
-					if (member.getRemovedDate() != null){
-						terminated = new IWTimestamp(member.getRemovedDate());
-						if (terminated.isEarlierThan(today))
-							active = false;
-						else 
-							active = true;
-					}else if (member.getRegisterDate() != null){
-						startdate = new IWTimestamp(member.getRegisterDate());
-						if (startdate.isLaterThan(today)){
-							active = true;
+					if (season != null && ((Integer) season.getPrimaryKey()).intValue() == getSession().getSeasonID()) {
+						if (member.getRemovedDate() != null){
+							terminated = new IWTimestamp(member.getRemovedDate());
+							if (terminated.isEarlierThan(today))
+								active = false;
+							else 
+								active = true;
 						}
-						else if (startdate.isEarlierThan(today) && member.getRemovedDate() == null){
-							active = true;
+						else if (member.getRegisterDate() != null){
+							startdate = new IWTimestamp(member.getRegisterDate());
+							if (startdate.isLaterThan(today)){
+								active = true;
+							}
+							else if (startdate.isEarlierThan(today) && member.getRemovedDate() == null){
+								active = true;
+							}
+							else
+								active = false;
 						}
-						else
-							active = false;
-					}
-					else {
-						active =true;
+						else {
+							active =true;
+						}
 					}
 				}
 				

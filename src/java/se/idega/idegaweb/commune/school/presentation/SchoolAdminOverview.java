@@ -808,8 +808,6 @@ public class SchoolAdminOverview extends CommuneBlock {
 						if (age.getYears() <= 18) {
 							addSubmit = true;
 							radio = getRadioButton(PARAMETER_USER_ID, user.getPrimaryKey().toString());
-							if (row == 2)
-								radio.setSelected();
 						
 							userTable.add(radio, 1, userRow);
 							userTable.add(Text.NON_BREAKING_SPACE, 1, userRow);
@@ -819,11 +817,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 						}
 					}
 				
-					userTable.setHeight(row++, 6);
+					userTable.setHeight(userRow++, 6);
 					if (addSubmit) {
-						SubmitButton login = (SubmitButton) getButton(new SubmitButton(localize("school.add_student","Add student"), PARAMETER_ACTION, String.valueOf(ACTION_ADD_STUDENT)));
-						login.setValueOnClick(PARAMETER_METHOD, "-1");
-						userTable.add(login, 1, userRow);
+						SubmitButton addButton = (SubmitButton) getButton(new SubmitButton(localize("school.add_student","Add student"), PARAMETER_ACTION, String.valueOf(ACTION_ADD_STUDENT)));
+						addButton.setValueOnClick(PARAMETER_METHOD, "-1");
+						addButton.setToEnableWhenSelected(PARAMETER_USER_ID);
+						userTable.add(addButton, 1, userRow);
 					}
 					else {
 						userTable.add(getSmallHeader(localize("school.no_student_found","No student found")), 1, userRow++);
@@ -840,6 +839,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			catch (Exception e) {
 			}
 		}
+		table.setHeight(++row, Table.HUNDRED_PERCENT);
 
 		return table;
 	}
@@ -1004,9 +1004,13 @@ public class SchoolAdminOverview extends CommuneBlock {
 	}
 	
 	private void addStudent(IWContext iwc) throws RemoteException {
-		getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
-		getParentPage().setParentToReload();
-		getParentPage().close();
+		if (_userID != -1) {
+			getSchoolCommuneBusiness(iwc).getSchoolBusiness().storeSchoolClassMember(_userID, getSchoolCommuneSession(iwc).getSchoolClassID(), new IWTimestamp().getTimestamp(), ((Integer)iwc.getCurrentUser().getPrimaryKey()).intValue());
+			getParentPage().setParentToReload();
+			getParentPage().close();
+		}
+		else
+			_method = METHOD_ADD_STUDENT;
 	}
 	
 	private void createStudent(IWContext iwc) throws RemoteException {

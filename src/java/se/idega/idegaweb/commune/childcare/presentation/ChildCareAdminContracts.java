@@ -375,6 +375,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 				IWTimestamp terminated = null;
 				IWTimestamp validFrom = null;
 				SchoolClassMember member = contract.getSchoolClassMember();
+				if (member == null) {
+					continue;
+				}
 				SchoolClass group = member.getSchoolClass();
 				
 				contractTable.add(getSmallText(provider.getName()), 1, crow);

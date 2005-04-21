@@ -843,11 +843,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SubmitButton resources = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.resources", "Resources"), PARAMETER_METHOD, String.valueOf(METHOD_LIST_RESOURCES)));
 			SubmitButton nativeLangButton = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.native_language", "Native language"), PARAMETER_METHOD, String.valueOf(METHOD_NATIVE_LANG_FORM)));
 			
-			
+			boolean hasPlacement = false;
+			if (getSchoolCommuneBusiness(iwc).isAlreadyInSchool(_userID, getSchoolCommuneSession(iwc).getSchoolID(), getSchoolCommuneSession(iwc).getSchoolSeasonID())) {
+				hasPlacement = true;
+			}
 			if (_schoolID != -1 && !_showOnlyOverview) {
-				table.add(replace, 1, row);
-				table.add(Text.getNonBrakingSpace(), 1, row);
-
+				if (!hasPlacement) {
+					table.add(replace, 1, row);
+					table.add(Text.getNonBrakingSpace(), 1, row);
+				}
 				if (_schoolID == pendingSchoolId) {
 					table.add(reject, 1, row);
 					table.add(Text.getNonBrakingSpace(), 1, row);

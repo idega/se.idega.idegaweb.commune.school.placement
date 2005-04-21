@@ -805,6 +805,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		boolean hasPlacement = false;
 		boolean showPlacement = false;
 
+		SchoolSeason season = getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(_previousSchoolSeasonID));
 		List formerStudents = new ArrayList();
 		if (_previousSchoolClassID != -1)
 			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(_previousSchoolClassID, _previousSchoolYearID));
@@ -838,6 +839,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				else {
 					hasPlacement = false;
 					if (_group != null && _group.getIsSubGroup()) {
+						checkBox.setDisabled(true);
+					}
+				}
+				if (studentMember.getRemovedDate() != null && season != null) {
+					IWTimestamp removedDate = new IWTimestamp(studentMember.getRemovedDate());
+					IWTimestamp seasonEnd = new IWTimestamp(season.getSchoolSeasonEnd());
+					if (removedDate.isEarlierThan(seasonEnd)) {
 						checkBox.setDisabled(true);
 					}
 				}

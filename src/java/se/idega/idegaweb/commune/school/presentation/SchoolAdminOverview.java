@@ -744,7 +744,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			
 			//show school year
 			if (null != schoolClassMember && schoolYear == null) {
-				SchoolYear scYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(schoolClassMember);
+				SchoolYear scYear = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchoolYear(new Integer(schoolClassMember.getSchoolYearId()));
 				if (null != scYear) {
 					table.add(getSmallHeader(localize("school.school_choice_year", "School year")), 1, row);
 					table.add(getSmallText(scYear.getName()), 2, row);

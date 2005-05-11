@@ -242,7 +242,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			SchoolSeason season = null;
 			if (_useOngoingSeason) {
 				try {
-					season = getCareBusiness().getSchoolSeasonHome().findSeasonByDate(new IWTimestamp().getDate());
+					season = getCareBusiness().getSchoolSeasonHome().findSeasonByDate(getBusiness().getSchoolBusiness().getCategoryElementarySchool(), new IWTimestamp().getDate());
 				}
 				catch (FinderException e) {
 					season = null;

@@ -22,6 +22,7 @@ import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.data.SchoolArea;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.core.builder.data.ICPage;
 import com.idega.core.location.data.Address;
 import com.idega.data.IDOCreateException;
@@ -83,6 +84,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String EMAIL_PROVIDER_MESSAGE = "application_received_body";
 
 	private String prmChildId = CitizenChildren.getChildIDParameterName();
+	private String prmChildUniqueId = CitizenChildren.getChildUniqueIDParameterName();
 
 	private Collection areas;
 	private Map providerMap;
@@ -98,26 +100,73 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	 */
 	public void init(IWContext iwc) throws Exception {
 		initChild(iwc);
-		if (child != null) {
-			parseAction(iwc);
+		if (hasPermission(iwc)){
+			if (child != null) {
+				parseAction(iwc);
 
-			switch (_action) {
-				case ACTION_VIEW_FORM :
-					viewForm(iwc);
-					break;
-				case ACTION_SUBMIT :
-					submitForm(iwc);
-					break;
+				switch (_action) {
+					case ACTION_VIEW_FORM :
+						viewForm(iwc);
+						break;
+					case ACTION_SUBMIT :
+						submitForm(iwc);
+						break;
+				}
 			}
+			else {
+				add(getHeader(localize("no_student_id_provided", "No student provided")));
+			}
+	
 		}
-		else {
-			add(getHeader(localize("no_student_id_provided", "No student provided")));
+		else{
+			add(getErrorText(localize("not_permitted", "You do not have permission")));
 		}
 	}
 
+	public boolean hasPermission(IWContext iwc) throws Exception {
+		boolean hasPermission = false;
+		
+		if (isAdmin(iwc)){
+			hasPermission = true;
+		}
+		else{
+		User parent = iwc.getCurrentUser();
+		Collection children = getUserBusiness(iwc).getChildrenForUser(parent);
+		Iterator theChild = children.iterator();
+			while(theChild.hasNext()){
+				User userChild = (User) theChild.next();
+				if (userChild.isIdentical(child)){
+					hasPermission = true;
+					break;
+				}
+								
+			}
+		}
+		return hasPermission;
+	}
+	
 	public void initChild(IWContext iwc) {
 		String ID = iwc.getParameter(prmChildId);
-		if (ID != null && !ID.equals("-1")) {
+		String childUniqueId = iwc.getParameter(prmChildUniqueId);
+		
+		if (childUniqueId != null && !childUniqueId.equals("-1")){
+			if (childUniqueId != null){
+				try {
+					child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);	
+				}
+				catch (IBOLookupException ibe){
+					log (ibe);
+				}
+				catch (FinderException fe){
+					log (fe);
+				}
+				catch (RemoteException re){
+					log (re);
+				}
+				
+			}
+		}
+		else if (ID != null && !ID.equals("-1")) {
 			try {
 				child = getBusiness().getUserBusiness().getUser(Integer.parseInt(ID));
 			}
@@ -130,7 +179,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		}
 		else {
 			try {
-				child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
+				child = getBusiness().getUserBusiness().getUserByUniqueId(getSession().getUniqueID());
 			}
 			catch (RemoteException e) {
 				e.printStackTrace();
@@ -138,7 +187,16 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			catch (Exception e){
 				log(e);
 			}
-			
+			try{
+				child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
+			}
+			catch (RemoteException e) {
+				e.printStackTrace();
+			}
+			catch (Exception e){
+				log(e);
+			}				
+						
 		}
 	}
 

@@ -2,9 +2,12 @@ package se.idega.idegaweb.commune.childcare.check.presentation;
 
 import is.idega.block.family.business.FamilyLogic;
 
+import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
+
+import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareSession;
@@ -15,6 +18,7 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.SchoolType;
+import com.idega.business.IBOLookupException;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.presentation.ExceptionWrapper;
@@ -98,7 +102,17 @@ public class CheckRequestForm extends CommuneBlock {
 
 	private boolean getUser(IWContext iwc) {
 		if (!createChoices()) {
-			if (iwc.isParameterSet(CitizenChildren.getChildIDParameterName())) {
+			if (iwc.isParameterSet(CitizenChildren.getChildUniqueIDParameterName())) {
+				String childUniqueId = iwc.getParameter(CitizenChildren.getChildUniqueIDParameterName());
+				try {
+					child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);
+					return true;
+				} catch (Exception e) {
+					return false;
+				}
+			}
+			
+			else if (iwc.isParameterSet(CitizenChildren.getChildIDParameterName())) {
 				try {
 					child = getCheckBusiness(iwc).getUserById(Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
 					return true;
@@ -126,15 +140,24 @@ public class CheckRequestForm extends CommuneBlock {
 			}
 		}
 		else {
-			try {
-				child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
+			try {				
+				child = getUserBusiness(iwc).getUserByUniqueId(getChildCareSession(iwc).getParameterUniqueID());
 				if (child != null)
 					return true;
 				return false;
 			}
 			catch (Exception e) {
-				return false;
+				try {
+					child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
+					if (child != null)
+						return true;
+					return false;
+				}
+				catch (Exception ex) {
+					return false;
+				}
 			}
+		
 		}
 	}
 

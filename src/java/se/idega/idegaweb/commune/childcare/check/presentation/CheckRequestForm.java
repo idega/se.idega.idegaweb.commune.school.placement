@@ -2,12 +2,9 @@ package se.idega.idegaweb.commune.childcare.check.presentation;
 
 import is.idega.block.family.business.FamilyLogic;
 
-import java.rmi.RemoteException;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
-
-import javax.ejb.FinderException;
 
 import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.childcare.business.ChildCareSession;
@@ -18,7 +15,6 @@ import se.idega.idegaweb.commune.school.business.SchoolCommuneBusiness;
 
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.SchoolType;
-import com.idega.business.IBOLookupException;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.presentation.ExceptionWrapper;

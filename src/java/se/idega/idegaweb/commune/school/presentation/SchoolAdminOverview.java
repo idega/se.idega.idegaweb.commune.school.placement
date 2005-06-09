@@ -615,7 +615,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 						}
 						
 						IWTimestamp today = IWTimestamp.RightNow();
-						if (placementDate == null && choice.getPlacementDate() != null) {
+						if (choice.getChosenSchoolId() == getSchoolCommuneSession(iwc).getSchoolID() && choice.getPlacementDate() != null) {
 							placementDate = new IWTimestamp(choice.getPlacementDate());
 							started = placementDate.getTimestamp().before(today.getDate());
 						}

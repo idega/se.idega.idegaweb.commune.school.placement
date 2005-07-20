@@ -2,6 +2,7 @@ package se.idega.idegaweb.commune.school.presentation;
 
 import java.rmi.RemoteException;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,6 +10,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.ejb.FinderException;
+
+import se.idega.idegaweb.commune.accounting.presentation.OperationalFieldsMenu;
+import se.idega.idegaweb.commune.accounting.school.business.StudyPathBusiness;
+import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
@@ -26,14 +31,20 @@ import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
+import com.idega.block.school.data.SchoolStudyPath;
+import com.idega.block.school.data.SchoolStudyPathHome;
+import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.Commune;
 import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
+import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.MediaWritable;
+import com.idega.presentation.ExceptionWrapper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
@@ -67,7 +78,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private final String PARAMETER_SEARCH = "scH_choise_search";
 	private final String PARAMETER_CURRENT_APPLICATION_PAGE = "sch_crrap_pg";
 	private final String PARAMETER_DELETE_CHOICE_ID = "delete_sch_choice";
-
+	
+	private final String  PROPERTY_START_HIGH_SCHOOL = "start_date_high_school";
+	
 	private final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
 	private final int ACTION_FINALIZE_GROUP = 3;
@@ -99,7 +112,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private boolean showBunRadioButtons = false;
 	//private boolean isOngoingSeason = false;
 	private boolean _useForTesting = false;
-
+	private String operationalField = null;
 	private SchoolClass _group;
 
 	private int _languageAge = 12;
@@ -107,7 +120,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
 			parseAction(iwc);
-
+			AccountingSession acs = getAccountingSession();
+			
+			operationalField = acs.getOperationalField();
+			
+			
 			switch (method) {
 				case ACTION_SAVE:
 					saveClass(iwc);
@@ -140,7 +157,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	private void parseAction(IWContext iwc) throws RemoteException {
 		//isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
-
+		IWResourceBundle iwrb = getResourceBundle(iwc);
+		IWTimestamp iwt = new IWTimestamp();
+		
+		iwrb.getIWBundleParent().getProperty(PROPERTY_START_HIGH_SCHOOL, iwt.getDate().toString());
+		
 		if (iwc.isParameterSet(PARAMETER_PREVIOUS_CLASS_ID)) _previousSchoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_PREVIOUS_CLASS_ID));
 
 		_previousSchoolSeasonID = getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID());
@@ -215,7 +236,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.setHeight(16, "12");
 		form.add(table);
 
-		table.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
+		table.add(getNavigationTable(true, multibleSchools, showBunRadioButtons, iwc), 1, 1);
 		table.add(getSearchAndSortTable(), 1, 3);
 		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 5);
 		if (useStyleNames()) {
@@ -292,7 +313,21 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		
 		add(form);
 	}
-
+	
+/*	protected Collection getStudyPaths(IWContext iwc){
+		Collection studyPaths = null; 
+		try {
+			StudyPathBusiness spb = getStudyPathBusiness(iwc);
+			AccountingSession acs = getAccountingSession();
+			studyPaths = spb.findStudyPathsByOperation(getIntParameter(iwc, acs.getParameterOperationalField()));
+		} catch (RemoteException e) {
+			log(e);
+		}
+		
+		return studyPaths;
+			
+	}
+*/
 	private void drawNewGroupForm(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
@@ -305,15 +340,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		form.add(table);
 		int row = 1;
 
-		Table headerTable = new Table(2, 1);
+		//Table headerTable = new Table(2, 1);
+		Table headerTable = new Table();
 		headerTable.setWidth(Table.HUNDRED_PERCENT);
 		headerTable.setCellpaddingAndCellspacing(0);
 		headerTable.setAlignment(2, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.add(headerTable, 1, row++);
 		table.setHeight(row++, "12");
 
-		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons), 1, 1);
-		headerTable.add(getSearchAndSortTable(), 2, 1);
+		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons, iwc), 1, 1);
+		headerTable.add(getSearchAndSortTable(), 1, 2);
 		if (useStyleNames()) {
 			headerTable.setCellpaddingLeft(1, 1, 12);
 			headerTable.setCellpaddingRight(2, 1, 12);
@@ -398,7 +434,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			applicationsPerPage = -1;
 		}
 
-		Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
+		Collection applicants = null;
+		if (getSchoolID() != -1)
+			applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
 
 		int row = 2;
 		if (multibleSchools) row = 1;
@@ -481,7 +519,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			log(e);
 		}
 
-		if (!applicants.isEmpty()) {
+		if (applicants != null && !applicants.isEmpty()) {
 			SchoolChoice choice;
 			School school;
 			User applicant;
@@ -789,7 +827,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
-		if (schoolAge >= 12) table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		if (schoolAge >= 12 && schoolAge <= 16) table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		if (schoolAge >= 16) table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);
 		if (useStyleNames()) {
 			table.setCellpaddingLeft(1, row, 12);
 			table.setCellpaddingRight(table.getColumns(), row, 12);
@@ -825,7 +864,20 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
-				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
+			/*	if (operationalField != null ){
+					getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField);
+					hasPlacement = true;
+					if (_group != null && _group.getIsSubGroup()) {
+						if (getBusiness().getSchoolBusiness().hasGroupPlacement(studentMember.getClassMemberId(), getSchoolClassID())) {
+							checkBox.setDisabled(true);
+						}
+					}
+					else {
+						checkBox.setDisabled(true);
+					}
+				}
+				*/
+				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField)) {
 					hasPlacement = true;
 					if (_group != null && _group.getIsSubGroup()) {
 						if (getBusiness().getSchoolBusiness().hasGroupPlacement(studentMember.getClassMemberId(), getSchoolClassID())) {
@@ -849,7 +901,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						checkBox.setDisabled(true);
 					}
 				}
-
+			
 				//String name = student.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
@@ -912,10 +964,24 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				
 				if (address != null && address.getStreetAddress() != null) table.add(getSmallText(address.getStreetAddress()), column, row);
 				column++;
-				if (schoolAge >= 12) {
+				if (schoolAge >= 12 && schoolAge <= 16)  {
 					if (studentMember.getLanguage() != null) table.add(getSmallText(localize(studentMember.getLanguage(), "")), 5, row);
 					column++;
 				}
+				if (schoolAge >= 16)  {
+					int studyPathId = studentMember.getStudyPathId();
+					SchoolStudyPathHome scHome = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+					if (studyPathId != -1){
+						try{
+							SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
+							if (course != null)table.add(getSmallText(course.getCode()), 5, row);
+						} catch (Exception e) {
+						e.printStackTrace();
+						}
+					}				
+					column++;
+				}
+				
 				if (getSchoolClassID() != -1) {
 					table.setWidth(column, "12");
 					table.add(checkBox, column, row);
@@ -1013,16 +1079,21 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.setCellpaddingLeft(1, row, 12);
 			table.setCellpaddingRight(table.getColumns(), row, 12);
 		}
+		if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row++);
+		}
+		else{
+			Layer layerE = new Layer(Layer.DIV);
+			Layer layerD = new Layer(Layer.DIV);
+			layerE.add(getSmallHeader(localize("school.placing_offer_alphabet_letter", "E")));
+			layerD.add(getSmallHeader(localize("school.placing_confirmed_alphabet_letter", "D")));
+			layerE.setToolTip(localize("school.placing_offer_tool_tip", "Tool tip E"));
+			layerD.setToolTip(localize("school.placing_confirmed_tool_tip", "Tool tip D"));
 
-		Layer layerE = new Layer(Layer.DIV);
-		Layer layerD = new Layer(Layer.DIV);
-		layerE.add(getSmallHeader(localize("school.placing_offer_alphabet_letter", "E")));
-		layerD.add(getSmallHeader(localize("school.placing_confirmed_alphabet_letter", "D")));
-		layerE.setToolTip(localize("school.placing_offer_tool_tip", "Tool tip E"));
-		layerD.setToolTip(localize("school.placing_confirmed_tool_tip", "Tool tip D"));
-
-		table.add(layerE, column++, row);
-		table.add(layerD, column++, row++);
+			table.add(layerE, column++, row);
+			table.add(layerD, column++, row++);
+		}
+		
 
 		User student;
 		Address address;
@@ -1135,16 +1206,33 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					if (choice != null) {
 						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
 						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);
-						if (choice.getHasReceivedPlacementMessage())
-							table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
-						else
-							table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
+						
+							if (choice.getHasReceivedPlacementMessage())
+								table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
+							else
+								table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
 
-						if (choice.getHasReceivedConfirmationMessage())
-							table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
-						else
-							table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
+							if (choice.getHasReceivedConfirmationMessage())
+								table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
+							else
+								table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
+						
+						
 					}
+				}
+				else if (operationalField !=null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+						int studyPathId = studentMember.getStudyPathId();
+						SchoolStudyPathHome scHome = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+						//table.add(getSmallText(studentMember.getStudyPathId()), column++, row);
+						if (studyPathId != -1){
+							try{
+								SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
+								if (course != null)table.add(getSmallText(course.getCode()), column++, row);
+							} catch (Exception e) {
+							e.printStackTrace();
+							}
+						}			
+										
 				}
 				row++;
 			}
@@ -1234,7 +1322,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		return table;
 	}
+	
+	//Collection studyPaths = null;
 
+	
 	protected Table getPreviousHeader(Collection classes) {
 		Table table = new Table(2, 1);
 		table.setCellpadding(0);
@@ -1322,6 +1413,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				menuPlaced.setSelectedElement(-1);
 			}
 		}
+		
 
 		table.setColumnAlignment(1, Table.HORIZONTAL_ALIGN_LEFT);
 		table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_RIGHT);
@@ -1340,13 +1432,28 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		int userID = ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue();
 		SchoolClassMember member;
 		SchoolChoice choice;
+		int studyPathID = -1;
 		SchoolSeason season = getBusiness().getSchoolChoiceBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID()));
+		if (iwc.isParameterSet(getSession().getParameterStudyPathID()))
+			studyPathID = new Integer (iwc.getParameter(getSession().getParameterStudyPathID())).intValue();
+		
 		if (season != null) {
 			stamp = new IWTimestamp(season.getSchoolSeasonStart());
 		}
+		/////// should be removed and changed to the startdate for the sch_school_season of the category
+		if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+			IWResourceBundle iwrb = getResourceBundle(iwc);
+			String startDateString = iwrb.getIWBundleParent().getProperty(PROPERTY_START_HIGH_SCHOOL, stamp.getDate().toString());
+			if (startDateString != null)
+				stamp = new IWTimestamp(startDateString);	
+		}
+		
+		/////////end
+		
 		SchoolSeason previousSeason = getBusiness().getPreviousSchoolSeason(getSchoolSeasonID());
 		getBusiness().resetSchoolClassStatus(getSchoolClassID());
 
+		
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
@@ -1359,7 +1466,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					else {
 						placementDate = new IWTimestamp(stamp);
 					}
-					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice());
+					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID());
 					if (member != null) {
 						getBusiness().importStudentInformationToNewClass(member, previousSeason);
 						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), placementDate.getDate(), null, iwc.getCurrentUser());
@@ -1371,8 +1478,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (students != null && students.length > 0) {
 			for (int a = 0; a < students.length; a++) {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID);
-
+				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID, studyPathID);
+			
 				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
 					getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), stamp.getDate(), null, iwc.getCurrentUser());
@@ -1474,7 +1581,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		}
 	}
 
-
+		
 	private SchoolChoiceHome getSchoolChoiceHome() throws RemoteException {
 		return (SchoolChoiceHome) com.idega.data.IDOLookup.getHome(SchoolChoice.class);
 	}

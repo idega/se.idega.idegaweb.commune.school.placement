@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
@@ -19,8 +20,11 @@ import se.idega.util.SchoolClassMemberComparatorForSweden;
 
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolStudyPath;
+import com.idega.block.school.data.SchoolStudyPathHome;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.core.location.data.Address;
+import com.idega.data.IDOLookup;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Link;
@@ -56,7 +60,8 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	private boolean multipleSchools = false;
 	private boolean showBunRadioButtons = false;
 	private SchoolClass _group;
-
+	private String operationalField = null;
+	
 	/**
 	 * @see se.idega.idegaweb.commune.school.presentation.SchoolCommuneBlock#init(com.idega.presentation.IWContext)
 	 */
@@ -64,6 +69,10 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		if (iwc.isLoggedOn()) {
 			parseAction(iwc);
 
+			AccountingSession acs = getAccountingSession();
+			
+			operationalField = acs.getOperationalField();
+			
 			switch (method) {
 				case ACTION_SAVE :
 					//saveClass(iwc);
@@ -164,6 +173,10 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		table.add(getSmallHeader(localize("school.class", "Class")), column++, row);
+		if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);	
+		}
+		
 		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), column, row);
 		table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
 		if (useStyleNames()) {
@@ -183,6 +196,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		Link move;
 		Link link;
 		int numberOfStudents = 0;
+		
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
 		boolean hasSpecialPlacement = false;
@@ -221,6 +235,11 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 				hasComment = studentMember.getNotes() != null;
 				notStarted = false;
 				hasTerminationDate = false;
+				int studyPathId = -1;
+				
+				if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+					studyPathId = studentMember.getStudyPathId();
+				}
 
 				if (studentMember.getRegisterDate() != null) {
 					startDate = new IWTimestamp(studentMember.getRegisterDate());
@@ -333,6 +352,23 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 				if (schoolClass != null)
 					table.add(getSmallText(schoolClass.getName()), column, row);
 				column++;
+				
+				if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+					if (studyPathId != -1){
+						try{
+							SchoolStudyPathHome scHome = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
+							SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
+							if (course != null)table.add(getSmallText(course.getCode()), column, row);
+						} catch (Exception e) {
+						e.printStackTrace();
+						}
+						
+					}		
+					column++;
+				}
+						
+				
+				
 				table.add(move, column, row);
 				//table.add(delete, 7, row);
 				row++;

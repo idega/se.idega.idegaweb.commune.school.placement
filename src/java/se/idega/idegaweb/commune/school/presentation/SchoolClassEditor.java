@@ -2,17 +2,15 @@ package se.idega.idegaweb.commune.school.presentation;
 
 import java.rmi.RemoteException;
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.ejb.FinderException;
 
-import se.idega.idegaweb.commune.accounting.presentation.OperationalFieldsMenu;
-import se.idega.idegaweb.commune.accounting.school.business.StudyPathBusiness;
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
@@ -25,6 +23,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
+
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -33,18 +32,15 @@ import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolStudyPathHome;
-import com.idega.block.school.data.SchoolType;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.Commune;
 import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
-import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
 import com.idega.io.MediaWritable;
-import com.idega.presentation.ExceptionWrapper;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
 import com.idega.presentation.Layer;
@@ -864,19 +860,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
-			/*	if (operationalField != null ){
-					getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField);
-					hasPlacement = true;
-					if (_group != null && _group.getIsSubGroup()) {
-						if (getBusiness().getSchoolBusiness().hasGroupPlacement(studentMember.getClassMemberId(), getSchoolClassID())) {
-							checkBox.setDisabled(true);
-						}
-					}
-					else {
-						checkBox.setDisabled(true);
-					}
-				}
-				*/
+			
 				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField)) {
 					hasPlacement = true;
 					if (_group != null && _group.getIsSubGroup()) {
@@ -969,7 +953,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					column++;
 				}
 				if (schoolAge >= 16)  {
-					int studyPathId = studentMember.getStudyPathId();
+					int studyPathId = -1;
+					studyPathId = studentMember.getStudyPathId();
 					SchoolStudyPathHome scHome = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
 					if (studyPathId != -1){
 						try{

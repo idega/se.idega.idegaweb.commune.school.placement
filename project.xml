@@ -49,6 +49,7 @@
       <roles/>
     </developer>
   </developers>
+  <dependencies>
      <dependency>
         <groupId>javaldap</groupId>
         <artifactId>javaldap-server</artifactId>

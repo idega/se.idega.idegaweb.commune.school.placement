@@ -5,17 +5,11 @@
   <pomVersion>3</pomVersion>
   <name>idegaWeb school placement</name>
   <artifactId>se.idega.idegaweb.commune.school.placement</artifactId>
-  <currentVersion>1.0.1</currentVersion>
+    <currentVersion>1.0.1</currentVersion>
   <!--currentVersion>1.0-SNAPSHOT</currentVersion-->
-
   <inceptionYear>2004</inceptionYear>
   <shortDescription>Commune School Placement</shortDescription>
   <versions>
-    <version>
-      <id>1.0.1</id>
-      <name>1.0.1</name>
-      <tag>SE_SCHOOL_PLACEMENT_1_0_1</tag>
-    </version>
   </versions>
   <branches/>
   <developers>
@@ -56,100 +50,76 @@
     </developer>
   </developers>
   <dependencies>
-    <dependency>
+     <dependency>
       <groupId>javaldap</groupId>
       <artifactId>java-ldapserver</artifactId>
-      <version>0.4</version>
-      <type>jar</type>
-      <url>http://codehaus.org/~trygvis/ldap</url>
-      <properties>
-      <!-- already included in core -->
-</properties>
+        <version>0.4</version>
+        <type>jar</type>
+        <url>http://codehaus.org/~trygvis/ldap</url>
+        <properties>
+        <!-- already included in core -->
+      </properties>
     </dependency>
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.core</artifactId>
-      <!--HELPER-->
-
-      <version>3.0.5</version>
-      <!--HELPER-->
+     <!--HELPER--><version>3.0.5</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
-    </dependency>
-    <dependency>
+	</dependency>
+   <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.process</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
-    </dependency>
-    <dependency>
+    </dependency> 
+  <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.builder</artifactId>
-      <!--HELPER-->
-
-      <version>1.4.2</version>
-      <!--HELPER-->
+     <!--HELPER--><version>1.4.2</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
-    </dependency>
-    <dependency>
+    </dependency> 
+   <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.school</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
-    </dependency>
-    <dependency>
+    </dependency> 
+   <dependency>
       <groupId>bundles</groupId>
       <artifactId>com.idega.block.navigation</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
-    </dependency>
-    <dependency>
+    </dependency> 
+      <dependency>
       <groupId>bundles</groupId>
       <artifactId>is.idega.block.family</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+     <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -159,12 +129,8 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.util</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -174,12 +140,8 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.cubecon.bun24.viewpoint</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -189,12 +151,8 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -204,12 +162,8 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.care</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -219,12 +173,8 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.accounting</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
@@ -234,57 +184,41 @@
     <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.childcare</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
     </dependency>
-    <dependency>
+   <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.school</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
     </dependency>
-    <dependency>
+   <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.provider</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>
         <eclipse.dependency>true</eclipse.dependency>
       </properties>
     </dependency>
-    <dependency>
+   <dependency>
       <groupId>bundles</groupId>
       <artifactId>se.idega.idegaweb.commune.school.accounting</artifactId>
-      <!--HELPER-->
-
-      <version>1.0.1</version>
-      <!--HELPER-->
+      <!--HELPER--><version>1.0.1</version><!--HELPER-->
       <!--HELPERversion>SNAPSHOT</versionHELPER-->
-
       <type>jar</type>
       <url>http://www.idega.com/</url>
       <properties>

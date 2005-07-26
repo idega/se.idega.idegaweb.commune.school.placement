@@ -51,8 +51,8 @@
   </developers>
   <dependencies>
      <dependency>
-        <groupId>javaldap</groupId>
-        <artifactId>javaldap-server</artifactId>
+      <groupId>javaldap</groupId>
+      <artifactId>java-ldapserver</artifactId>
         <version>0.4</version>
         <type>jar</type>
         <url>http://codehaus.org/~trygvis/ldap</url>

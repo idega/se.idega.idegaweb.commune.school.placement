@@ -1,5 +1,5 @@
 /*
- * $Id: SchoolBlock.java,v 1.1 2005/08/09 16:36:28 laddi Exp $
+ * $Id: SchoolBlock.java,v 1.2 2005/08/10 15:06:35 thomas Exp $
  * Created on Aug 3, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -16,7 +16,7 @@ import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolBusiness;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolSession;
-import se.idega.idegaweb.commune.school.music.business.MusicConstants;
+import se.idega.idegaweb.commune.school.business.SchoolConstants;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -40,10 +40,10 @@ import com.idega.util.PersonalIDFormatter;
 
 
 /**
- * Last modified: $Date: 2005/08/09 16:36:28 $ by $Author: laddi $
+ * Last modified: $Date: 2005/08/10 15:06:35 $ by $Author: thomas $
  * 
  * @author <a href="mailto:laddi@idega.com">laddi</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public abstract class SchoolBlock extends CommuneBlock {
 
@@ -52,8 +52,6 @@ public abstract class SchoolBlock extends CommuneBlock {
 	protected static final String STYLENAME_TEXT_CELL = "TextCell";
 	protected static final String STYLENAME_INPUT_CELL = "InputCell";
 	protected static final String STYLENAME_INFORMATION_CELL = "InformationCell";
-	
-	public static final String PARAMETER_SCHOOL_YEAR = "sb_school_year";
 
 	private SchoolBusiness sBusiness;
 	private CommuneUserBusiness uBusiness;
@@ -211,7 +209,7 @@ public abstract class SchoolBlock extends CommuneBlock {
 	
 	protected Help getHelpButton(String key) {
 		Help help = new Help();
-		help.setHelpTextBundle(MusicConstants.HELP_BUNDLE_IDENTFIER);
+		help.setHelpTextBundle(SchoolConstants.HELP_BUNDLE_IDENTFIER);
 		help.setHelpTextKey(key);
 		help.setImage(getBundle().getImage("help.gif"));
 		return help;

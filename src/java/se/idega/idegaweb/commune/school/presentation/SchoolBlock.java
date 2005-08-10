@@ -1,5 +1,5 @@
 /*
- * $Id: SchoolBlock.java,v 1.2 2005/08/10 15:06:35 thomas Exp $
+ * $Id: SchoolBlock.java,v 1.3 2005/08/10 15:12:54 thomas Exp $
  * Created on Aug 3, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -12,11 +12,11 @@ package se.idega.idegaweb.commune.school.presentation;
 import java.rmi.RemoteException;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
+import se.idega.idegaweb.commune.care.business.CareConstants;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolBusiness;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolSession;
-import se.idega.idegaweb.commune.school.business.SchoolConstants;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
@@ -40,10 +40,10 @@ import com.idega.util.PersonalIDFormatter;
 
 
 /**
- * Last modified: $Date: 2005/08/10 15:06:35 $ by $Author: thomas $
+ * Last modified: $Date: 2005/08/10 15:12:54 $ by $Author: thomas $
  * 
  * @author <a href="mailto:laddi@idega.com">laddi</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public abstract class SchoolBlock extends CommuneBlock {
 
@@ -209,7 +209,7 @@ public abstract class SchoolBlock extends CommuneBlock {
 	
 	protected Help getHelpButton(String key) {
 		Help help = new Help();
-		help.setHelpTextBundle(SchoolConstants.HELP_BUNDLE_IDENTFIER);
+		help.setHelpTextBundle(CareConstants.HELP_BUNDLE_IDENTFIER);
 		help.setHelpTextKey(key);
 		help.setImage(getBundle().getImage("help.gif"));
 		return help;

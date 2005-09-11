@@ -89,7 +89,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private int sortChoicesBy = SchoolClassMemberComparatorForSweden.NAME_SORT;
 	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
 	private int sortPlacedUnplacedBy = -1;
-
+	private int studyPathID = -1;
+	
 	private String searchString = "";
 
 	private int _previousSchoolClassID = -1;
@@ -823,6 +824,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
+		
+				
 		if (schoolAge >= 12 && schoolAge <= 16) table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
 		if (schoolAge >= 16) table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);
 		if (useStyleNames()) {
@@ -847,6 +850,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		else
 			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), _previousSchoolSeasonID, _previousSchoolYearID));
 
+		
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
@@ -861,6 +865,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
 			
+				
 				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField)) {
 					hasPlacement = true;
 					if (_group != null && _group.getIsSubGroup()) {
@@ -886,6 +891,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					}
 				}
 			
+								
 				//String name = student.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
@@ -949,9 +955,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				if (address != null && address.getStreetAddress() != null) table.add(getSmallText(address.getStreetAddress()), column, row);
 				column++;
 				if (schoolAge >= 12 && schoolAge <= 16)  {
-					if (studentMember.getLanguage() != null) table.add(getSmallText(localize(studentMember.getLanguage(), "")), 5, row);
+					if (studentMember.getLanguage() != null) 
+						table.add(getSmallText(localize(studentMember.getLanguage(), "")), column, row);
 					column++;
 				}
+				
 				if (schoolAge >= 16)  {
 					int studyPathId = -1;
 					studyPathId = studentMember.getStudyPathId();
@@ -959,7 +967,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					if (studyPathId != -1){
 						try{
 							SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
-							if (course != null)table.add(getSmallText(course.getCode()), 5, row);
+							if (course != null)table.add(getSmallText(course.getCode()), column, row);
 						} catch (Exception e) {
 						e.printStackTrace();
 						}
@@ -1417,7 +1425,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		int userID = ((Integer) iwc.getCurrentUser().getPrimaryKey()).intValue();
 		SchoolClassMember member;
 		SchoolChoice choice;
-		int studyPathID = -1;
+		
 		SchoolSeason season = getBusiness().getSchoolChoiceBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID()));
 		if (iwc.isParameterSet(getSession().getParameterStudyPathID()))
 			studyPathID = new Integer (iwc.getParameter(getSession().getParameterStudyPathID())).intValue();
@@ -1437,8 +1445,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		
 		SchoolSeason previousSeason = getBusiness().getPreviousSchoolSeason(getSchoolSeasonID());
 		getBusiness().resetSchoolClassStatus(getSchoolClassID());
-
 		
+				
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
@@ -1451,6 +1459,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					else {
 						placementDate = new IWTimestamp(stamp);
 					}
+					
+					
 					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID());
 					if (member != null) {
 						getBusiness().importStudentInformationToNewClass(member, previousSeason);
@@ -1463,6 +1473,23 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (students != null && students.length > 0) {
 			for (int a = 0; a < students.length; a++) {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
+				User student;
+				SchoolClassMember scm;
+				
+				if (studyPathID == -1){
+					try{
+						student = getUserBusiness(iwc).getUser(Integer.parseInt(students[a]));
+						scm = getBusiness().getSchoolBusiness().getSchoolClassMemberHome().findLatestByUser(student);
+						
+						studyPathID = scm.getStudyPathId();
+					}
+					catch (FinderException fe){
+						log (fe);
+					}
+				}
+				
+				
+				
 				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID, studyPathID);
 			
 				if (member != null) {

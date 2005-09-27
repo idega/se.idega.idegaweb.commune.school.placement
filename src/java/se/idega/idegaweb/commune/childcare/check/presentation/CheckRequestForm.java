@@ -69,6 +69,8 @@ public class CheckRequestForm extends CommuneBlock {
 	private User child;
 	
 	private boolean _createChoices = false;
+    
+    private Integer childCareTypeId = null;
 
 	public CheckRequestForm() {}
 
@@ -339,23 +341,41 @@ public class CheckRequestForm extends CommuneBlock {
 		int row = 1;
 
 		childCareTypeTable.add(getSmallHeader(localize("check.request_regarding", "The request regards") + ":"), 1, row);
-		SchoolBusiness schBuiz = getSchoolCommuneBusiness(iwc).getSchoolBusiness();
-		Collection childCareTypes= null;
-		if (_isFreeTimeType){
-			childCareTypes = schBuiz.findAllSchoolTypesInCategoryFreeTime(schBuiz.getChildCareSchoolCategory());			
-		}else {
-			childCareTypes = schBuiz.findAllSchoolTypesInCategory(schBuiz.getChildCareSchoolCategory(),false);	
-		}
-				
-		
-		DropdownMenu typeChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_CHILD_CARE_TYPE));
-		Iterator iter = childCareTypes.iterator();
-		
-		while (iter.hasNext()) {
-			SchoolType st = (SchoolType) iter.next();
-			typeChoice.addMenuElement(st.getPrimaryKey().toString(), localize(getSchoolCommuneBusiness(iwc).getLocalizedSchoolTypeKey(st),st.getSchoolTypeName()));
-		}
-		childCareTypeTable.add(typeChoice, 2, row);
+	        
+        SchoolBusiness schBuiz = getSchoolCommuneBusiness(iwc).getSchoolBusiness();
+        
+        if (getChildCareTypeId() == null) { // user has not set child care type id in component property
+    		
+            Collection childCareTypes= null;
+            if (_isFreeTimeType){
+                childCareTypes = schBuiz.findAllSchoolTypesInCategoryFreeTime(schBuiz.getChildCareSchoolCategory());            
+            }else {
+                childCareTypes = schBuiz.findAllSchoolTypesInCategory(schBuiz.getChildCareSchoolCategory(),false);  
+            }
+            
+    		DropdownMenu typeChoice = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAM_CHILD_CARE_TYPE));
+    		Iterator iter = childCareTypes.iterator();
+    		
+    		while (iter.hasNext()) {
+    			SchoolType st = (SchoolType) iter.next();
+    			typeChoice.addMenuElement(st.getPrimaryKey().toString(), localize(getSchoolCommuneBusiness(iwc).getLocalizedSchoolTypeKey(st),st.getSchoolTypeName()));
+    		}
+    		childCareTypeTable.add(typeChoice, 2, row);
+            
+        } else {  // user has set child care type id in component property          
+        
+            try {
+                SchoolType schoolType = schBuiz.getSchoolType(getChildCareTypeId());  
+                HiddenInput hi = new HiddenInput(PARAM_CHILD_CARE_TYPE, ((Integer) schoolType.getPrimaryKey()).toString());
+                
+                childCareTypeTable.add(getSmallText(schoolType.getName()), 2, row);
+                childCareTypeTable.add(hi, 2, row);
+                
+            } catch (Exception e) {
+                super.add(new ExceptionWrapper(e, this));
+            }
+            
+        }
 
 		if (this.paramErrorChildCateType) {
 			childCareTypeTable.add(getSmallErrorText(localize("check.child_care_type_error", "You must select child care type")), 2, 1);
@@ -519,4 +539,12 @@ public class CheckRequestForm extends CommuneBlock {
 	public void setIsFreeTimeType(boolean isFreeTimeType) {
 		this._isFreeTimeType = isFreeTimeType;
 	}
+
+    public Integer getChildCareTypeId() {
+        return childCareTypeId;
+    }
+
+    public void setChildCareTypeId(Integer childCareTypeId) {
+        this.childCareTypeId = childCareTypeId;
+    }
 }

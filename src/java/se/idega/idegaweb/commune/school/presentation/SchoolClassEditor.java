@@ -56,6 +56,7 @@ import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.User;
 import com.idega.util.IWTimestamp;
+import com.idega.util.LocaleUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.TextSoap;
 
@@ -196,7 +197,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				String temp = searchString;
 				temp = TextSoap.findAndCut(temp, "-");
 				Long.parseLong(temp);
-				if (temp.length() == 10) {
+				if (temp.length() == 10 && iwc.getApplicationSettings().getDefaultLocale().equals(LocaleUtil.getSwedishLocale())) {
 					int firstTwo = Integer.parseInt(temp.substring(0, 2));
 					if (firstTwo < 85) {
 						temp = "20" + temp;
@@ -619,7 +620,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				column++;
 				if (!useStyleNames()) {
-					if (PIDChecker.getInstance().isFemale(applicant.getPersonalID()))
+					if (applicant.getGender().isFemaleGender())
 						table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
 					else
 						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);

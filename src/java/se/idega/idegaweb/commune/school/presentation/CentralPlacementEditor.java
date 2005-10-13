@@ -28,7 +28,7 @@ import se.idega.idegaweb.commune.care.resource.business.ResourceBusiness;
 import se.idega.idegaweb.commune.care.resource.data.Resource;
 import se.idega.idegaweb.commune.care.resource.data.ResourceClassMember;
 import se.idega.idegaweb.commune.childcare.business.ChildCareConstants;
-import se.idega.idegaweb.commune.message.business.MessageBusiness;
+import se.idega.idegaweb.commune.message.business.CommuneMessageBusiness;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditor;
 import se.idega.idegaweb.commune.provider.presentation.SchoolGroupEditorAdmin;
 import se.idega.idegaweb.commune.school.business.CentralPlacementBusiness;
@@ -82,8 +82,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2004/10/29 13:02:08 $ by $Author: laddi $
- * @version $Revision: 1.96 $
+ * Last modified: $Date: 2005/10/13 18:36:11 $ by $Author: laddi $
+ * @version $Revision: 1.97 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -2149,8 +2149,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		return (SchoolClassMemberHome) IDOLookup.getHome(SchoolClassMember.class);
 	}
 
-	private MessageBusiness getMessageBusiness(IWContext iwc) throws RemoteException {
-		return (MessageBusiness) IBOLookup.getServiceInstance(iwc, MessageBusiness.class);
+	private CommuneMessageBusiness getMessageBusiness(IWContext iwc) throws RemoteException {
+		return (CommuneMessageBusiness) IBOLookup.getServiceInstance(iwc, CommuneMessageBusiness.class);
 	}
 
 	public CommuneUserBusiness getCommuneUserBusiness(IWContext iwc) throws RemoteException {

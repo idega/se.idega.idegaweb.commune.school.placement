@@ -1,5 +1,5 @@
 /*
- * $Id: SchoolBlock.java,v 1.3 2005/08/10 15:12:54 thomas Exp $
+ * $Id: SchoolBlock.java,v 1.4 2005/10/14 05:05:35 laddi Exp $
  * Created on Aug 3, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -40,10 +40,10 @@ import com.idega.util.PersonalIDFormatter;
 
 
 /**
- * Last modified: $Date: 2005/08/10 15:12:54 $ by $Author: thomas $
+ * Last modified: $Date: 2005/10/14 05:05:35 $ by $Author: laddi $
  * 
  * @author <a href="mailto:laddi@idega.com">laddi</a>
- * @version $Revision: 1.3 $
+ * @version $Revision: 1.4 $
  */
 public abstract class SchoolBlock extends CommuneBlock {
 
@@ -128,34 +128,34 @@ public abstract class SchoolBlock extends CommuneBlock {
 		}
 		
 		table.add(getSmallHeader(localize("name", "Name")), 1, row);
-		table.add(getText(user.getName()), 2, row);
+		table.add(getSmallText(user.getName()), 2, row);
 		
 		table.add(getSmallHeader(localize("personal_id", "Personal ID")), 4, row);
-		table.add(getText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())), 5, row++);
+		table.add(getSmallText(PersonalIDFormatter.format(user.getPersonalID(), iwc.getCurrentLocale())), 5, row++);
 		
 		table.add(getSmallHeader(localize("address", "Address")), 1, row);
 		table.add(getSmallHeader(localize("zip_code", "Postal code")), 4, row);
 		if (address != null) {
-			table.add(getText(address.getStreetAddress()), 2, row);
+			table.add(getSmallText(address.getStreetAddress()), 2, row);
 		}
 		if (postal != null) {
-			table.add(getText(postal.getPostalAddress()), 5, row);
+			table.add(getSmallText(postal.getPostalAddress()), 5, row);
 		}
 		row++;
 		
 		table.add(getSmallHeader(localize("home_phone", "Home phone")), 1, row);
 		table.add(getSmallHeader(localize("mobile_phone", "Mobile phone")), 4, row);
 		if (phone != null && phone.getNumber() != null) {
-			table.add(getText(phone.getNumber()), 2, row);
+			table.add(getSmallText(phone.getNumber()), 2, row);
 		}
 		if (mobile != null && mobile.getNumber() != null) {
-			table.add(getText(mobile.getNumber()), 5, row);
+			table.add(getSmallText(mobile.getNumber()), 5, row);
 		}
 		row++;
 		
 		table.add(getSmallHeader(localize("email", "E-mail")), 1, row);
 		if (email != null && email.getEmailAddress() != null) {
-			table.add(getText(email.getEmailAddress()), 2, row);
+			table.add(getSmallText(email.getEmailAddress()), 2, row);
 		}
 		row++;
 		

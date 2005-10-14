@@ -69,6 +69,8 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	private final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
 	private final int ACTION_CREATE_CONTRACTS = 3;
+
+	private boolean iShowCreateContractsButton = true;
 	
 	public void init(IWContext iwc) throws Exception {
 			
@@ -214,12 +216,14 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.setWidth(2, 4);
 		table.add(menu, 3, 1);
 		
-		SubmitButton createContracts = (SubmitButton) getStyledInterface(new SubmitButton(PARAMETER_CREATE_CONTRACTS, localize("childcare.create_contracts", "Create contracts")));
-//		createContracts.setSingleSubmitConfirm("testa");
-		createContracts.setSubmitConfirm(localize("childcare.confirm_create_contracts", "Create afterschool contracts for students with school placement."));
-		table.add(Text.NON_BREAKING_SPACE, 4, 1);
-		table.add(Text.NON_BREAKING_SPACE, 5, 1);
-		table.add(createContracts, 6, 1);
+		if (iShowCreateContractsButton ) {
+			SubmitButton createContracts = (SubmitButton) getStyledInterface(new SubmitButton(PARAMETER_CREATE_CONTRACTS, localize("childcare.create_contracts", "Create contracts")));
+	//		createContracts.setSingleSubmitConfirm("testa");
+			createContracts.setSubmitConfirm(localize("childcare.confirm_create_contracts", "Create afterschool contracts for students with school placement."));
+			table.add(Text.NON_BREAKING_SPACE, 4, 1);
+			table.add(Text.NON_BREAKING_SPACE, 5, 1);
+			table.add(createContracts, 6, 1);
+		}
 		
 		form.add(table);
 		
@@ -463,5 +467,10 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			// empty			
 		}
 		//this.searchEnabled = searchEnabled;
+	}
+
+	
+	public void setShowCreateContractsButton(boolean showCreateContractsButton) {
+		iShowCreateContractsButton = showCreateContractsButton;
 	}
 }

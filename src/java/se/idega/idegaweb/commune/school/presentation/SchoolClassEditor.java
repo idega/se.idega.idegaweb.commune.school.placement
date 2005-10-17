@@ -523,6 +523,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			User applicant;
 			Address address;
 			IWTimestamp created;
+			boolean hasPriority = false;
+			boolean showPriority = false;
 			boolean hasComment = false;
 			boolean showComment = false;
 			boolean hasPlacement = false;
@@ -539,6 +541,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, choice.getPrimaryKey().toString());
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
 				hasComment = choice.getMessage() != null;
+				hasPriority = choice.getPriority();
 
 				if (getBusiness().isAlreadyInSchool(choice.getChildId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
 					hasPlacement = true;
@@ -597,9 +600,15 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_SEASON, String.valueOf(choice.getSchoolSeasonId()));
 				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_STUDENT, String.valueOf(choice.getChildId()));
 				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CHOICE_STATUS, choice.getStatus());
-				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CLASS_MEMBER, "-1");
-
-				if (hasComment || hasPlacement) {
+				link.setParameter(SchoolAdminOverview.PARAMETER_RESOURCE_CLASS_MEMBER, "-1");						
+				
+				if (hasComment || hasPlacement || hasPriority) {
+					
+					if (hasPriority) {
+						showPriority = true;
+						table.add(getSmallErrorText("&Delta;"), column, row);
+					}
+					
 					if (hasComment) {
 						showComment = true;
 						table.add(getSmallErrorText("*"), column, row);
@@ -660,8 +669,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				row++;
 			}
 
-			if (showComment || showPlacement) {
-				table.setHeight(row++, 2);
+			if (showComment || showPlacement || showPriority) {
+				table.setHeight(row++, 2);				
+				if (showPriority) {
+					table.mergeCells(1, row, table.getColumns(), row);
+					if (useStyleNames()) {
+						table.setCellpaddingLeft(1, row, 12);
+					}
+					table.add(getSmallErrorText("&Delta; "), 1, row);
+					table.add(getSmallText(localize("school_choice.has_priority", "Child has priority")), 1, row++);
+				}				
 				if (showComment) {
 					table.mergeCells(1, row, table.getColumns(), row);
 					if (useStyleNames()) {

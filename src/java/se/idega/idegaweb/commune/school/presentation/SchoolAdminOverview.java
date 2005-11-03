@@ -889,7 +889,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 				table.add(nativeLangButton, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);
 			}
-
+			if(isPlaced == true) {
+				showChangePlacementDate = false;
+			}
 			if (showChangePlacementDate) {
 				table.add(changePlacementDate, 1, row);
 				table.add(Text.getNonBrakingSpace(), 1, row);

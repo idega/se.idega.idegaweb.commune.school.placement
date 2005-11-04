@@ -114,6 +114,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private SchoolClass _group;
 
 	private int _languageAge = 12;
+	
+	private boolean showPriorityColumnInExcel = false;
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -677,7 +679,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						table.setCellpaddingLeft(1, row, 12);
 					}
 					table.add(getSmallErrorText("&Delta; "), 1, row);
-					table.add(getSmallText(localize("school_choice.has_priority", "Child has priority")), 1, row++);
+					table.add(getSmallText(localize("school_choice.child_has_priority", "Child has priority")), 1, row++);
 				}				
 				if (showComment) {
 					table.mergeCells(1, row, table.getColumns(), row);
@@ -819,6 +821,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			xls.setToolTip(localize("school.list_new_students", "List new students"));
 			Link excelLink = getChoicesXLSLink(SchoolChoiceWriter.class, xls);
 			excelLink.addParameter(SchoolChoiceWriter.prmGrade, getSchoolYearID());
+			excelLink.addParameter(SchoolChoiceWriter.PARAMETER_SHOW_PRIORITY_COLUMN, Boolean.toString(getShowPriorityColumnInExcel()));
 			table.add(excelLink, 1, 1);
 		}
 
@@ -1669,5 +1672,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	public void setShowMessageTextButton(boolean show) {
 		showMessageTextButton = show;
+	}
+
+	public boolean getShowPriorityColumnInExcel() {
+		return showPriorityColumnInExcel;
+	}
+
+	public void setShowPriorityColumnInExcel(boolean showPriorityColumnInExcel) {
+		this.showPriorityColumnInExcel = showPriorityColumnInExcel;
 	}
 }

@@ -95,6 +95,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	
 	private ICPage _checkPage;
 
+    private boolean isFClassAndPrio = false; 
+
 	/**
 	 * @see se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock#init(com.idega.presentation.IWContext)
 	 */
@@ -312,7 +314,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			
 			String subject = localize(EMAIL_PROVIDER_SUBJECT, "After school application received");
 			String body = localize(EMAIL_PROVIDER_MESSAGE, "We have received your after school application for {0} to {1}.");
-			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, season, subject, body);
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, season, subject, body, isFClassAndPrio);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {
@@ -618,5 +620,13 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	 */
 	private ICPage getCheckPage() {
 		return this._checkPage;
+	}
+
+	public boolean getFClassAndPrio() {
+		return isFClassAndPrio;
+	}
+
+	public void setFClassAndPrio(boolean isFClassAndPrio) {
+		this.isFClassAndPrio = isFClassAndPrio;
 	}
 }

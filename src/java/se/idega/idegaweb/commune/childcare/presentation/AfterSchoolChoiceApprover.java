@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import se.idega.idegaweb.commune.care.business.CareConstants;
+import se.idega.idegaweb.commune.care.data.AfterSchoolChoice;
+import se.idega.idegaweb.commune.care.data.AfterSchoolChoiceHome;
 import se.idega.idegaweb.commune.care.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.childcare.event.ChildCareEventListener;
@@ -20,6 +22,7 @@ import com.idega.business.IBOLookup;
 import com.idega.business.IBORuntimeException;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.location.data.Address;
+import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
@@ -71,6 +74,8 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	private final int ACTION_CREATE_CONTRACTS = 3;
 
 	private boolean iShowCreateContractsButton = true;
+	
+	private boolean showFClass = false;
 	
 	public void init(IWContext iwc) throws Exception {
 			
@@ -254,8 +259,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.setColumns(4);
 		if (useStyleNames()) {
 			table.setRowStyleClass(1, getHeaderRowClass());
-		}
-		else {
+		} else {
 			table.setRowColor(1, getHeaderColor());
 		}
 		int row = 1;
@@ -281,6 +285,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			Link link;
 			boolean hasMessage = false;
 			String name = null;
+			boolean showPriority = false;
 			
 			IWTimestamp today = new IWTimestamp();		
 			
@@ -288,18 +293,41 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			while (iter.hasNext()) {
 				column = 1;
 				application = (ChildCareApplication) iter.next();
-				child = application.getChild();
+				child = application.getChild(); 
 				address = getBusiness().getUserBusiness().getUsersMainAddress(child);
 				phone = getBusiness().getUserBusiness().getChildHomePhone(child);
 				hasMessage = application.getMessage() != null;		
 				boolean active = false;
+				
+				AfterSchoolChoice afc = null;
+				AfterSchoolChoiceHome home = (AfterSchoolChoiceHome)IDOLookup.getHome(AfterSchoolChoice.class);
+				try {
+					afc = home.findByPrimaryKey((Integer)application.getPrimaryKey()); //AfterSchoolChoice extends ChildCareApplication, so it is safe to do so.
+				} catch (Exception e) {
+					e.printStackTrace();
+				} 
+				boolean isFClass = afc.getFClass();
+				
+				if (showFClass) {  
+					// from spec and Malin:
+					// ONLY applications with {COMM_CHILDCARE.F_CLASS set to TRUE ('Y') } are visible					 
+					if(!isFClass) {
+						continue;
+					}					
+				} else {
+					// from spec: IF this property [showFClass] is False then only applications where 
+				    // COMM_CHILDCARE.F_CLASS is set to false (‘N’) or null should be visible in the list.
+					if(isFClass) {
+						continue;
+					}					
+				}
 				
 				SchoolClassMember member;
 				IWTimestamp terminated = null;
 				IWTimestamp startdate = null;
 				
 				Collection placings = getBusiness().getSchoolBusiness().findClassMemberInChildCare(((Integer) child.getPrimaryKey()).intValue(), getSession().getChildCareID());
-				Iterator iterPlac = placings.iterator();
+				Iterator iterPlac = placings.iterator();				
 				
 				while (iterPlac.hasNext()) {
 					column = 1;
@@ -330,71 +358,85 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 							active =true;
 						}
 					}
-				}
+				}			
 				
-				
-				if (!active){
-				
-				if (useStyleNames()) {
-					if (row % 2 == 0) {
-						table.setRowStyleClass(row, getDarkRowClass());
-					}
-					else {
-						table.setRowStyleClass(row, getLightRowClass());
-					}
-					table.setCellpaddingLeft(1, row, 12);
-					table.setCellpaddingRight(table.getColumns(), row, 12);
-				}
-
-				if (application.getApplicationStatus() == getBusiness().getStatusAccepted()) {
-					table.setRowColor(row, ACCEPTED_COLOR);
-				}
-				else if (application.getApplicationStatus() == getBusiness().getStatusParentsAccept()) {
-					table.setRowColor(row, PARENTS_ACCEPTED_COLOR);
-				}
-				else if (application.getApplicationStatus() == getBusiness().getStatusContract()) {
-					table.setRowColor(row, CONTRACT_COLOR);
-				}
-				else {
-					if (!useStyleNames()) {
-						if (row % 2 == 0)
-							table.setRowColor(row, getZebraColor1());
-						else
-							table.setRowColor(row, getZebraColor2());
-					}
-				}
+				if (!active) {
 					
-				//link = getSmallLink(child.getNameLastFirst(true));
-				name = getBusiness().getUserBusiness().getNameLastFirst(child, true);
-				link = getSmallLink(name);
-				link.setEventListener(ChildCareEventListener.class);
-				link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
-				link.setParameter(getSession().getParameterApplicationID(), application.getPrimaryKey().toString());
-				link.setParameter(getSession().getParameterCaseCode(), CareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
-				if (getResponsePage() != null)
-					link.setPage(getResponsePage());
+					if (useStyleNames()) {
+						if (row % 2 == 0) {
+							table.setRowStyleClass(row, getDarkRowClass());
+						}
+						else {
+							table.setRowStyleClass(row, getLightRowClass());
+						}
+						table.setCellpaddingLeft(1, row, 12);
+						table.setCellpaddingRight(table.getColumns(), row, 12);
+					}
 	
-				if (hasMessage) {
-					showMessage = true;
-					table.add(getSmallErrorText("*"), column, row);
-					table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
-				}
-				
-				table.add(link, column++, row);
-				table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
-				
-				if (address != null)
-					table.add(getSmallText(address.getStreetAddress()), column++, row);
-				else
-					table.add(getSmallText("-"), column++, row);
-				if (phone != null)
-					table.add(getSmallText(phone.getNumber()), column++, row++);
-				else
-					table.add(getSmallText("-"), column++, row++);
-			}
-			} //active
-			if (showMessage) {
+					if (application.getApplicationStatus() == getBusiness().getStatusAccepted()) {
+						table.setRowColor(row, ACCEPTED_COLOR);
+					} else if (application.getApplicationStatus() == getBusiness().getStatusParentsAccept()) {
+						table.setRowColor(row, PARENTS_ACCEPTED_COLOR);
+					} else if (application.getApplicationStatus() == getBusiness().getStatusContract()) {
+						table.setRowColor(row, CONTRACT_COLOR);
+					} else {
+						if (!useStyleNames()) {
+							if (row % 2 == 0)
+								table.setRowColor(row, getZebraColor1());
+							else
+								table.setRowColor(row, getZebraColor2());
+						}
+					}
+						
+					//link = getSmallLink(child.getNameLastFirst(true));
+					name = getBusiness().getUserBusiness().getNameLastFirst(child, true);
+					link = getSmallLink(name);
+					link.setEventListener(ChildCareEventListener.class);
+					link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
+					link.setParameter(getSession().getParameterApplicationID(), application.getPrimaryKey().toString());
+					link.setParameter(getSession().getParameterCaseCode(), CareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
+					if (getResponsePage() != null)
+						link.setPage(getResponsePage());
+		
+					boolean hasQueuePriority = application.getHasQueuePriority();
+					if (hasQueuePriority) {					
+						showPriority = true;
+						table.add(getSmallErrorText("&Delta;"), column, row);
+						table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+					}					
+					
+					if (hasMessage) {
+						showMessage = true;
+						table.add(getSmallErrorText("*"), column, row);
+						table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
+					}
+					
+					table.add(link, column++, row);
+					table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
+					
+					if (address != null)
+						table.add(getSmallText(address.getStreetAddress()), column++, row);
+					else
+						table.add(getSmallText("-"), column++, row);
+					if (phone != null)
+						table.add(getSmallText(phone.getNumber()), column++, row++);
+					else
+						table.add(getSmallText("-"), column++, row++);
+				} //active
+			} // while
+			
+			if (showPriority || showMessage) {
 				table.setHeight(row++, 2);
+			}
+			if (showPriority) {				
+				table.mergeCells(1, row, table.getColumns(), row);
+				if (useStyleNames()) {
+					table.setCellpaddingLeft(1, row, 12);
+				}
+				table.add(getSmallErrorText("&Delta; "), 1, row);
+				table.add(getSmallText(localize("school_choice.child_has_priority", "Child has priority")), 1, row++);
+			}	
+			if (showMessage) {
 				table.mergeCells(1, row, table.getColumns(), row);
 				if (useStyleNames()) {
 					table.setCellpaddingLeft(1, row, 12);
@@ -472,5 +514,13 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	
 	public void setShowCreateContractsButton(boolean showCreateContractsButton) {
 		iShowCreateContractsButton = showCreateContractsButton;
+	}
+
+	public boolean getShowFClass() {
+		return showFClass;
+	}
+
+	public void setShowFClass(boolean showFClass) {
+		this.showFClass = showFClass;
 	}
 }

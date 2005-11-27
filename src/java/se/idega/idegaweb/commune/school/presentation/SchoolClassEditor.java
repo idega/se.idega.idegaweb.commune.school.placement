@@ -111,7 +111,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	private int _languageAge = 12;
 	
-	private boolean showPriorityColumnInExcel = false;
+	private boolean showPriorityColumnInExcel = false;	
+	private boolean showHandicraftChoiceInExcelAndPdf = false;	
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -359,10 +360,14 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Link pdfLink = getPDFLink(SchoolClassWriter.class, getBundle().getImage("shared/pdf.gif"));
 			pdfLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			pdfLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
+			pdfLink.addParameter(SchoolClassWriter.PARAMETER_SHOW_HANDICRAFT_COLUMN, Boolean.toString(this.isShowHandicraftChoiceInExcelAndPdf()));
+			
 			table.add(pdfLink, 1, row);
 			Link excelLink = getXLSLink(SchoolClassWriter.class, getBundle().getImage("shared/xls.gif"));
 			excelLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			excelLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
+			excelLink.addParameter(SchoolClassWriter.PARAMETER_SHOW_HANDICRAFT_COLUMN, Boolean.toString(this.isShowHandicraftChoiceInExcelAndPdf()));
+			
 			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(excelLink, 1, row++);
 		}
@@ -1676,5 +1681,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	public void setShowPriorityColumnInExcel(boolean showPriorityColumnInExcel) {
 		this.showPriorityColumnInExcel = showPriorityColumnInExcel;
+	}
+	
+	public boolean isShowHandicraftChoiceInExcelAndPdf() {
+		return showHandicraftChoiceInExcelAndPdf;
+	}
+	
+	public void setShowHandicraftChoiceInExcelAndPdf(boolean showHandicraftChoiceInExcelAndPdf) {
+		this.showHandicraftChoiceInExcelAndPdf = showHandicraftChoiceInExcelAndPdf;
 	}
 }

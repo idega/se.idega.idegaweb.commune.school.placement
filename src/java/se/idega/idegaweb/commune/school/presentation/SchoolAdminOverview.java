@@ -796,7 +796,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (schoolClassMember != null) {
 				SchoolStudyPath handicraft = schoolClassMember.getHandicraft();
 				if (null != handicraft) {
-					table.add(getSmallHeader(localize("school.school_choice_handicraft", "Handicraft")), 1, row);
+					table.add(getSmallHeader(localize("school.handicraft.choice_of_handicraft", "Choice of handicraft")), 1, row);
 					table.add(getSmallText(localize(handicraft.getLocalizedKey(), handicraft.getLocalizedKey())), 2, row);	
 					row++;
 				}

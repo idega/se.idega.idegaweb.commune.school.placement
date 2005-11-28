@@ -1482,8 +1482,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						placementDate = new IWTimestamp(stamp);
 					}
 					
+					SchoolStudyPath handicraft = choice.getHandicraft();
+					int handicraftId = handicraft != null ? ((Integer) handicraft.getPrimaryKey()).intValue() : -1;
 					
-					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID());
+					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID(), handicraftId);
 					if (member != null) {
 						getBusiness().importStudentInformationToNewClass(member, previousSeason);
 						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), placementDate.getDate(), null, iwc.getCurrentUser());
@@ -1497,20 +1499,18 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
 				User student;
 				SchoolClassMember scm;
-				
-				if (studyPathID == -1){
-					try{
+
+				if (studyPathID == -1) {	
+					try {					
 						student = getUserBusiness(iwc).getUser(Integer.parseInt(students[a]));
 						scm = getBusiness().getSchoolBusiness().getSchoolClassMemberHome().findLatestByUser(student);
 						
-						studyPathID = scm.getStudyPathId();
+						studyPathID = scm.getStudyPathId();					
 					}
 					catch (FinderException fe){
 						log (fe);
 					}
 				}
-				
-				
 				
 				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID, studyPathID);
 			

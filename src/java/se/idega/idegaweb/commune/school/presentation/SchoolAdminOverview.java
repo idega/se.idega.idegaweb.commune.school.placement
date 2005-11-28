@@ -521,6 +521,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SchoolClassMember schClMem = null;
 			SchoolClassMember preSchoolClMem = null;
 			String language = null;
+//			SchoolStudyPath handicraft = null;
 			SchoolYear schoolYear = null;
 			String schoolClass = null;
 			//SchoolChoiceBusiness schBuiz;
@@ -605,6 +606,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 						if (language == null) {
 							language = choice.getLanguageChoice();
 						}
+						
+//						if (handicraft == null) {
+//							handicraft = choice.getHandicraft();
+//						}
+						
 						if (schoolYear == null){
 							if (schClMem != null){
 								schoolYear = schClMem.getSchoolYear();								
@@ -644,15 +650,23 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(getSmallHeader(localize("school.school_choice_language", "Preferred language")), 1, row);
 					table.add(getSmallText(localize(language, language)), 2, row++);
 				}
+				
 				if (placementDate != null) {
 					table.add(getSmallHeader(localize("school.placement_date", "Placement date")), 1, row);
 					table.add(getSmallText(placementDate.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), 2, row++);
 					showChangePlacementDate = true;
 				}
+				
 				if (message != null) {
 					table.add(getSmallHeader(localize("school.school_choice_message", "Applicant message")), 1, row);
 					table.add(getSmallText(message), 2, row++);
 				}
+				
+//				if (handicraft != null) {
+//					table.add(getSmallHeader(localize("school.school_choice_handicraft", "Handicraft")), 1, row);
+//					table.add(getSmallText(localize(handicraft.getLocalizedKey(), handicraft.getLocalizedKey())), 2, row++);
+//				}
+				
 				if (extraChoice != null) {
 					table.add(getSmallHeader(localize("school.extra_choice_message", "Extra choice")), 1, row);
 					table.add(getSmallText(extraChoice), 2, row++);
@@ -777,6 +791,17 @@ public class SchoolAdminOverview extends CommuneBlock {
 			if (nativeLang != null)
 				table.add(getSmallText(nativeLang.getName()), 2, row);
 			row++;
+			
+			//show handicraft, if exists			
+			if (schoolClassMember != null) {
+				SchoolStudyPath handicraft = schoolClassMember.getHandicraft();
+				if (null != handicraft) {
+					table.add(getSmallHeader(localize("school.handicraft.choice_of_handicraft", "Choice of handicraft")), 1, row);
+					table.add(getSmallText(localize(handicraft.getLocalizedKey(), handicraft.getLocalizedKey())), 2, row);	
+					row++;
+				}
+			}			
+			
 
 			// *** Resources START ***
 			if (_schoolClassMemberID != -1) {

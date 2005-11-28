@@ -111,7 +111,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	private int _languageAge = 12;
 	
-	private boolean showPriorityColumnInExcel = false;
+	private boolean showPriorityColumnInExcel = false;	
+	private boolean showHandicraftChoiceInExcelAndPdf = false;	
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -359,10 +360,14 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Link pdfLink = getPDFLink(SchoolClassWriter.class, getBundle().getImage("shared/pdf.gif"));
 			pdfLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			pdfLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
+			pdfLink.addParameter(SchoolClassWriter.PARAMETER_SHOW_HANDICRAFT_COLUMN, Boolean.toString(this.isShowHandicraftChoiceInExcelAndPdf()));
+			
 			table.add(pdfLink, 1, row);
 			Link excelLink = getXLSLink(SchoolClassWriter.class, getBundle().getImage("shared/xls.gif"));
 			excelLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			excelLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
+			excelLink.addParameter(SchoolClassWriter.PARAMETER_SHOW_HANDICRAFT_COLUMN, Boolean.toString(this.isShowHandicraftChoiceInExcelAndPdf()));
+			
 			table.add(Text.getNonBrakingSpace(), 1, row);
 			table.add(excelLink, 1, row++);
 		}
@@ -1477,8 +1482,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						placementDate = new IWTimestamp(stamp);
 					}
 					
+					SchoolStudyPath handicraft = choice.getHandicraft();
+					int handicraftId = handicraft != null ? ((Integer) handicraft.getPrimaryKey()).intValue() : -1;
 					
-					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID());
+					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID(), handicraftId);
 					if (member != null) {
 						getBusiness().importStudentInformationToNewClass(member, previousSeason);
 						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), placementDate.getDate(), null, iwc.getCurrentUser());
@@ -1492,20 +1499,18 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());
 				User student;
 				SchoolClassMember scm;
-				
-				if (studyPathID == -1){
-					try{
+
+				if (studyPathID == -1) {	
+					try {					
 						student = getUserBusiness(iwc).getUser(Integer.parseInt(students[a]));
 						scm = getBusiness().getSchoolBusiness().getSchoolClassMemberHome().findLatestByUser(student);
 						
-						studyPathID = scm.getStudyPathId();
+						studyPathID = scm.getStudyPathId();					
 					}
 					catch (FinderException fe){
 						log (fe);
 					}
 				}
-				
-				
 				
 				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID, studyPathID);
 			
@@ -1676,5 +1681,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	public void setShowPriorityColumnInExcel(boolean showPriorityColumnInExcel) {
 		this.showPriorityColumnInExcel = showPriorityColumnInExcel;
+	}
+	
+	public boolean isShowHandicraftChoiceInExcelAndPdf() {
+		return showHandicraftChoiceInExcelAndPdf;
+	}
+	
+	public void setShowHandicraftChoiceInExcelAndPdf(boolean showHandicraftChoiceInExcelAndPdf) {
+		this.showHandicraftChoiceInExcelAndPdf = showHandicraftChoiceInExcelAndPdf;
 	}
 }

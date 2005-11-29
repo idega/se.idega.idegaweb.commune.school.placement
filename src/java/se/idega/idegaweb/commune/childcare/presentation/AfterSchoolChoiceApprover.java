@@ -302,7 +302,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 				AfterSchoolChoice afc = null;
 				AfterSchoolChoiceHome home = (AfterSchoolChoiceHome)IDOLookup.getHome(AfterSchoolChoice.class);
 				try {
-					afc = home.findByPrimaryKey((Integer)application.getPrimaryKey()); //AfterSchoolChoice extends ChildCareApplication, so it is safe to do so.
+					afc = home.findByPrimaryKey(application.getPrimaryKey()); //AfterSchoolChoice extends ChildCareApplication, so it is safe to do so.
 				} catch (Exception e) {
 					e.printStackTrace();
 				} 

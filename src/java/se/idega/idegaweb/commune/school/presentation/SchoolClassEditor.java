@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.care.business.AccountingSession;
+import se.idega.idegaweb.commune.childcare.business.ChildCareQueueWriter;
+import se.idega.idegaweb.commune.childcare.business.ChildCareSiblingListWriter;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
@@ -36,6 +38,7 @@ import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.io.DownloadWriter;
 import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -361,6 +364,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			pdfLink.addParameter(SchoolClassWriter.prmClassId, getSchoolClassID());
 			pdfLink.addParameter(SchoolClassWriter.prmYearId, getSchoolYearID());
 			pdfLink.addParameter(SchoolClassWriter.PARAMETER_SHOW_HANDICRAFT_COLUMN, Boolean.toString(this.isShowHandicraftChoiceInExcelAndPdf()));
+			
+			table.add(getListOfCoordinatesButton(iwc), 2, row);
 			
 			table.add(pdfLink, 1, row);
 			Link excelLink = getXLSLink(SchoolClassWriter.class, getBundle().getImage("shared/xls.gif"));
@@ -1440,6 +1445,23 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
+	private Form getListOfCoordinatesButton(IWContext iwc) throws RemoteException {
+		Form form = new Form();
+		form.setAction(iwc.getIWMainApplication().getMediaServletURI());
+		/*form.addParameter(DownloadWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(ChildCareSiblingListWriter.class));		
+		form.addParameter(ChildCareQueueWriter.PARAMETER_PROVIDER_ID, getSession().getChildCareID());
+		form.addParameter(ChildCareQueueWriter.PARAMETER_SORT_BY, getSession().getSortBy());
+		form.addParameter(ChildCareQueueWriter.PARAMETER_NUMBER_PER_PAGE, _numberPerPage);
+		form.addParameter(ChildCareQueueWriter.PARAMETER_START, _start);
+		SubmitButton button = (SubmitButton) getButton(new SubmitButton(localize("child_care.sibling_list", "See sibling list"),
+		PARAMETER_CLEAN_QUEUE,		
+		Boolean.TRUE.toString()));
+		form.setToShowLoadingOnSubmit(false);		
+		form.setToDisableOnSubmit(button, true);
+		form.add(button);		*/
+		return form;
+	}
+	
 	private void saveClass(IWContext iwc) throws RemoteException {
 		String[] applications = iwc.getParameterValues(PARAMETER_APPLICANT_ID);
 		String[] students = iwc.getParameterValues(getSession().getParameterStudentID());

@@ -8,10 +8,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.ejb.FinderException;
+
 import se.idega.idegaweb.commune.care.business.AccountingSession;
-import se.idega.idegaweb.commune.childcare.business.ChildCareQueueWriter;
-import se.idega.idegaweb.commune.childcare.business.ChildCareSiblingListWriter;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
@@ -22,6 +22,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
+
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -38,7 +39,6 @@ import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.io.DownloadWriter;
 import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -1445,7 +1445,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Form getListOfCoordinatesButton(IWContext iwc) throws RemoteException {
+	private Form getListOfCoordinatesButton(IWContext iwc) {
 		Form form = new Form();
 		form.setAction(iwc.getIWMainApplication().getMediaServletURI());
 		/*form.addParameter(DownloadWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(ChildCareSiblingListWriter.class));		

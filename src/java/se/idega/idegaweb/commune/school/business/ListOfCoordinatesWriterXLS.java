@@ -227,73 +227,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
                         PersonalIDFormatter.format(child.getPersonalID(),
                                 locale));                
                 User parent = application.getOwner();
-                FamilyLogic familyLogic = this.getMemberFamilyLogic(iwc);
-                Collection children = familyLogic.getChildrenFor(parent);                                
-                Iterator c_iter = children.iterator();
-                Integer childId = (Integer) child.getPrimaryKey();
-                int siblingcounter = 0;
-                while(c_iter.hasNext()) {
-                	User sibling = (User)c_iter.next();
-                	Integer siblingId = (Integer)sibling.getPrimaryKey();
-                    ChildCareBusiness ccbb = getChildCareBusiness(iwc);                 	
-                	if (childId.equals(siblingId)) {
-                		continue;
-                	} else {                		
-                		/*ccbb.getActivePlacement(siblingId.intValue())!=null*/
-                		School prov = ccbb.getCurrentProviderByPlacement(siblingId.intValue());
-            			//if(prov==null) { System.out.println("Provider is null?? wtf??!?"); }
-                		if( ccbb.hasActiveNotRemovedPlacements(siblingId.intValue())&&(prov!=null) ) {
-                			if(siblingcounter>=1) {                			                			
-                    			row = sheet.createRow((short) cellRow++);
-                    		}
-                    		Name childname = new Name(sibling.getFirstName(), sibling
-                                    .getMiddleName(), sibling.getLastName());
-                    		if(name.getName(locale, true)!=null) {
-                    			row.createCell((short) 0).setCellValue(name.getName(locale, true));
-                    		}
-                    		if(child.getPersonalID()!=null) {
-                    			row.createCell((short) 1).setCellValue(PersonalIDFormatter.format(child.getPersonalID(),locale));
-                    		}
-                    		if(childname.getName(locale, true)!=null) {
-                    			row.createCell((short) 2).setCellValue(childname.getName(locale, true));
-                    		}
-                    		if(sibling.getPersonalID()!=null) {
-                    			row.createCell((short) 3).setCellValue(PersonalIDFormatter.format(sibling.getPersonalID(),locale));                         	
-                    		}
-                    		try {                    			                    			
-                    			Integer providerId = (Integer)prov.getPrimaryKey();
-                    			if(prov.getName()!=null) {
-                             		row.createCell((short) 4).setCellValue(prov.getName());
-                             		//System.out.println("Provider name is : "+ prov.getName());
-                             	} else {
-                             		row.createCell((short) 4).setCellValue("");
-                             	}
-                    			ChildCareApplication app = ccbb.getActivePlacement(siblingId.intValue());
-                    			IWCalendar splacementDate = new IWCalendar(iwc.getCurrentLocale(), app.getFromDate());                     	
-                    			if (splacementDate != null) {
-                    				  row.createCell((short) 5).setCellValue(
-                    				          splacementDate.getLocaleDate(IWCalendar.SHORT));
-                    			}
-                    			SchoolBusinessBean schoolBean = new SchoolBusinessBean();
-                             	SchoolClassMember schoolClassMember = schoolBean.getSchoolClassMemberHome().findLatestByUserAndSchool(siblingId.intValue(), providerId.intValue());                         
-                             	if(schoolClassMember.getRemovedDate()!=null) { 
-    	                         	IWCalendar splacementEndDate = new IWCalendar(iwc.getCurrentLocale(), schoolClassMember.getRemovedDate());                     	
-    	                         	if (splacementEndDate != null) {
-    	                                row.createCell((short) 6).setCellValue(
-    	                                        splacementEndDate.getLocaleDate(IWCalendar.SHORT));
-    	                            } else {
-    	                         	    row.createCell((short) 6).setCellValue("");
-    	                         	}
-                             	} else {
-                             	    row.createCell((short) 6).setCellValue("");
-                             	}                             	
-                    		} catch(NullPointerException e) {
-                    			//lalalalala
-                    		}    
-                    		siblingcounter++;
-                     	}
-                	}
-                }
+                
             }
             wb.write(mos);
         }
@@ -349,6 +283,13 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);	
 	}
     
+	protected String getCoordinate(int childID) {
+		String coordinate = null;
+		// get ic_address_coordinate for child from table ic_user_address. should be easy as that afaiu.
+		
+		return coordinate;
+	}
+	
     private int getOrdering(int providerId) throws RemoteException {
         School provider = business.getSchoolBusiness().getSchool(new Integer(providerId));
         int ordering = provider.getSortByBirthdate() ? ChildCareAdmin.ORDER_BY_DATE_OF_BIRTH : ChildCareAdmin.ORDER_BY_QUEUE_DATE;

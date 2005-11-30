@@ -823,6 +823,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Link excelLink = getChoicesXLSLink(SchoolChoiceWriter.class, xls);
 			excelLink.addParameter(SchoolChoiceWriter.prmGrade, getSchoolYearID());
 			excelLink.addParameter(SchoolChoiceWriter.PARAMETER_SHOW_PRIORITY_COLUMN, Boolean.toString(getShowPriorityColumnInExcel()));
+			excelLink.addParameter(SchoolChoiceWriter.PARAMETER_SHOW_HANDICRAFT_COLUMN, Boolean.toString(this.isShowHandicraftChoiceInExcelAndPdf()));
 			table.add(excelLink, 1, 1);
 		}
 

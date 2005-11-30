@@ -1448,7 +1448,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private Form getListOfCoordinatesButton(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setAction(iwc.getIWMainApplication().getMediaServletURI());
-		form.addParameter(DownloadWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(ChildCareSiblingListWriter.class));		
+		/*form.addParameter(DownloadWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(ChildCareSiblingListWriter.class));		
 		form.addParameter(ChildCareQueueWriter.PARAMETER_PROVIDER_ID, getSession().getChildCareID());
 		form.addParameter(ChildCareQueueWriter.PARAMETER_SORT_BY, getSession().getSortBy());
 		form.addParameter(ChildCareQueueWriter.PARAMETER_NUMBER_PER_PAGE, _numberPerPage);
@@ -1458,7 +1458,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		Boolean.TRUE.toString()));
 		form.setToShowLoadingOnSubmit(false);		
 		form.setToDisableOnSubmit(button, true);
-		form.add(button);		
+		form.add(button);*/		
 		return form;
 	}
 	

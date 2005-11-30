@@ -521,7 +521,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			SchoolClassMember schClMem = null;
 			SchoolClassMember preSchoolClMem = null;
 			String language = null;
-//			SchoolStudyPath handicraft = null;
+			SchoolStudyPath handicraft = null;
 			SchoolYear schoolYear = null;
 			String schoolClass = null;
 			//SchoolChoiceBusiness schBuiz;
@@ -607,9 +607,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 							language = choice.getLanguageChoice();
 						}
 						
-//						if (handicraft == null) {
-//							handicraft = choice.getHandicraft();
-//						}
+						if (handicraft == null) {
+							handicraft = choice.getHandicraft();
+						}
 						
 						if (schoolYear == null){
 							if (schClMem != null){
@@ -662,15 +662,12 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(getSmallText(message), 2, row++);
 				}
 				
-//				if (handicraft != null) {
-//					table.add(getSmallHeader(localize("school.school_choice_handicraft", "Handicraft")), 1, row);
-//					table.add(getSmallText(localize(handicraft.getLocalizedKey(), handicraft.getLocalizedKey())), 2, row++);
-//				}
-				
 				if (extraChoice != null) {
 					table.add(getSmallHeader(localize("school.extra_choice_message", "Extra choice")), 1, row);
 					table.add(getSmallText(extraChoice), 2, row++);
 				}
+				
+			
 			}
 
 			// if not school change
@@ -793,15 +790,15 @@ public class SchoolAdminOverview extends CommuneBlock {
 			row++;
 			
 			//show handicraft, if exists			
+			// we want to take handicraft from current class memeber. if class member is not there, then we take handicraft we got from choices
 			if (schoolClassMember != null) {
-				SchoolStudyPath handicraft = schoolClassMember.getHandicraft();
-				if (null != handicraft) {
-					table.add(getSmallHeader(localize("school.handicraft.choice_of_handicraft", "Choice of handicraft")), 1, row);
-					table.add(getSmallText(localize(handicraft.getLocalizedKey(), handicraft.getLocalizedKey())), 2, row);	
-					row++;
-				}
+				handicraft = schoolClassMember.getHandicraft();
+			}
+			if (handicraft != null) {
+				table.add(getSmallHeader(localize("school.handicraft.choice_of_handicraft", "Choice of handicraft")), 1, row);
+				table.add(getSmallText(localize(handicraft.getLocalizedKey(), handicraft.getLocalizedKey())), 2, row);	
+				row++;
 			}			
-			
 
 			// *** Resources START ***
 			if (_schoolClassMemberID != -1) {

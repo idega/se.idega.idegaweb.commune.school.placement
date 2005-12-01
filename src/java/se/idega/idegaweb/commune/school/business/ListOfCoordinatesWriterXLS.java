@@ -21,7 +21,11 @@ import se.idega.idegaweb.commune.care.data.ChildCareApplication;
 import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.presentation.ChildCareAdmin;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
+import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
+
+
 import com.idega.block.school.data.School;
+
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWResourceBundle;
@@ -32,16 +36,22 @@ import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.User;
+import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
-import com.lowagie.text.BadElementException;
+
+/*import com.lowagie.text.BadElementException;
 import com.lowagie.text.Cell;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
 import com.lowagie.text.Phrase;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.Table;
+*/
+
+import se.idega.util.SchoolClassMemberComparatorForSweden;
+
 
 public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaWritable { 
 
@@ -50,6 +60,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	
 	private Locale locale;
 	private IWResourceBundle iwrb;
+	
 	
 	private String schoolName;
 	private String groupName;
@@ -64,15 +75,44 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	public final static String PARAMETER_TO_DATE = "cc_to_date";
 	public final static String PARAMETER_START = "cc_start";
 	
+	public final static String PARAMETER_SCHOOL_ID = "school_id";
+	public final static String PARAMETER_SCHOOL_SEASON_ID = "school_season_id";
+	public final static String PARAMETER_SCHOOL_YEAR_ID = "school_year_id";		
+	public final static String PARAMETER_VALID_STATUSES = "valid_statuses";
+	public final static String PARAMETER_SEARCH_STRING = "search_string";
+	
 	public final static String PARAMETER_TYPE = "print_type";
 
     private int providerId = 0;
 	
+    private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
+	private int sortChoicesBy = SchoolClassMemberComparatorForSweden.NAME_SORT;
+	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
+	private int sortPlacedUnplacedBy = -1;
+	private int studyPathID = -1;
+	
+	private String searchString = "";
+
+	private int _previousSchoolClassID = -1;
+	private int _previousSchoolSeasonID = -1;
+	private int _previousSchoolYearID = -1;
+	private int _choiceForDeletion = -1;
+
+	private boolean multibleSchools = false;
+	private boolean showStudentTable = true;
+	private boolean showMessageTextButton = false;
+	private boolean showListOfCoordinatesButton = true;
+	private boolean searchEnabled = true;
+
+	private int applicationsPerPage = 10;
+    
+    
 	public ListOfCoordinatesWriterXLS() {
 	}
 	
 	public void init(HttpServletRequest req, IWContext iwc) {
 		try {
+			System.out.println("----------------------  init ---------------------- ----------------------");
 			locale = iwc.getApplicationSettings().getApplicationLocale();
 			business = getChildCareBusiness(iwc);
 		
@@ -134,6 +174,22 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	
 	public MemoryFileBuffer writeXLS(Collection applications, IWContext iwc)
             throws Exception {
+		Collection applicants = null;
+		String[] validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
+		SchoolChoiceBusinessBean schoolChoiceBean = new SchoolChoiceBusinessBean();
+		int start = -1;
+		Integer school_id = new Integer(PARAMETER_SCHOOL_ID);
+		Integer school_season_id = new Integer(PARAMETER_SCHOOL_SEASON_ID);
+		Integer school_year_id = new Integer(PARAMETER_SCHOOL_YEAR_ID);
+		if((PARAMETER_SCHOOL_ID != null) ) {
+			try {
+				applicants = schoolChoiceBean.getApplicantsForSchool(school_id.intValue(), school_season_id.intValue(), school_year_id.intValue(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
+			}catch(RemoteException e) {
+				//log(e);
+			}
+		} 
+		System.out.println("================================================= +++");
+
         MemoryFileBuffer buffer = new MemoryFileBuffer();
         MemoryOutputStream mos = new MemoryOutputStream(buffer);
         if (!applications.isEmpty()) {
@@ -203,7 +259,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
             
             ChildCareApplication application;
             User child;          
-            //IWCalendar placementDate;
+            IWCalendar placementDate;
             
             Iterator iter = applications.iterator();
             while (iter.hasNext()) {
@@ -211,10 +267,10 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
                 application = (ChildCareApplication) iter.next();
                 child = application.getChild();
 
-                /*placementDate = new IWCalendar(iwc.getCurrentLocale(),
+                placementDate = new IWCalendar(iwc.getCurrentLocale(),
                         application.getFromDate());
                 School provider = getChildCareBusiness(iwc)
-                        .getCurrentProviderByPlacement(application.getChildId());   */           
+                        .getCurrentProviderByPlacement(application.getChildId());              
 
                 Name name = new Name(child.getFirstName(), child
                         .getMiddleName(), child.getLastName());
@@ -223,7 +279,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
                 row.createCell((short) 1).setCellValue(
                         PersonalIDFormatter.format(child.getPersonalID(),
                                 locale));                
-                //User parent = application.getOwner();
+                User parent = application.getOwner();
                 
             }
             wb.write(mos);
@@ -238,7 +294,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 		return service;
 	}
 	
-	private Table getTable(String[] headers, int[] sizes) throws BadElementException, DocumentException {
+	/*private Table getTable(String[] headers, int[] sizes) throws BadElementException, DocumentException {
 		Table datatable = new Table(headers.length);
 		datatable.setPadding(0.0f);
 		datatable.setSpacing(0.0f);
@@ -255,7 +311,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 		datatable.setDefaultCellBorder(Rectangle.NO_BORDER);
 		datatable.setDefaultRowspan(1);
 		return datatable;
-	}
+	}*/
 
 	private Collection getApplicationCollection(IWContext iwc, int childcareId, int sortBy, int numberPerPage, int start, Date fromDate, Date toDate) throws RemoteException {
 		Collection applications;
@@ -280,11 +336,25 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 		return (CommuneUserBusiness) IBOLookup.getServiceInstance(iwc, CommuneUserBusiness.class);	
 	}
     
-	protected String getCoordinate(int childID) {
-		String coordinate = null;
+	protected Collection getApplicants() {
+		Collection applicants = null;
 		// get ic_address_coordinate for child from table ic_user_address. should be easy as that afaiu.
-		
-		return coordinate;
+		String[] validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
+		//getBusiness().		
+		SchoolChoiceBusinessBean schoolChoiceBean = new SchoolChoiceBusinessBean();
+		int start = -1;
+		Integer school_id = new Integer(PARAMETER_SCHOOL_ID);
+		Integer school_season_id = new Integer(PARAMETER_SCHOOL_SEASON_ID);
+		Integer school_year_id = new Integer(PARAMETER_SCHOOL_YEAR_ID);
+		if((PARAMETER_SCHOOL_ID != null) ) {
+			try {
+				applicants = schoolChoiceBean.getApplicantsForSchool(school_id.intValue(), school_season_id.intValue(), school_year_id.intValue(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
+			}catch(RemoteException e) {
+				//log(e);
+			}
+		} 
+		System.out.println("================================================= +++");
+		return applicants;
 	}
 	
     private int getOrdering(int providerId) throws RemoteException {

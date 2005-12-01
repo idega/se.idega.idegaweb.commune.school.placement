@@ -7,6 +7,10 @@
   </classpathentry>
   <classpathentry kind="var" path="MAVEN_REPO/javaldap/jars/java-ldapserver-0.4.jar">
   </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/itextpdf/jars/itext-paulo-139.jar">
+  </classpathentry>
+  <classpathentry kind="var" path="MAVEN_REPO/poi/jars/poi-2.5-final-20040428.jar">
+  </classpathentry>
   <classpathentry kind="src" path="/com.idega.core">
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.process">

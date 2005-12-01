@@ -20,6 +20,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
+import com.idega.io.DownloadWriter;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;

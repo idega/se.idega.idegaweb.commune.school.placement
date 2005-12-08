@@ -11,8 +11,8 @@ import java.util.Map;
 import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
+import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceBusinessBean;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
 import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
@@ -20,7 +20,6 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
-import com.idega.io.DownloadWriter;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
@@ -38,6 +37,7 @@ import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
+import com.idega.io.DownloadWriter;
 import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -57,7 +57,6 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.LocaleUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.TextSoap;
-import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
 
 /**
  * @author Laddi

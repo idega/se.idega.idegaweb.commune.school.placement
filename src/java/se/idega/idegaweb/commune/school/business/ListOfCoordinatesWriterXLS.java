@@ -22,10 +22,8 @@ import se.idega.idegaweb.commune.childcare.business.ChildCareBusiness;
 import se.idega.idegaweb.commune.childcare.presentation.ChildCareAdmin;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
-
-
+import se.idega.util.SchoolClassMemberComparatorForSweden;
 import com.idega.block.school.data.School;
-
 import com.idega.business.IBOLookup;
 import com.idega.idegaweb.IWApplicationContext;
 import com.idega.idegaweb.IWResourceBundle;
@@ -36,21 +34,9 @@ import com.idega.io.MemoryInputStream;
 import com.idega.io.MemoryOutputStream;
 import com.idega.presentation.IWContext;
 import com.idega.user.data.User;
-import com.idega.util.IWCalendar;
 import com.idega.util.IWTimestamp;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.Name;
-
-/*import com.lowagie.text.BadElementException;
-import com.lowagie.text.Cell;
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.Font;
-import com.lowagie.text.Phrase;
-import com.lowagie.text.Rectangle;
-import com.lowagie.text.Table;
-*/
-
-import se.idega.util.SchoolClassMemberComparatorForSweden;
 
 
 public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaWritable { 
@@ -174,7 +160,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	
 	public MemoryFileBuffer writeXLS(Collection applications, IWContext iwc)
             throws Exception {
-		Collection applicants = null;
+		/*Collection applicants = null;
 		String[] validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
 		SchoolChoiceBusinessBean schoolChoiceBean = new SchoolChoiceBusinessBean();
 		int start = -1;
@@ -187,7 +173,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 			}catch(RemoteException e) {
 				//log(e);
 			}
-		} 
+		} */
 		System.out.println("================================================= +++");
 
         MemoryFileBuffer buffer = new MemoryFileBuffer();
@@ -259,7 +245,6 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
             
             ChildCareApplication application;
             User child;          
-            IWCalendar placementDate;
             
             Iterator iter = applications.iterator();
             while (iter.hasNext()) {
@@ -267,10 +252,10 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
                 application = (ChildCareApplication) iter.next();
                 child = application.getChild();
 
-                placementDate = new IWCalendar(iwc.getCurrentLocale(),
+                /*IWCalendar placementDate = new IWCalendar(iwc.getCurrentLocale(),
                         application.getFromDate());
                 School provider = getChildCareBusiness(iwc)
-                        .getCurrentProviderByPlacement(application.getChildId());              
+                        .getCurrentProviderByPlacement(application.getChildId());*/          
 
                 Name name = new Name(child.getFirstName(), child
                         .getMiddleName(), child.getLastName());
@@ -279,7 +264,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
                 row.createCell((short) 1).setCellValue(
                         PersonalIDFormatter.format(child.getPersonalID(),
                                 locale));                
-                User parent = application.getOwner();
+                //User parent = application.getOwner();
                 
             }
             wb.write(mos);

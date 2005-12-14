@@ -11,6 +11,64 @@ import java.util.Map;
 import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceBusinessBean;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
+import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
+import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
+import se.idega.idegaweb.commune.school.data.SchoolChoice;
+import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
+import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
+import se.idega.idegaweb.commune.school.event.SchoolEventListener;
+import com.idega.io.DownloadWriter;
+import se.idega.util.SchoolClassMemberComparatorForSweden;
+import com.idega.block.process.data.Case;
+import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.data.School;
+import com.idega.block.school.data.SchoolClass;
+import com.idega.block.school.data.SchoolClassMember;
+import com.idega.block.school.data.SchoolSeason;
+import com.idega.block.school.data.SchoolStudyPath;
+import com.idega.block.school.data.SchoolStudyPathHome;
+import com.idega.block.school.data.SchoolYear;
+import com.idega.business.IBOLookup;
+import com.idega.core.location.data.Address;
+import com.idega.core.location.data.Commune;
+import com.idega.core.location.data.CommuneHome;
+import com.idega.data.IDOLookup;
+import com.idega.idegaweb.IWMainApplication;
+import com.idega.idegaweb.IWResourceBundle;
+import com.idega.io.MediaWritable;
+import com.idega.presentation.IWContext;
+import com.idega.presentation.Image;
+import com.idega.presentation.Layer;
+import com.idega.presentation.Table;
+import com.idega.presentation.text.Link;
+import com.idega.presentation.text.Text;
+import com.idega.presentation.ui.CheckBox;
+import com.idega.presentation.ui.DropdownMenu;
+import com.idega.presentation.ui.Form;
+import com.idega.presentation.ui.GenericButton;
+import com.idega.presentation.ui.HiddenInput;
+import com.idega.presentation.ui.SubmitButton;
+import com.idega.presentation.ui.TextInput;
+import com.idega.user.data.User;
+import com.idega.util.IWTimestamp;
+import com.idega.util.LocaleUtil;
+import com.idega.util.PersonalIDFormatter;
+import com.idega.util.text.TextSoap;
+import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
+import java.rmi.RemoteException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.ejb.FinderException;
+import se.idega.idegaweb.commune.care.business.AccountingSession;
+import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
@@ -57,6 +115,7 @@ import com.idega.util.IWTimestamp;
 import com.idega.util.LocaleUtil;
 import com.idega.util.PersonalIDFormatter;
 import com.idega.util.text.TextSoap;
+
 
 /**
  * @author Laddi
@@ -375,7 +434,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			
 			
 			table.add(Text.getNonBrakingSpace(), 1, row);
+			table.add(pdfLink, 1, row);			
 			table.add(excelLink, 1, row++);
+			
 		}
 
 		table.add(getNewStudentTable(iwc), 1, row++);
@@ -440,7 +501,19 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		else {
 			applicationsPerPage = -1;
 		}
-
+		System.out.println("School ID from lister : "+getSchoolID());
+		System.out.println("School Season ID from lister : "+getSchoolSeasonID());
+		System.out.println("School Year ID from lister : "+getSchoolYearID());
+		System.out.print("Valid Statuses from lister : ");
+		for(int i=0;i<validStatuses.length;i++) { System.out.print(validStatuses[i]+" ");}
+		System.out.println();
+		System.out.println("Search string from lister :"+searchString);
+		System.out.println("Sort Choices by from lister :"+sortChoicesBy);
+		System.out.println("applications per page from lister :"+applicationsPerPage);
+		System.out.println("start from lister :"+start);
+		System.out.println("sortPlacedUnplacedBy from lister :"+sortPlacedUnplacedBy);
+				
+				
 		Collection applicants = null;
 		if (getSchoolID() != -1)
 			applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
@@ -492,8 +565,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 		}
 		if (showListOfCoordinatesButton) {
-			table.add(getListOfCoordinatesButton(iwc), 1, 1);
-			table.setBorder(1);
+			Link excelLink1 = getListOfCoordinatesXLSLink(ListOfCoordinatesWriterXLS.class, getBundle().getImage("shared/xls.gif"));
+			table.add(excelLink1, 1, 1);
 		}
 		
 		headerRow = row;
@@ -591,7 +664,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				//String name = applicant.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(applicant, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = applicant.getName();
-
+				try {
 				if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR_THIS_SCHOOL);
 				}
@@ -609,7 +682,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 							table.setRowColor(row, getZebraColor2());
 					}
 				}
-
+				}catch(NullPointerException e) {
+					log(e);
+				}
 				link = getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
 				link.setParameter(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_OVERVIEW));
@@ -902,8 +977,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				student = (User) studentMap.get(new Integer(studentMember.getClassMemberId()));
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
-			
-				
+							
 				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField)) {
 					hasPlacement = true;
 					if (_group != null && _group.getIsSubGroup()) {
@@ -1455,19 +1529,15 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Form getListOfCoordinatesButton(IWContext iwc) throws RemoteException {		
-		Form form = new Form();
-		form.setAction(iwc.getIWMainApplication().getMediaServletURI());		
-		form.addParameter(DownloadWriter.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(ListOfCoordinatesWriterXLS.class));		
-		form.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_ID, session.getSchoolID());
-		form.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_SEASON_ID, session.getSchoolSeasonID());
-		form.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_YEAR_ID, session.getSchoolYearID());		
-		form.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SEARCH_STRING, searchString);		
-		SubmitButton button = (SubmitButton) getButton(new SubmitButton(localize("school.view_coordinates", "View coordinates"), "", Boolean.TRUE.toString()));
-		form.setToShowLoadingOnSubmit(false);		
-		form.setToDisableOnSubmit(button, true);
-		form.add(button);
-		return form;
+	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
+		Link link = new Link(image);
+		link.setWindow(getFileWindow());
+		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
+		link.addParameter(ListOfCoordinatesWriterXLS.prmSchoolId, getSchoolID());
+		link.addParameter(ListOfCoordinatesWriterXLS.prmSeasonId, getSchoolSeasonID());		
+		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_YEAR_ID, getSchoolYearID());		
+		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SEARCH_STRING, searchString);
+		return link;
 	}
 	
 	private void saveClass(IWContext iwc) throws RemoteException {

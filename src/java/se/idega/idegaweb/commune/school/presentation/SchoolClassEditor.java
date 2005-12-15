@@ -102,7 +102,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private boolean multibleSchools = false;
 	private boolean showStudentTable = true;
 	private boolean showMessageTextButton = false;
-	private boolean showListOfCoordinatesButton = true;
+//	private boolean showListOfCoordinatesButton = true;
 	private boolean searchEnabled = true;
 
 	private int applicationsPerPage = 10;

@@ -8,11 +8,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.ejb.FinderException;
+
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceBusinessBean;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
 import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
@@ -20,8 +21,8 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
-import com.idega.io.DownloadWriter;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
+
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -38,64 +39,6 @@ import com.idega.core.location.data.CommuneHome;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWMainApplication;
 import com.idega.idegaweb.IWResourceBundle;
-import com.idega.io.MediaWritable;
-import com.idega.presentation.IWContext;
-import com.idega.presentation.Image;
-import com.idega.presentation.Layer;
-import com.idega.presentation.Table;
-import com.idega.presentation.text.Link;
-import com.idega.presentation.text.Text;
-import com.idega.presentation.ui.CheckBox;
-import com.idega.presentation.ui.DropdownMenu;
-import com.idega.presentation.ui.Form;
-import com.idega.presentation.ui.GenericButton;
-import com.idega.presentation.ui.HiddenInput;
-import com.idega.presentation.ui.SubmitButton;
-import com.idega.presentation.ui.TextInput;
-import com.idega.user.data.User;
-import com.idega.util.IWTimestamp;
-import com.idega.util.LocaleUtil;
-import com.idega.util.PersonalIDFormatter;
-import com.idega.util.text.TextSoap;
-import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
-import java.rmi.RemoteException;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.ejb.FinderException;
-import se.idega.idegaweb.commune.care.business.AccountingSession;
-import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
-import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
-import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
-import se.idega.idegaweb.commune.school.business.SchoolClassWriter;
-import se.idega.idegaweb.commune.school.data.SchoolChoice;
-import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
-import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
-import se.idega.idegaweb.commune.school.event.SchoolEventListener;
-import se.idega.util.SchoolClassMemberComparatorForSweden;
-import com.idega.block.process.data.Case;
-import com.idega.block.school.business.SchoolBusiness;
-import com.idega.block.school.data.School;
-import com.idega.block.school.data.SchoolClass;
-import com.idega.block.school.data.SchoolClassMember;
-import com.idega.block.school.data.SchoolSeason;
-import com.idega.block.school.data.SchoolStudyPath;
-import com.idega.block.school.data.SchoolStudyPathHome;
-import com.idega.block.school.data.SchoolYear;
-import com.idega.business.IBOLookup;
-import com.idega.core.location.data.Address;
-import com.idega.core.location.data.Commune;
-import com.idega.core.location.data.CommuneHome;
-import com.idega.data.IDOLookup;
-import com.idega.idegaweb.IWMainApplication;
-import com.idega.idegaweb.IWResourceBundle;
-import com.idega.io.DownloadWriter;
 import com.idega.io.MediaWritable;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Image;
@@ -564,10 +507,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				navigationTable.add(next, 3, 1);
 			}
 		}
-		if (showListOfCoordinatesButton) {
+/*		if (showListOfCoordinatesButton) {
 			Link excelLink1 = getListOfCoordinatesXLSLink(ListOfCoordinatesWriterXLS.class, getBundle().getImage("shared/xls.gif"));
 			table.add(excelLink1, 1, 1);
-		}
+		}*/
 		
 		headerRow = row;
 		if (useStyleNames()) {
@@ -1529,7 +1472,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
+/*	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
 		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
@@ -1538,7 +1481,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_YEAR_ID, getSchoolYearID());		
 		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SEARCH_STRING, searchString);
 		return link;
-	}
+	}*/
 	
 	private void saveClass(IWContext iwc) throws RemoteException {
 		String[] applications = iwc.getParameterValues(PARAMETER_APPLICANT_ID);

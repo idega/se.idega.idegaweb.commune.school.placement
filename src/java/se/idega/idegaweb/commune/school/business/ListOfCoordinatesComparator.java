@@ -2,11 +2,10 @@ package se.idega.idegaweb.commune.school.business;
 
 import java.rmi.RemoteException;
 import java.util.Comparator;
-import com.idega.block.school.data.School;
-import com.idega.core.location.data.Address;
-import com.idega.user.data.User;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
+import com.idega.core.location.data.Address;
+import com.idega.user.data.User;
 
 
 public class ListOfCoordinatesComparator implements Comparator {

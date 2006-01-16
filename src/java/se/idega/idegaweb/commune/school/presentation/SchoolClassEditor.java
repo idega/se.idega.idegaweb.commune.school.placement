@@ -8,11 +8,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
+import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceWriter;
@@ -22,7 +21,6 @@ import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
-
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -102,7 +100,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private boolean multibleSchools = false;
 	private boolean showStudentTable = true;
 	private boolean showMessageTextButton = false;
-//	private boolean showListOfCoordinatesButton = true;
+	private boolean showListOfCoordinatesButton = true;
 	private boolean searchEnabled = true;
 
 	private int applicationsPerPage = 10;
@@ -113,6 +111,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private boolean _useForTesting = false;
 	private String operationalField = null;
 	private SchoolClass _group;
+	
 
 	private int _languageAge = 12;
 	
@@ -241,14 +240,14 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.add(getNavigationTable(true, multibleSchools, showBunRadioButtons, iwc), 1, 1);
 		table.add(getSearchAndSortTable(), 1, 3);
 		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 5);
-		if (useStyleNames()) {
+	//	if (useStyleNames()) {
 			table.setCellpaddingLeft(1, 1, 12);
 			table.setCellpaddingLeft(1, 3, 12);
 			table.setCellpaddingLeft(1, 5, 12);
 			table.setCellpaddingRight(1, 1, 12);
 			table.setCellpaddingRight(1, 3, 12);
 			table.setCellpaddingRight(1, 5, 12);
-		}
+	//	}
 
 		table.add(getApplicationTable(iwc), 1, 7);
 
@@ -281,7 +280,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					report.setPageToOpen(getResponsePage());
 					table.add(report, 1, 17);
 					table.add(Text.getNonBrakingSpace(), 1, 17);
-				}
+				} 
 			}
 
 			if (getSchoolClassID() != -1) {
@@ -507,10 +506,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				navigationTable.add(next, 3, 1);
 			}
 		}
-/*		if (showListOfCoordinatesButton) {
+		if (showListOfCoordinatesButton) {
 			Link excelLink1 = getListOfCoordinatesXLSLink(ListOfCoordinatesWriterXLS.class, getBundle().getImage("shared/xls.gif"));
 			table.add(excelLink1, 1, 1);
-		}*/
+		}
 		
 		headerRow = row;
 		if (useStyleNames()) {
@@ -1091,13 +1090,15 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		boolean isReady = false;
 		boolean isLocked = false;
 		boolean isSubGroup = false;
+		getSchoolClassID();
 		SchoolClass newSchoolClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 		if (newSchoolClass != null) {
 			isReady = newSchoolClass.getReady();
 			isLocked = newSchoolClass.getLocked();
 			isSubGroup = newSchoolClass.getIsSubGroup();
 		}
-
+		
+  
 		Table table = new Table();
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
@@ -1344,12 +1345,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 			if (isReady) {
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
-					groupReady.setDisabled(true);
+					//groupReady.setDisabled(true);
 				}
 			}
 			else {
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
-					groupReady.setDisabled(true);
+					//groupReady.setDisabled(true);
 				}
 			}
 
@@ -1472,7 +1473,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-/*	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
+	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
 		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
@@ -1481,7 +1482,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_YEAR_ID, getSchoolYearID());		
 		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SEARCH_STRING, searchString);
 		return link;
-	}*/
+	}
 	
 	private void saveClass(IWContext iwc) throws RemoteException {
 		String[] applications = iwc.getParameterValues(PARAMETER_APPLICANT_ID);
@@ -1504,7 +1505,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			IWResourceBundle iwrb = getResourceBundle(iwc);
 			String startDateString = iwrb.getIWBundleParent().getProperty(PROPERTY_START_HIGH_SCHOOL, stamp.getDate().toString());
 			if (startDateString != null)
-				stamp = new IWTimestamp(startDateString);	
+				stamp = new IWTimestamp(startDateString);	startDateString=null;
 		}
 		
 		/////////end
@@ -1512,7 +1513,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		SchoolSeason previousSeason = getBusiness().getPreviousSchoolSeason(getSchoolSeasonID());
 		getBusiness().resetSchoolClassStatus(getSchoolClassID());
 		
-				
+		
 		if (applications != null && applications.length > 0) {
 			for (int a = 0; a < applications.length; a++) {
 				int schoolTypeID = getSchoolBusiness(iwc).getSchoolTypeIdFromSchoolClass(getSchoolClassID());

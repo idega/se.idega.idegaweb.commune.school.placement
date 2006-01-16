@@ -259,23 +259,21 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.setColumns(4);
 		if (useStyleNames()) {
 			table.setRowStyleClass(1, getHeaderRowClass());
-		} else {
+		}
+		else {
 			table.setRowColor(1, getHeaderColor());
 		}
 		int row = 1;
 		int column = 1;
-			
 		if (useStyleNames()) {
 			table.setCellpaddingLeft(1, row, 12);
 			table.setCellpaddingRight(table.getColumns(), row, 12);
 		}
-		table.add(getLocalizedSmallHeader("child_care.name","Name"), column++, row);
-		table.add(getLocalizedSmallHeader("child_care.personal_id","Personal ID"), column++, row);
-		table.add(getLocalizedSmallHeader("child_care.address","Address"), column++, row);
-		table.add(getLocalizedSmallHeader("child_care.phone","Phone"), column++, row++);
-
+		table.add(getLocalizedSmallHeader("child_care.name", "Name"), column++, row);
+		table.add(getLocalizedSmallHeader("child_care.personal_id", "Personal ID"), column++, row);
+		table.add(getLocalizedSmallHeader("child_care.address", "Address"), column++, row);
+		table.add(getLocalizedSmallHeader("child_care.phone", "Phone"), column++, row++);
 		boolean showMessage = false;
-
 		Collection applications = getApplicationCollection(iwc, sortStudentsBy);
 		if (applications != null && !applications.isEmpty()) {
 			ChildCareApplication application;
@@ -286,169 +284,179 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 			boolean hasMessage = false;
 			String name = null;
 			boolean showPriority = false;
-			
-			IWTimestamp today = new IWTimestamp();		
-			
+			IWTimestamp today = new IWTimestamp();
 			Iterator iter = applications.iterator();
+			int selectedSeason = Integer.valueOf(getSeasons().getSelectedElementValue()).intValue();
 			while (iter.hasNext()) {
 				column = 1;
 				application = (ChildCareApplication) iter.next();
-				child = application.getChild(); 
+				child = application.getChild();
 				address = getBusiness().getUserBusiness().getUsersMainAddress(child);
 				phone = getBusiness().getUserBusiness().getChildHomePhone(child);
-				hasMessage = application.getMessage() != null;		
+				hasMessage = application.getMessage() != null;
 				boolean active = false;
-				
 				AfterSchoolChoice afc = null;
-				AfterSchoolChoiceHome home = (AfterSchoolChoiceHome)IDOLookup.getHome(AfterSchoolChoice.class);
+				AfterSchoolChoiceHome home = (AfterSchoolChoiceHome) IDOLookup.getHome(AfterSchoolChoice.class);
+				int itemSeason = 0;
 				try {
-					afc = home.findByPrimaryKey(application.getPrimaryKey()); //AfterSchoolChoice extends ChildCareApplication, so it is safe to do so.
-				} catch (Exception e) {
-					e.printStackTrace();
-				} 
-				boolean isFClass = afc.getFClass();
-				
-				if (showFClass) {  
-					// from spec and Malin:
-					// ONLY applications with {COMM_CHILDCARE.F_CLASS set to TRUE ('Y') } are visible					 
-					if(!isFClass) {
-						continue;
-					}					
-				} else {
-					// from spec: IF this property [showFClass] is False then only applications where 
-				    // COMM_CHILDCARE.F_CLASS is set to false (‘N’) or null should be visible in the list.
-					if(isFClass) {
-						continue;
-					}					
+					afc = home.findByPrimaryKey(application.getPrimaryKey()); // AfterSchoolChoice
+																				// extends
+																				// ChildCareApplication,
+																				// so
+																				// it
+																				// is
+																				// safe
+																				// to
+																				// do
+																				// so.
+					if (afc != null)
+						itemSeason = afc.getSchoolSeasonId();
 				}
-				
-				SchoolClassMember member;
-				IWTimestamp terminated = null;
-				IWTimestamp startdate = null;
-				
-				Collection placings = getBusiness().getSchoolBusiness().findClassMemberInChildCare(((Integer) child.getPrimaryKey()).intValue(), getSession().getChildCareID());
-				Iterator iterPlac = placings.iterator();				
-				
-				while (iterPlac.hasNext()) {
-					column = 1;
-					member = (SchoolClassMember) iterPlac.next();
-					SchoolClass group = member.getSchoolClass();
-					SchoolSeason season = group.getSchoolSeason();
-					
-					if (season != null && ((Integer) season.getPrimaryKey()).intValue() == getSession().getSeasonID()) {
-						if (member.getRemovedDate() != null){
-							terminated = new IWTimestamp(member.getRemovedDate());
-							if (terminated.isEarlierThan(today))
-								active = false;
-							else 
-								active = true;
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				if (selectedSeason == itemSeason) {  // filter for seasons added by Igors 10.01.2006
+					boolean isFClass = afc.getFClass();
+					if (showFClass) {
+						// from spec and Malin:
+						// ONLY applications with {COMM_CHILDCARE.F_CLASS set to
+						// TRUE ('Y') } are visible
+						if (!isFClass) {
+							continue;
 						}
-						else if (member.getRegisterDate() != null){
-							startdate = new IWTimestamp(member.getRegisterDate());
-							if (startdate.isLaterThan(today)){
+					}
+					else {
+						// from spec: IF this property [showFClass] is False
+						// then only applications where
+						// COMM_CHILDCARE.F_CLASS is set to false (‘N’) or null
+						// should be visible in the list.
+						if (isFClass) {
+							continue;
+						}
+					}
+					SchoolClassMember member;
+					IWTimestamp terminated = null;
+					IWTimestamp startdate = null;
+					Collection placings = getBusiness().getSchoolBusiness().findClassMemberInChildCare(
+							((Integer) child.getPrimaryKey()).intValue(), getSession().getChildCareID());
+					Iterator iterPlac = placings.iterator();
+					while (iterPlac.hasNext()) {
+						column = 1;
+						member = (SchoolClassMember) iterPlac.next();
+						SchoolClass group = member.getSchoolClass();
+						SchoolSeason season = group.getSchoolSeason();
+						if (season != null
+								&& ((Integer) season.getPrimaryKey()).intValue() == getSession().getSeasonID()) {
+							if (member.getRemovedDate() != null) {
+								terminated = new IWTimestamp(member.getRemovedDate());
+								if (terminated.isEarlierThan(today))
+									active = false;
+								else
+									active = true;
+							}
+							else if (member.getRegisterDate() != null) {
+								startdate = new IWTimestamp(member.getRegisterDate());
+								if (startdate.isLaterThan(today)) {
+									active = true;
+								}
+								else if (startdate.isEarlierThan(today) && member.getRemovedDate() == null) {
+									active = true;
+								}
+								else
+									active = false;
+							}
+							else {
 								active = true;
 							}
-							else if (startdate.isEarlierThan(today) && member.getRemovedDate() == null){
-								active = true;
+						}
+					}
+					if (!active) {
+						if (useStyleNames()) {
+							if (row % 2 == 0) {
+								table.setRowStyleClass(row, getDarkRowClass());
 							}
-							else
-								active = false;
+							else {
+								table.setRowStyleClass(row, getLightRowClass());
+							}
+							table.setCellpaddingLeft(1, row, 12);
+							table.setCellpaddingRight(table.getColumns(), row, 12);
+						}
+						if (application.getApplicationStatus() == getBusiness().getStatusAccepted()) {
+							table.setRowColor(row, ACCEPTED_COLOR);
+						}
+						else if (application.getApplicationStatus() == getBusiness().getStatusParentsAccept()) {
+							table.setRowColor(row, PARENTS_ACCEPTED_COLOR);
+						}
+						else if (application.getApplicationStatus() == getBusiness().getStatusContract()) {
+							table.setRowColor(row, CONTRACT_COLOR);
 						}
 						else {
-							active =true;
+							if (!useStyleNames()) {
+								if (row % 2 == 0)
+									table.setRowColor(row, getZebraColor1());
+								else
+									table.setRowColor(row, getZebraColor2());
+							}
 						}
-					}
-				}			
-				
-				if (!active) {
-					
-					if (useStyleNames()) {
-						if (row % 2 == 0) {
-							table.setRowStyleClass(row, getDarkRowClass());
+						// link = getSmallLink(child.getNameLastFirst(true));
+						name = getBusiness().getUserBusiness().getNameLastFirst(child, true);
+						link = getSmallLink(name);
+						link.setEventListener(ChildCareEventListener.class);
+						link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
+						link.setParameter(getSession().getParameterApplicationID(),
+								application.getPrimaryKey().toString());
+						link.setParameter(getSession().getParameterCaseCode(), CareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
+						if (getResponsePage() != null)
+							link.setPage(getResponsePage());
+						boolean hasQueuePriority = application.getHasQueuePriority();
+						if (hasQueuePriority) {
+							showPriority = true;
+							table.add(getSmallErrorText("&Delta;"), column, row);
+							table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
 						}
-						else {
-							table.setRowStyleClass(row, getLightRowClass());
+						if (hasMessage) {
+							showMessage = true;
+							table.add(getSmallErrorText("*"), column, row);
+							table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
 						}
-						table.setCellpaddingLeft(1, row, 12);
-						table.setCellpaddingRight(table.getColumns(), row, 12);
-					}
-	
-					if (application.getApplicationStatus() == getBusiness().getStatusAccepted()) {
-						table.setRowColor(row, ACCEPTED_COLOR);
-					} else if (application.getApplicationStatus() == getBusiness().getStatusParentsAccept()) {
-						table.setRowColor(row, PARENTS_ACCEPTED_COLOR);
-					} else if (application.getApplicationStatus() == getBusiness().getStatusContract()) {
-						table.setRowColor(row, CONTRACT_COLOR);
-					} else {
-						if (!useStyleNames()) {
-							if (row % 2 == 0)
-								table.setRowColor(row, getZebraColor1());
-							else
-								table.setRowColor(row, getZebraColor2());
-						}
-					}
-						
-					//link = getSmallLink(child.getNameLastFirst(true));
-					name = getBusiness().getUserBusiness().getNameLastFirst(child, true);
-					link = getSmallLink(name);
-					link.setEventListener(ChildCareEventListener.class);
-					link.setParameter(getSession().getParameterUserID(), String.valueOf(application.getChildId()));
-					link.setParameter(getSession().getParameterApplicationID(), application.getPrimaryKey().toString());
-					link.setParameter(getSession().getParameterCaseCode(), CareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
-					if (getResponsePage() != null)
-						link.setPage(getResponsePage());
-		
-					boolean hasQueuePriority = application.getHasQueuePriority();
-					if (hasQueuePriority) {					
-						showPriority = true;
-						table.add(getSmallErrorText("&Delta;"), column, row);
-						table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
-					}					
-					
-					if (hasMessage) {
-						showMessage = true;
-						table.add(getSmallErrorText("*"), column, row);
-						table.add(getSmallText(Text.NON_BREAKING_SPACE), column, row);
-					}
-					
-					table.add(link, column++, row);
-					table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), column++, row);
-					
-					if (address != null)
-						table.add(getSmallText(address.getStreetAddress()), column++, row);
-					else
-						table.add(getSmallText("-"), column++, row);
-					if (phone != null)
-						table.add(getSmallText(phone.getNumber()), column++, row++);
-					else
-						table.add(getSmallText("-"), column++, row++);
-				} //active
+						table.add(link, column++, row);
+						table.add(
+								getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())),
+								column++, row);
+						if (address != null)
+							table.add(getSmallText(address.getStreetAddress()), column++, row);
+						else
+							table.add(getSmallText("-"), column++, row);
+						if (phone != null)
+							table.add(getSmallText(phone.getNumber()), column++, row++);
+						else
+							table.add(getSmallText("-"), column++, row++);
+					} // active
+				} // season filter
 			} // while
-			
 			if (showPriority || showMessage) {
 				table.setHeight(row++, 2);
 			}
-			if (showPriority) {				
+			if (showPriority) {
 				table.mergeCells(1, row, table.getColumns(), row);
 				if (useStyleNames()) {
 					table.setCellpaddingLeft(1, row, 12);
 				}
 				table.add(getSmallErrorText("&Delta; "), 1, row);
 				table.add(getSmallText(localize("school_choice.child_has_priority", "Child has priority")), 1, row++);
-			}	
+			}
 			if (showMessage) {
 				table.mergeCells(1, row, table.getColumns(), row);
 				if (useStyleNames()) {
 					table.setCellpaddingLeft(1, row, 12);
 				}
 				table.add(getSmallErrorText("* "), 1, row);
-				table.add(getSmallText(localize("child_care.has_message_in_application","The application has a message attached")), 1, row++);
+				table.add(getSmallText(localize("child_care.has_message_in_application",
+						"The application has a message attached")), 1, row++);
 			}
-			
 			table.setColumnAlignment(2, Table.HORIZONTAL_ALIGN_CENTER);
 			table.setColumnAlignment(4, Table.HORIZONTAL_ALIGN_CENTER);
 		}
-			
 		return table;
 	}
 

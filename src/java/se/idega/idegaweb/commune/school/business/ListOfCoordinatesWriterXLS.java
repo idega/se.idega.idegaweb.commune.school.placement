@@ -154,7 +154,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 		MemoryOutputStream mos = new MemoryOutputStream(buffer);
 		String[] validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
 		List students = (List)business.getSchoolChoiceBusiness().getApplicantsForSchool(schoolID, seasonID, syear, validStatuses, searchString, SchoolChoiceComparator.NAME_SORT, -1, -1);
-		String providerCoordinate = business.getSchoolBusiness().getSchool(schoolID).getSchoolKeyCode();
+		String providerCoordinate = business.getSchoolBusiness().getSchool(new Integer(schoolID)).getSchoolKeyCode();
 		if (!students.isEmpty()) {
 			Collections.sort(students,  new ListOfCoordinatesComparator(providerCoordinate, business, userBusiness));			 
 		    HSSFWorkbook wb = new HSSFWorkbook();
@@ -177,7 +177,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 			HSSFRow row = sheet.createRow(cellRow++);
 			HSSFCell cell = row.createCell((short)cellColumn++);
 			cell = row.createCell((short) 0);			
-			cell.setCellValue(business.getSchoolBusiness().getSchool(schoolID).getName());
+			cell.setCellValue(business.getSchoolBusiness().getSchool(new Integer(schoolID)).getName());
 			cell.setCellStyle(style);
 			cell = row.createCell((short) 3);
 			cell.setCellValue(iwrb.getLocalizedString("school.Coordinate","Coordinate")+": "+providerCoordinate);

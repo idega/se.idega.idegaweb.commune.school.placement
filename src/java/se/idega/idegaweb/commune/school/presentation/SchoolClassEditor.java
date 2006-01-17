@@ -1473,7 +1473,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
+	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
 		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));

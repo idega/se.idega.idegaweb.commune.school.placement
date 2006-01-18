@@ -58,7 +58,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	public static final int ACTION_SAVE = 2;
 	private final int ACTION_CREATE_CONTRACTS = 3;
 
-	private boolean iShowCreateContractsButton = true;
+	private boolean iShowCreateContractsButton = false;
 	
 	private boolean showFClass = false;
 	
@@ -342,6 +342,8 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 						else {
 							cell.add(new Text("-"));
 						}
+						
+						iRow++;
 					} // active
 				} // season filter
 			} // while
@@ -359,12 +361,12 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		list.add(item);
 		
 		item = new ListItem();
-		item.setStyleClass("accepted");
+		item.setStyleClass("parentAccepted");
 		item.add(new Text(localize("child_care.application_status_parents_accepted", "Parents accepted")));
 		list.add(item);
 
 		item = new ListItem();
-		item.setStyleClass("accepted");
+		item.setStyleClass("contract");
 		item.add(new Text(localize("child_care.application_status_contract", "Contract")));
 		list.add(item);
 		

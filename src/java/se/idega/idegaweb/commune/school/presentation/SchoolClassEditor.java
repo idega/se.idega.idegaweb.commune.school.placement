@@ -505,7 +505,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				navigationTable.add(next, 3, 1);
 			}
 		}
-		if (showListOfCoordinatesButton) {
+		if (isShowListOfCoordinatesButton()) {
 			Link excelLink1 = getListOfCoordinatesXLSLink(ListOfCoordinatesWriterXLS.class, getBundle().getImage("shared/xls.gif"));
 			table.add(excelLink1, 1, 1);
 		}
@@ -1731,5 +1731,15 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	public void setShowHandicraftChoiceInExcelAndPdf(boolean showHandicraftChoiceInExcelAndPdf) {
 		this.showHandicraftChoiceInExcelAndPdf = showHandicraftChoiceInExcelAndPdf;
+	}
+
+	
+	public boolean isShowListOfCoordinatesButton() {
+		return showListOfCoordinatesButton;
+	}
+
+	
+	public void setShowListOfCoordinatesButton(boolean showListOfCoordinatesButton) {
+		this.showListOfCoordinatesButton = showListOfCoordinatesButton;
 	}
 }

@@ -210,6 +210,8 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 
 			Iterator iter = applications.iterator();
 			while (iter.hasNext()) {
+				row = group.createRow();
+				
 				application = (ChildCareApplication) iter.next();
 				child = application.getChild();
 				address = getBusiness().getUserBusiness().getUsersMainAddress(child);

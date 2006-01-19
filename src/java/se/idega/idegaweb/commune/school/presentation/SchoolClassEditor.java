@@ -1732,3 +1732,4 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	public void setShowHandicraftChoiceInExcelAndPdf(boolean showHandicraftChoiceInExcelAndPdf) {
 		this.showHandicraftChoiceInExcelAndPdf = showHandicraftChoiceInExcelAndPdf;
 	}
+}

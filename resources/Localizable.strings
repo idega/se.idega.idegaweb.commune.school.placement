@@ -98,6 +98,7 @@ child.other_information=Other information
 child.other_information_help=If there is anything else that you feel the school should know about the child, please fill in the details.
 contact=Contact
 custodian=Custodian
+custodian_must_be_at_least_18_years_old=The custodian you have selected is younger than 18 years old. Custodians must be at least 18 years old or older.
 departure_time=Departure time
 details=Details
 email=E-mail

@@ -97,6 +97,7 @@ child.other_information=A\u00F0rar uppl\u00FDsingar
 child.other_information_help=Ef \u00FEa\u00F0 er eitthva\u00F0 s\u00E9rstakt sem \u00FE\u00FA vilt taka fram, vinsamlega skr\u00E1i\u00F0 \u00FEa\u00F0 h\u00E9r.
 contact=Tengili\u00F0ur
 custodian=Foreldri/forr\u00E1\u00F0ama\u00F0ur
+custodian_must_be_at_least_18_years_old=Foreldrar/forr\u00E1\u00F0amenn ver\u00F0a a\u00F0 vera a\u00F0 minnsta kosti 18 \u00E1ra.
 departure_time=Fari\u00F0 heim kl.
 details=Ef svari\u00F0 er j\u00E1, vinsamlega sk\u00FDri\u00F0 n\u00E1nar
 email=Netfang

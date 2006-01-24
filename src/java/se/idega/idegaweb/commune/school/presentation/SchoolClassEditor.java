@@ -508,6 +508,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (isShowListOfCoordinatesButton()) {
 			Image xls1 = getBundle().getImage("shared/xls.gif");
 			xls1.setToolTip(localize("school.list_of_coordinates", "List of coordinates"));
+			xls1.setAlt(localize("school.list_of_coordinates_excel", "Excel"));
 			Link excelLink1 = getListOfCoordinatesXLSLink(ListOfCoordinatesWriterXLS.class, xls1);
 			table.add(excelLink1, 1, 1);
 		}

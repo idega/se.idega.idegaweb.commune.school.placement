@@ -1532,7 +1532,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					
 					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID(), handicraftId);
 					if (member != null) {
-						getBusiness().importStudentInformationToNewClass(member, previousSeason);
+						if (previousSeason != null) {
+							getBusiness().importStudentInformationToNewClass(member, previousSeason);
+						}
 						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), placementDate.getDate(), null, iwc.getCurrentUser());
 					}
 				}

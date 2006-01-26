@@ -107,7 +107,6 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	private boolean showStatistics = true;
 	private boolean showBunRadioButtons = false;
-	//private boolean isOngoingSeason = false;
 	private boolean _useForTesting = false;
 	private String operationalField = null;
 	private SchoolClass _group;
@@ -156,7 +155,6 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	}
 
 	private void parseAction(IWContext iwc) throws RemoteException {
-		//isOngoingSeason = getBusiness().isOngoingSeason(getSchoolSeasonID());
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		IWTimestamp iwt = new IWTimestamp();
 		
@@ -257,7 +255,6 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		}
 
 		if (this.showStudentTable) {
-			//if (_previousSchoolYearID != -1 && !isOngoingSeason) {
 			if (_previousSchoolYearID != -1) {
 				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 				validateSchoolClass(previousClasses);
@@ -1350,16 +1347,17 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
-			if (isReady) {
-				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
-					groupReady.setDisabled(true);
-				}
-			}
-			else {
-				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
-					groupReady.setDisabled(true);
-				}
-			}
+//			 TODO if it is wrong I think there would be some kind of filter, (the task T3) // Added by Igors 26.01.2006
+//			if (isReady) {
+//				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
+//					groupReady.setDisabled(true);  
+//				}
+//			}
+//			else {
+//				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
+//					groupReady.setDisabled(true);
+//				}
+//			}
 
 			table.add(groupReady, 1, row);
 		}

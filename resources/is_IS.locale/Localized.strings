@@ -15,7 +15,7 @@ application.after_school_care_provider=Fr\u00EDstundaheimili
 application.after_school_care_send_confirmation=Ums\u00F3kn \u00FE\u00EDn um dv\u00F6l \u00E1 fr\u00EDstundaheimili hefur veri\u00F0 m\u00F3ttekin. Ums\u00F3kn gildir eitt sk\u00F3la\u00E1r \u00ED senn (\u00E1g\u00FAst \u2013 j\u00FAn\u00ED).  Allar breytingar \u00E1 ums\u00F3kn skal tilkynna til vi\u00F0komandi umsj\u00F3narmanns. Ums\u00F3knir fyrir sk\u00F3la\u00E1ri\u00F0 ver\u00F0a afgreiddar \u00ED \u00E1g\u00FAst \u00FEegar \u00ED lj\u00F3s kemur hvernig tekist hefur a\u00F0 manna fr\u00EDstundaheimili\u00F0. \u00DE\u00FA f\u00E6r\u00F0 \u00FE\u00E1 n\u00FD skilabo\u00F0 \u00ED \u00FEj\u00F3nustug\u00E1ttina og \u00E1 uppgefi\u00F0 netfang. Ums\u00F3knir sem berast \u00E1 mi\u00F0ju sk\u00F3la\u00E1ri eru me\u00F0h\u00F6ndla\u00F0ar eins flj\u00F3tt og h\u00E6gt er.<br><br>\r\n\r\nAllar n\u00E1nari uppl\u00FDsingar eru veittar \u00ED vi\u00F0komandi fr\u00EDstundami\u00F0st\u00F6\u00F0 (Frostaskj\u00F3l, T\u00F3nab\u00E6r, \u00C1rsel, Mi\u00F0berg, Gufunesb\u00E6r) e\u00F0a hj\u00E1 \u00CDTR \u00ED s\u00EDma 411-5000
 application.after_school_save_completed=Ums\u00F3kn \u00FE\u00EDn hefur veri\u00F0 m\u00F3ttekin\!
 application.agree_terms=J\u00E1, \u00E9g sam\u00FEykki\!
-application.agreement=Undirrita\u00F0ur hefur lesi\u00F0 og kynnt s\u00E9r skilm\u00E1la \u00CDTR og sam\u00FEykkir innihald ums\u00F3knarinnar \u00E1samt grei\u00F0lsufyrirkomulagi\:
+application.agreement=Undirrita\u00F0ur hefur lesi\u00F0 og kynnt s\u00E9r skilm\u00E1la \u00CDTR og sam\u00FEykkir innihald ums\u00F3knarinnar \u00E1samt grei\u00F0slufyrirkomulagi\: <a href\="/content/files/public/itr/skilmalar.pdf">S\u00E6kja skilm\u00E1la</a>
 application.agreement_info=Skilm\u00E1lar
 application.applicant=Ums\u00E6kjandi
 application.apply_for_home_school_help=Ef \u00FE\u00FA vilt ekki s\u00E6kja um heimask\u00F3la, smelltu \u00E1 nei og \u00FE\u00E1 f\u00E6r\u00F0u m\u00F6guleika \u00E1 a\u00F0 velja sk\u00F3la h\u00E9r fyrir ne\u00F0an.
@@ -86,7 +86,7 @@ application.third_school=\u00DEri\u00F0ja val
 application.visa=Visa
 application.walks_self=Fer sj\u00E1lft heim
 application.wants_refreshments=S\u00ED\u00F0degishressing
-application.wants_refreshments_help=Ef \u00FE\u00FA vilt a\u00F0 barni\u00F0 f\u00E1i s\u00ED\u00F0degishressingu \u00E1 me\u00F0an \u00E1 dv\u00F6l stendur, veldu \u00FE\u00E1 'J\u00E1'.
+application.wants_refreshments_help=Ef \u00FE\u00FA vilt a\u00F0 barni\u00F0 f\u00E1i s\u00ED\u00F0degishressingu \u00E1 me\u00F0an \u00E1 dv\u00F6l stendur, veldu \u00FE\u00E1 'J\u00E1'.  Gjald fyrir s\u00ED\u00F0degishressingu er 2.100 kr \u00E1 m\u00E1nu\u00F0i.
 application.year=\u00C1r
 apply_for_after_school_care=S\u00E6kja um fr\u00EDstundaheimili
 back=Til baka

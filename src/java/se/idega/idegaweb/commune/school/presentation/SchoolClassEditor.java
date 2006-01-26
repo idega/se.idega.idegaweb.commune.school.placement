@@ -456,8 +456,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				
 				
 		Collection applicants = null;
-		if (getSchoolID() != -1)
-			applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
+		//if (getSchoolID() != -1) // this filter not needed for NACKA  added by Igors 26.01.2006
+		applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
 
 		int row = 2;
 		if (multibleSchools) row = 1;
@@ -535,7 +535,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		Link link;
 
 		// Added for SchoolChoice deletion
-		if (getSchoolClassID() == -1) table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
+		if (getSchoolClassID() == -1)
+			table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
 		table.add(new HiddenInput(PARAMETER_DELETE_CHOICE_ID, "-1"), column, row);
 
 		Date from = null;
@@ -579,7 +580,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				hasPriority = choice.getPriority();
 
 				if (getBusiness().isAlreadyInSchool(choice.getChildId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
-					hasPlacement = true;
+				hasPlacement = true;
 					if (_group != null && _group.getIsSubGroup()) {
 						if (getBusiness().getSchoolBusiness().hasGroupPlacement(choice.getChildId(), getSchoolClassID(), _group.getIsSubGroup())) {
 							checkBox.setDisabled(true);
@@ -710,7 +711,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					table.add(delButt, column, row);
 				}
 				row++;
-			}
+			}//end while
 
 			if (showComment || showPlacement || showPriority) {
 				table.setHeight(row++, 2);				

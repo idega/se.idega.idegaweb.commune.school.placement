@@ -677,6 +677,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					if (schoolName.length() > 20) schoolName = schoolName.substring(0, 20) + "...";
 					table.add(getSmallText(schoolName), column, row);
 					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
+ 			    } else{
+					school = getBusiness().getSchoolChoiceBusiness().getSchool(choice.getChosenSchoolId());
+					String schoolName = school.getName();  
+					if (schoolName.length() > 20) schoolName = schoolName.substring(0, 20) + "...";
+					table.add(schoolName, column, row);
+					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
 				}
 				column++;
 				if (showLanguage) { 
@@ -1473,7 +1479,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) {
+	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
 		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
@@ -1532,7 +1538,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					
 					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID(), handicraftId);
 					if (member != null) {
-						getBusiness().importStudentInformationToNewClass(member, previousSeason);
+						if (previousSeason != null) {
+							getBusiness().importStudentInformationToNewClass(member, previousSeason);
+						}
 						getBusiness().getSchoolBusiness().addToSchoolClassMemberLog(((Integer) member.getPrimaryKey()).intValue(), getSchoolClassID(), placementDate.getDate(), null, iwc.getCurrentUser());
 					}
 				}

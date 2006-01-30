@@ -664,10 +664,15 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				column++;
 				if (!useStyleNames()) {
-					if (applicant.getGender().isFemaleGender())
-						table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-					else
-						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+					try{
+						if (applicant.getGender().isFemaleGender())
+							table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
+						else
+							table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+					}  catch(NullPointerException e) {
+						    table.add("", column++, row);
+ 				       }
+					
 				}
 				
 				if (school != null) {

@@ -133,6 +133,7 @@ iw.component.se.idega.idegaweb.commune.school.presentation.SchoolApplication.nam
 mobile_phone=Mobile phone
 monday=Monday
 must_agree_terms=You have to agree to the terms.
+must_enter_card_number=You must enter credit card number
 must_enter_home_phone=You must enter a home phone for relative.
 must_enter_personal_id=You must enter a personal ID
 must_select_departure_times=You have to select times for departure

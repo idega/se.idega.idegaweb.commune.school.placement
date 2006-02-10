@@ -1260,11 +1260,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				table.add(delete, column++, row);
 
 				if (hasChoice) {
-					int ClassMemberId=studentMember.getClassMemberId();
-					int SchoolID=session.getSchoolID();
-					int SchoolSeasonID=session.getSchoolSeasonID();
-					//SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
-                    SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(ClassMemberId,SchoolID,SchoolSeasonID);
+					SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
 					if (choice != null) {
 						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
 						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);

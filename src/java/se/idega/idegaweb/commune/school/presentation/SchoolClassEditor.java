@@ -1352,17 +1352,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
-//			 TODO if it is wrong I think there would be some kind of filter, (the task T3) // Added by Igors 26.01.2006
-//			if (isReady) {
-//				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
-//					groupReady.setDisabled(true);  
-//				}
-//			}
-//			else {
-//				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
-//					groupReady.setDisabled(true);
-//				}
-//			}
+			if (isReady) {
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
+					groupReady.setDisabled(true);  
+				}
+			}
+			else {
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
+					groupReady.setDisabled(true);
+				}
+			}
 
 			table.add(groupReady, 1, row);
 		}
@@ -1483,7 +1482,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) {
+	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
 		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));

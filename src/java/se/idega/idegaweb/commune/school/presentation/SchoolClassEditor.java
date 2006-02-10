@@ -1260,7 +1260,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				table.add(delete, column++, row);
 
 				if (hasChoice) {
-					SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
+					int ClassMemberId=studentMember.getClassMemberId();
+					int SchoolID=session.getSchoolID();
+					int SchoolSeasonID=session.getSchoolSeasonID();
+					//SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
+                    SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(ClassMemberId,SchoolID,SchoolSeasonID);
 					if (choice != null) {
 						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
 						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);
@@ -1352,17 +1356,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
-//			 TODO if it is wrong I think there would be some kind of filter, (the task T3) // Added by Igors 26.01.2006
-//			if (isReady) {
-//				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
-//					groupReady.setDisabled(true);  
-//				}
-//			}
-//			else {
-//				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
-//					groupReady.setDisabled(true);
-//				}
-//			}
+			if (isReady) {
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
+					groupReady.setDisabled(true);  
+				}
+			}
+			else {
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
+					groupReady.setDisabled(true);
+				}
+			}
 
 			table.add(groupReady, 1, row);
 		}

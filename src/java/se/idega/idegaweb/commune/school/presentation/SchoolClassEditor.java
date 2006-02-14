@@ -681,12 +681,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					table.add(getSmallText(schoolName), column, row);
 					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
  			    } else{
-					school = getBusiness().getSchoolChoiceBusiness().getSchool(choice.getChosenSchoolId());
-					String schoolName = school.getName();  
+					String schoolName=(String)choice.getFromSchool(choice.getChosenSchoolId(),choice.getSchoolSeasonId(),choice.getChildId());
+					if(schoolName==null) schoolName = choice.getChosenSchool().getName();
 					if (schoolName.length() > 20) schoolName = schoolName.substring(0, 20) + "...";
-					table.add(schoolName, column, row);
+					table.add(getSmallText(schoolName), column, row);
 					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
-				}
+									}
 				column++;
 				if (showLanguage) { 
 					if (choice.getLanguageChoice() != null) table.add(getSmallText(localize(choice.getLanguageChoice(), "")), column, row);

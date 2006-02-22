@@ -11,15 +11,9 @@ package se.idega.idegaweb.commune.school.presentation;
 
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import java.rmi.RemoteException;
-import java.util.Collection;
-import java.util.Iterator;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolBusiness;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolSession;
-import se.idega.idegaweb.commune.school.data.SchoolChoice;
-import com.idega.block.school.data.School;
-import com.idega.block.school.data.SchoolSeason;
-import com.idega.block.school.data.SchoolYear;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -30,7 +24,6 @@ import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
-import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
 import com.idega.user.data.User;
@@ -46,88 +39,6 @@ public class SchoolApplicationViewer extends ApplicationForm {
 	
 	public String getCaseCode() {
 		return null;
-	}
-	
-	private void viewApplication(IWContext iwc, SchoolSeason season, boolean hasPlacing) throws RemoteException {
-		Form form = new Form();
-
-		Table table = new Table();
-		table.setCellpadding(0);
-		table.setCellspacing(0);
-		table.setWidth(Table.HUNDRED_PERCENT);
-		form.add(table);
-		int row = 1;
-		
-		table.add(getPersonInfo(iwc, getCommuneSchoolSession(iwc).getUser()), 1, row++);
-		table.setHeight(row++, 6);
-		
-		table.add(getHeader(iwrb.getLocalizedString("application.view_application", "View application")), 1, row++);
-		table.setHeight(row++, 6);
-		
-		Table viewTable = new Table();
-		viewTable.setColumns(2);
-		table.add(viewTable, 1, row++);
-		int iRow = 1;
-		
-		SchoolYear year = null;
-		String message = null;
-		Collection choices = getCommuneSchoolBusiness(iwc).getAllChoices(getCommuneSchoolSession(iwc).getUser(), season);
-		
-		int count = 1;
-		Iterator iter = choices.iterator();
-		while (iter.hasNext()) {
-			SchoolChoice choice = (SchoolChoice) iter.next();
-			School school = choice.getChosenSchool();
-			
-			if (count == 1) {
-				viewTable.add(new Text(iwrb.getLocalizedString("application.first_school", "First school")), 1, iRow);
-			}
-			else if (count == 2) {
-				viewTable.add(new Text(iwrb.getLocalizedString("application.second_school", "Second school")), 1, iRow);
-			}
-			else if (count == 3) {
-				viewTable.add(new Text(iwrb.getLocalizedString("application.third_school", "Third school")), 1, iRow);
-			}
-			viewTable.add(new Text(school.getSchoolName()), 2, iRow++);
-
-			if (year == null) {
-				year = choice.getSchoolYear();
-			}
-			if (message == null) {
-				message = choice.getMessage();
-			}
-		}
-		
-		viewTable.setHeight(iRow++, 6);
-		
-		if (year != null) {
-			viewTable.add(new Text(iwrb.getLocalizedString("application.year", "Year")), 1, iRow);
-			viewTable.add(new Text(year.getSchoolYearName()), 2, iRow++);
-			viewTable.setHeight(iRow++, 6);
-			viewTable.mergeCells(1, iRow, 2, iRow);
-			viewTable.setBottomCellBorder(1, iRow++, 1, "#D7D7D7", "solid");
-			viewTable.setHeight(iRow++, 6);
-		}
-		
-		if (message != null) {
-			viewTable.add(new Text(iwrb.getLocalizedString("application.message", "Message")), 1, iRow++);
-			viewTable.mergeCells(1, iRow, 2, iRow);
-			viewTable.add(new Text(message), 1, iRow++);
-			viewTable.setHeight(iRow++, 6);
-			viewTable.mergeCells(1, iRow, 2, iRow);
-			viewTable.setBottomCellBorder(1, iRow++, 1, "#D7D7D7", "solid");
-			viewTable.setHeight(iRow++, 6);
-		}
-		
-		iRow = addChildInformation(iwc, viewTable, getCommuneSchoolSession(iwc).getUser(), iRow);
-		
-		boolean canDisplaySchoolImages = getCommuneSchoolBusiness(iwc).canDisplaySchoolImages(getCommuneSchoolSession(iwc).getUser());
-		viewTable.mergeCells(1, iRow, table.getColumns(), iRow);
-		viewTable.add(getBooleanTable(new Text(iwrb.getLocalizedString("child.can_diplay_images_info", "Can display images")), canDisplaySchoolImages), 1, iRow);
-		viewTable.setWidth(1, "50%");
-		viewTable.setWidth(2, "50%");
-
-		add(form);
 	}
 	
 	protected int addChildInformation(IWContext iwc, Table table, User child, int iRow) throws RemoteException {

@@ -10,7 +10,6 @@ import com.idega.user.data.User;
 
 public class ListOfCoordinatesComparator implements Comparator {
 	
-	private SchoolCommuneBusiness business;
 	private CommuneUserBusiness userBusiness;
 	
 	private static final int OBJECT1_IS_BIGGER_THAN_OBJECT2 = 1;
@@ -21,7 +20,6 @@ public class ListOfCoordinatesComparator implements Comparator {
 	
 	ListOfCoordinatesComparator(String providerCoordinate, SchoolCommuneBusiness business,
 			CommuneUserBusiness userBusiness) {
-		this.business = business;
 		this.userBusiness = userBusiness; 	
 		this.providerCoordinate = providerCoordinate;
 	}

@@ -19,7 +19,6 @@ import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.presentation.CommuneBlock;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
-import se.idega.util.SchoolClassMemberComparatorForSweden;
 import com.idega.business.IBOLookup;
 import com.idega.core.location.data.Address;
 import com.idega.idegaweb.IWApplicationContext;
@@ -54,11 +53,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	public final static String PARAMETER_SEARCH_STRING = "search_string";
 	public final static String PARAMETER_PROVIDER_NAME = "provider_name";
 	
-	private int applicationsPerPage = 10;
-	private int sortChoicesBy = SchoolClassMemberComparatorForSweden.NAME_SORT;
 	private String searchString = "";
-	private int sortPlacedUnplacedBy = -1;
-	
 	private int season;
 	private int school;
 	private int syear;

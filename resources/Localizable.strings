@@ -85,6 +85,7 @@ application.school_choice_overview=Overview
 application.school_choose_help=Select the school/s you want to apply for.
 application.school_year=School year
 application.school_year_help=Select the year the applicant is applying for.
+application.season=Season
 application.second_school=Second school
 application.select_school=Select school
 application.select_school_year=Select school year

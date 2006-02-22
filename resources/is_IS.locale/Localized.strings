@@ -85,6 +85,7 @@ application.school_choice_overview=Yfirlit
 application.school_choose_help=Velji\u00F0 fyrst hverfi og s\u00ED\u00F0an \u00FEann sk\u00F3la sem \u00F3ska\u00F0 er eftir \u00ED \u00FEv\u00ED hverfi.
 application.school_year=\u00C1rgangur
 application.school_year_help=Vinsamlega athugi\u00F0 hvort r\u00E9ttur \u00E1rgangur er valinn. Ef ekki vinsamlega velji\u00F0 r\u00E9ttan \u00E1rgang \u00FAr fellilistanum. \r\n
+application.season=T\u00EDmabil
 application.second_school=Anna\u00F0 val
 application.select_area=Velja hverfi
 application.select_school=Velji\u00F0 sk\u00F3la

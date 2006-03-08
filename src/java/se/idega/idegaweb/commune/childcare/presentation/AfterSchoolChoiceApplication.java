@@ -9,15 +9,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
 import javax.ejb.FinderException;
-
 import se.idega.idegaweb.commune.care.data.AfterSchoolChoice;
 import se.idega.idegaweb.commune.childcare.business.AfterSchoolBusiness;
 import se.idega.idegaweb.commune.presentation.CitizenChildren;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceBusiness;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
-
 import com.idega.block.navigation.presentation.UserHomeLink;
 import com.idega.block.school.data.SchoolArea;
 import com.idega.block.school.data.SchoolSeason;
@@ -33,6 +30,7 @@ import com.idega.presentation.text.Break;
 import com.idega.presentation.text.Text;
 import com.idega.presentation.ui.CheckBox;
 import com.idega.presentation.ui.DateInput;
+import com.idega.presentation.ui.DropdownMenu;
 import com.idega.presentation.ui.Form;
 import com.idega.presentation.ui.SubmitButton;
 import com.idega.presentation.ui.TextArea;
@@ -62,11 +60,11 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String PARAM_AREA = "ccas_area";
 	private final static String PARAM_PROVIDER = "ccas_provider";
 	private final static String PARAM_MESSAGE = "ccas_message";
-	private final static String PARAM_SEND_TO_CHECK = "ccas_send_to_check";
+	private final static String PARAM_SEND_TO_CHECK = "ccas_send_to_check";	
+	private final static String PARAM_SCHOOL_SEASON = "ccas_school_season";
 	
 	private static final String EARLIESTSTARTDATE_DEFAULT = "The earliest possible placement date is: ";
-	private static final String EARLIESTSTARTDATE_KEY = "ccas_earlyStartDate";
-	
+	private static final String EARLIESTSTARTDATE_KEY = "ccas_earlyStartDate";	
 	
 	private final static String PROVIDERS = "ccas_providers";
 	private final static String NAME = "ccas_name";
@@ -298,8 +296,18 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			else {
 				parent = iwc.getCurrentUser();
 			}
-
+			
 			SchoolSeason season = null;
+			if (iwc.isParameterSet(PARAM_SCHOOL_SEASON)) {
+				String seasonPK = iwc.getParameter(PARAM_SCHOOL_SEASON);
+				try {
+					season = getCareBusiness().getSchoolSeasonHome().findByPrimaryKey(seasonPK);
+				}
+				catch (FinderException e) {					
+					e.printStackTrace();
+				}				
+			}
+			/* this is going to be ignored
 			if (_useOngoingSeason) {
 				try {
 					season = getCareBusiness().getSchoolSeasonHome().findSeasonByDate(getBusiness().getSchoolBusiness().getCategoryElementarySchool(), new IWTimestamp().getDate());
@@ -311,6 +319,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					season = null;
 				}
 			}
+			*/
 			
 			String subject = localize(EMAIL_PROVIDER_SUBJECT, "After school application received");
 			String body = localize(EMAIL_PROVIDER_MESSAGE, "We have received your after school application for {0} to {1}.");
@@ -354,7 +363,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		inputTable.setCellspacing(0);
 		inputTable.setCellpadding(2);
 		inputTable.setColumns(3);
-
+		
 		int row = 1;
 
 		if (_showCheckOption) {
@@ -372,10 +381,18 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			
 			inputTable.setHeight(row++, 12);
 		}
-		
+			
 		inputTable.mergeCells(1, row, inputTable.getColumns(), row);
 		inputTable.add(getHeader(localize(PROVIDERS, "Providers")), 1, row++);
-
+		
+		inputTable.add(getSchoolSeasonMenu(iwc), 3, row);		
+		
+		String strSchoolSeason = localize("school_season", "School season");
+		Text labelSchoolSeason = getSmallHeader(strSchoolSeason);
+		inputTable.add(labelSchoolSeason, 1, row++);
+		
+		inputTable.add("", 1, row++); //spacer
+		
 		String message = null;
 		String strProvider = localize(PARAM_PROVIDER, "Provider");
 		Text labelProvider = getSmallHeader(strProvider);
@@ -459,6 +476,17 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		inputTable.setWidth(2, 8);
 
 		return inputTable;
+	}
+
+	private DropdownMenu getSchoolSeasonMenu(IWContext iwc) throws RemoteException {
+		DropdownMenu menu = new DropdownMenu(getAfterSchoolBusiness(iwc).getOngoingAndNextSeasons(), PARAM_SCHOOL_SEASON);	
+		try {
+			menu.setSelectedElement(((Integer)getCareBusiness().getCurrentSeason().getPrimaryKey()).toString());
+		}
+		catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		return menu;
 	}
 
 	private Table getChildInfoTable(IWContext iwc) {

@@ -19,6 +19,8 @@
   </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.school">
   </classpathentry>
+  <classpathentry kind="src" path="/com.idega.user">
+  </classpathentry>
   <classpathentry kind="src" path="/com.idega.block.navigation">
   </classpathentry>
   <classpathentry kind="src" path="/is.idega.block.family">

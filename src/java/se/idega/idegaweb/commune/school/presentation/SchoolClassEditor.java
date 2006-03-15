@@ -593,8 +593,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						checkBox.setDisabled(true);
 					}
 				}
-				if(choice.getStatus().matches("FLYT")) 
-					checkBox.setDisabled(false);
+				//if(choice.getStatus().matches("FLYT")) 
+				//	checkBox.setDisabled(false);
 				
 				if (useStyleNames()) {
 					if (row % 2 == 0)
@@ -958,7 +958,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					}
 				}
 			
-								
+
+				
 				//String name = student.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
 				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();

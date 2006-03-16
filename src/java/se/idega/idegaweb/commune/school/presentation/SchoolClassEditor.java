@@ -1168,6 +1168,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		boolean isSpeciallyPlaced = false;
 		boolean hasComment = false;
 		boolean showComment = false;
+		
+		int countOfStudentsWhoHaveChoice = 0;
+		int countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage = 0;
 
 		List formerStudents = null;
 		if (!isSubGroup) {
@@ -1226,6 +1229,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				else if (hasChoice) {
 					table.setRowColor(row, HAS_SCHOOL_CHOICE_COLOR);
+					countOfStudentsWhoHaveChoice++;
 				}
 				else {
 					if (!useStyleNames()) {
@@ -1268,10 +1272,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
 						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);
 						
-							if (choice.getHasReceivedPlacementMessage())
+							if (choice.getHasReceivedPlacementMessage()) {
 								table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
-							else
+								countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage++;
+							}
+							else {
 								table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
+							}
 
 							if (choice.getHasReceivedConfirmationMessage())
 								table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
@@ -1361,11 +1368,20 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 			}
 			else {
+				
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
+					groupReady.setDisabled(true);  
+				}
+				
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
 					groupReady.setDisabled(true);
 				}
 			}
 
+			if (countOfStudentsWhoHaveChoice > countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage) {
+				groupReady.setDisabled(true);
+			}
+			
 			table.add(groupReady, 1, row);
 		}
 		table.mergeCells(1, row, table.getColumns(), row);

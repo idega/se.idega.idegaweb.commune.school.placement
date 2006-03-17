@@ -20,6 +20,7 @@ import javax.ejb.FinderException;
 import se.idega.idegaweb.commune.accounting.business.BatchDeadlineService;
 import se.idega.idegaweb.commune.business.CommuneUserBusiness;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
+import se.idega.idegaweb.commune.care.business.ProviderSession;
 import se.idega.idegaweb.commune.care.resource.business.ClassMemberException;
 import se.idega.idegaweb.commune.care.resource.business.DateException;
 import se.idega.idegaweb.commune.care.resource.business.ResourceBusiness;
@@ -45,8 +46,10 @@ import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolStudyPath;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.block.school.presentation.SchoolClassDropdownDouble;
+import com.idega.block.school.presentation.SchoolUserChooser;
 import com.idega.builder.business.BuilderLogic;
 import com.idega.business.IBOLookup;
+import com.idega.business.IBOLookupException;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.localisation.data.ICLanguage;
@@ -55,6 +58,7 @@ import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWBundle;
+import com.idega.idegaweb.IWUserContext;
 import com.idega.presentation.IWContext;
 import com.idega.presentation.Table;
 import com.idega.presentation.text.Break;
@@ -1568,6 +1572,19 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
+    
+    protected School  getProvider(IWUserContext iwuc)
+    {
+        try
+        {
+            return ((ProviderSession)IBOLookup.getSessionInstance(iwuc, se.idega.idegaweb.commune.care.business.ProviderSession.class)).getProvider();
+        }
+        catch (Exception e)
+        {
+                return null;
+        }
+    }
+    
 	private Table getResourceForm(IWContext iwc) throws RemoteException {
 		Table table = new Table();
 		table.setBorder(0);
@@ -1580,9 +1597,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 			table.mergeCells(1, 1, 2, 1);
 			table.add(getSmallErrorText(resourceErrorMsg), 1, row++);
 		}
-		table.add(getSmallHeader(localize("school.resource", "Resource")), 1, row++);
-		table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row++);
-		table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
+		table.add(getSmallHeader(localize("school.resource", "Resource")), 1, row++);				
 
 		// *** Input fields ***
 		if (resourceErrorMsg != null) {
@@ -1590,11 +1605,30 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		else {
 			row = 1;
-		}
+		}        
+        
 		DropdownMenu rscDD = getAssignableResources(iwc);
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_ID))
 			rscDD.setSelectedElement(iwc.getParameter(PARAMETER_RESOURCE_ID));
 		table.add(rscDD, 2, row++);
+        
+        School provider = getProvider(iwc);
+        
+        Link link = new Link(localize("create_school_user", "Create school user"));
+        link.setAsImageButton(true);
+        link.setWindowToOpen(com.idega.block.school.presentation.SchoolUserWindow.class);
+        link.setParameter("sue_act", "sue_pvs");
+        link.setParameter("pr_schl_id", provider.getPrimaryKey().toString());
+        table.add(link, 2, row++);
+        
+        table.add(getSmallHeader(localize("teacher", "Teacher") + ":"), 1, row);
+        
+        SchoolUserChooser chooser = new SchoolUserChooser("sao_teachers",provider );
+        
+        table.add(chooser, 2, row++);
+        
+        table.add(getSmallHeader(localize("school.startdate", "Startdate")), 1, row);
+        
 		long currentTime = new Date().getTime();
 
 		DateInput startDate = new DateInput(PARAMETER_RESOURCE_STARTDATE);
@@ -1607,6 +1641,9 @@ public class SchoolAdminOverview extends CommuneBlock {
 		}
 		table.add(startDate, 2, row++);
 
+        
+        table.add(getSmallHeader(localize("school.enddate", "Enddate")), 1, row);
+        
 		DateInput endDate = new DateInput(PARAMETER_RESOURCE_ENDDATE);
 		endDate.setToDisplayDayLast(true);
 		if (iwc.isParameterSet(PARAMETER_RESOURCE_ENDDATE)) {
@@ -2331,9 +2368,11 @@ public class SchoolAdminOverview extends CommuneBlock {
 		String startDateStr = iwc.getParameter(PARAMETER_RESOURCE_STARTDATE);
 		String endDateStr = iwc.getParameter(PARAMETER_RESOURCE_ENDDATE);
 		
+        String teacherId =  iwc.getParameter("sao_teachers");
+        
 		int registratorID = iwc.getCurrentUserId();
 		try {
-			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, registratorID, _viewAllResources);
+			getResourceBusiness(iwc).createResourcePlacement(rscID, _schoolClassMemberID, startDateStr, endDateStr, registratorID, _viewAllResources, teacherId);
 		}
 		catch (ResourceException re) {
 			errMsg = localize(re.getKey(), re.getDefTrans());

@@ -49,7 +49,6 @@ import com.idega.block.school.presentation.SchoolClassDropdownDouble;
 import com.idega.block.school.presentation.SchoolUserChooser;
 import com.idega.builder.business.BuilderLogic;
 import com.idega.business.IBOLookup;
-import com.idega.business.IBOLookupException;
 import com.idega.core.contact.data.Email;
 import com.idega.core.contact.data.Phone;
 import com.idega.core.localisation.data.ICLanguage;

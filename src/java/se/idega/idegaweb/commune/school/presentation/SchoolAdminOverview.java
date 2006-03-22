@@ -1616,8 +1616,12 @@ public class SchoolAdminOverview extends CommuneBlock {
         Link link = new Link(localize("create_school_user", "Create school user"));
         link.setAsImageButton(true);
         link.setWindowToOpen(com.idega.block.school.presentation.SchoolUserWindow.class);
-        link.setParameter("sue_act", "sue_pvs");
-        link.setParameter("pr_schl_id", provider==null ? "" : provider.getPrimaryKey().toString());
+        if (provider!=null)
+        {
+            link.setParameter("sue_act",  "sue_pvs");
+            link.setParameter("pr_schl_id",  provider.getPrimaryKey().toString());
+        }        
+        
         table.add(link, 2, row++);
         
         table.add(getSmallHeader(localize("teacher", "Teacher") + ":"), 1, row);

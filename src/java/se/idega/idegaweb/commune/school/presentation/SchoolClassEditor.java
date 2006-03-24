@@ -1367,12 +1367,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					groupReady.setDisabled(true);  
 				}
 			}
-			else {
-				
-				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
-					groupReady.setDisabled(true);  
-				}
-				
+			else {				
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
 					groupReady.setDisabled(true);
 				}

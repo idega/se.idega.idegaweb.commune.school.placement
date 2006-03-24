@@ -500,7 +500,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	}
 	
 	private Collection createContracts(IWContext iwc) throws RemoteException {
-		return getAfterSchoolBusiness(iwc).createContractsForChildrenWithSchoolPlacement(getSession().getChildCareID(), iwc.getCurrentUser(), iwc.getCurrentLocale());
+		return getAfterSchoolBusiness(iwc).createContractsForChildrenWithSchoolPlacement(getSession().getChildCareID(), iwc.getCurrentUser(), iwc.getCurrentLocale(), getSession().getSeasonID());
 	}
 	
 	protected AfterSchoolBusiness getAfterSchoolBusiness(IWApplicationContext iwac) {

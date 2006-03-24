@@ -44,6 +44,8 @@ import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
 import com.idega.block.school.data.SchoolSeason;
 import com.idega.block.school.data.SchoolStudyPath;
+import com.idega.block.school.data.SchoolUser;
+import com.idega.block.school.data.SchoolUserHome;
 import com.idega.block.school.data.SchoolYear;
 import com.idega.block.school.presentation.SchoolClassDropdownDouble;
 import com.idega.block.school.presentation.SchoolUserChooser;
@@ -55,6 +57,7 @@ import com.idega.core.localisation.data.ICLanguage;
 import com.idega.core.localisation.data.ICLanguageHome;
 import com.idega.core.location.data.Address;
 import com.idega.core.location.data.PostalCode;
+import com.idega.core.user.data.UserHome;
 import com.idega.data.IDOLookup;
 import com.idega.idegaweb.IWBundle;
 import com.idega.idegaweb.IWUserContext;
@@ -78,6 +81,8 @@ import com.idega.presentation.ui.TextArea;
 import com.idega.presentation.ui.TextInput;
 import com.idega.user.business.NoEmailFoundException;
 import com.idega.user.business.NoPhoneFoundException;
+import com.idega.user.data.Group;
+import com.idega.user.data.GroupHome;
 import com.idega.user.data.User;
 import com.idega.util.Age;
 import com.idega.util.IWCalendar;
@@ -1479,19 +1484,20 @@ public class SchoolAdminOverview extends CommuneBlock {
 		table.setWidth(5, "50");
 		table.add(getSmallHeader(localize("school.resource", "Resource")), 1, 1);
 		table.add(getSmallHeader(localize("school.startdate", "Startdate")), 2, 1);
-		table.add(getSmallHeader(localize("school.enddate", "Enddate")), 3, 1);
-		table.add(getSmallHeader(localize("school.finish", "Finish")), 4, 1);
-		table.add(getSmallHeader(localize("school.delete", "Delete")), 5, 1);
-		table.addText(Text.NON_BREAKING_SPACE, 6, 1);
+		table.add(getSmallHeader(localize("school.enddate", "Enddate")), 3, 1);        
+        table.add(getSmallHeader(localize("school.teacher", "Teacher")), 4, 1);                
+		table.add(getSmallHeader(localize("school.finish", "Finish")), 5, 1);
+		table.add(getSmallHeader(localize("school.delete", "Delete")), 6, 1);
+		table.addText(Text.NON_BREAKING_SPACE, 7, 1);
 		table.setRowColor(1, getHeaderColor());
-		table.setColor(6, 1, "#FFFFFF");
-		table.add(new HiddenInput(PARAMETER_ACTION, "-1"), 6, 1);
-		table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, "false"), 6, 1);
-		table.add(new HiddenInput(PARAMETER_DELETE_RESOURCE_PLACEMENT, "-1"), 6, 1);
-		table.add(new HiddenInput(PARAMETER_RESOURCE_CLASS_MEMBER, "-1"), 6, 1);
-		table.add(new HiddenInput(PARAMETER_RESOURCE_NAME, ""), 6, 1);
-		table.add(new HiddenInput(PARAMETER_RESOURCE_STARTDATE, ""), 6, 1);
-		table.add(new HiddenInput(PARAMETER_RESOURCE_ENDDATE, ""), 6, 1);
+		table.setColor(7, 1, "#FFFFFF");
+		table.add(new HiddenInput(PARAMETER_ACTION, "-1"), 7, 1);
+		table.add(new HiddenInput(PARAMETER_SHOW_ONLY_OVERVIEW, "false"), 7, 1);
+		table.add(new HiddenInput(PARAMETER_DELETE_RESOURCE_PLACEMENT, "-1"), 7, 1);
+		table.add(new HiddenInput(PARAMETER_RESOURCE_CLASS_MEMBER, "-1"), 7, 1);
+		table.add(new HiddenInput(PARAMETER_RESOURCE_NAME, ""), 7, 1);
+		table.add(new HiddenInput(PARAMETER_RESOURCE_STARTDATE, ""), 7, 1);
+		table.add(new HiddenInput(PARAMETER_RESOURCE_ENDDATE, ""), 7, 1);
 		table.setRowHeight(1, "7");
 
 		// list resources
@@ -1534,13 +1540,16 @@ public class SchoolAdminOverview extends CommuneBlock {
 				Date endDate = mbr.getEndDate();
 				if (endDate != null)
 					table.add(getSmallText(endDate.toString()), 3, row);
-				table.add(finish, 4, row);
-				table.add(delete, 5, row);
+				
+                table.add(getSmallText(getTeacherName(mbr.getTeacherId())), 4, row);
+                
+                table.add(finish, 5, row);
+				table.add(delete, 6, row);
 				if (row % 2 == 1)
 					table.setRowColor(row, getZebraColor1());
 				else
 					table.setRowColor(row, getZebraColor2());
-				table.setColor(6, row, "#FFFFFF");
+				table.setColor(7, row, "#FFFFFF");
 				row++;
 			}
 		}
@@ -1571,6 +1580,27 @@ public class SchoolAdminOverview extends CommuneBlock {
 		return table;
 	}
 
+    private String getTeacherName(String id)
+    {
+        String result = "";
+        if (id==null || id.equals(""))
+        {
+            return result;
+        }
+        
+        try
+        {
+            UserHome userHome;
+            userHome = (UserHome)IDOLookup.getHome(com.idega.core.user.data.User.class);
+            com.idega.core.user.data.User user = userHome.findByPrimaryKey(id);
+            result = user.getName();
+        } catch (Exception ex)
+        {
+            return result;
+        }
+        
+        return result;
+    }
     
     protected School  getProvider(IWUserContext iwuc)
     {

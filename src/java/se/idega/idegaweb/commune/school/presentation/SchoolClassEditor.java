@@ -253,7 +253,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.setCellpaddingLeft(1, 9, 12);
 			table.setCellpaddingRight(1, 9, 12);
 		}
-
+		
+		////////////////
+		if (false) {
+			table.add(getMoveStudentsSchoolChoiceTable(), 1, 10); //table.setBorder(1);
+		}
+		////////////////
+		
 		if (this.showStudentTable) {
 			if (_previousSchoolYearID != -1) {
 				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
@@ -1345,9 +1351,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		String buttonLabel = "";
 		if (isReady)
-			buttonLabel = localize("school.class_locked", "Class locked");
+			buttonLabel = localize("school.class_locked", "Class locked"); //in swedish: Skicka definitivt besked
 		else
-			buttonLabel = localize("school.class_ready", "Class ready");
+			buttonLabel = localize("school.class_ready", "Class ready"); //in swedish: Skicka erbjudande om plats
 
 		table.add(back, 1, row);
 		if (useStyleNames()) {
@@ -1362,19 +1368,25 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
-			if (isReady) {
+			if (isReady) { // button now says: Skicka definitivt besked
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
 					groupReady.setDisabled(true);  
 				}
+				
+				/* rule:
+				 * 
+				 *  if there are students in the list that haven’t received the ‘prel besked’ then 
+				 *  the ‘skicka def besked’ shouldn’t be active even if the date set in system 
+				 *  properties for Datum för definitivt besked om plats i skola has occurred
+				 */
+				if (countOfStudentsWhoHaveChoice > countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage) {
+					groupReady.setDisabled(true);
+				} 
 			}
-			else {				
+			else {	//button says: Skicka erbjudande om plats			
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
 					groupReady.setDisabled(true);
 				}
-			}
-
-			if (countOfStudentsWhoHaveChoice > countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage) {
-				groupReady.setDisabled(true);
 			}
 			
 			table.add(groupReady, 1, row);
@@ -1769,5 +1781,42 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	public void setShowListOfCoordinatesButton(boolean showListOfCoordinatesButton) {
 		this.showListOfCoordinatesButton = showListOfCoordinatesButton;
+	}
+	
+	
+	/**
+	 * function has to be implemented
+	 * @return
+	 */
+	private Table getMoveStudentsSchoolChoiceTable() {
+		Table table = new Table();
+		table.setBorder(1);
+		
+		Text skola = new Text("Skola:");
+		Text skolaDropdown = new Text("Skola dropdown");
+		
+		DropdownMenu schools = null;
+		try {
+			schools = getSchools(false, "ELEMENTARY_SCHOOL");
+			schools.setName("zazzzzzzaaaboooooo");
+			schools.setToSubmit(false);
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		Text sorteraEfter = new Text("Sortera efter:");		
+		Text namn = new Text("namn");
+		Text allaElever = new Text("Alla elever");
+		
+		table.add(skola, 1, 1);
+		table.add(schools, 2, 1);
+		table.mergeCells(2, 1, 3, 1);		
+		
+		table.add(sorteraEfter, 1, 2);
+		table.add(namn, 2, 2);
+		table.add(allaElever, 3, 2);		
+		
+		return table;
 	}
 }

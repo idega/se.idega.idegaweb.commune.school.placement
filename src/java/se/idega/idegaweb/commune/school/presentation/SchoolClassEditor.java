@@ -1793,7 +1793,6 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.setBorder(1);
 		
 		Text skola = new Text("Skola:");
-		Text skolaDropdown = new Text("Skola dropdown");
 		
 		DropdownMenu schools = null;
 		try {

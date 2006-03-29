@@ -1345,9 +1345,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		String buttonLabel = "";
 		if (isReady)
-			buttonLabel = localize("school.class_locked", "Class locked");
+			buttonLabel = localize("school.class_locked", "Class locked"); //in swedish: Skicka definitivt besked
 		else
-			buttonLabel = localize("school.class_ready", "Class ready");
+			buttonLabel = localize("school.class_ready", "Class ready"); //in swedish: Skicka erbjudande om plats
 
 		table.add(back, 1, row);
 		if (useStyleNames()) {
@@ -1362,19 +1362,25 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, String.valueOf(SchoolAdminOverview.METHOD_FINALIZE_GROUP));
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
-			if (isReady) {
+			if (isReady) { // button now says: Skicka definitivt besked
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
 					groupReady.setDisabled(true);  
 				}
+				
+				/* rule:
+				 * 
+				 *  if there are students in the list that haven’t received the ‘prel besked’ then 
+				 *  the ‘skicka def besked’ shouldn’t be active even if the date set in system 
+				 *  properties for Datum för definitivt besked om plats i skola has occurred
+				 */
+				if (countOfStudentsWhoHaveChoice > countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage) {
+					groupReady.setDisabled(true);
+				} 
 			}
-			else {				
+			else {	//button says: Skicka erbjudande om plats			
 				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
 					groupReady.setDisabled(true);
 				}
-			}
-
-			if (countOfStudentsWhoHaveChoice > countOfStudentsWhoHaveChoiceAndHaveReceivedPlacementMessage) {
-				groupReady.setDisabled(true);
 			}
 			
 			table.add(groupReady, 1, row);

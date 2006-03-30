@@ -9,6 +9,8 @@
  */
 package se.idega.idegaweb.commune.school.presentation;
 
+import is.idega.block.family.business.FamilyLogic;
+import is.idega.block.family.data.Child;
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
 import java.rmi.RemoteException;
 import se.idega.idegaweb.commune.care.business.CareBusiness;
@@ -41,11 +43,13 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		return null;
 	}
 	
-	protected int addChildInformation(IWContext iwc, Table table, User child, int iRow) throws RemoteException {
-		Boolean hasGrowthDeviation = getCareBusiness(iwc).hasGrowthDeviation(child);
-		String growthDeviation = getCareBusiness(iwc).getGrowthDeviationDetails(child);
-		Boolean hasAllergies = getCareBusiness(iwc).hasAllergies(child);
-		String allergies = getCareBusiness(iwc).getAllergiesDetails(child);
+	protected int addChildInformation(IWContext iwc, Table table, User user, int iRow) throws RemoteException {
+		Child child = getMemberFamilyLogic(iwc).getChild(user);
+		
+		Boolean hasGrowthDeviation = child.hasGrowthDeviation();
+		String growthDeviation = child.getGrowthDeviationDetails();
+		Boolean hasAllergies = child.hasAllergies();
+		String allergies = child.getAllergiesDetails();
 		String lastCareProvider = getCareBusiness(iwc).getLastCareProvider(child);
 		Boolean canContactLastProvider = getCareBusiness(iwc).canContactLastCareProvider(child);
 		String otherInformation = getCareBusiness(iwc).getOtherInformation(child);
@@ -182,6 +186,15 @@ public class SchoolApplicationViewer extends ApplicationForm {
 	protected CareBusiness getCareBusiness(IWApplicationContext iwac) {
 		try {
 			return (CareBusiness) IBOLookup.getServiceInstance(iwac, CareBusiness.class);
+		}
+		catch (IBOLookupException ile) {
+			throw new IBORuntimeException(ile);
+		}
+	}
+
+	protected FamilyLogic getMemberFamilyLogic(IWApplicationContext iwac) {
+		try {
+			return (FamilyLogic) IBOLookup.getServiceInstance(iwac, FamilyLogic.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);

@@ -12,10 +12,14 @@ package se.idega.idegaweb.commune.school.presentation;
 import is.idega.block.family.business.FamilyLogic;
 import is.idega.block.family.data.Child;
 import is.idega.idegaweb.egov.application.presentation.ApplicationForm;
+
 import java.rmi.RemoteException;
+
 import se.idega.idegaweb.commune.care.business.CareBusiness;
-import se.idega.idegaweb.commune.school.business.CommuneSchoolBusiness;
 import se.idega.idegaweb.commune.school.business.CommuneSchoolSession;
+
+import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.data.Student;
 import com.idega.business.IBOLookup;
 import com.idega.business.IBOLookupException;
 import com.idega.business.IBORuntimeException;
@@ -45,14 +49,15 @@ public class SchoolApplicationViewer extends ApplicationForm {
 	
 	protected int addChildInformation(IWContext iwc, Table table, User user, int iRow) throws RemoteException {
 		Child child = getMemberFamilyLogic(iwc).getChild(user);
+		Student student = getSchoolBusiness(iwc).getStudent(user);
 		
 		Boolean hasGrowthDeviation = child.hasGrowthDeviation();
 		String growthDeviation = child.getGrowthDeviationDetails();
 		Boolean hasAllergies = child.hasAllergies();
 		String allergies = child.getAllergiesDetails();
-		String lastCareProvider = getCareBusiness(iwc).getLastCareProvider(child);
-		Boolean canContactLastProvider = getCareBusiness(iwc).canContactLastCareProvider(child);
-		String otherInformation = getCareBusiness(iwc).getOtherInformation(child);
+		String lastCareProvider = student.getLastProvider();
+		boolean canContactLastProvider = student.canContactLastProvider();
+		String otherInformation = child.getOtherInformation();
 		
 		if (hasGrowthDeviation != null) {
 			table.mergeCells(1, iRow, table.getColumns(), iRow);
@@ -97,7 +102,7 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		}
 		
 		table.mergeCells(1, iRow, table.getColumns(), iRow);
-		table.add(getBooleanTable(new Text(iwrb.getLocalizedString("child.can_contact_last_care_provider_info", "Can contact last care provider")), canContactLastProvider != null ? canContactLastProvider.booleanValue() : false), 1, iRow++);
+		table.add(getBooleanTable(new Text(iwrb.getLocalizedString("child.can_contact_last_care_provider_info", "Can contact last care provider")), canContactLastProvider), 1, iRow++);
 		
 		table.setHeight(iRow++, 6);
 		table.mergeCells(1, iRow, table.getColumns(), iRow);
@@ -174,9 +179,9 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		}
 	}
 
-	protected CommuneSchoolBusiness getCommuneSchoolBusiness(IWApplicationContext iwac) {
+	protected SchoolBusiness getSchoolBusiness(IWApplicationContext iwac) {
 		try {
-			return (CommuneSchoolBusiness) IBOLookup.getServiceInstance(iwac, CommuneSchoolBusiness.class);
+			return (SchoolBusiness) IBOLookup.getServiceInstance(iwac, SchoolBusiness.class);
 		}
 		catch (IBOLookupException ile) {
 			throw new IBORuntimeException(ile);

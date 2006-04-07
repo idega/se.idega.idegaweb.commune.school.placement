@@ -253,7 +253,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.setCellpaddingLeft(1, 9, 12);
 			table.setCellpaddingRight(1, 9, 12);
 		}
-
+		
+		////////////////
+		if (false) {
+			table.add(getMoveStudentsSchoolChoiceTable(), 1, 10); //table.setBorder(1);
+		}
+		////////////////
+		
 		if (this.showStudentTable) {
 			if (_previousSchoolYearID != -1) {
 				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
@@ -1014,10 +1020,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 				
 				if (!useStyleNames()) {
-					if (student.getGender().isFemaleGender())
-						table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-					else
-						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+					if(student.getGender()!=null){
+						if (student.getGender().isFemaleGender())
+							table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
+						else{
+							table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+						}
+			    	}
+					else 	column++;
+			     
+						
 				}
 				
 				if (address != null && address.getStreetAddress() != null) table.add(getSmallText(address.getStreetAddress()), column, row);
@@ -1775,5 +1787,41 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	public void setShowListOfCoordinatesButton(boolean showListOfCoordinatesButton) {
 		this.showListOfCoordinatesButton = showListOfCoordinatesButton;
+	}
+	
+	
+	/**
+	 * function has to be implemented
+	 * @return
+	 */
+	private Table getMoveStudentsSchoolChoiceTable() {
+		Table table = new Table();
+		table.setBorder(1);
+		
+		Text skola = new Text("Skola:");
+		
+		DropdownMenu schools = null;
+		try {
+			schools = getSchools(false, "ELEMENTARY_SCHOOL");
+			schools.setName("zazzzzzzaaaboooooo");
+			schools.setToSubmit(false);
+		}
+		catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		
+		Text sorteraEfter = new Text("Sortera efter:");		
+		Text namn = new Text("namn");
+		Text allaElever = new Text("Alla elever");
+		
+		table.add(skola, 1, 1);
+		table.add(schools, 2, 1);
+		table.mergeCells(2, 1, 3, 1);		
+		
+		table.add(sorteraEfter, 1, 2);
+		table.add(namn, 2, 2);
+		table.add(allaElever, 3, 2);		
+		
+		return table;
 	}
 }

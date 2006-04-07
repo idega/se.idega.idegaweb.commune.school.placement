@@ -1020,10 +1020,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 				
 				if (!useStyleNames()) {
-					if (student.getGender().isFemaleGender())
-						table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-					else
-						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+					if(student.getGender()!=null){
+						if (student.getGender().isFemaleGender())
+							table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
+						else{
+							table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+						}
+			    	}
+					else 	column++;
+			     
+						
 				}
 				
 				if (address != null && address.getStreetAddress() != null) table.add(getSmallText(address.getStreetAddress()), column, row);

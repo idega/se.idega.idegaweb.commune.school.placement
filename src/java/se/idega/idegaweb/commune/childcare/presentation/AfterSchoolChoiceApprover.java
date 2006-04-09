@@ -69,9 +69,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	//private final String PARAMETER_SORT_PLACED = "sch_choice_sort_placed";
 	//private final String PARAMETER_SEARCH = "scH_choise_search";	
 	
-	private final int ACTION_MANAGE = 1;
+	private static final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
-	private final int ACTION_CREATE_CONTRACTS = 3;
+	private static final int ACTION_CREATE_CONTRACTS = 3;
 
 	private boolean iShowCreateContractsButton = true;
 	
@@ -83,7 +83,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		if (iwc.isLoggedOn()) {
 			parseAction(iwc);
 
-			switch (action) {
+			switch (this.action) {
 			case ACTION_MANAGE:
 				drawForm(iwc);
 				break;
@@ -111,25 +111,30 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		else
 			method = 0;*/
 
-		if (iwc.isParameterSet(PARAMETER_CREATE_CONTRACTS))
-			action = ACTION_CREATE_CONTRACTS;		
-		else if (iwc.isParameterSet(PARAMETER_ACTION))
-			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
-		else
-			action = ACTION_MANAGE;
+		if (iwc.isParameterSet(this.PARAMETER_CREATE_CONTRACTS)) {
+			this.action = ACTION_CREATE_CONTRACTS;
+		}
+		else if (iwc.isParameterSet(PARAMETER_ACTION)) {
+			this.action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		}
+		else {
+			this.action = ACTION_MANAGE;
+		}
 		
-		if (iwc.isParameterSet(PARAMETER_SORT))
-			sortChoicesBy = iwc.getParameter(PARAMETER_SORT);
-		else
-			sortChoicesBy = "c.QUEUE_DATE";
-			sortStudentsBy = sortChoicesBy;
+		if (iwc.isParameterSet(this.PARAMETER_SORT)) {
+			this.sortChoicesBy = iwc.getParameter(this.PARAMETER_SORT);
+		}
+		else {
+			this.sortChoicesBy = "c.QUEUE_DATE";
+		}
+			this.sortStudentsBy = this.sortChoicesBy;
 			
 	}
 	
 	private void drawForm(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
-		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(this.action)));
 
 		Table table = new Table(3, 17);
 				
@@ -201,7 +206,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 	protected Form getSearchAndSortTable() {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
-		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(this.action)));
 		
 		Table table = new Table(6, 1);
 		table.setCellpadding(0);
@@ -211,18 +216,18 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		
 		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":"), 1, 1);
 
-		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
+		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT));
 		menu.addMenuElement("c.QUEUE_DATE", localize("childcare.sort_queuedate", "Queue date"));
 		menu.addMenuElement("iu.LAST_NAME", localize("childcare.sort_name", "Name"));
 		menu.addMenuElement("iu.PERSONAL_ID", localize("childcare.sort_personal_id", "Personal ID"));
 		
-		menu.setSelectedElement(sortChoicesBy);
+		menu.setSelectedElement(this.sortChoicesBy);
 		menu.setToSubmit();		
 		table.setWidth(2, 4);
 		table.add(menu, 3, 1);
 		
-		if (iShowCreateContractsButton ) {
-			SubmitButton createContracts = (SubmitButton) getStyledInterface(new SubmitButton(PARAMETER_CREATE_CONTRACTS, localize("childcare.create_contracts", "Create contracts")));
+		if (this.iShowCreateContractsButton ) {
+			SubmitButton createContracts = (SubmitButton) getStyledInterface(new SubmitButton(this.PARAMETER_CREATE_CONTRACTS, localize("childcare.create_contracts", "Create contracts")));
 	//		createContracts.setSingleSubmitConfirm("testa");
 			createContracts.setSubmitConfirm(localize("childcare.confirm_create_contracts", "Create afterschool contracts for students with school placement."));
 			table.add(Text.NON_BREAKING_SPACE, 4, 1);
@@ -274,7 +279,7 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 		table.add(getLocalizedSmallHeader("child_care.address", "Address"), column++, row);
 		table.add(getLocalizedSmallHeader("child_care.phone", "Phone"), column++, row++);
 		boolean showMessage = false;
-		Collection applications = getApplicationCollection(iwc, sortStudentsBy);
+		Collection applications = getApplicationCollection(iwc, this.sortStudentsBy);
 		if (applications != null && !applications.isEmpty()) {
 			ChildCareApplication application;
 			User child;
@@ -309,15 +314,16 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 																				// to
 																				// do
 																				// so.
-					if (afc != null)
+					if (afc != null) {
 						itemSeason = afc.getSchoolSeasonId();
+					}
 				}
 				catch (Exception e) {
 					e.printStackTrace();
 				}
 				if (selectedSeason == itemSeason) {  // filter for seasons added by Igors 10.01.2006
 					boolean isFClass = afc.getFClass();
-					if (showFClass) {
+					if (this.showFClass) {
 						// from spec and Malin:
 						// ONLY applications with {COMM_CHILDCARE.F_CLASS set to
 						// TRUE ('Y') } are visible
@@ -349,10 +355,12 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 								&& ((Integer) season.getPrimaryKey()).intValue() == getSession().getSeasonID()) {
 							if (member.getRemovedDate() != null) {
 								terminated = new IWTimestamp(member.getRemovedDate());
-								if (terminated.isEarlierThan(today))
+								if (terminated.isEarlierThan(today)) {
 									active = false;
-								else
+								}
+								else {
 									active = true;
+								}
 							}
 							else if (member.getRegisterDate() != null) {
 								startdate = new IWTimestamp(member.getRegisterDate());
@@ -362,8 +370,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 								else if (startdate.isEarlierThan(today) && member.getRemovedDate() == null) {
 									active = true;
 								}
-								else
+								else {
 									active = false;
+								}
 							}
 							else {
 								active = true;
@@ -392,10 +401,12 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 						}
 						else {
 							if (!useStyleNames()) {
-								if (row % 2 == 0)
+								if (row % 2 == 0) {
 									table.setRowColor(row, getZebraColor1());
-								else
+								}
+								else {
 									table.setRowColor(row, getZebraColor2());
+								}
 							}
 						}
 						// link = getSmallLink(child.getNameLastFirst(true));
@@ -406,8 +417,9 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 						link.setParameter(getSession().getParameterApplicationID(),
 								application.getPrimaryKey().toString());
 						link.setParameter(getSession().getParameterCaseCode(), CareConstants.AFTER_SCHOOL_CASE_CODE_KEY);
-						if (getResponsePage() != null)
+						if (getResponsePage() != null) {
 							link.setPage(getResponsePage());
+						}
 						boolean hasQueuePriority = application.getHasQueuePriority();
 						if (hasQueuePriority) {
 							showPriority = true;
@@ -423,14 +435,18 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 						table.add(
 								getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())),
 								column++, row);
-						if (address != null)
+						if (address != null) {
 							table.add(getSmallText(address.getStreetAddress()), column++, row);
-						else
+						}
+						else {
 							table.add(getSmallText("-"), column++, row);
-						if (phone != null)
+						}
+						if (phone != null) {
 							table.add(getSmallText(phone.getNumber()), column++, row++);
-						else
+						}
+						else {
 							table.add(getSmallText("-"), column++, row++);
+						}
 					} // active
 				} // season filter
 			} // while
@@ -521,11 +537,11 @@ public class AfterSchoolChoiceApprover extends ChildCareBlock {
 
 	
 	public void setShowCreateContractsButton(boolean showCreateContractsButton) {
-		iShowCreateContractsButton = showCreateContractsButton;
+		this.iShowCreateContractsButton = showCreateContractsButton;
 	}
 
 	public boolean getShowFClass() {
-		return showFClass;
+		return this.showFClass;
 	}
 
 	public void setShowFClass(boolean showFClass) {

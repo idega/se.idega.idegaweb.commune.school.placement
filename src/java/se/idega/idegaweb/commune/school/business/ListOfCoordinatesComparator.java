@@ -38,8 +38,8 @@ public class ListOfCoordinatesComparator implements Comparator {
 		if(coordinate1!=null&&coordinate2==null) {
 			return OBJECT1_IS_SMALLER_THAN_OBJECT2;
 		}
-		int difference1 = Math.abs(Integer.parseInt(coordinate1)-Integer.parseInt(providerCoordinate));
-		int difference2 = Math.abs(Integer.parseInt(coordinate2)-Integer.parseInt(providerCoordinate));
+		int difference1 = Math.abs(Integer.parseInt(coordinate1)-Integer.parseInt(this.providerCoordinate));
+		int difference2 = Math.abs(Integer.parseInt(coordinate2)-Integer.parseInt(this.providerCoordinate));
 		if(difference1==difference2) {
 			return OBJECT1_IS_EQUAL_TO_OBJECT2;
 		} else if(difference1<difference2) {
@@ -55,7 +55,7 @@ public class ListOfCoordinatesComparator implements Comparator {
 		String coordinate=null;
 		applicant = schoolChoice.getChild();
 		try {
-			Address address = userBusiness.getUsersMainAddress(applicant);
+			Address address = this.userBusiness.getUsersMainAddress(applicant);
 			try {
 				coordinate =  address.getCoordinate().getCoordinateCode();
 			} catch(NullPointerException e) { 

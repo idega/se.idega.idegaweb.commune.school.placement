@@ -66,17 +66,17 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	
 	public void init(HttpServletRequest req, IWContext iwc) {
 		try {
-			locale = iwc.getApplicationSettings().getApplicationLocale();
-			business = getSchoolCommuneBusiness(iwc);
-			userBusiness = getCommuneUserBusiness(iwc);
-			iwrb = iwc.getIWMainApplication().getBundle(CommuneBlock.IW_BUNDLE_IDENTIFIER).getResourceBundle(locale);
+			this.locale = iwc.getApplicationSettings().getApplicationLocale();
+			this.business = getSchoolCommuneBusiness(iwc);
+			this.userBusiness = getCommuneUserBusiness(iwc);
+			this.iwrb = iwc.getIWMainApplication().getBundle(CommuneBlock.IW_BUNDLE_IDENTIFIER).getResourceBundle(this.locale);
 			 
 		//	if (req.getParameter(prmSeasonId) != null && req.getParameter(prmSchoolId) != null) {
-				season = Integer.parseInt(req.getParameter(prmSeasonId));
-				school = Integer.parseInt(req.getParameter(prmSchoolId));
-				syear = Integer.parseInt(req.getParameter(PARAMETER_SCHOOL_YEAR_ID));
-				searchString = req.getParameter(PARAMETER_SEARCH_STRING);
-				buffer = writeXLS(school, season, syear);
+				this.season = Integer.parseInt(req.getParameter(prmSeasonId));
+				this.school = Integer.parseInt(req.getParameter(prmSchoolId));
+				this.syear = Integer.parseInt(req.getParameter(PARAMETER_SCHOOL_YEAR_ID));
+				this.searchString = req.getParameter(PARAMETER_SEARCH_STRING);
+				this.buffer = writeXLS(this.school, this.season, this.syear);
 			//}
 		}
 		catch (Exception e) {
@@ -85,34 +85,36 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	}
 	
 	public String getMimeType() {
-		if (buffer != null)
-			return buffer.getMimeType();
+		if (this.buffer != null) {
+			return this.buffer.getMimeType();
+		}
 		return "application/x-msexcel";
 	}
 	
 	public void writeTo(OutputStream out) throws IOException {
-		if (buffer != null) {
-			MemoryInputStream mis = new MemoryInputStream(buffer);
+		if (this.buffer != null) {
+			MemoryInputStream mis = new MemoryInputStream(this.buffer);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			while (mis.available() > 0) {
 				baos.write(mis.read());
 			}
 			baos.writeTo(out);
 		}
-		else
+		else {
 			System.err.println("buffer is null");
+		}
 	}
 	
 	public MemoryFileBuffer writeXLS(int schoolID, int seasonID, int syear) throws Exception {
 		MemoryFileBuffer buffer = new MemoryFileBuffer();
 		MemoryOutputStream mos = new MemoryOutputStream(buffer);
 		String[] validStatuses = new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED};
-		List students = (List)business.getSchoolChoiceBusiness().getApplicantsForSchool(schoolID, seasonID, syear, validStatuses, searchString, SchoolChoiceComparator.NAME_SORT, -1, -1);
-		String providerCoordinate = business.getSchoolBusiness().getSchool(new Integer(schoolID)).getSchoolKeyCode();
+		List students = (List)this.business.getSchoolChoiceBusiness().getApplicantsForSchool(schoolID, seasonID, syear, validStatuses, this.searchString, SchoolChoiceComparator.NAME_SORT, -1, -1);
+		String providerCoordinate = this.business.getSchoolBusiness().getSchool(new Integer(schoolID)).getSchoolKeyCode();
 		if (!students.isEmpty()) {
-			Collections.sort(students,  new ListOfCoordinatesComparator(providerCoordinate, business, userBusiness));			 
+			Collections.sort(students,  new ListOfCoordinatesComparator(providerCoordinate, this.business, this.userBusiness));			 
 		    HSSFWorkbook wb = new HSSFWorkbook();
-		    HSSFSheet sheet = wb.createSheet(iwrb.getLocalizedString("school.coordinates","Coordinates"));
+		    HSSFSheet sheet = wb.createSheet(this.iwrb.getLocalizedString("school.coordinates","Coordinates"));
 		    sheet.setColumnWidth((short)0, (short) (30 * 256));
 		    sheet.setColumnWidth((short)1, (short) (14 * 256));
 		    sheet.setColumnWidth((short)2, (short) (30 * 256));
@@ -131,30 +133,30 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 			HSSFRow row = sheet.createRow(cellRow++);
 			HSSFCell cell = row.createCell((short)cellColumn++);
 			cell = row.createCell((short) 0);			
-			cell.setCellValue(business.getSchoolBusiness().getSchool(new Integer(schoolID)).getName());
+			cell.setCellValue(this.business.getSchoolBusiness().getSchool(new Integer(schoolID)).getName());
 			cell.setCellStyle(style);
 			cell = row.createCell((short) 3);
-			cell.setCellValue(iwrb.getLocalizedString("school.Coordinate","Coordinate")+": "+providerCoordinate);
+			cell.setCellValue(this.iwrb.getLocalizedString("school.Coordinate","Coordinate")+": "+providerCoordinate);
 			cell.setCellStyle(style);
 			row = sheet.createRow((short) (cellRow++));
 			row = sheet.createRow((short) (cellRow++));
 			cell = row.createCell((short) 0);
-		    cell.setCellValue(iwrb.getLocalizedString("school.name","Name"));
+		    cell.setCellValue(this.iwrb.getLocalizedString("school.name","Name"));
 		    cell.setCellStyle(style);
 		    cell = row.createCell((short)cellColumn++);
-		    cell.setCellValue(iwrb.getLocalizedString("school.personal_id","Personal ID"));
+		    cell.setCellValue(this.iwrb.getLocalizedString("school.personal_id","Personal ID"));
 		    cell.setCellStyle(style);
 		    cell = row.createCell((short)cellColumn++);
-		    cell.setCellValue(iwrb.getLocalizedString("school.Street","Street"));
+		    cell.setCellValue(this.iwrb.getLocalizedString("school.Street","Street"));
 		    cell.setCellStyle(style);
 			cell = row.createCell((short)cellColumn++);
-			cell.setCellValue(iwrb.getLocalizedString("school.zip_code","Zip code"));
+			cell.setCellValue(this.iwrb.getLocalizedString("school.zip_code","Zip code"));
 			cell.setCellStyle(style);
 		    cell = row.createCell((short)cellColumn++);
-		    cell.setCellValue(iwrb.getLocalizedString("school.city","City"));
+		    cell.setCellValue(this.iwrb.getLocalizedString("school.city","City"));
 		    cell.setCellStyle(style);
 		    cell = row.createCell((short)cellColumn++);
-		    cell.setCellValue(iwrb.getLocalizedString("school.coordinate","Coordinate"));
+		    cell.setCellValue(this.iwrb.getLocalizedString("school.coordinate","Coordinate"));
 		    cell.setCellStyle(style);
 		    
 		    SchoolChoice choice;
@@ -169,13 +171,14 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 				//created = new IWTimestamp(choice.getCreated());
 				applicant = choice.getChild();
 				//school = business.getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
-				address = userBusiness.getUsersMainAddress(applicant);
+				address = this.userBusiness.getUsersMainAddress(applicant);
 				
 				Name name = new Name(applicant.getFirstName(), applicant.getMiddleName(), applicant.getLastName());
-				row.createCell((short)cellColumn++).setCellValue(name.getName(locale, true));
-			    row.createCell((short)cellColumn++).setCellValue(PersonalIDFormatter.format(applicant.getPersonalID(), locale));
-			    if (address != null)
-				    row.createCell((short)cellColumn).setCellValue(address.getStreetAddress());
+				row.createCell((short)cellColumn++).setCellValue(name.getName(this.locale, true));
+			    row.createCell((short)cellColumn++).setCellValue(PersonalIDFormatter.format(applicant.getPersonalID(), this.locale));
+			    if (address != null) {
+						row.createCell((short)cellColumn).setCellValue(address.getStreetAddress());
+					}
 			    cellColumn++;
 				row.createCell((short)cellColumn++).setCellValue(address.getPostalAddress().split(" ")[0]);
 				row.createCell((short)cellColumn++).setCellValue(address.getCity());
@@ -201,7 +204,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	}
 
 	public boolean getShowPriorityColumn() {
-		return showPriorityColumn;
+		return this.showPriorityColumn;
 	}
 
 	public void setShowPriorityColumn(boolean showPriorityColumn) {
@@ -209,7 +212,7 @@ public class ListOfCoordinatesWriterXLS extends DownloadWriter implements MediaW
 	}
 	
 	public boolean isShowHandicraftColumn() {
-		return showHandicraftColumn;
+		return this.showHandicraftColumn;
 	}
 	
 	public void setShowHandicraftColumn(boolean showHandicraftColumn) {

@@ -85,19 +85,23 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 	}
 
 	private void parseAction(IWContext iwc) {
-		if (iwc.isParameterSet(PARAMETER_SORT))
-			sortChoicesBy = Integer.parseInt(iwc.getParameter(PARAMETER_SORT));
-		else
-			sortChoicesBy = SchoolChoiceComparator.NAME_SORT;
+		if (iwc.isParameterSet(this.PARAMETER_SORT)) {
+			this.sortChoicesBy = Integer.parseInt(iwc.getParameter(this.PARAMETER_SORT));
+		}
+		else {
+			this.sortChoicesBy = SchoolChoiceComparator.NAME_SORT;
+		}
 
-		if (iwc.isParameterSet(PARAMETER_SEARCH))
-			searchString = iwc.getParameter(PARAMETER_SEARCH);
+		if (iwc.isParameterSet(this.PARAMETER_SEARCH)) {
+			this.searchString = iwc.getParameter(this.PARAMETER_SEARCH);
+		}
 
-		if (searchString != null && searchString.length() > 0) {
+		if (this.searchString != null && this.searchString.length() > 0) {
 			try {
-				String temp = searchString;
-				if (temp.indexOf("-") != -1)
+				String temp = this.searchString;
+				if (temp.indexOf("-") != -1) {
 					temp = TextSoap.findAndCut(temp, "-");
+				}
 				Long.parseLong(temp);
 				if (temp.length() == 10 ) {
 					int firstTwo = Integer.parseInt(temp.substring(0, 2));
@@ -107,7 +111,7 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 						temp = "19"+temp;
 					}
 				}
-				searchString = temp;
+				this.searchString = temp;
 			}
 			catch (NumberFormatException nfe) {}
 		}
@@ -121,15 +125,17 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 
 		SchoolYear year = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int schoolYearAge = getBusiness().getGradeForYear(getSchoolYearID()) - 1;
-		if (year != null && schoolYearAge >= 12)
+		if (year != null && schoolYearAge >= 12) {
 			showLanguage = true;
-		if (getSchoolID() == -1)
+		}
+		if (getSchoolID() == -1) {
 			showLanguage = true;
+		}
 
 		String[] validStatuses =  new String[] { SchoolChoiceBMPBean.CASE_STATUS_PLACED, SchoolChoiceBMPBean.CASE_STATUS_PRELIMINARY, SchoolChoiceBMPBean.CASE_STATUS_MOVED };
 		int applicantsSize = 0;
 		try {
-			applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, null, validStatuses, searchString);
+			applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, null, validStatuses, this.searchString);
 		}
 		catch (Exception e) {
 			applicantsSize = 0;
@@ -146,11 +152,12 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 		table.add(getSmallHeader(localize("school.personal_id", "Personal ID")), column++, row);
 		table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
-		if (showLanguage)
+		if (showLanguage) {
 			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		}
 		table.add(getSmallHeader(localize("school.date", "Date")), column, row++);
 
-		Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, searchString, sortChoicesBy, applicationsPerPage, start);
+		Collection applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), schoolYearAge, validStatuses, this.searchString, this.sortChoicesBy, this.applicationsPerPage, this.start);
 		if (!applicants.isEmpty()) {
 			Map studentMap = getBusiness().getUserMapFromChoices(applicants);
 
@@ -171,13 +178,16 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 				Name childName = new Name(applicant.getFirstName(), applicant.getMiddleName(), applicant.getLastName());
 				String name = childName.getName(iwc.getApplicationSettings().getDefaultLocale(), true);
 
-				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
+				if (choice.getChoiceOrder() > 1 || choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
 					table.setRowColor(row, "#FFEAEA");
+				}
 				else {
-					if (row % 2 == 0)
+					if (row % 2 == 0) {
 						table.setRowColor(row, getZebraColor1());
-					else
+					}
+					else {
 						table.setRowColor(row, getZebraColor2());
+					}
 				}
 
 				link = getSmallLink(name);
@@ -188,23 +198,28 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(applicant.getPersonalID(), iwc.getCurrentLocale())), column++, row);
-				if (PIDChecker.getInstance().isFemale(applicant.getPersonalID()))
+				if (PIDChecker.getInstance().isFemale(applicant.getPersonalID())) {
 					table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-				else
+				}
+				else {
 					table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+				}
 
 				if (school != null) {
 					String schoolName = school.getName();
-					if (schoolName.length() > 20)
+					if (schoolName.length() > 20) {
 						schoolName = schoolName.substring(0, 20) + "...";
+					}
 					table.add(getSmallText(schoolName), column, row);
-					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED))
+					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
 						table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
+					}
 				}
 				column++;
 				if (showLanguage) {
-					if (choice.getLanguageChoice() != null)
+					if (choice.getLanguageChoice() != null) {
 						table.add(getSmallText(localize(choice.getLanguageChoice(),"")), column, row);
+					}
 					column++;
 				}
 				table.add(getSmallText(calendar.getLocaleDate(IWCalendar.SHORT)), column++, row++);
@@ -278,12 +293,12 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 	}
 	
 	private Table getNavigationTable(IWContext iwc, int applicantsSize) {
-		currentPage = 0;
-		int maxPage = (int) Math.ceil(applicantsSize / applicationsPerPage);
-		if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
-			currentPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
+		this.currentPage = 0;
+		int maxPage = (int) Math.ceil(applicantsSize / this.applicationsPerPage);
+		if (iwc.isParameterSet(this.PARAMETER_CURRENT_APPLICATION_PAGE)) {
+			this.currentPage = Integer.parseInt(iwc.getParameter(this.PARAMETER_CURRENT_APPLICATION_PAGE));
 		}
-		start = currentPage * applicationsPerPage;
+		this.start = this.currentPage * this.applicationsPerPage;
 
 		Table navigationTable = new Table(3, 1);
 		navigationTable.setCellpadding(0);
@@ -297,12 +312,12 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 
 		Text prev = getSmallText(localize("previous", "Previous"));
 		Text next = getSmallText(localize("next", "Next"));
-		Text info = getSmallText(localize("page", "Page") + " " + (currentPage + 1) + " " + localize("of", "of") + " " + (maxPage + 1));
-		if (currentPage > 0) {
+		Text info = getSmallText(localize("page", "Page") + " " + (this.currentPage + 1) + " " + localize("of", "of") + " " + (maxPage + 1));
+		if (this.currentPage > 0) {
 			Link lPrev = getSmallLink(localize("previous", "Previous"));
-			lPrev.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currentPage - 1));
-			lPrev.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
-			lPrev.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
+			lPrev.addParameter(this.PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(this.currentPage - 1));
+			lPrev.addParameter(this.PARAMETER_SEARCH, iwc.getParameter(this.PARAMETER_SEARCH));
+			lPrev.addParameter(this.PARAMETER_SORT, iwc.getParameter(this.PARAMETER_SORT));
 			navigationTable.add(lPrev, 1, 1);
 		}
 		else {
@@ -310,11 +325,11 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 		}
 		navigationTable.add(info, 2, 1);
 
-		if (currentPage < maxPage) {
+		if (this.currentPage < maxPage) {
 			Link lNext = getSmallLink(localize("next", "Next"));
-			lNext.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currentPage + 1));
-			lNext.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
-			lNext.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
+			lNext.addParameter(this.PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(this.currentPage + 1));
+			lNext.addParameter(this.PARAMETER_SEARCH, iwc.getParameter(this.PARAMETER_SEARCH));
+			lNext.addParameter(this.PARAMETER_SORT, iwc.getParameter(this.PARAMETER_SORT));
 			navigationTable.add(lNext, 3, 1);
 		}
 		else {
@@ -345,23 +360,25 @@ public class SchoolChoicesStatistics extends SchoolAccountingCommuneBlock {
 		table.setCellspacing(0);
 		SchoolYear schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int yearAge = -1;
-		if (schoolYear != null)
+		if (schoolYear != null) {
 			yearAge = schoolYear.getSchoolYearAge();
+		}
 
 		table.add(getSmallHeader(localize("school.search_for", "Search for") + ":" + Text.NON_BREAKING_SPACE), 1, 1);
-		TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH, searchString));
+		TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(this.PARAMETER_SEARCH, this.searchString));
 		table.add(tiSearch, 2, 1);
 		table.setHeight(2, "2");
 
 		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":" + Text.NON_BREAKING_SPACE), 1, 3);
 
-		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
+		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT));
 		menu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name", "Name"));
 		menu.addMenuElement(SchoolChoiceComparator.PERSONAL_ID_SORT, localize("school.sort_personal_id", "Personal ID"));
 		menu.addMenuElement(SchoolChoiceComparator.GENDER_SORT, localize("school.sort_gender", "Gender"));
-		if (yearAge >= 12)
+		if (yearAge >= 12) {
 			menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language", "Language"));
-		menu.setSelectedElement(sortChoicesBy);
+		}
+		menu.setSelectedElement(this.sortChoicesBy);
 		menu.setToSubmit();
 		table.add(menu, 2, 3);
 

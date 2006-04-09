@@ -103,10 +103,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	public void init(IWContext iwc) throws Exception {
 		initChild(iwc);
 		if (hasPermission(iwc)){
-			if (child != null) {
+			if (this.child != null) {
 				parseAction(iwc);
 
-				switch (_action) {
+				switch (this._action) {
 					case ACTION_VIEW_FORM :
 						viewForm(iwc);
 						break;
@@ -137,7 +137,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		Iterator theChild = children.iterator();
 			while(theChild.hasNext()){
 				User userChild = (User) theChild.next();
-				if (userChild.isIdentical(child)){
+				if (userChild.isIdentical(this.child)){
 					hasPermission = true;
 					break;
 				}
@@ -148,13 +148,13 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 	
 	public void initChild(IWContext iwc) {
-		String ID = iwc.getParameter(prmChildId);
-		String childUniqueId = iwc.getParameter(prmChildUniqueId);
+		String ID = iwc.getParameter(this.prmChildId);
+		String childUniqueId = iwc.getParameter(this.prmChildUniqueId);
 		
 		if (childUniqueId != null && !childUniqueId.equals("-1")){
 			if (childUniqueId != null){
 				try {
-					child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);	
+					this.child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);	
 				}
 				catch (IBOLookupException ibe){
 					log (ibe);
@@ -170,7 +170,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		}
 		else if (ID != null && !ID.equals("-1")) {
 			try {
-				child = getBusiness().getUserBusiness().getUser(Integer.parseInt(ID));
+				this.child = getBusiness().getUserBusiness().getUser(Integer.parseInt(ID));
 			}
 			catch (NumberFormatException e) {
 				e.printStackTrace();
@@ -181,7 +181,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		}
 		else {
 			try {
-				child = getBusiness().getUserBusiness().getUserByUniqueId(getSession().getUniqueID());
+				this.child = getBusiness().getUserBusiness().getUserByUniqueId(getSession().getUniqueID());
 			}
 			catch (RemoteException e) {
 				e.printStackTrace();
@@ -190,7 +190,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				log(e);
 			}
 			try{
-				child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
+				this.child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
 			}
 			catch (RemoteException e) {
 				e.printStackTrace();
@@ -203,8 +203,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 
 	protected boolean isAdmin(IWContext iwc) {
-		if (iwc.hasEditPermission(this))
+		if (iwc.hasEditPermission(this)) {
 			return true;
+		}
 
 		try {
 			return getBusiness().getUserBusiness().isRootCommuneAdministrator(iwc.getCurrentUser());
@@ -215,19 +216,21 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 
 	private void parseAction(IWContext iwc) {
-		isAdmin = isAdmin(iwc);
+		this.isAdmin = isAdmin(iwc);
 
-		if (iwc.isParameterSet(PARAMETER_ACTION))
-			_action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
-		else
-			_action = ACTION_VIEW_FORM;
+		if (iwc.isParameterSet(PARAMETER_ACTION)) {
+			this._action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		}
+		else {
+			this._action = ACTION_VIEW_FORM;
+		}
 
 	}
 
 	private void viewForm(IWContext iwc) throws RemoteException {
-		if (child != null) {
+		if (this.child != null) {
 			Form form = new Form();
-			form.maintainParameter(prmChildId);
+			form.maintainParameter(this.prmChildId);
 
 			Table table = new Table();
 			//table.setWidth(getWidth());
@@ -242,11 +245,12 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.setHeight(row++, 12);
 
 			SubmitButton submit = (SubmitButton) getButton(new SubmitButton(localize(PARAM_FORM_SUBMIT, "Submit application"), PARAMETER_ACTION, String.valueOf(ACTION_SUBMIT)));
-			if (isAdmin) {
+			if (this.isAdmin) {
 				try {
-					User parent = getBusiness().getUserBusiness().getCustodianForChild(child);
-					if (parent == null)
+					User parent = getBusiness().getUserBusiness().getCustodianForChild(this.child);
+					if (parent == null) {
 						submit.setDisabled(true);
+					}
 				}
 				catch (RemoteException re) {
 					submit.setDisabled(true);
@@ -292,15 +296,15 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			String message = iwc.getParameter(PARAM_MESSAGE);
 
 			User parent = null;
-			if (isAdmin) {
-				parent = getBusiness().getUserBusiness().getCustodianForChild(child);
+			if (this.isAdmin) {
+				parent = getBusiness().getUserBusiness().getCustodianForChild(this.child);
 			}
 			else {
 				parent = iwc.getCurrentUser();
 			}
 
 			SchoolSeason season = null;
-			if (_useOngoingSeason) {
+			if (this._useOngoingSeason) {
 				try {
 					season = getCareBusiness().getSchoolSeasonHome().findSeasonByDate(getBusiness().getSchoolBusiness().getCategoryElementarySchool(), new IWTimestamp().getDate());
 				}
@@ -314,7 +318,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			
 			String subject = localize(EMAIL_PROVIDER_SUBJECT, "After school application received");
 			String body = localize(EMAIL_PROVIDER_MESSAGE, "We have received your after school application for {0} to {1}.");
-			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) child.getPrimaryKey(), providers, message, dates, season, subject, body, isFClassAndPrio);
+			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) this.child.getPrimaryKey(), providers, message, dates, season, subject, body, this.isFClassAndPrio);
 			done = choices != null && !choices.isEmpty();
 		}
 		catch (RemoteException e) {
@@ -357,7 +361,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 		int row = 1;
 
-		if (_showCheckOption) {
+		if (this._showCheckOption) {
 			inputTable.mergeCells(1, row, inputTable.getColumns(), row);
 			inputTable.setWidth(1, row, Table.HUNDRED_PERCENT);
 			inputTable.add(getSmallHeader(localize(CHECK_MESSAGE, "Please note that if you select a private provider, you have to fill out a check application as well.")), 1, row++);
@@ -427,12 +431,14 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				DateInput date = (DateInput) getStyledInterface(new DateInput(PARAM_DATE + "_" + i));
 				//date.setAsNotEmpty(localize(EMPTYSTARTDATE_KEY, EMPTYSTARTDATE_DEFAULT));
 				date.setEarliestPossibleDate(stamp.getDate(), localize(EARLIESTSTARTDATE_KEY, EARLIESTSTARTDATE_DEFAULT) + " " + new IWTimestamp(stamp.getDate()).getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT));
-				if (afterSchoolChoice != null)
+				if (afterSchoolChoice != null) {
 					date.setDate(afterSchoolChoice.getFromDate());
+				}
 				//else
 				//	date.setToCurrentDate();
-				if (isAdmin)
+				if (this.isAdmin) {
 					date.setYearRange(stamp.getYear() - 5, stamp.getYear() + 5);
+				}
 				inputTable.add(labelFrom, 1, row);
 				inputTable.setWidth(1, row, 100);
 				inputTable.add(date, 3, row++);
@@ -443,8 +449,9 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			TextArea messageArea = (TextArea) getStyledInterface(new TextArea(PARAM_MESSAGE));
 			messageArea.setRows(4);
 			messageArea.setWidth(Table.HUNDRED_PERCENT);
-			if (message != null)
+			if (message != null) {
 				messageArea.setContent(message);
+			}
 
 			inputTable.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
 			inputTable.add(getSmallHeader(localize("message", "Message")), 1, row);
@@ -473,15 +480,16 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		table.add(getSmallHeader(localize(PID, "Personal ID") + ":"), 1, 2);
 		table.add(getSmallHeader(localize(ADDRESS, "Address") + ":"), 1, 3);
 
-		Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+		Name name = new Name(this.child.getFirstName(), this.child.getMiddleName(), this.child.getLastName());
 		table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 3, 1);
-		String personalID = PersonalIDFormatter.format(child.getPersonalID(), iwc.getIWMainApplication().getSettings().getApplicationLocale());
+		String personalID = PersonalIDFormatter.format(this.child.getPersonalID(), iwc.getIWMainApplication().getSettings().getApplicationLocale());
 		table.add(getSmallText(personalID), 3, 2);
 
 		try {
-			Address address = getBusiness().getUserBusiness().getUsersMainAddress(child);
-			if (address != null)
+			Address address = getBusiness().getUserBusiness().getUsersMainAddress(this.child);
+			if (address != null) {
 				table.add(getSmallText(address.getStreetAddress() + ", " + address.getPostalAddress()), 3, 3);
+			}
 		}
 		catch (RemoteException e) {
 		}
@@ -562,16 +570,18 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		dropdown.addEmptyElement(localize("select_area", "Select area..."), emptyString);
 
 		try {
-			if (areas == null)
-				areas = getBusiness().getSchoolBusiness().findAllSchoolAreas();
-			if (providerMap == null)
-				providerMap = getBusiness().getProviderAreaMap(areas, locale, emptyString, true);
+			if (this.areas == null) {
+				this.areas = getBusiness().getSchoolBusiness().findAllSchoolAreas();
+			}
+			if (this.providerMap == null) {
+				this.providerMap = getBusiness().getProviderAreaMap(this.areas, locale, emptyString, true);
+			}
 
-			if (areas != null && providerMap != null) {
-				Iterator iter = areas.iterator();
+			if (this.areas != null && this.providerMap != null) {
+				Iterator iter = this.areas.iterator();
 				while (iter.hasNext()) {
 					SchoolArea area = (SchoolArea) iter.next();
-					dropdown.addMenuElement(area.getPrimaryKey().toString(), area.getSchoolAreaName(), (Map) providerMap.get(area));
+					dropdown.addMenuElement(area.getPrimaryKey().toString(), area.getSchoolAreaName(), (Map) this.providerMap.get(area));
 				}
 			}
 		}
@@ -598,7 +608,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 	
 	public void setUseOngoingSeason(boolean useOngoingSeason) {
-		_useOngoingSeason = useOngoingSeason;
+		this._useOngoingSeason = useOngoingSeason;
 	}
 	
 	/**
@@ -623,7 +633,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	}
 
 	public boolean getFClassAndPrio() {
-		return isFClassAndPrio;
+		return this.isFClassAndPrio;
 	}
 
 	public void setFClassAndPrio(boolean isFClassAndPrio) {

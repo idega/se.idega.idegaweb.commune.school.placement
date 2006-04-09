@@ -82,8 +82,8 @@ import com.idega.util.text.Name;
 
 /**
  * @author <br><a href="mailto:gobom@wmdata.com">Göran Borgman</a><br>
- * Last modified: $Date: 2005/10/13 18:36:11 $ by $Author: laddi $
- * @version $Revision: 1.97 $
+ * Last modified: $Date: 2006/04/09 12:01:14 $ by $Author: laddi $
+ * @version $Revision: 1.98 $
  */
 public class CentralPlacementEditor extends SchoolCommuneBlock {
 	// *** Localization keys ***
@@ -238,15 +238,15 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private boolean _cancelNewPlacement = false;
 
 	public void init(IWContext iwc) throws Exception {
-		iwrb = getResourceBundle(iwc);
-		form = new Form();
-		form.setName(CentralPlacementEditorConstants.FORM_NAME);
-		form.setEventListener(SchoolEventListener.class);
+		this.iwrb = getResourceBundle(iwc);
+		this.form = new Form();
+		this.form.setName(CentralPlacementEditorConstants.FORM_NAME);
+		this.form.setEventListener(SchoolEventListener.class);
 		
 		// Parameter name returning chosen User from SearchUserModule
-		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
+		this.uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
 
-		form.add(getMainTable());
+		this.form.add(getMainTable());
 		parse(iwc);
 		
 		// Borgman test
@@ -269,15 +269,15 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		//Get child (User object) from search result param or session attribute
 		getSearchResult(iwc);
 
-		currentSeason = getCentralPlacementBusiness(iwc).getCurrentSeason();
+		this.currentSeason = getCentralPlacementBusiness(iwc).getCurrentSeason();
 		// Perform actions according the _action input parameter
-		switch (_action) {
+		switch (this._action) {
 			case ACTION_PLACE_PUPIL :
 				try {
 					SchoolSeason chosenSeason = getSchoolSeasonHome().
 						findByPrimaryKey(new Integer(getSchoolCommuneSession(iwc).getSchoolSeasonID()));
-					latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, chosenSeason);
-					storedPlacement = storePlacement(iwc, child);
+					this.latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(this.child, chosenSeason);
+					this.storedPlacement = storePlacement(iwc, this.child);
 				} 
 				catch (Exception e1) {log(e1);}			
 				break;
@@ -291,13 +291,13 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		}
 		// Show main page tables		
 		try {
-			if (storedPlacement == null) {
+			if (this.storedPlacement == null) {
 				// Show main form parts
-				if (!_newPlacement || _cancelNewPlacement) {
+				if (!this._newPlacement || this._cancelNewPlacement) {
 					// First part with search, pupil and latest placement
 					setMainTableContent(getSearchTable(iwc));
-					setMainTableContent(getPupilTable(iwc, child));
-					setMainTableContent(getLatestPlacementTable(iwc, child));
+					setMainTableContent(getPupilTable(iwc, this.child));
+					setMainTableContent(getLatestPlacementTable(iwc, this.child));
 				} else {
 					// New placement form
 					setMainTableContent(getNewPlacementTable(iwc));
@@ -313,33 +313,33 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			setMainTableContent(new Text("RemoteException thrown!! Error connecting to EJB's"));
 		}
 
-		add(form);
+		add(this.form);
 	}
 
 	private Table getMainTable() {
-		mainTable = new Table();
-		mainTable.setBorder(0);
-		mainTable.setWidth(550);
-		mainTable.setCellpadding(0);
-		mainTable.setCellspacing(0);
+		this.mainTable = new Table();
+		this.mainTable.setBorder(0);
+		this.mainTable.setWidth(550);
+		this.mainTable.setCellpadding(0);
+		this.mainTable.setCellspacing(0);
 		int col = 1;
-		mainTableRow = 1;
+		this.mainTableRow = 1;
 		
 		//  *** WINDOW HEADING ***
-		mainTable.add(
+		this.mainTable.add(
 			getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Central placement of pupil"), 
-																														col, mainTableRow);
-		mainTable.setColor(col, mainTableRow, getHeaderColor());
-		mainTable.setAlignment(col, mainTableRow, Table.HORIZONTAL_ALIGN_CENTER);
-		mainTable.setRowVerticalAlignment(mainTableRow, Table.VERTICAL_ALIGN_MIDDLE);
-		mainTable.setRowHeight(mainTableRow++, "20");
+																														col, this.mainTableRow);
+		this.mainTable.setColor(col, this.mainTableRow, getHeaderColor());
+		this.mainTable.setAlignment(col, this.mainTableRow, Table.HORIZONTAL_ALIGN_CENTER);
+		this.mainTable.setRowVerticalAlignment(this.mainTableRow, Table.VERTICAL_ALIGN_MIDDLE);
+		this.mainTable.setRowHeight(this.mainTableRow++, "20");
 
-		return mainTable;
+		return this.mainTable;
 	}
 
 	private void setMainTableContent(PresentationObject obj) {
 		int col = 1;
-		mainTable.add(obj, col, mainTableRow++);
+		this.mainTable.add(obj, col, this.mainTableRow++);
 	}
 
 	public Table getSearchTable(IWContext iwc) {
@@ -353,7 +353,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		int col = 1;
 		int row = 1;
 
-		Image space1 = (Image) transGIF.clone();
+		Image space1 = (Image) this.transGIF.clone();
 		space1.setWidth(6);
 
 		// *** HEADING Search pupil ***
@@ -377,19 +377,19 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			} else if (iwc.isParameterSet("usrch_search_fname" + UNIQUE_SUFFIX)
 							|| iwc.isParameterSet("usrch_search_lname" + UNIQUE_SUFFIX)
 							|| iwc.isParameterSet("usrch_search_pid" + UNIQUE_SUFFIX)) {
-					errMsgSearch = localize(KEY_SEARCH_NO_PUPIL_FOUND, "No pupil found");
+					this.errMsgSearch = localize(KEY_SEARCH_NO_PUPIL_FOUND, "No pupil found");
 			}
 		} catch (Exception e) {}		
 		table.add(searchModule, col++, row);
 		
 		// Get current pupil from session attribute
-		child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);		
+		this.child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);		
 		
-		if (errMsgSearch != null) {
+		if (this.errMsgSearch != null) {
 			row++;
 			col = 1;
 			table.add(Text.getNonBrakingSpace(4), col, row);
-			table.add(getSmallErrorText(errMsgSearch), col, row);
+			table.add(getSmallErrorText(this.errMsgSearch), col, row);
 		}
 		
 		return table;
@@ -402,21 +402,22 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
-		transGIF.setHeight("1");
-		transGIF.setWidth("1");
+		this.transGIF.setHeight("1");
+		this.transGIF.setWidth("1");
 		String rowHeight = "20";
 		
-		if (mainRowHeight != null)
-			rowHeight = mainRowHeight;
+		if (this.mainRowHeight != null) {
+			rowHeight = this.mainRowHeight;
+		}
 			
 		int row = 1;
 		int col = 1;
 		// add empty space row
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
 		// Set COLUMN WIDTH for column 1 to 5
 		table.setWidth(1, row, "100");
 		//table.setWidth(2, row, "70");
@@ -437,8 +438,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		col = 1;
 		// Personal Id Number
 		table.add(getSmallHeader(localize(KEY_PERSONAL_ID_LABEL, "Personal id: ")), col++, row);
-		if (child != null)
+		if (child != null) {
 			table.add(getSmallText(child.getPersonalID()), col++, row);
+		}
 		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
@@ -449,12 +451,14 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		col = 1;
 		nameTable.setCellpadding(0);
 		nameTable.setCellspacing(0);
-		if (child != null)
+		if (child != null) {
 			nameTable.add(getSmallText(child.getLastName()), col++, 1);
+		}
 		// First Name       
 		nameTable.add(getSmallHeader(localize(KEY_FIRST_NAME_LABEL, "First name: ")), col++, 1);
-		if (child != null)
+		if (child != null) {
 			nameTable.add(getSmallText(child.getFirstName()), col++, 1);
+		}
 		nameTable.setWidth(1, 1, "100");
 		nameTable.setWidth(2, 1, "100");
 		nameTable.setWidth(3, 1, "100");
@@ -488,8 +492,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				for (Iterator iter = phones.iterator(); iter.hasNext(); i++) {
 					Phone phone = (Phone) iter.next();
 					pBuf.append(phone.getNumber());
-					if (i < phonesSize - 1)
+					if (i < phonesSize - 1) {
 						pBuf.append(", ");
+					}
 				}
 				pBuf.append("&nbsp;");
 				table.add(getSmallText(pBuf.toString()), col, row);
@@ -510,21 +515,22 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
-		transGIF.setHeight("1");
-		transGIF.setWidth("1");
+		this.transGIF.setHeight("1");
+		this.transGIF.setWidth("1");
 		String rowHeight = "20";
 
-		if (mainRowHeight != null)
-			rowHeight = mainRowHeight;
+		if (this.mainRowHeight != null) {
+			rowHeight = this.mainRowHeight;
+		}
 		
 		int row = 1;
 		int col = 1;
 		// add empty space row
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row); 
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row); 
 		// Set COLUMN WIDTH for column 1 to 5
 		table.setWidth(1, row, "100");
 		table.setWidth(2, row, "100");
@@ -554,8 +560,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// School type
 		table.add(getSmallHeader(localize(KEY_SCHOOL_TYPE_LABEL, "School type: ")), col, row);
 		// BUTTON Pupil overview
-		pupilOverviewLinkButton = getPupilOverviewButton(); 
-		table.add(pupilOverviewLinkButton, 5, row);
+		this.pupilOverviewLinkButton = getPupilOverviewButton(); 
+		table.add(this.pupilOverviewLinkButton, 5, row);
 				//PARAM_PRESENTATION, String.valueOf(PRESENTATION_SEARCH_FORM)), 5, row);
 		table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		table.setRowHeight(row, rowHeight);
@@ -591,8 +597,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.add(getSmallHeader(localize(KEY_ENDDATE_LABEL, "End date: ")), col+2, row);
 		col = 5;
 		// Edit latest placement BUTTON
-		editLatestPlacementButton = getEditLatestPlacementButton();
-		table.add(editLatestPlacementButton, col, row);
+		this.editLatestPlacementButton = getEditLatestPlacementButton();
+		table.add(this.editLatestPlacementButton, col, row);
 		table.setAlignment(col, row, Table.HORIZONTAL_ALIGN_RIGHT);
 		
 		table.setRowHeight(row, rowHeight);
@@ -600,29 +606,30 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// VALUES - Latest placement
 		if (child != null) {
 			try {
-				latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, currentSeason);
-				if (latestPl != null) {
+				this.latestPl = getCentralPlacementBusiness(iwc).getLatestPlacementFromElemAndHighSchool(child, this.currentSeason);
+				if (this.latestPl != null) {
 					row--;row--;row--;row--;row--;
 					col = 2;
 					// School type
 					try {
-						SchoolType type = latestPl.getSchoolType();
-						if (type != null)
-							table.add(getSmallText(type.getName()), col, row);						
+						SchoolType type = this.latestPl.getSchoolType();
+						if (type != null) {
+							table.add(getSmallText(type.getName()), col, row);
+						}						
 					} catch (Exception e) {}
 					// BUTTON Pupil overview
-					activatePupilOverviewButton(latestPl);
+					activatePupilOverviewButton(this.latestPl);
 					
 					row++;
 
-					String buf =  getCentralPlacementBusiness(iwc).getPlacementString(latestPl, child, this.iwrb);
+					String buf =  getCentralPlacementBusiness(iwc).getPlacementString(this.latestPl, child, this.iwrb);
 					
 					table.add(getSmallText(buf), col, row);
 					table.mergeCells(col, row, col+2, row);
 
 					// BUTTON Regular payment for Latest Placement	
 					try {
-						table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row);
+						table.add(getRegularPaymentTopButton(iwc, this.latestPl), 5, row);
 						table.setAlignment(5, row, Table.HORIZONTAL_ALIGN_RIGHT);
 					} catch (Exception e) {}
 					
@@ -630,15 +637,15 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					
 					// Resources
 					try {
-						table.add(getSmallText(getResourcesString(iwc, latestPl)), col, row);
+						table.add(getSmallText(getResourcesString(iwc, this.latestPl)), col, row);
 						table.mergeCells(col, row, col+2, row);
 					} catch (Exception e) {}
 					
 					row++;
 					
 					// Placement
-					if (latestPl.getPlacementParagraph() != null) {
-						table.add(getSmallText(latestPl.getPlacementParagraph()), col, row);
+					if (this.latestPl.getPlacementParagraph() != null) {
+						table.add(getSmallText(this.latestPl.getPlacementParagraph()), col, row);
 						table.mergeCells(col, row, col+2, row);
 					}
 					
@@ -657,7 +664,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					// Payment by agreement
 					col = 4;
 					try {
-						if (latestPl.getHasCompensationByAgreement()) {
+						if (this.latestPl.getHasCompensationByAgreement()) {
 							table.add(getSmallText(localize(KEY_CONTRACT_YES, "Yes")), col, row);
 						}
 					} catch (Exception e) {}
@@ -669,19 +676,20 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					
 					// Start date
 					try {
-						table.add(getSmallText(getDateString(latestPl.getRegisterDate())), col, row);
+						table.add(getSmallText(getDateString(this.latestPl.getRegisterDate())), col, row);
 					} catch (Exception e) {}
 					
 					col = 4;
 					
 					// End date
 					try {
-						if (latestPl.getRemovedDate() != null)
-							table.add(getSmallText(getDateString(latestPl.getRemovedDate())), col, row);
+						if (this.latestPl.getRemovedDate() != null) {
+							table.add(getSmallText(getDateString(this.latestPl.getRemovedDate())), col, row);
+						}
 					} catch (Exception e) {}
 					
 					// Edit latest placement BUTTON
-					activateEditLatestPlacementButton(latestPl);
+					activateEditLatestPlacementButton(this.latestPl);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -690,7 +698,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			// BUTTON Regular payment for Latest Placement					
 			if (!(iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) 
 					|| "-1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY))) {
-				table.add(getRegularPaymentTopButton(iwc, latestPl), 5, row-3);
+				table.add(getRegularPaymentTopButton(iwc, this.latestPl), 5, row-3);
 				table.setAlignment(5, row-3, Table.HORIZONTAL_ALIGN_RIGHT);
 			}
 		}
@@ -704,13 +712,13 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		
 		
 		// BUTTON New placement
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_NEW_PLACEMENT, "New placement"), 
+		table.add(new SubmitButton(this.iwrb.getLocalizedImageButton(KEY_BUTTON_NEW_PLACEMENT, "New placement"), 
 																							PARAM_NEW_PLACEMENT, "true"), col++, row);
 		row++;
 		col = 1;
 		
 		// Empty space row
-		table.add(transGIF, col, row);
+		table.add(this.transGIF, col, row);
 		table.setRowHeight(row, rowHeight);
 		row++;
 		col = 1;
@@ -732,21 +740,22 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.setWidth("100%");
 		table.setCellpadding(2);
 		table.setCellspacing(0);
-		transGIF.setHeight("1");
-		transGIF.setWidth("1");
+		this.transGIF.setHeight("1");
+		this.transGIF.setWidth("1");
 		String rowHeight = "20";
 
-		if (mainRowHeight != null)
-			rowHeight = mainRowHeight;
+		if (this.mainRowHeight != null) {
+			rowHeight = this.mainRowHeight;
+		}
 
 		int row = 1;
 		int col = 1;
 		// add empty space row
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
 		// Set COLUMN WIDTH for column 1 to 5
 		table.setWidth(1, row, "100");
 		table.setWidth(2, row, "90");
@@ -765,10 +774,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.add(new HiddenInput(PARAM_NEW_PLACEMENT, "true"), 1, 1);
 		
 		// ERROR MSG - errMsgMid
-		if (errMsgMid != null) {
+		if (this.errMsgMid != null) {
 			row++;
 			col = 1;
-			table.add(getSmallErrorText(errMsgMid), col, row);
+			table.add(getSmallErrorText(this.errMsgMid), col, row);
 			table.mergeCells(col, row, col+2, row);
 		}
 
@@ -785,12 +794,12 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		col = 1;
 		
 		//Student name
-		child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);
+		this.child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);
 		table.add(getSmallHeader(localize(KEY_STUDENT, "Student: ")), col++, row);
-		if (child != null) {
-			Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+		if (this.child != null) {
+			Name name = new Name(this.child.getFirstName(), this.child.getMiddleName(), this.child.getLastName());
 			table.add(name.getName(iwc.getApplicationSettings().getDefaultLocale())+ ",&nbsp;&nbsp;", col, row);
-			table.add(child.getPersonalID(), col, row);			
+			table.add(this.child.getPersonalID(), col, row);			
 		}
 		table.mergeCells(col, row, col+2, row);
 		table.setRowHeight(row, rowHeight);
@@ -839,7 +848,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.setRowHeight(row, rowHeight);
 
 		// Provider values		
-		if (storedPlacement == null && iwc.isParameterSet(PARAM_PROVIDER) 
+		if (this.storedPlacement == null && iwc.isParameterSet(PARAM_PROVIDER) 
 				&& !("-1".equals(iwc.getParameter(PARAM_PROVIDER))) 
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) ) {
 			School school = getCurrentProvider(iwc);
@@ -931,7 +940,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// Resource
 		table.add(getSmallHeader(localize(KEY_RESOURCE_LABEL, "Resource: ")), col++, row);
 		//  Resource input checkboxes
-		if (storedPlacement == null 
+		if (this.storedPlacement == null 
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED))) 
@@ -1044,7 +1053,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		row++;
 
 		// empty space row
-		Image trans1 = (Image) transGIF.clone();
+		Image trans1 = (Image) this.transGIF.clone();
 		table.add(trans1, col, row);
 		table.setRowHeight(row, rowHeight);
 		
@@ -1052,10 +1061,10 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		row++;		
 		// BOTTOM BUTTONS
 			// Place
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_PLACE, "Place"), 
+		table.add(new SubmitButton(this.iwrb.getLocalizedImageButton(KEY_BUTTON_PLACE, "Place"), 
 								PARAM_ACTION, String.valueOf(ACTION_PLACE_PUPIL)), col++, row);
 			// Cancel		
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel"),
+		table.add(new SubmitButton(this.iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel"),
 						PARAM_CANCEL_NEW_PLACEMENT, "true"), col++, row);
 		col = 1;
 		row++;		
@@ -1088,7 +1097,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		table.setWidth(col++, row, 30);
 		table.setWidth(col, row, Table.HUNDRED_PERCENT);
 
-		Image space1 = (Image) transGIF.clone();
+		Image space1 = (Image) this.transGIF.clone();
 		space1.setWidth(6);
 		
 		table.add(space1, col, row);
@@ -1161,15 +1170,15 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		row++;
 		
 		table.add(new HiddenInput(PARAM_STORED_PLACEMENT_ID, 
-												((Integer) storedPlacement.getPrimaryKey()).toString()), 1, 1);
+												((Integer) this.storedPlacement.getPrimaryKey()).toString()), 1, 1);
 
 		// BOTTOM BUTTONS
 			// Send
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_SEND, "Send"), 
+		table.add(new SubmitButton(this.iwrb.getLocalizedImageButton(KEY_BUTTON_SEND, "Send"), 
 								PARAM_ACTION, String.valueOf(ACTION_SEND_MESSAGES)), col, row);
 		table.add(space1, col, row);
 			// Cancel		
-		table.add(new SubmitButton(iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel")), col, row);
+		table.add(new SubmitButton(this.iwrb.getLocalizedImageButton(KEY_BUTTON_CANCEL, "Cancel")), col, row);
 		table.mergeCells(col, row, col+1, row);
 		col = 2;
 		row++;
@@ -1188,17 +1197,17 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	 * @param iwc Request object context
 	 */
 	public void getSearchResult(IWContext iwc) {
-		if (iwc.isParameterSet(uniqueUserSearchParam)) {
-			Integer userID = Integer.valueOf(iwc.getParameter(uniqueUserSearchParam));
+		if (iwc.isParameterSet(this.uniqueUserSearchParam)) {
+			Integer userID = Integer.valueOf(iwc.getParameter(this.uniqueUserSearchParam));
 			try {
-				child = getUserBusiness(iwc).getUser(userID);
+				this.child = getUserBusiness(iwc).getUser(userID);
 				// Put User object in session
-				iwc.getSession().setAttribute(SESSION_KEY_CHILD, child);
+				iwc.getSession().setAttribute(SESSION_KEY_CHILD, this.child);
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
 		} else {
-			child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);
+			this.child = (User) iwc.getSession().getAttribute(SESSION_KEY_CHILD);
 		}
 	}
 
@@ -1240,8 +1249,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			schoolCats.addMenuElement(
 				(String) highSchool.getPrimaryKey(),
 				localize(highSchool.getLocalizedKey(), "High School"));
-			if (storedPlacement == null && iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
+			if (this.storedPlacement == null && iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) {
 				schoolCats.setSelectedElement(iwc.getParameter(PARAM_SCHOOL_CATEGORY));
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -1257,7 +1267,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		providers.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 		try {
 			// Get school category from topmost dropdown
-			if (storedPlacement == null && iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
+			if (this.storedPlacement == null && iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
 					&& !("-1".equals(PARAM_SCHOOL_CATEGORY))) {
 				// Get schooltypes in category
 				Collection schTypes =
@@ -1291,7 +1301,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		drop.setValueOnChange(PARAM_SCHOOL_TYPE_CHANGED, "1");
 		drop.setToSubmit(true);
 		drop.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (storedPlacement == null 
+		if (this.storedPlacement == null 
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
 				&& iwc.isParameterSet(PARAM_SCHOOL_CATEGORY) 
 				&& !iwc.getParameter(PARAM_SCHOOL_CATEGORY).equals("-1")
@@ -1343,7 +1353,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					int langPK = ((Integer) aLang.getPrimaryKey()).intValue();
 					drop.addMenuElement(langPK, aLang.getName());
 				}
-				if (storedPlacement == null && iwc.isParameterSet(PARAM_NATIVE_LANGUAGE)) {
+				if (this.storedPlacement == null && iwc.isParameterSet(PARAM_NATIVE_LANGUAGE)) {
 					drop.setSelectedElement(iwc.getParameter(PARAM_NATIVE_LANGUAGE));
 				}
 			}
@@ -1365,7 +1375,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		txtLangChoice.addMenuElement("school.language_spanish", localize("school.language_spanish", "Spanish"));
 		txtLangChoice.addMenuElement("school.language_swedish_english", localize("school.language_swedish_english", "Swedish/English"));
 		
-		if (storedPlacement == null && iwc.isParameterSet(PARAM_LANGUAGE)) {
+		if (this.storedPlacement == null && iwc.isParameterSet(PARAM_LANGUAGE)) {
 			txtLangChoice.setSelectedElement(iwc.getParameter(PARAM_LANGUAGE));
 		}
 		
@@ -1378,7 +1388,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 																				new DropdownMenu(PARAM_STUDY_PATH));
 		studyPaths.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 
-		if (storedPlacement == null 
+		if (this.storedPlacement == null 
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& iwc.isParameterSet(PARAM_PROVIDER) 
@@ -1413,7 +1423,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		years.setValueOnChange(PARAM_SCHOOL_YEAR_CHANGED, "1");
 		years.setToSubmit(true);
 		years.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
-		if (storedPlacement == null 
+		if (this.storedPlacement == null 
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& iwc.isParameterSet(PARAM_SCHOOL_TYPE)
@@ -1458,7 +1468,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 																				new DropdownMenu(PARAM_SCHOOL_GROUP));
 		groups.addMenuElement("-1", localize(KEY_DROPDOWN_CHOSE, "- Chose -"));
 			
-		if (storedPlacement == null 
+		if (this.storedPlacement == null 
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_CATEGORY_CHANGED))) 
 				&& !("1".equals(iwc.getParameter(PARAM_PROVIDER_CHANGED)))
 				&& !("1".equals(iwc.getParameter(PARAM_SCHOOL_TYPE_CHANGED)))
@@ -1511,7 +1521,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		yesNo.addMenuElement(KEY_DROPDOWN_NO, localize(KEY_DROPDOWN_NO, "No"));
 		yesNo.addMenuElement(KEY_DROPDOWN_YES, localize(KEY_DROPDOWN_YES, "Yes"));
 		yesNo.setSelectedElement(KEY_DROPDOWN_NO);
-		if (storedPlacement == null && iwc.isParameterSet(PARAM_PAYMENT_BY_AGREEMENT)) {
+		if (this.storedPlacement == null && iwc.isParameterSet(PARAM_PAYMENT_BY_AGREEMENT)) {
 			yesNo.setSelectedElement(iwc.getParameter(PARAM_PAYMENT_BY_AGREEMENT));
 		}
 		return yesNo;
@@ -1549,7 +1559,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					drop.addMenuElement(intervalKey, localize(intervalKey, intervalKey));					
 				}
 			}
-			if (storedPlacement == null && iwc.isParameterSet(PARAM_INVOICE_INTERVAL)) {
+			if (this.storedPlacement == null && iwc.isParameterSet(PARAM_INVOICE_INTERVAL)) {
 				drop.setSelectedElement(iwc.getParameter(PARAM_INVOICE_INTERVAL));		
 			}
 		} catch (RemoteException re) {
@@ -1562,7 +1572,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private TextInput getPlacementParagraphTextInput(IWContext iwc) {
 		TextInput txt = (TextInput) getStyledInterface(new TextInput(PARAM_PLACEMENT_PARAGRAPH));
 		txt.setLength(25);
-		if (storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_PARAGRAPH)) {
+		if (this.storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_PARAGRAPH)) {
 			txt.setContent(iwc.getParameter(PARAM_PLACEMENT_PARAGRAPH));
 		}
 		return txt;
@@ -1578,7 +1588,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		dInput.setToDisplayDayLast(true);
 		int thisYear = today.getYear();
 		dInput.setYearRange(thisYear - 1, thisYear + 1);
-		if (storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_DATE)) {
+		if (this.storedPlacement == null && iwc.isParameterSet(PARAM_PLACEMENT_DATE)) {
 			IWTimestamp placeStamp = new IWTimestamp(iwc.getParameter(PARAM_PLACEMENT_DATE));
 			java.sql.Date placeDate = placeStamp.getDate();
 			dInput.setDate(placeDate);
@@ -1620,8 +1630,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private String getCommuneName(School school) {
 		String comName = "";
 		Commune commune = school.getCommune();
-		if (commune != null)
+		if (commune != null) {
 			comName = commune.getCommuneName();
+		}
 			
 		return comName;
 	}
@@ -1629,8 +1640,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	public Text getStoredPlacementMsg(IWContext iwc) throws RemoteException {
 		Text txt = null;
 		StringBuffer buf = null;
-		if (storedPlacement != null) {
-			SchoolClassMember pl = storedPlacement;
+		if (this.storedPlacement != null) {
+			SchoolClassMember pl = this.storedPlacement;
 			buf = new StringBuffer();
 			//buf.append(localize(KEY_STORED_MSG_PRFX, "Stored placement: "));
 			try {
@@ -1649,8 +1660,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				e.printStackTrace();
 			}
 			String rscsStr = getResourcesString(iwc, pl);
-			if (!rscsStr.equals(""))
+			if (!rscsStr.equals("")) {
 				buf.append(", " + rscsStr);
+			}
 
 		}				
 		txt = new Text(buf.toString());
@@ -1679,8 +1691,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				}
 			}
 			buf.append(rscPl.getResource().getResourceName());
-			if (i < coll.size())
-				buf.append(", ");			
+			if (i < coll.size()) {
+				buf.append(", ");
+			}			
 			i++;			
 		}
 				
@@ -1712,22 +1725,23 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private void activatePupilOverviewButton(SchoolClassMember plc) {
 		String schClassId = String.valueOf(plc.getSchoolClassId());
 		String plcId =  ((Integer) plc.getPrimaryKey()).toString();
-		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
-		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
-		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
-		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_RESOURCE_PERMISSION, 
+		this.pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_USER_ID, String.valueOf(plc.getClassMemberId()));
+		this.pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, schClassId);        
+		this.pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, plcId);
+		this.pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_RESOURCE_PERMISSION, 
 																  SchoolAdminOverview.PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN);
-		pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR, "true");
-		if (plc.getRemovedDate() != null)
-			pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
+		this.pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR, "true");
+		if (plc.getRemovedDate() != null) {
+			this.pupilOverviewLinkButton.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());
+		}									
 	}
 
 	private Link getPlacementHistoryButton() {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_PLACEMENT_HISTORY, "Placement history")));
 		linkButton.setAsImageButton(true);
 		linkButton.setWindowToOpen(CentralPlacementHistoryViewer.class);
-		if (child != null) {
-			Integer PK = (Integer) child.getPrimaryKey();
+		if (this.child != null) {
+			Integer PK = (Integer) this.child.getPrimaryKey();
 			linkButton.addParameter(PlacementHistoryViewer.PARAM_PUPIL_ID, PK.intValue());			
 		}
 		
@@ -1738,8 +1752,8 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		Link linkButton = new Link(getSmallText(localize(KEY_BUTTON_CONTRACT_HISTORY, "Contract history")));
 		linkButton.setAsImageButton(true);
 		linkButton.setWindowToOpen(CentralPlacementChildCareContracts.class);
-		if (child != null) {
-			Integer PK = (Integer) child.getPrimaryKey();
+		if (this.child != null) {
+			Integer PK = (Integer) this.child.getPrimaryKey();
 			linkButton.addParameter(ChildCareConstants.PARAMETER_CHILD_ID, PK.intValue());			
 		}
 		return linkButton;
@@ -1770,8 +1784,9 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			providerID = provID.intValue();
 		} catch (Exception e) {			
 		}
-		if (providerID != -1)
+		if (providerID != -1) {
 			linkButton.addParameter(RegularPaymentEntriesList.PAR_SELECTED_PROVIDER, providerID);
+		}
 
 		return linkButton;
 	}
@@ -1786,22 +1801,26 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		
 			// SchoolCategoryID		
 		String categoryID = "-1";
-		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
+		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) {
 			categoryID = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
+		}
 		AccountingSession aSession = (AccountingSession) 
 												IBOLookup.getSessionInstance(iwc, AccountingSession.class);
-		if (aSession != null && !"-1".equals(categoryID))										
+		if (aSession != null && !"-1".equals(categoryID)) {
 			aSession.setOperationalField(categoryID); //iwc.getParameter(PARAM_SCHOOL_CATEGORY));
+		}
 
 
 		int providerID = -1;
 					
-		if (!categoryID.equals("-1") && iwc.isParameterSet(PARAM_PROVIDER))
+		if (!categoryID.equals("-1") && iwc.isParameterSet(PARAM_PROVIDER)) {
 			providerID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
+		}
 		
 			// providerID
-		if (providerID != -1)
+		if (providerID != -1) {
 			linkButton.addParameter(RegularPaymentEntriesList.PAR_SELECTED_PROVIDER, providerID);
+		}
 
 		return linkButton;
 	}
@@ -1816,7 +1835,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private void activateEditLatestPlacementButton(SchoolClassMember plc) {
 		if (plc != null) {
 			Integer plcPK = (Integer) plc.getPrimaryKey();
-			editLatestPlacementButton.setParameter(
+			this.editLatestPlacementButton.setParameter(
 											CentralPlacementEditLatestPlacement.PARAM_LATEST_PLACEMENT_ID, 
 											plcPK.toString());
 		}
@@ -1844,19 +1863,23 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 		//String tmp = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
 		
-		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY))
+		if (iwc.isParameterSet(PARAM_SCHOOL_CATEGORY)) {
 			categoryID = iwc.getParameter(PARAM_SCHOOL_CATEGORY);
+		}
 
-		if (!categoryID.equals("-1") && iwc.isParameterSet(PARAM_SCHOOL_TYPE))
+		if (!categoryID.equals("-1") && iwc.isParameterSet(PARAM_SCHOOL_TYPE)) {
 			typeID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_TYPE));
+		}
 
 
-		if (!categoryID.equals("-1") && typeID != -1 && iwc.isParameterSet(PARAM_PROVIDER))
+		if (!categoryID.equals("-1") && typeID != -1 && iwc.isParameterSet(PARAM_PROVIDER)) {
 			providerID = Integer.parseInt(iwc.getParameter(PARAM_PROVIDER));
+		}
 
 		if (!categoryID.equals("-1") && typeID != -1  && providerID != -1 
-				&& iwc.isParameterSet(PARAM_SCHOOL_YEAR))
+				&& iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
 			yearID = Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR));
+		}
 		
 	// Set parameters and session values to use as default in SchoolGroupEditorAdmin
 	
@@ -1879,16 +1902,18 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 		// SchoolYearID
 		ProviderSession pSession = (ProviderSession)
 													IBOLookup.getSessionInstance(iwc, ProviderSession.class);
-		if (pSession != null)
+		if (pSession != null) {
 			pSession.setYearID(yearID);
+		}
 
 		// SchoolSeasonID	
 		try {
 			SchoolSeason currentSeason = getCareBusiness().getCurrentSeason();
 			if (currentSeason != null) {
 				seasonID = ((Integer) currentSeason.getPrimaryKey()).intValue();
-				if (pSession != null)
-					pSession.setSeasonID(seasonID);			
+				if (pSession != null) {
+					pSession.setSeasonID(seasonID);
+				}			
 			}						
 		} catch (FinderException e) {	}
 				
@@ -1901,15 +1926,15 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	 * @throws RemoteException
 	 */
 	private void prepareCentralPlacementProviderSession(IWContext iwc) throws RemoteException {
-		_providerSession = getCentralPlacementProviderSession(iwc);
+		this._providerSession = getCentralPlacementProviderSession(iwc);
 		if (iwc.isParameterSet(PARAM_PROVIDER) && !("-1".equals(iwc.getParameter(PARAM_PROVIDER)))) {
 			String provIdStr = iwc.getParameter(PARAM_PROVIDER);
 			int provID = Integer.parseInt(provIdStr);
-			_providerSession.setProviderID(provID);
+			this._providerSession.setProviderID(provID);
 		}
 		
 		if (iwc.isParameterSet(PARAM_SCHOOL_YEAR)) {
-			_providerSession.setYearID(Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR)));
+			this._providerSession.setYearID(Integer.parseInt(iwc.getParameter(PARAM_SCHOOL_YEAR)));
 		}
 	}	
 
@@ -1920,18 +1945,18 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private void parse(IWContext iwc) {
 		if (iwc.isParameterSet(PARAM_ACTION)) {
 			String actionStr = iwc.getParameter(PARAM_ACTION);
-			_action = Integer.parseInt(actionStr);
+			this._action = Integer.parseInt(actionStr);
 
 		}
 		
 		if (iwc.isParameterSet(PARAM_NEW_PLACEMENT)
 				&& "true".equals(iwc.getParameter(PARAM_NEW_PLACEMENT))) {
-			_newPlacement = true;		
+			this._newPlacement = true;		
 		}
 		
 		if (iwc.isParameterSet(PARAM_CANCEL_NEW_PLACEMENT)
 				&& "true".equals(iwc.getParameter(PARAM_CANCEL_NEW_PLACEMENT))) {
-			_cancelNewPlacement = true;
+			this._cancelNewPlacement = true;
 		}
 	}
 
@@ -1939,13 +1964,14 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 	private SchoolClassMember storePlacement(IWContext iwc, User child) {
 		SchoolClassMember mbr = null;
 		int childID =  -1;
-		if (child != null)
+		if (child != null) {
 			childID = ((Integer) child.getPrimaryKey()).intValue();
+		}
 		try {
 			mbr = getPlacementBusiness(iwc).storeSchoolClassMember(iwc, childID);			
 			sendEndedPlacementMessageToProvider(iwc);
 		} catch (CentralPlacementException cpe) {
-			errMsgMid = localize(cpe.getKey(), cpe.getDefTrans());
+			this.errMsgMid = localize(cpe.getKey(), cpe.getDefTrans());
 		} catch (RemoteException re) {
 			re.printStackTrace();
 		}
@@ -1955,14 +1981,14 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 
 	protected void removeSessionChild(IWContext iwc) {
 		iwc.getSession().removeAttribute(SESSION_KEY_CHILD);
-		child = null;
+		this.child = null;
 	}
 	
 	public void sendEndedPlacementMessageToProvider(IWContext iwc) throws RemoteException {
 		// Update latest placement with removed_date
-		if(latestPl != null) {
+		if(this.latestPl != null) {
 			try {
-				latestPl = getSchoolClassMemberHome().findByPrimaryKey(latestPl.getPrimaryKey());
+				this.latestPl = getSchoolClassMemberHome().findByPrimaryKey(this.latestPl.getPrimaryKey());
 			} catch (EJBException e) {
 				e.printStackTrace();
 			} catch (FinderException e) {
@@ -1970,28 +1996,28 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 			}			
 		}
 		// Send messages to provider users
-		if (latestPl != null) {			
-			Collection users = getSchoolBusiness(iwc).getSchoolUsers(latestPl.getSchoolClass().getSchool());
+		if (this.latestPl != null) {			
+			Collection users = getSchoolBusiness(iwc).getSchoolUsers(this.latestPl.getSchoolClass().getSchool());
 			String subject = localize(KEY_FINISHED_PLACEMENT, "Finished placement");
 			String body = null;
 			StringBuffer buf = new StringBuffer("");
 			
-			buf.append(localize(KEY_FINISHED_PLACEMENT_FOR, "Finished placement for")+" "+child.getName());
+			buf.append(localize(KEY_FINISHED_PLACEMENT_FOR, "Finished placement for")+" "+this.child.getName());
 			try {
-				buf.append(", "+latestPl.getSchoolClass().getSchool().getName());						
+				buf.append(", "+this.latestPl.getSchoolClass().getSchool().getName());						
 			} catch (Exception e) {}
 			try {
-				buf.append(", "+latestPl.getSchoolType().getName());					
+				buf.append(", "+this.latestPl.getSchoolType().getName());					
 			} catch (Exception e) {}
 			try {
-				buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_YEAR, "school year")+": "+latestPl.getSchoolYear().getName());						
+				buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_YEAR, "school year")+": "+this.latestPl.getSchoolYear().getName());						
 			} catch (Exception e) {}
 			try {
-				buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_GROUP, "group")+": "+latestPl.getSchoolClass().getSchoolClassName());						
+				buf.append(", "+localize(CentralPlacementEditorConstants.KEY_SCHOOL_GROUP, "group")+": "+this.latestPl.getSchoolClass().getSchoolClassName());						
 			} catch (Exception e) {}
 			try {
 				buf.append(", "+localize(KEY_END_DATE, "End date")+": ");
-				IWTimestamp stamp = new IWTimestamp(latestPl.getRemovedDate());
+				IWTimestamp stamp = new IWTimestamp(this.latestPl.getRemovedDate());
 				buf.append(stamp.getDateString("yyyy-MM-dd"));
 			} catch (Exception e) {}
 			body = buf.toString();
@@ -2016,12 +2042,12 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 				if (iwc.isParameterSet(PARAM_MSG_TO_PARENT)) {			
 					Collection parents;
 					try {
-						parents = getCommuneUserBusiness(iwc).getMemberFamilyLogic().getParentsFor(child);
+						parents = getCommuneUserBusiness(iwc).getMemberFamilyLogic().getParentsFor(this.child);
 						String subject = localize(KEY_NEW_PLACEMENT, "New placement");
 						String body = null;
 						StringBuffer buf = new StringBuffer("");
 				
-						buf.append(localize(KEY_NEW_PLACEMENT_FOR, "New placement for")+" "+child.getName());
+						buf.append(localize(KEY_NEW_PLACEMENT_FOR, "New placement for")+" "+this.child.getName());
 						try {
 							buf.append(", "+placement.getSchoolClass().getSchool().getName());						
 						} catch (Exception e) {}
@@ -2059,7 +2085,7 @@ public class CentralPlacementEditor extends SchoolCommuneBlock {
 					String body = null;
 					StringBuffer buf = new StringBuffer("");
 				
-					buf.append(localize(KEY_NEW_PLACEMENT_FOR, "New placement for")+" "+child.getName());
+					buf.append(localize(KEY_NEW_PLACEMENT_FOR, "New placement for")+" "+this.child.getName());
 					try {
 						buf.append(", "+placement.getSchoolClass().getSchool().getName());						
 					} catch (Exception e) {}

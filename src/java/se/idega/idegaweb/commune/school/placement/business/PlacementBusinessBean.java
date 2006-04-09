@@ -1,5 +1,5 @@
 /*
- * $Id: PlacementBusinessBean.java,v 1.5 2005/02/16 11:05:31 laddi Exp $
+ * $Id: PlacementBusinessBean.java,v 1.6 2006/04/09 12:01:14 laddi Exp $
  * Created on Oct 15, 2004
  *
  * Copyright (C) 2004 Idega Software hf. All Rights Reserved.
@@ -120,8 +120,9 @@ public class PlacementBusinessBean extends IBOServiceBean  implements PlacementB
 		}
 		studentID = childID;
 		student = getUserBusiness().getUser(studentID);
-		if (student == null) 
+		if (student == null) {
 			throw new CentralPlacementException(KEY_ERROR_CHILD_ID, "No valid pupil found");
+		}
 		
 		try {
 			chosenSeason = getCareBusiness().getSchoolSeasonHome().
@@ -129,8 +130,9 @@ public class PlacementBusinessBean extends IBOServiceBean  implements PlacementB
 		} catch (Exception e1) {
 			//empty
 		}
-		if (chosenSeason == null)
+		if (chosenSeason == null) {
 			throw new CentralPlacementException(KEY_ERROR_SEASON, "Error finding chosen season");
+		}
 		
 		latestPlacement = getCentralPlacementBusiness().getLatestPlacementFromElemAndHighSchool(student, chosenSeason);
 		

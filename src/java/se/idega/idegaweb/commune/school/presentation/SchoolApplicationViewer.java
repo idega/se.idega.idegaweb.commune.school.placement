@@ -40,7 +40,7 @@ public class SchoolApplicationViewer extends ApplicationForm {
 	private IWResourceBundle iwrb;
 	
 	public void present(IWContext iwc) {
-		iwrb = getResourceBundle(iwc);
+		this.iwrb = getResourceBundle(iwc);
 	}
 	
 	public String getCaseCode() {
@@ -61,12 +61,12 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		
 		if (hasGrowthDeviation != null) {
 			table.mergeCells(1, iRow, table.getColumns(), iRow);
-			table.add(getBooleanTable(new Text(iwrb.getLocalizedString("child.has_growth_deviation_info", "Has growth deviation")), hasGrowthDeviation.booleanValue()), 1, iRow++);
+			table.add(getBooleanTable(new Text(this.iwrb.getLocalizedString("child.has_growth_deviation_info", "Has growth deviation")), hasGrowthDeviation.booleanValue()), 1, iRow++);
 
 			if (growthDeviation != null) {
 				table.setHeight(iRow++, 6);
 				table.mergeCells(1, iRow, table.getColumns(), iRow);
-				table.add(getTextAreaTable(new Text(iwrb.getLocalizedString("child.growth_deviation_details_info", "Growth deviation details")), growthDeviation), 1, iRow++);
+				table.add(getTextAreaTable(new Text(this.iwrb.getLocalizedString("child.growth_deviation_details_info", "Growth deviation details")), growthDeviation), 1, iRow++);
 			}
 			
 			table.setHeight(iRow++, 6);
@@ -77,12 +77,12 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		
 		if (hasAllergies != null) {
 			table.mergeCells(1, iRow, table.getColumns(), iRow);
-			table.add(getBooleanTable(new Text(iwrb.getLocalizedString("child.has_allergies_info", "Has allergies")), hasAllergies.booleanValue()), 1, iRow++);
+			table.add(getBooleanTable(new Text(this.iwrb.getLocalizedString("child.has_allergies_info", "Has allergies")), hasAllergies.booleanValue()), 1, iRow++);
 	
 			if (allergies != null) {
 				table.setHeight(iRow++, 6);
 				table.mergeCells(1, iRow, table.getColumns(), iRow);
-				table.add(getTextAreaTable(new Text(iwrb.getLocalizedString("child.allergies_details_info", "Allergies details")), allergies), 1, iRow++);
+				table.add(getTextAreaTable(new Text(this.iwrb.getLocalizedString("child.allergies_details_info", "Allergies details")), allergies), 1, iRow++);
 			}
 			
 			table.setHeight(iRow++, 6);
@@ -93,7 +93,7 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		
 		if (lastCareProvider != null) {
 			table.mergeCells(1, iRow, table.getColumns(), iRow);
-			table.add(getTextInputTable(new Text(iwrb.getLocalizedString("child.last_care_provider_info", "Last care provider")), lastCareProvider), 1, iRow++);
+			table.add(getTextInputTable(new Text(this.iwrb.getLocalizedString("child.last_care_provider_info", "Last care provider")), lastCareProvider), 1, iRow++);
 
 			table.setHeight(iRow++, 6);
 			table.mergeCells(1, iRow, table.getColumns(), iRow);
@@ -102,7 +102,7 @@ public class SchoolApplicationViewer extends ApplicationForm {
 		}
 		
 		table.mergeCells(1, iRow, table.getColumns(), iRow);
-		table.add(getBooleanTable(new Text(iwrb.getLocalizedString("child.can_contact_last_care_provider_info", "Can contact last care provider")), canContactLastProvider), 1, iRow++);
+		table.add(getBooleanTable(new Text(this.iwrb.getLocalizedString("child.can_contact_last_care_provider_info", "Can contact last care provider")), canContactLastProvider), 1, iRow++);
 		
 		table.setHeight(iRow++, 6);
 		table.mergeCells(1, iRow, table.getColumns(), iRow);
@@ -111,7 +111,7 @@ public class SchoolApplicationViewer extends ApplicationForm {
 
 		if (otherInformation != null) {
 			table.mergeCells(1, iRow, table.getColumns(), iRow);
-			table.add(getTextAreaTable(new Text(iwrb.getLocalizedString("child.other_information_info", "Other information")), otherInformation), 1, iRow++);
+			table.add(getTextAreaTable(new Text(this.iwrb.getLocalizedString("child.other_information_info", "Other information")), otherInformation), 1, iRow++);
 
 			table.setHeight(iRow++, 6);
 			table.mergeCells(1, iRow, table.getColumns(), iRow);

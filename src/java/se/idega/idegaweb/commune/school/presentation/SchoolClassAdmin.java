@@ -49,9 +49,9 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	private final String PARAMETER_STUDENT_ID = "sch_student_id";
 	private final String PARAMETER_SORT = "sch_student_sort";
 
-	private final int ACTION_MANAGE = 1;
-	private final int ACTION_SAVE = 2;
-	private final int ACTION_DELETE = 4;
+	private static final int ACTION_MANAGE = 1;
+	private static final int ACTION_SAVE = 2;
+	private static final int ACTION_DELETE = 4;
 
 	private int action = 0;
 	private int method = 0;
@@ -71,9 +71,9 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 
 			AccountingSession acs = getAccountingSession();
 			
-			operationalField = acs.getOperationalField();
+			this.operationalField = acs.getOperationalField();
 			
-			switch (method) {
+			switch (this.method) {
 				case ACTION_SAVE :
 					//saveClass(iwc);
 					break;
@@ -82,7 +82,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 					break;
 			}
 
-			switch (action) {
+			switch (this.action) {
 				case ACTION_MANAGE :
 					drawForm(iwc);
 					break;
@@ -94,27 +94,33 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	}
 
 	private void parseAction(IWContext iwc) {
-		if (iwc.isParameterSet(PARAMETER_ACTION))
-			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
-		else
-			action = ACTION_MANAGE;
+		if (iwc.isParameterSet(this.PARAMETER_ACTION)) {
+			this.action = Integer.parseInt(iwc.getParameter(this.PARAMETER_ACTION));
+		}
+		else {
+			this.action = ACTION_MANAGE;
+		}
 
-		if (iwc.isParameterSet(PARAMETER_METHOD))
-			method = Integer.parseInt(iwc.getParameter(PARAMETER_METHOD));
-		else
-			method = 0;
+		if (iwc.isParameterSet(this.PARAMETER_METHOD)) {
+			this.method = Integer.parseInt(iwc.getParameter(this.PARAMETER_METHOD));
+		}
+		else {
+			this.method = 0;
+		}
 
-		if (iwc.isParameterSet(PARAMETER_SORT))
-			sortStudentsBy = Integer.parseInt(iwc.getParameter(PARAMETER_SORT));
-		else
-			sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
+		if (iwc.isParameterSet(this.PARAMETER_SORT)) {
+			this.sortStudentsBy = Integer.parseInt(iwc.getParameter(this.PARAMETER_SORT));
+		}
+		else {
+			this.sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
+		}
 
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
-		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+		form.add(new HiddenInput(this.PARAMETER_ACTION, String.valueOf(this.action)));
 
 		Table table = new Table(1, 5);
 		table.setCellpadding(0);
@@ -136,12 +142,12 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 			table.setCellpaddingRight(1, 1, 12);
 		}
 
-		headerTable.add(getNavigationTable(true, multipleSchools, showBunRadioButtons), 1, 1);
+		headerTable.add(getNavigationTable(true, this.multipleSchools, this.showBunRadioButtons), 1, 1);
 		headerTable.add(getSortTable(), 1, 3);
 		headerTable.setVerticalAlignment(1, 3, Table.VERTICAL_ALIGN_BOTTOM);
 
 		if (getSchoolClassID() != -1) {
-			_group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
+			this._group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 			table.add(getStudentTable(iwc), 1, 3);
 			table.add(getLegendTable(), 1, 5);
 			if (useStyleNames()) {
@@ -173,12 +179,12 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		table.add(getSmallHeader(localize("school.class", "Class")), column++, row);
-		if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+		if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);	
 		}
 		
-		table.add(new HiddenInput(PARAMETER_STUDENT_ID, "-1"), column, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
+		table.add(new HiddenInput(this.PARAMETER_STUDENT_ID, "-1"), column, row);
+		table.add(new HiddenInput(this.PARAMETER_METHOD, "0"), column, row);
 		if (useStyleNames()) {
 			table.setRowStyleClass(row, getHeaderRowClass());
 			table.setCellpaddingLeft(1, row, 12);
@@ -211,17 +217,17 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		IWTimestamp startDate;
 
 		List students = null;
-		if (!_group.getIsSubGroup()) {
+		if (!this._group.getIsSubGroup()) {
 			students = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(getSchoolClassID(), getSchoolYearID()));
 		}
 		else {
-			students = new ArrayList(getBusiness().getSchoolBusiness().findSubGroupPlacements(_group));
+			students = new ArrayList(getBusiness().getSchoolBusiness().findSubGroupPlacements(this._group));
 		}
 
 		if (!students.isEmpty()) {
 			numberOfStudents = students.size();
 			Map studentMap = getCareBusiness().getStudentList(students);
-			Collections.sort(students, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(students, SchoolClassMemberComparatorForSweden.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = students.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -237,7 +243,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 				hasTerminationDate = false;
 				int studyPathId = -1;
 				
-				if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+				if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 					studyPathId = studentMember.getStudyPathId();
 				}
 
@@ -276,8 +282,9 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 
 				//String name = student.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
-				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is"))
+				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) {
 					name = student.getName();
+				}
 
 				if (useStyleNames()) {
 					if (row % 2 == 0) {
@@ -301,10 +308,12 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 				}
 				else {
 					if (!useStyleNames()) {
-						if (row % 2 == 0)
+						if (row % 2 == 0) {
 							table.setRowColor(row, getZebraColor1());
-						else
+						}
+						else {
 							table.setRowColor(row, getZebraColor2());
+						}
 					}
 				}
 
@@ -333,32 +342,39 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 				link.addParameter(SchoolAdminOverview.PARAMETER_PAGE_ID, getParentPage().getPageID());
 				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_ID, getSchoolClassID());
 				link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_ID, ((Integer) studentMember.getPrimaryKey()).toString());
-				if (studentMember.getRemovedDate() != null)
+				if (studentMember.getRemovedDate() != null) {
 					link.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, studentMember.getRemovedDate().toString());
+				}
 
 				table.add(link, column++, row);
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 
 				if (!useStyleNames()) {
-					if (PIDChecker.getInstance().isFemale(student.getPersonalID()))
+					if (PIDChecker.getInstance().isFemale(student.getPersonalID())) {
 						table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-					else
+					}
+					else {
 						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+					}
 				}
 				
-				if (address != null && address.getStreetAddress() != null)
+				if (address != null && address.getStreetAddress() != null) {
 					table.add(getSmallText(address.getStreetAddress()), column, row);
+				}
 				column++;
-				if (schoolClass != null)
+				if (schoolClass != null) {
 					table.add(getSmallText(schoolClass.getName()), column, row);
+				}
 				column++;
 				
-				if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+				if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 					if (studyPathId != -1){
 						try{
 							SchoolStudyPathHome scHome = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
 							SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
-							if (course != null)table.add(getSmallText(course.getCode()), column, row);
+							if (course != null) {
+								table.add(getSmallText(course.getCode()), column, row);
+							}
 						} catch (Exception e) {
 						e.printStackTrace();
 						}
@@ -424,19 +440,21 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		table.setCellspacing(0);
 		SchoolYear schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		int yearAge = -1;
-		if (schoolYear != null)
+		if (schoolYear != null) {
 			yearAge = schoolYear.getSchoolYearAge();
+		}
 
 		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":" + Text.NON_BREAKING_SPACE), 1, 3);
 
-		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
+		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT));
 		menu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name", "Name"));
 		menu.addMenuElement(SchoolChoiceComparator.PERSONAL_ID_SORT, localize("school.sort_personal_id", "Personal ID"));
 		menu.addMenuElement(SchoolChoiceComparator.ADDRESS_SORT, localize("school.sort_address", "Address"));
 		menu.addMenuElement(SchoolChoiceComparator.GENDER_SORT, localize("school.sort_gender", "Gender"));
-		if (action != ACTION_SAVE && yearAge >= 12)
+		if (this.action != ACTION_SAVE && yearAge >= 12) {
 			menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language", "Language"));
-		menu.setSelectedElement(sortStudentsBy);
+		}
+		menu.setSelectedElement(this.sortStudentsBy);
 		menu.setToSubmit();
 		table.add(menu, 2, 3);
 
@@ -446,14 +464,15 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	}
 
 	private void delete(IWContext iwc) throws RemoteException {
-		String student = iwc.getParameter(PARAMETER_STUDENT_ID);
+		String student = iwc.getParameter(this.PARAMETER_STUDENT_ID);
 		if (student != null && student.length() > 0) {
 			getBusiness().getSchoolBusiness().removeSchoolClassMemberFromClass(Integer.parseInt(student), getSchoolClassID());
 			SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(Integer.parseInt(student), getSchoolID(), getSchoolSeasonID());
 			getBusiness().setNeedsSpecialAttention(Integer.parseInt(student), getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID()), false);
 			if (choice != null) {
-				if (choice.getCaseStatus().equals("PLAC"))
+				if (choice.getCaseStatus().equals("PLAC")) {
 					getBusiness().getSchoolChoiceBusiness().setAsPreliminary(choice, iwc.getCurrentUser());
+				}
 			}
 		}
 	}
@@ -464,7 +483,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	 * Turns on/of view of drop down showing providers
 	 */
 	public void setMultipleSchools(boolean multiple) {
-		multipleSchools = multiple;
+		this.multipleSchools = multiple;
 	}
 
 	/**
@@ -474,6 +493,6 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	 * @param show
 	 */
 	public void setShowBunRadioButtons(boolean show) {
-		showBunRadioButtons = show;
+		this.showBunRadioButtons = show;
 	}
 }

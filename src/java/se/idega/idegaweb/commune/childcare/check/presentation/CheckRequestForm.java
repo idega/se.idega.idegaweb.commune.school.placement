@@ -103,7 +103,7 @@ public class CheckRequestForm extends CommuneBlock {
 			if (iwc.isParameterSet(CitizenChildren.getChildUniqueIDParameterName())) {
 				String childUniqueId = iwc.getParameter(CitizenChildren.getChildUniqueIDParameterName());
 				try {
-					child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);
+					this.child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);
 					return true;
 				} catch (Exception e) {
 					return false;
@@ -112,14 +112,14 @@ public class CheckRequestForm extends CommuneBlock {
 			
 			else if (iwc.isParameterSet(CitizenChildren.getChildIDParameterName())) {
 				try {
-					child = getCheckBusiness(iwc).getUserById(Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
+					this.child = getCheckBusiness(iwc).getUserById(Integer.parseInt(iwc.getParameter(CitizenChildren.getChildIDParameterName())));
 					return true;
 				} catch (Exception e) {
 					return false;
 				}
 			} else if (iwc.isParameterSet(CitizenChildren.getChildSSNParameterName())) {
 				try {
-					child = getCheckBusiness(iwc).getUserByPersonalId(iwc.getParameter(CitizenChildren.getChildSSNParameterName()));
+					this.child = getCheckBusiness(iwc).getUserByPersonalId(iwc.getParameter(CitizenChildren.getChildSSNParameterName()));
 					return true;
 				} catch (Exception e) {
 					return false;
@@ -127,9 +127,10 @@ public class CheckRequestForm extends CommuneBlock {
 			} 
 			else {
 				try {
-					child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
-					if (child != null)
+					this.child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
+					if (this.child != null) {
 						return true;
+					}
 					return false;
 				}
 				catch (Exception e) {
@@ -139,16 +140,18 @@ public class CheckRequestForm extends CommuneBlock {
 		}
 		else {
 			try {				
-				child = getUserBusiness(iwc).getUserByUniqueId(getChildCareSession(iwc).getParameterUniqueID());
-				if (child != null)
+				this.child = getUserBusiness(iwc).getUserByUniqueId(getChildCareSession(iwc).getParameterUniqueID());
+				if (this.child != null) {
 					return true;
+				}
 				return false;
 			}
 			catch (Exception e) {
 				try {
-					child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
-					if (child != null)
+					this.child = getCheckBusiness(iwc).getUserById(getChildCareSession(iwc).getChildID());
+					if (this.child != null) {
 						return true;
+					}
 					return false;
 				}
 				catch (Exception ex) {
@@ -170,15 +173,18 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private void viewForm(IWContext iwc) throws Exception {
-		boolean hasCheck = getCareBusiness(iwc).hasGrantedCheck(child);
+		boolean hasCheck = getCareBusiness(iwc).hasGrantedCheck(this.child);
 		if (hasCheck) {
-			if (createChoices() && getResponsePage() != null)
+			if (createChoices() && getResponsePage() != null) {
 				iwc.forwardToIBPage(getParentPage(), getResponsePage());
-			else
+			}
+			else {
 				add(getLocalizedHeader("check.already_has_check","Child already has a check granted."));
+			}
 		}
-		else
+		else {
 			add(getForm(iwc));
+		}
 	}
 
 	private void formSubmitted(IWContext iwc) throws Exception {
@@ -190,11 +196,12 @@ public class CheckRequestForm extends CommuneBlock {
 		String paramMTMC = iwc.isParameterSet(PARAM_MOTHER_TONGUE_MOTHER_CHILD) ? iwc.getParameter(PARAM_MOTHER_TONGUE_MOTHER_CHILD) : "";
 		String paramMTFC = iwc.isParameterSet(PARAM_MOTHER_TONGUE_FATHER_CHILD) ? iwc.getParameter(PARAM_MOTHER_TONGUE_FATHER_CHILD) : "";
 		String paramMTP = iwc.isParameterSet(PARAM_MOTHER_TONGUE_PARENTS) ? iwc.getParameter(PARAM_MOTHER_TONGUE_PARENTS) : "";
-		int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(((Integer)child.getPrimaryKey()).intValue());
+		int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(((Integer)this.child.getPrimaryKey()).intValue());
 		boolean showErrors = true;
 		if (createChoices()) {
-			if (checkID != -1)
+			if (checkID != -1) {
 				showErrors = false;
+			}
 		}
 		
 		try {
@@ -219,7 +226,7 @@ public class CheckRequestForm extends CommuneBlock {
 		}
 
 		if (showErrors) {
-			if (isError) {
+			if (this.isError) {
 				viewForm(iwc);
 				return;
 			}
@@ -228,24 +235,25 @@ public class CheckRequestForm extends CommuneBlock {
 		try {
 			if (showErrors){
 				User user = null;
-				if (_useAsAdmin){
+				if (this._useAsAdmin){
 					user = getCustodian(iwc);
-					if (user == null)
-						user = iwc.getCurrentUser();	
+					if (user == null) {
+						user = iwc.getCurrentUser();
+					}	
 				}
 				else{
 					user = iwc.getCurrentUser();
 				}
 					
-				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, user, "", false, false, false, false, false);
+				checkID = getCheckBusiness(iwc).createCheck(paramChildCareType, paramWorkSituation1, paramWorkSituation2, paramMTMC, paramMTFC, paramMTP, ((Integer) this.child.getPrimaryKey()).intValue(), getCheckBusiness(iwc).getMethodUser(), checkAmount, checkFee, user, "", false, false, false, false, false);
 			}
 			
 			if (createChoices()) {
 				String childcareThisSchool = iwc.getParameter(PARAM_CHILDCARE_THIS);
 				if (childcareThisSchool != null) {
-					Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+					Name name = new Name(this.child.getFirstName(), this.child.getMiddleName(), this.child.getLastName());
 					Object[] arguments = { name.getName(iwc.getApplicationSettings().getDefaultLocale(), true) };
-					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().setChildcarePreferences(iwc.getCurrentUser(),((Integer)child.getPrimaryKey()).intValue(), Boolean.valueOf(childcareThisSchool).booleanValue(), iwc.getParameter(PARAM_CHILDCARE_OTHER), localize("check.student_childcare_other","Application for childcare outside of chosen school"), MessageFormat.format(localize("check.student_childcare_other_body","The following student has applied for childcare outside of the chosen school"), arguments));
+					getSchoolCommuneBusiness(iwc).getSchoolChoiceBusiness().setChildcarePreferences(iwc.getCurrentUser(),((Integer)this.child.getPrimaryKey()).intValue(), Boolean.valueOf(childcareThisSchool).booleanValue(), iwc.getParameter(PARAM_CHILDCARE_OTHER), localize("check.student_childcare_other","Application for childcare outside of chosen school"), MessageFormat.format(localize("check.student_childcare_other_body","The following student has applied for childcare outside of the chosen school"), arguments));
 				}
 			}
 		} catch (Exception e) {
@@ -261,7 +269,7 @@ public class CheckRequestForm extends CommuneBlock {
 
 	private Form getForm(IWContext iwc) throws Exception {
 		Form f = new Form();
-		f.add(new HiddenInput(CitizenChildren.getChildIDParameterName(), ((Integer) child.getPrimaryKey()).toString()));
+		f.add(new HiddenInput(CitizenChildren.getChildIDParameterName(), ((Integer) this.child.getPrimaryKey()).toString()));
 
 		Table formTable = new Table();
 		formTable.setWidth(getWidth());
@@ -270,9 +278,10 @@ public class CheckRequestForm extends CommuneBlock {
 		int row = 1;
 		boolean showCheckForm = true;
 		if (createChoices()) {
-			int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(((Integer)child.getPrimaryKey()).intValue());
-			if (checkID != -1)
-				showCheckForm = false;	
+			int checkID = getCheckBusiness(iwc).hasChildApprovedCheck(((Integer)this.child.getPrimaryKey()).intValue());
+			if (checkID != -1) {
+				showCheckForm = false;
+			}	
 		}
 
 		formTable.add(getLocalizedHeader("check.application_for", "Application for"), 1, row++);
@@ -290,8 +299,9 @@ public class CheckRequestForm extends CommuneBlock {
 				formTable.add(getChildcareTypeTable(iwc), 1, row++);
 				formTable.setHeight(row++, 12);
 			}
-			else
+			else {
 				formTable.add(new HiddenInput(PARAM_CHILD_CARE_TYPE, "3"), 1, row++);
+			}
 
 			formTable.add(getLocalizedHeader("check.custodians", "Custodians"), 1, row++);
 			formTable.add(getCustodianTable(iwc), 1, row++);
@@ -314,19 +324,20 @@ public class CheckRequestForm extends CommuneBlock {
 		int row = 1;
 
 		childTable.add(getSmallHeader(localize("check.name", "Name") + ":"), 1, row);
-		Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+		Name name = new Name(this.child.getFirstName(), this.child.getMiddleName(), this.child.getLastName());
 		childTable.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row++);
 
 		childTable.add(getSmallHeader(localize("check.personal_id", "Personal ID") + ":"), 1, row);
-		childTable.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), 2, row++);
+		childTable.add(getSmallText(PersonalIDFormatter.format(this.child.getPersonalID(), iwc.getCurrentLocale())), 2, row++);
 
-		Address address = getCheckBusiness(iwc).getUserAddress(child);
-		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(child);
+		Address address = getCheckBusiness(iwc).getUserAddress(this.child);
+		PostalCode code = getCheckBusiness(iwc).getUserPostalCode(this.child);
 		if (address != null) {
 			childTable.add(getSmallHeader(localize("check.address", "Address") + ":"), 1, row);
 			childTable.add(getSmallText(address.getStreetAddress()), 2, row);
-			if ( code != null )
+			if ( code != null ) {
 				childTable.add(getSmallText(", " + code.getPostalCode() + " " + code.getName()), 2, row);
+			}
 		}
 		row++;
 
@@ -347,7 +358,7 @@ public class CheckRequestForm extends CommuneBlock {
         if (getChildCareTypeId() == null) { // user has not set child care type id in component property
     		
             Collection childCareTypes= null;
-            if (_isFreeTimeType){
+            if (this._isFreeTimeType){
                 childCareTypes = schBuiz.findAllSchoolTypesInCategoryFreeTime(schBuiz.getChildCareSchoolCategory());            
             }else {
                 childCareTypes = schBuiz.findAllSchoolTypesInCategory(schBuiz.getChildCareSchoolCategory(),false);  
@@ -385,7 +396,7 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
 	private User getCustodian(IWContext iwc) throws Exception{
-		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(child);
+		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(this.child);
 		User parent = null;
 		if (coll != null) {
 			//int row = 1;
@@ -406,7 +417,7 @@ public class CheckRequestForm extends CommuneBlock {
 		custodianTable.setCellspacing(0);
 		custodianTable.setWidth(1, "170");
 
-		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(child);
+		Collection coll = getMemberFamilyLogic(iwc).getCustodiansFor(this.child);
 		if (coll != null) {
 			int row = 1;
 			int parentNumber = 1;
@@ -419,15 +430,19 @@ public class CheckRequestForm extends CommuneBlock {
 				custodianTable.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 2, row++);
 				
 				custodianTable.add(getLocalizedSmallHeader("check.civil_status", "Civil status"), 1, row);
-				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) )
+				if ( getMemberFamilyLogic(iwc).hasPersonGotSpouse(parent) ) {
 					custodianTable.add(getSmallText(localize("check.married", "Married")), 2, row++);
-				else
+				}
+				else {
 					custodianTable.add(getSmallText(localize("check.un_married", "UnMarried")), 2, row++);
+				}
 
-				if ((row == 1 && this.paramErrorWorkSituation1) || (row == 2 && this.paramErrorWorkSituation2))
+				if ((row == 1 && this.paramErrorWorkSituation1) || (row == 2 && this.paramErrorWorkSituation2)) {
 					custodianTable.add(getSmallErrorText(localize("check.social_status", "Social status")), 1, row);
-				else
+				}
+				else {
 					custodianTable.add(getLocalizedSmallHeader("check.social_status", "Social status"), 1, row);
+				}
 				custodianTable.add(getWorkSituationMenu(iwc, PARAM_WORK_SITUATION + String.valueOf(parentNumber)), 2, row);
 				Link infoLink = new Link(this.getInformationIcon(localize("check.work_situation_information", "Information about the work situation.")));
 				infoLink.setToOpenAlert(localize("check.work_situation_message", "Information about the work situation..."));
@@ -513,7 +528,7 @@ public class CheckRequestForm extends CommuneBlock {
 	 * @return boolean
 	 */
 	public boolean createChoices() {
-		return _createChoices;
+		return this._createChoices;
 	}
 
 	/**
@@ -521,7 +536,7 @@ public class CheckRequestForm extends CommuneBlock {
 	 * @param createChoices The createChoices to set
 	 */
 	public void setCreateChoices(boolean createChoices) {
-		_createChoices = createChoices;
+		this._createChoices = createChoices;
 	}
 	
 	/**
@@ -541,7 +556,7 @@ public class CheckRequestForm extends CommuneBlock {
 	}
 
     public Integer getChildCareTypeId() {
-        return childCareTypeId;
+        return this.childCareTypeId;
     }
 
     public void setChildCareTypeId(Integer childCareTypeId) {

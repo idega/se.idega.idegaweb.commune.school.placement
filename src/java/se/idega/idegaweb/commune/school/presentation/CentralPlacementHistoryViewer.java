@@ -74,24 +74,24 @@ public class CentralPlacementHistoryViewer extends Window {
 		// row 1
 		mainTable.setWidth(col, 1, "2px");
 		mainTable.setWidth(col+3, 1, "2px");
-		mainTable.setRowColor(1, FRAME_COLOR);
+		mainTable.setRowColor(1, this.FRAME_COLOR);
 		mainTable.setAlignment(col+1, 1, Table.HORIZONTAL_ALIGN_CENTER);
 		mainTable.setVerticalAlignment(col+1, 1, Table.VERTICAL_ALIGN_MIDDLE);
 		mainTable.setRowHeight(1, "20");
 		// row 2
-		mainTable.setColor(col, 2, FRAME_COLOR);
+		mainTable.setColor(col, 2, this.FRAME_COLOR);
 		mainTable.mergeCells(col+1, 2, col+2, 2);
-		mainTable.setColor(col+3, 2, FRAME_COLOR);
+		mainTable.setColor(col+3, 2, this.FRAME_COLOR);
 		// row 3		
-		mainTable.setRowColor(3, FRAME_COLOR);
+		mainTable.setRowColor(3, this.FRAME_COLOR);
 		mainTable.setRowHeight(3, "2px");
 
 		//  *** WINDOW HEADING ***
-		Text heading1 = new Text(iwrb.getLocalizedString(KEY_WINDOW_HEADING_1, 
+		Text heading1 = new Text(this.iwrb.getLocalizedString(KEY_WINDOW_HEADING_1, 
 												"edit window opened from"));
-		Text heading2 = new Text(iwrb.getLocalizedString(KEY_WINDOW_HEADING_2, 
+		Text heading2 = new Text(this.iwrb.getLocalizedString(KEY_WINDOW_HEADING_2, 
 												"Central Placement Editor"));
-		Text reloadMsg = new Text(iwrb.getLocalizedString(KEY_WINDOW_HEADING_RELOAD_MSG, 
+		Text reloadMsg = new Text(this.iwrb.getLocalizedString(KEY_WINDOW_HEADING_RELOAD_MSG, 
 												"Press to close this window and reload Central Placement Editor"));
 									
 		heading1.setFontStyle(STYLE_SMALL_HEADER);
@@ -102,7 +102,7 @@ public class CentralPlacementHistoryViewer extends Window {
 		mainTable.add(Text.getBreak(), col+1, 1);
 		mainTable.add(heading2, col+1, 1);
 		
-		Image buttonImg = iwrb.getLocalizedImageButton(KEY_BUTTON_CLOSE_AND_RELOAD, 
+		Image buttonImg = this.iwrb.getLocalizedImageButton(KEY_BUTTON_CLOSE_AND_RELOAD, 
 																			"Close and reload");
 		SubmitButton button = new SubmitButton(buttonImg);
 		Form closeAndReloadForm = new Form();
@@ -116,7 +116,7 @@ public class CentralPlacementHistoryViewer extends Window {
 	private void setMainTableContent(PresentationObject obj) {
 		int col = 2;
 		int row = 2;
-		mainTable.add(obj, col, row);
+		this.mainTable.add(obj, col, row);
 	}
 
 	/**
@@ -131,13 +131,13 @@ public class CentralPlacementHistoryViewer extends Window {
 	 * @see com.idega.presentation.PresentationObject#main(IWContext)
 	 */
 	public void main(IWContext iwc) throws Exception {
-		iwrb = getResourceBundle(iwc);
+		this.iwrb = getResourceBundle(iwc);
 		if (iwc.isParameterSet(PARAM_CLOSE_AND_RELOAD)) {
 			reloadParentAndClose();
 		} else {
-			mainTable = getMainTable();
+			this.mainTable = getMainTable();
 			setMainTableContent(new PlacementHistoryViewer());
-			add(mainTable);
+			add(this.mainTable);
 		}
 	}
 	

@@ -1,5 +1,5 @@
 /*
- * $Id: SchoolBlock.java,v 1.4 2005/10/14 05:05:35 laddi Exp $
+ * $Id: SchoolBlock.java,v 1.5 2006/04/09 12:01:14 laddi Exp $
  * Created on Aug 3, 2005
  *
  * Copyright (C) 2005 Idega Software hf. All Rights Reserved.
@@ -40,10 +40,10 @@ import com.idega.util.PersonalIDFormatter;
 
 
 /**
- * Last modified: $Date: 2005/10/14 05:05:35 $ by $Author: laddi $
+ * Last modified: $Date: 2006/04/09 12:01:14 $ by $Author: laddi $
  * 
  * @author <a href="mailto:laddi@idega.com">laddi</a>
- * @version $Revision: 1.4 $
+ * @version $Revision: 1.5 $
  */
 public abstract class SchoolBlock extends CommuneBlock {
 
@@ -68,27 +68,27 @@ public abstract class SchoolBlock extends CommuneBlock {
 	public abstract void present(IWContext iwc) throws Exception;
 
 	public SchoolBusiness getSchoolBusiness() {
-		return sBusiness;
+		return this.sBusiness;
 	}
 
 	public CommuneUserBusiness getUserBusiness() {
-		return uBusiness;
+		return this.uBusiness;
 	}
 
 	public CommuneSchoolBusiness getBusiness() {
-		return business;
+		return this.business;
 	}
 	
 	public CareBusiness getCareBusiness() {
-		return careBusiness;
+		return this.careBusiness;
 	}
 	
 	public AfterSchoolBusiness getAfterSchoolBusiness() {
-		return aBusiness;
+		return this.aBusiness;
 	}
 
 	public CommuneSchoolSession getSession() {
-		return session;
+		return this.session;
 	}
 
 	protected Table getPersonInfoTable(IWContext iwc, User user) throws RemoteException {
@@ -222,12 +222,12 @@ public abstract class SchoolBlock extends CommuneBlock {
 	private void initialize(IWContext iwc) {
 		setResourceBundle(getResourceBundle(iwc));
 		setBundle(getBundle(iwc));
-		business = getCommuneSchoolBusiness(iwc);
-		session = getCommuneSchoolSession(iwc);
-		sBusiness = getSchoolBusiness(iwc);
-		uBusiness = getUserBusiness(iwc);
-		careBusiness = getCareBusiness(iwc);
-		aBusiness = getAfterSchoolBusiness(iwc);
+		this.business = getCommuneSchoolBusiness(iwc);
+		this.session = getCommuneSchoolSession(iwc);
+		this.sBusiness = getSchoolBusiness(iwc);
+		this.uBusiness = getUserBusiness(iwc);
+		this.careBusiness = getCareBusiness(iwc);
+		this.aBusiness = getAfterSchoolBusiness(iwc);
 	}
 
 	private CommuneSchoolBusiness getCommuneSchoolBusiness(IWApplicationContext iwac) {

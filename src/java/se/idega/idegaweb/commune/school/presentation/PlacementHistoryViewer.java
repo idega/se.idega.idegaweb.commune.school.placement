@@ -146,13 +146,13 @@ public class PlacementHistoryViewer extends CommuneBlock {
 
 	public void main(IWContext iwc) throws Exception {
 		//iwrb = getResourceBundle(iwc);
-		form = new Form();
-		form.setName(SEARCH_FORM_NAME);
+		this.form = new Form();
+		this.form.setName(SEARCH_FORM_NAME);
 		
 	
 		// Parameter name returning chosen User from SearchUserModule
-		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
-		form.maintainAllParameters();
+		this.uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
+		this.form.maintainAllParameters();
 		
 		if (iwc.isParameterSet(PARAM_REMOVE_PLACEMENT) 
 				&& !("-1".equals(iwc.getParameter(PARAM_REMOVE_PLACEMENT)))) {
@@ -168,45 +168,45 @@ public class PlacementHistoryViewer extends CommuneBlock {
 			}
 		}
 
-		pupil = getPupilFromParam(iwc);
+		this.pupil = getPupilFromParam(iwc);
 		
-		form.add(getMainTable());
+		this.form.add(getMainTable());
 		setMainTableContent(getSearchTable(iwc));
-		setMainTableContent(getPupilTable(iwc, pupil));
+		setMainTableContent(getPupilTable(iwc, this.pupil));
 		setMainTableContent(getPlacementTable(iwc));
 		
 		// Add empty bottom that fills the bottom window space
-		setMainTableContent(transGIF);
-		mainTable.setHeight(1, mainTableRow -1, Table.HUNDRED_PERCENT);
+		setMainTableContent(this.transGIF);
+		this.mainTable.setHeight(1, this.mainTableRow -1, Table.HUNDRED_PERCENT);
 		
-		add(form);
+		add(this.form);
 	}
 
 	private Table getMainTable() {
-		mainTable = new Table();
-		mainTable.setBorder(0);
-		mainTable.setWidth(Table.HUNDRED_PERCENT);
-		mainTable.setHeight(Table.HUNDRED_PERCENT);
-		mainTable.setCellpadding(0);
-		mainTable.setCellspacing(0);
+		this.mainTable = new Table();
+		this.mainTable.setBorder(0);
+		this.mainTable.setWidth(Table.HUNDRED_PERCENT);
+		this.mainTable.setHeight(Table.HUNDRED_PERCENT);
+		this.mainTable.setCellpadding(0);
+		this.mainTable.setCellspacing(0);
 		int col = 1;
-		mainTableRow = 1;
+		this.mainTableRow = 1;
 		
 		//  *** WINDOW HEADING ***
-		mainTable.add(
+		this.mainTable.add(
 			getLocalizedSmallHeader(KEY_WINDOW_HEADING, "Placement history viewer"), 
-																														col, mainTableRow);
-		mainTable.setColor(col, mainTableRow, getHeaderColor());
-		mainTable.setAlignment(col, mainTableRow, Table.HORIZONTAL_ALIGN_CENTER);
-		mainTable.setRowVerticalAlignment(mainTableRow, Table.VERTICAL_ALIGN_MIDDLE);
-		mainTable.setRowHeight(mainTableRow++, "20");
+																														col, this.mainTableRow);
+		this.mainTable.setColor(col, this.mainTableRow, getHeaderColor());
+		this.mainTable.setAlignment(col, this.mainTableRow, Table.HORIZONTAL_ALIGN_CENTER);
+		this.mainTable.setRowVerticalAlignment(this.mainTableRow, Table.VERTICAL_ALIGN_MIDDLE);
+		this.mainTable.setRowHeight(this.mainTableRow++, "20");
 
-		return mainTable;
+		return this.mainTable;
 	}
 
 	private void setMainTableContent(PresentationObject obj) {
 		int col = 1;
-		mainTable.add(obj, col, mainTableRow++);
+		this.mainTable.add(obj, col, this.mainTableRow++);
 	}
 
 	public Table getSearchTable(IWContext iwc) {
@@ -219,7 +219,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		int col = 1;
 		int row = 1;
 
-		Image space1 = (Image) transGIF.clone();
+		Image space1 = (Image) this.transGIF.clone();
 		space1.setWidth(6);
 
 		// *** HEADING Search pupil ***
@@ -240,7 +240,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 			searchMod.process(iwc);
 			User oneChild = searchMod.getUser();
 			if (oneChild != null) {
-				pupil = oneChild;
+				this.pupil = oneChild;
 			}
 		} catch (Exception e) {}
 		
@@ -254,17 +254,17 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		table.setBorder(0);
 		table.setCellpadding(2);
 		table.setCellspacing(0);
-		transGIF.setHeight("1");
-		transGIF.setWidth("1");
+		this.transGIF.setHeight("1");
+		this.transGIF.setWidth("1");
 
 		int row = 1;
 		int col = 1;
 		// add empty space row
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
-		table.add(transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
+		table.add(this.transGIF, col++, row);
 		// Set COLUMN WIDTH for column 1 to 5
 		table.setWidth(1, row, "100");
 		//table.setWidth(2, row, "70");
@@ -285,15 +285,16 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		col = 1;
 
 		// empty space row
-		table.add(transGIF, col, row);
+		table.add(this.transGIF, col, row);
 		table.setRowHeight(row, "5");
 		col = 1;
 		row++;		
 		
 		// Personal Id Number
 		table.add(getSmallHeader(localize(KEY_PERSONAL_ID_LABEL, "Personal id: ")), col++, row);
-		if (pupil != null)
+		if (pupil != null) {
 			table.add(getSmallText(pupil.getPersonalID()), col++, row);
+		}
 		row++;
 		col = 1;
 		// Last Name
@@ -303,12 +304,14 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		col = 1;
 		nameTable.setCellpadding(0);
 		nameTable.setCellspacing(0);
-		if (pupil != null)
+		if (pupil != null) {
 			nameTable.add(getSmallText(pupil.getLastName()), col++, 1);
+		}
 		// First Name       
 		nameTable.add(getSmallHeader(localize(KEY_FIRST_NAME_LABEL, "First name: ")), col++, 1);
-		if (pupil != null)
+		if (pupil != null) {
 			nameTable.add(getSmallText(pupil.getFirstName()), col++, 1);
+		}
 		nameTable.setWidth(1, 1, "100");
 		nameTable.setWidth(2, 1, "100");
 		nameTable.setWidth(3, 1, "100");
@@ -340,8 +343,9 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				for (Iterator iter = phones.iterator(); iter.hasNext(); i++) {
 					Phone phone = (Phone) iter.next();
 					pBuf.append(phone.getNumber());
-					if (i < phonesSize - 1)
+					if (i < phonesSize - 1) {
 						pBuf.append(", ");
+					}
 				}
 				pBuf.append("&nbsp;");
 				table.add(getSmallText(pBuf.toString()), col, row);
@@ -376,7 +380,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		row++;
 
 		// empty space row
-		table.add(transGIF, col, row);
+		table.add(this.transGIF, col, row);
 		table.setRowHeight(row, "10");
 		col = 1;
 		row++;		
@@ -420,9 +424,9 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		// Loop placements
 		Collection placements = null;
 		try {
-			if (pupil != null) {
+			if (this.pupil != null) {
 				placements = getSchoolBusiness(iwc).getSchoolClassMemberHome()
-																		   .findAllOrderedByRegisterDate(pupil);
+																		   .findAllOrderedByRegisterDate(this.pupil);
 				
 			}
 		} catch (FinderException e) {}		
@@ -492,17 +496,21 @@ public class PlacementHistoryViewer extends CommuneBlock {
 				} catch (Exception e) {col++;}
 				// Placement paragraph
 				try {
-					if (plc.getPlacementParagraph() != null)
+					if (plc.getPlacementParagraph() != null) {
 						table.add(getSmallText(plc.getPlacementParagraph()), col++, row);
-					else
+					}
+					else {
 						col++;
+					}
 				} catch (Exception e) {col++;}
 				// Notes
 				try {
-					if (plc.getNotes() != null)
+					if (plc.getNotes() != null) {
 						table.add(getSmallText(plc.getNotes()), col++, row);
-					else
+					}
+					else {
 						col++;
+					}
 				} catch (Exception e) {col++;}
 				// Pupil overview button
 				try {
@@ -523,8 +531,9 @@ public class PlacementHistoryViewer extends CommuneBlock {
 					editButt.addParameter(SchoolAdminOverview.PARAMETER_RESOURCE_PERMISSION, 
 							SchoolAdminOverview.PARAMETER_RESOURCE_PERM_VALUE_CENTRAL_ADMIN);
 					editButt.addParameter(SchoolAdminOverview.PARAMETER_FROM_CENTRAL_PLACEMENT_EDITOR, "true");
-					if (plc.getRemovedDate() != null)
-						editButt.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());									
+					if (plc.getRemovedDate() != null) {
+						editButt.addParameter(SchoolAdminOverview.PARAMETER_SCHOOL_CLASS_MEMBER_REMOVED_DATE, plc.getRemovedDate().toString());
+					}									
 				
 					table.add(editButt, col, row);
 					table.setAlignment(col++, row, Table.HORIZONTAL_ALIGN_CENTER);
@@ -566,7 +575,7 @@ public class PlacementHistoryViewer extends CommuneBlock {
 		col = 1;
 
 		// empty space row
-		table.add(transGIF, col, row);
+		table.add(this.transGIF, col, row);
 		table.setRowHeight(row, "20");
 
 
@@ -577,14 +586,14 @@ public class PlacementHistoryViewer extends CommuneBlock {
 	private User getPupilFromParam(IWContext iwc) throws RemoteException {
 		User child = null;
 		// Parameter name returning chosen User from SearchUserModule
-		uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
+		this.uniqueUserSearchParam = SearchUserModule.getUniqueUserParameterName(UNIQUE_SUFFIX);
 
 		if (iwc.isParameterSet(PARAM_PUPIL_ID)) {
 			String idStr = iwc.getParameter(PARAM_PUPIL_ID);
 			int childID = Integer.parseInt(idStr);
 			child = getUserBusiness(iwc).getUser(childID);
-		} else if (iwc.isParameterSet(uniqueUserSearchParam)) {
-			int childID = Integer.parseInt(iwc.getParameter(uniqueUserSearchParam));
+		} else if (iwc.isParameterSet(this.uniqueUserSearchParam)) {
+			int childID = Integer.parseInt(iwc.getParameter(this.uniqueUserSearchParam));
 			child = getUserBusiness(iwc).getUser(childID);
 		}
 		

@@ -148,7 +148,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	public void init(IWContext iwc) throws Exception {
 		int action = process(iwc);
 
-		if (child != null) {
+		if (this.child != null) {
 			switch (action) {
 				case ACTION_VIEW_FORM:
 					showForm(iwc);
@@ -203,8 +203,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			terminationDate = new IWTimestamp(iwc.getParameter(PARAM_TERMINATION_DATE));
 		}
 		IWTimestamp replyDate = null;
-		if (iwc.isParameterSet(PARAM_LAST_REPLY_DATE))
+		if (iwc.isParameterSet(PARAM_LAST_REPLY_DATE)) {
 			replyDate = new IWTimestamp(iwc.getParameter(PARAM_LAST_REPLY_DATE));
+		}
 		String comment = iwc.getParameter(PARAM_COMMENT);
 		String preSchool = iwc.getParameter(PARAM_PRE_SCHOOL);
 		String extraContractMessage = iwc.getParameter(PARAM_EXTRA_CONTRACT_MESSAGE);
@@ -276,18 +277,19 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 	public int process(IWContext iwc) {
 		try {
 			if (getSession().getApplicationID() != -1) {
-				application = getBusiness().getApplication(getSession().getApplicationID());
-				child = application.getChild();
-				isUpdate = true;
-				if (application.getApplicationStatus() == getBusiness().getStatusContract())
-					finalize = true;
+				this.application = getBusiness().getApplication(getSession().getApplicationID());
+				this.child = this.application.getChild();
+				this.isUpdate = true;
+				if (this.application.getApplicationStatus() == getBusiness().getStatusContract()) {
+					this.finalize = true;
+				}
 			}
 			else if (getSession().getChildID() != -1) {
-				child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
+				this.child = getBusiness().getUserBusiness().getUser(getSession().getChildID());
 			}
 		}
 		catch (RemoteException re) {
-			child = null;
+			this.child = null;
 			log(re);
 		}
 
@@ -311,18 +313,19 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		table.add(getLocalizedHeader(LABEL_CHILD, "Child"), 1, row++);
 		table.add(getLocalizedLabel(LABEL_USER_NAME, "Name"), 1, row);
-		Name name = new Name(child.getFirstName(), child.getMiddleName(), child.getLastName());
+		Name name = new Name(this.child.getFirstName(), this.child.getMiddleName(), this.child.getLastName());
 		table.add(getSmallText(name.getName(iwc.getApplicationSettings().getDefaultLocale(), true)), 3, row++);
 		table.add(getLocalizedLabel(LABEL_PERSONAL_ID, "Personal ID"), 1, row);
-		table.add(getSmallText(PersonalIDFormatter.format(child.getPersonalID(), iwc.getCurrentLocale())), 3, row++);
+		table.add(getSmallText(PersonalIDFormatter.format(this.child.getPersonalID(), iwc.getCurrentLocale())), 3, row++);
 		table.add(getLocalizedLabel(LABEL_ADDRESS, "Address"), 1, row);
 		try {
-			Address address = getUserService(iwc).getUsersMainAddress(child);
+			Address address = getUserService(iwc).getUsersMainAddress(this.child);
 			if (address != null) {
 				String postalAddress = address.getPostalAddress();
 				table.add(getSmallText(address.getStreetAddress()), 3, row);
-				if (postalAddress != null)
+				if (postalAddress != null) {
 					table.add(getSmallText(", " + postalAddress), 3, row);
+				}
 			}
 		}
 		catch (RemoteException e) {
@@ -332,23 +335,26 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		boolean hasCheck = false;
 		try {
-			if (child != null)
-				hasCheck = getCareBusiness(iwc).hasGrantedCheck(child);
+			if (this.child != null) {
+				hasCheck = getCareBusiness(iwc).hasGrantedCheck(this.child);
+			}
 		}
 		catch (RemoteException e) {
 			e.printStackTrace();
 		}
 
 		table.add(getLocalizedLabel(LABEL_GRANTED_CHECK, "Granted check"), 1, row);
-		if (!hasCheck)
+		if (!hasCheck) {
 			table.add(getSmallText(localize("child_care.no", "No")), 3, row++);
-		else
+		}
+		else {
 			table.add(getSmallText(localize("child_care.yes", "Yes")), 3, row++);
+		}
 		table.setHeight(row++, 12);
 
 		Collection contracts = null;
 		try {
-			contracts = getBusiness().getLatestContractsForChild(((Integer) child.getPrimaryKey()).intValue(), 3);
+			contracts = getBusiness().getLatestContractsForChild(((Integer) this.child.getPrimaryKey()).intValue(), 3);
 		}
 		catch (RemoteException e3) {
 			// TODO Auto-generated catch block
@@ -488,7 +494,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 
 		Collection parents;
 		try {
-			parents = getBusiness().getUserBusiness().getParentsForChild(child);
+			parents = getBusiness().getUserBusiness().getParentsForChild(this.child);
 		}
 		catch (RemoteException e2) {
 			parents = null;
@@ -514,16 +520,17 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 				RadioButton getBill = this.getRadioButton(PARAM_GETBILL, parent.getPrimaryKey().toString());
 				getBill.keepStatusOnAction(true);
 				getBill.setMustBeSelected(localize("child_care.must_select_billed_to", "You must select who to send the bill to."));
-				if (application != null) {
-					if (application.getOwner().equals(parent)) {
+				if (this.application != null) {
+					if (this.application.getOwner().equals(parent)) {
 						getBill.setSelected(true);
 					}
 				}
 				table.add(getBill, 3, row++);
 
 				row++;
-				if (iter.hasNext())
+				if (iter.hasNext()) {
 					table.setHeight(row++, 6);
+				}
 			}
 		}
 		table.setHeight(row++, 12);
@@ -616,8 +623,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(getSmallHeader(localize("child_care.pre_school", "Specify pre-school:")), 1, row);
 		TextInput preSchool = (TextInput) getStyledInterface(new TextInput(PARAM_PRE_SCHOOL));
 		preSchool.setLength(40);
-		if (application != null && application.getPreSchool() != null)
-			preSchool.setContent(application.getPreSchool());
+		if (this.application != null && this.application.getPreSchool() != null) {
+			preSchool.setContent(this.application.getPreSchool());
+		}
 		table.add(preSchool, 3, row++);
 		table.setHeight(row++, 12);
 
@@ -633,7 +641,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			TextInput hoursWeek = (TextInput) getStyledInterface(new TextInput(PARAM_HOURS));
 			hoursWeek.keepStatusOnAction(true);
 			hoursWeek.setLength(2);
-			if (!isUpdate || finalize) {
+			if (!this.isUpdate || this.finalize) {
 				hoursWeek.setAsNotEmpty(localize("child_care.child_care_time_required", "You must fill in the child care time."));
 				hoursWeek.setAsIntegers(localize("child_care.only_integers_allowed", "Not a valid child care time."));
 			}
@@ -644,7 +652,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 			if (getBusiness().getUseEmployment()) {
 				DropdownMenu employment = this.getEmploymentTypes(PARAM_EMPLOYMENT, -1);
 				employment.keepStatusOnAction(true);
-				if (!isUpdate || finalize) {
+				if (!this.isUpdate || this.finalize) {
 					employment.setAsNotEmpty(localize("child_care.must_select_employment_type", "You must select employment type."), "-1");
 				}
 				table.add(getLocalizedLabel(LABEL_EMPLOYMENT, "Employment"), 1, row);
@@ -658,11 +666,13 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.setHeight(row++, 12);
 
 		BooleanInput hasExtraContract = (BooleanInput) getStyledInterface(new BooleanInput(PARAM_EXTRA_CONTRACT));
-		if (application != null)
-			hasExtraContract.setSelected(application.getHasExtraContract());
+		if (this.application != null) {
+			hasExtraContract.setSelected(this.application.getHasExtraContract());
+		}
 		TextInput extraContractMessage = (TextInput) getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_MESSAGE));
-		if (application != null && application.getExtraContractMessage() != null)
-			extraContractMessage.setContent(application.getExtraContractMessage());
+		if (this.application != null && this.application.getExtraContractMessage() != null) {
+			extraContractMessage.setContent(this.application.getExtraContractMessage());
+		}
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT, "Extra contract")), 1, row);
 		table.add(hasExtraContract, 3, row);
 		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
@@ -671,11 +681,13 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(extraContractMessage, 3, row++);
 
 		BooleanInput hasExtraContractOther = (BooleanInput) getStyledInterface(new BooleanInput(PARAM_EXTRA_CONTRACT_OTHER));
-		if (application != null)
-			hasExtraContractOther.setSelected(application.getHasExtraContractOther());
+		if (this.application != null) {
+			hasExtraContractOther.setSelected(this.application.getHasExtraContractOther());
+		}
 		TextInput extraContractOtherMessage = (TextInput) getStyledInterface(new TextInput(PARAM_EXTRA_CONTRACT_OTHER_MESSAGE));
-		if (application != null && application.getExtraContractMessageOther() != null)
-			extraContractOtherMessage.setContent(application.getExtraContractMessageOther());
+		if (this.application != null && this.application.getExtraContractMessageOther() != null) {
+			extraContractOtherMessage.setContent(this.application.getExtraContractMessageOther());
+		}
 		table.add(getSmallHeader(localize(LABEL_EXTRA_CONTRACT_OTHER, "Extra contract other")), 1, row);
 		table.add(hasExtraContractOther, 3, row);
 		table.add(new Text(Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE + Text.NON_BREAKING_SPACE), 3, row);
@@ -691,11 +703,11 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		placementDate.setAsNotEmpty(localize("child_care.must_select_placement_date", "You have to select a placement date"));
 		placementDate.setYearRange(stamp.getYear() - 1, stamp.getYear() + 3);
 	
-		if (application != null) {
-			placementDate.setDate(application.getFromDate());
+		if (this.application != null) {
+			placementDate.setDate(this.application.getFromDate());
 		}
-		if (earliestPossiblePlacementDate != null) {
-			placementDate.setEarliestPossibleDate(earliestPossiblePlacementDate, localize("child_care.placement_date_overlaps_existing_placement", "Selected placement date overlaps existing contract"));
+		if (this.earliestPossiblePlacementDate != null) {
+			placementDate.setEarliestPossibleDate(this.earliestPossiblePlacementDate, localize("child_care.placement_date_overlaps_existing_placement", "Selected placement date overlaps existing contract"));
 		}
 		table.add(getLocalizedLabel(LABEL_PLACEMENT_DATE, "Placement date"), 1, row);
 		table.add(placementDate, 3, row++);
@@ -707,7 +719,7 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		table.add(getLocalizedLabel(LABEL_TERMINATION_DATE, "Termination date"), 1, row);
 		table.add(terminationDate, 3, row++);
 
-		if (application != null) {
+		if (this.application != null) {
 			DateInput replyDate = (DateInput) getStyledInterface(new DateInput(PARAM_LAST_REPLY_DATE));
 			replyDate.keepStatusOnAction(true);
 			replyDate.setToDisplayDayLast(true);
@@ -720,8 +732,9 @@ public class ChildCareAdminContracts extends ChildCareBlock {
 		comment.keepStatusOnAction(true);
 		comment.setWidth(Table.HUNDRED_PERCENT);
 		comment.setHeight("50");
-		if (application != null && application.getMessage() != null)
-			comment.setContent(application.getMessage());
+		if (this.application != null && this.application.getMessage() != null) {
+			comment.setContent(this.application.getMessage());
+		}
 		table.setVerticalAlignment(1, row, Table.VERTICAL_ALIGN_TOP);
 		table.add(getLocalizedLabel(LABEL_COMMENT, "Comment"), 1, row);
 		table.add(comment, 3, row++);

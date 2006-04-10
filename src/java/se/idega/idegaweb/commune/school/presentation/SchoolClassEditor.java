@@ -622,8 +622,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						checkBox.setDisabled(true);
 					}
 				}
-				//if(choice.getStatus().matches("FLYT")) 
-				//	checkBox.setDisabled(false);
+				if(choice.getStatus().matches("FLYT")) 
+					checkBox.setDisabled(false);
 				
 				if (useStyleNames()) {
 					if (row % 2 == 0) {

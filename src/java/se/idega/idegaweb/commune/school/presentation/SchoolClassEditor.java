@@ -76,11 +76,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	private final String  PROPERTY_START_HIGH_SCHOOL = "start_date_high_school";
 	
-	private final int ACTION_MANAGE = 1;
+	private static final int ACTION_MANAGE = 1;
 	public static final int ACTION_SAVE = 2;
-	private final int ACTION_FINALIZE_GROUP = 3;
-	private final int ACTION_DELETE = 4;
-	private final int ACTION_DELETE_SCHOOL_CHOICE = 5;
+	private static final int ACTION_FINALIZE_GROUP = 3;
+	private static final int ACTION_DELETE = 4;
+	private static final int ACTION_DELETE_SCHOOL_CHOICE = 5;
 
 	private int action = 0;
 	private int method = 0;
@@ -121,10 +121,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			parseAction(iwc);
 			AccountingSession acs = getAccountingSession();
 			
-			operationalField = acs.getOperationalField();
+			this.operationalField = acs.getOperationalField();
 			
 			
-			switch (method) {
+			switch (this.method) {
 				case ACTION_SAVE:
 					saveClass(iwc);
 					break;
@@ -135,11 +135,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					finalizeGroup();
 					break;
 				case ACTION_DELETE_SCHOOL_CHOICE:
-					deleteSchoolChoice(iwc, _choiceForDeletion);
+					deleteSchoolChoice(iwc, this._choiceForDeletion);
 					break;
 			}
 
-			switch (action) {
+			switch (this.action) {
 				case ACTION_MANAGE:
 					drawForm(iwc);
 					break;
@@ -158,43 +158,57 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		IWResourceBundle iwrb = getResourceBundle(iwc);
 		IWTimestamp iwt = new IWTimestamp();
 		
-		iwrb.getIWBundleParent().getProperty(PROPERTY_START_HIGH_SCHOOL, iwt.getDate().toString());
+		iwrb.getIWBundleParent().getProperty(this.PROPERTY_START_HIGH_SCHOOL, iwt.getDate().toString());
 		
-		if (iwc.isParameterSet(PARAMETER_PREVIOUS_CLASS_ID)) _previousSchoolClassID = Integer.parseInt(iwc.getParameter(PARAMETER_PREVIOUS_CLASS_ID));
+		if (iwc.isParameterSet(this.PARAMETER_PREVIOUS_CLASS_ID)) {
+			this._previousSchoolClassID = Integer.parseInt(iwc.getParameter(this.PARAMETER_PREVIOUS_CLASS_ID));
+		}
 
-		_previousSchoolSeasonID = getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID());
-		if (getSchoolYearID() != -1) _previousSchoolYearID = getBusiness().getPreviousSchoolYear(getSchoolYearID());
+		this._previousSchoolSeasonID = getBusiness().getPreviousSchoolSeasonID(getSchoolSeasonID());
+		if (getSchoolYearID() != -1) {
+			this._previousSchoolYearID = getBusiness().getPreviousSchoolYear(getSchoolYearID());
+		}
 
-		if (iwc.isParameterSet(PARAMETER_ACTION))
-			action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
-		else
-			action = ACTION_MANAGE;
+		if (iwc.isParameterSet(PARAMETER_ACTION)) {
+			this.action = Integer.parseInt(iwc.getParameter(PARAMETER_ACTION));
+		}
+		else {
+			this.action = ACTION_MANAGE;
+		}
 
-		if (iwc.isParameterSet(PARAMETER_METHOD))
-			method = Integer.parseInt(iwc.getParameter(PARAMETER_METHOD));
-		else
-			method = 0;
+		if (iwc.isParameterSet(this.PARAMETER_METHOD)) {
+			this.method = Integer.parseInt(iwc.getParameter(this.PARAMETER_METHOD));
+		}
+		else {
+			this.method = 0;
+		}
 
-		if (iwc.isParameterSet(PARAMETER_SORT))
-			sortChoicesBy = Integer.parseInt(iwc.getParameter(PARAMETER_SORT));
-		else
-			sortChoicesBy = SchoolChoiceComparator.NAME_SORT;
-		sortStudentsBy = sortChoicesBy;
+		if (iwc.isParameterSet(this.PARAMETER_SORT)) {
+			this.sortChoicesBy = Integer.parseInt(iwc.getParameter(this.PARAMETER_SORT));
+		}
+		else {
+			this.sortChoicesBy = SchoolChoiceComparator.NAME_SORT;
+		}
+		this.sortStudentsBy = this.sortChoicesBy;
 
-		if (iwc.isParameterSet(PARAMETER_SORT_PLACED))
-			sortPlaced = Integer.parseInt(iwc.getParameter(PARAMETER_SORT_PLACED));
-		else
-			sortPlaced = -1;
-		sortPlacedUnplacedBy = sortPlaced;
+		if (iwc.isParameterSet(this.PARAMETER_SORT_PLACED)) {
+			this.sortPlaced = Integer.parseInt(iwc.getParameter(this.PARAMETER_SORT_PLACED));
+		}
+		else {
+			this.sortPlaced = -1;
+		}
+		this.sortPlacedUnplacedBy = this.sortPlaced;
 
-		if (iwc.isParameterSet(PARAMETER_SEARCH)) searchString = iwc.getParameter(PARAMETER_SEARCH);
+		if (iwc.isParameterSet(this.PARAMETER_SEARCH)) {
+			this.searchString = iwc.getParameter(this.PARAMETER_SEARCH);
+		}
 
-		_group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
+		this._group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
 
 		/** Fixing String */
-		if (searchString != null && searchString.length() > 0) {
+		if (this.searchString != null && this.searchString.length() > 0) {
 			try {
-				String temp = searchString;
+				String temp = this.searchString;
 				temp = TextSoap.findAndCut(temp, "-");
 				Long.parseLong(temp);
 				if (temp.length() == 10 && iwc.getApplicationSettings().getDefaultLocale().equals(LocaleUtil.getSwedishLocale())) {
@@ -206,19 +220,21 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 						temp = "19" + temp;
 					}
 				}
-				searchString = temp;
+				this.searchString = temp;
 			}
 			catch (NumberFormatException nfe) {
 			}
 		}
 
-		if (iwc.isParameterSet(PARAMETER_DELETE_CHOICE_ID)) _choiceForDeletion = Integer.parseInt(iwc.getParameter(PARAMETER_DELETE_CHOICE_ID));
+		if (iwc.isParameterSet(this.PARAMETER_DELETE_CHOICE_ID)) {
+			this._choiceForDeletion = Integer.parseInt(iwc.getParameter(this.PARAMETER_DELETE_CHOICE_ID));
+		}
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
-		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(this.action)));
 
 		Table table = new Table(1, 17);
 		table.setCellpadding(0);
@@ -234,7 +250,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.setHeight(16, "12");
 		form.add(table);
 
-		table.add(getNavigationTable(true, multibleSchools, showBunRadioButtons, iwc), 1, 1);
+		table.add(getNavigationTable(true, this.multibleSchools, this.showBunRadioButtons, iwc), 1, 1);
 		table.add(getSearchAndSortTable(), 1, 3);
 		table.add(getSmallHeader(localize("school.school_choices_for_year", "School choices for selected year")), 1, 5);
 		if (useStyleNames()) {
@@ -261,7 +277,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		////////////////
 		
 		if (this.showStudentTable) {
-			if (_previousSchoolYearID != -1) {
+			if (this._previousSchoolYearID != -1) {
 				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 				validateSchoolClass(previousClasses);
 
@@ -286,10 +302,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 
 			if (getSchoolClassID() != -1) {
-				HiddenInput method = new HiddenInput(PARAMETER_METHOD, "0");
+				HiddenInput method = new HiddenInput(this.PARAMETER_METHOD, "0");
 
 				SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
-				submit.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
+				submit.setValueOnClick(this.PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
 				submit.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
 				form.setToDisableOnSubmit(submit, true);
 				SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
@@ -301,7 +317,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 		}
 
-		if (showMessageTextButton) {
+		if (this.showMessageTextButton) {
 			GenericButton msgText = getButton(new GenericButton("messageText", localize("school.show_message_text", "Message Text")));
 			msgText.addParameterToWindow(SchoolAdminOverview.PARAMETER_METHOD, SchoolAdminOverview.METHOD_MESSAGE_TEXT);
 			msgText.setWindowToOpen(SchoolAdminWindow.class);
@@ -334,7 +350,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private void drawNewGroupForm(IWContext iwc) throws RemoteException {
 		Form form = new Form();
 		form.setEventListener(SchoolEventListener.class);
-		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(action)));
+		form.add(new HiddenInput(PARAMETER_ACTION, String.valueOf(this.action)));
 
 		Table table = new Table();
 		table.setCellpadding(0);
@@ -351,7 +367,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.add(headerTable, 1, row++);
 		table.setHeight(row++, "12");
 
-		headerTable.add(getNavigationTable(true, multibleSchools, showBunRadioButtons, iwc), 1, 1);
+		headerTable.add(getNavigationTable(true, this.multibleSchools, this.showBunRadioButtons, iwc), 1, 1);
 		headerTable.add(getSearchAndSortTable(), 1, 2);
 		if (useStyleNames()) {
 			headerTable.setCellpaddingLeft(1, 1, 12);
@@ -402,7 +418,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		SchoolYear year = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
 		boolean currentSeason = getBusiness().getCurrentSchoolSeasonID() == getSchoolSeasonID();
-		if (year != null && year.getSchoolYearAge() >= _languageAge) showLanguage = true;
+		if (year != null && year.getSchoolYearAge() >= this._languageAge) {
+			showLanguage = true;
+		}
 
 		if (showLanguage) {
 			table.setColumns(9); 
@@ -415,7 +433,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.setColumns(table.getColumns() - 1);
 		}
 
-		if (!showStudentTable) {
+		if (!this.showStudentTable) {
 			table.setColumns(table.getColumns() - 1);
 		}
 
@@ -428,7 +446,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		if (this.multibleSchools) {
 			try {
-				applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), null, validStatuses, searchString, sortPlacedUnplacedBy);
+				applicantsSize = getBusiness().getSchoolChoiceBusiness().getNumberOfApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), null, validStatuses, this.searchString, this.sortPlacedUnplacedBy);
 
 			}
 			catch (Exception e) {
@@ -436,14 +454,14 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 
 			currPage = 0;
-			maxPage = (int) Math.ceil(applicantsSize / applicationsPerPage);
-			if (iwc.isParameterSet(PARAMETER_CURRENT_APPLICATION_PAGE)) {
-				currPage = Integer.parseInt(iwc.getParameter(PARAMETER_CURRENT_APPLICATION_PAGE));
+			maxPage = (int) Math.ceil(applicantsSize / this.applicationsPerPage);
+			if (iwc.isParameterSet(this.PARAMETER_CURRENT_APPLICATION_PAGE)) {
+				currPage = Integer.parseInt(iwc.getParameter(this.PARAMETER_CURRENT_APPLICATION_PAGE));
 			}
-			start = currPage * applicationsPerPage;
+			start = currPage * this.applicationsPerPage;
 		}
 		else {
-			applicationsPerPage = -1;
+			this.applicationsPerPage = -1;
 		}
 		System.out.println("School ID from lister : "+getSchoolID());
 		System.out.println("School Season ID from lister : "+getSchoolSeasonID());
@@ -451,19 +469,21 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		System.out.print("Valid Statuses from lister : ");
 		for(int i=0;i<validStatuses.length;i++) { System.out.print(validStatuses[i]+" ");}
 		System.out.println();
-		System.out.println("Search string from lister :"+searchString);
-		System.out.println("Sort Choices by from lister :"+sortChoicesBy);
-		System.out.println("applications per page from lister :"+applicationsPerPage);
+		System.out.println("Search string from lister :"+this.searchString);
+		System.out.println("Sort Choices by from lister :"+this.sortChoicesBy);
+		System.out.println("applications per page from lister :"+this.applicationsPerPage);
 		System.out.println("start from lister :"+start);
-		System.out.println("sortPlacedUnplacedBy from lister :"+sortPlacedUnplacedBy);
+		System.out.println("sortPlacedUnplacedBy from lister :"+this.sortPlacedUnplacedBy);
 				
 				
 		Collection applicants = null;
 		//if (getSchoolID() != -1) // this filter not needed for NACKA  added by Igors 26.01.2006
-		applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, searchString, sortChoicesBy, applicationsPerPage, start, sortPlacedUnplacedBy);
+		applicants = getBusiness().getSchoolChoiceBusiness().getApplicantsForSchool(getSchoolID(), getSchoolSeasonID(), getSchoolYearID(), validStatuses, this.searchString, this.sortChoicesBy, this.applicationsPerPage, start, this.sortPlacedUnplacedBy);
 
 		int row = 2;
-		if (multibleSchools) row = 1;
+		if (this.multibleSchools) {
+			row = 1;
+		}
 		int column = 1;
 		int headerRow = -1;
 
@@ -485,10 +505,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Text info = getSmallText(localize("page", "Page") + " " + (currPage + 1) + " " + localize("of", "of") + " " + (maxPage + 1));
 			if (currPage > 0) {
 				Link lPrev = getSmallLink(localize("previous", "Previous"));
-				lPrev.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage - 1));
-				lPrev.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
-				lPrev.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
-				lPrev.addParameter(PARAMETER_SORT_PLACED, iwc.getParameter(PARAMETER_SORT_PLACED));
+				lPrev.addParameter(this.PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage - 1));
+				lPrev.addParameter(this.PARAMETER_SEARCH, iwc.getParameter(this.PARAMETER_SEARCH));
+				lPrev.addParameter(this.PARAMETER_SORT, iwc.getParameter(this.PARAMETER_SORT));
+				lPrev.addParameter(this.PARAMETER_SORT_PLACED, iwc.getParameter(this.PARAMETER_SORT_PLACED));
 				navigationTable.add(lPrev, 1, 1);
 			}
 			else {
@@ -498,10 +518,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 			if (currPage < maxPage) {
 				Link lNext = getSmallLink(localize("next", "Next"));
-				lNext.addParameter(PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage + 1));
-				lNext.addParameter(PARAMETER_SEARCH, iwc.getParameter(PARAMETER_SEARCH));
-				lNext.addParameter(PARAMETER_SORT, iwc.getParameter(PARAMETER_SORT));
-				lNext.addParameter(PARAMETER_SORT_PLACED, iwc.getParameter(PARAMETER_SORT_PLACED));
+				lNext.addParameter(this.PARAMETER_CURRENT_APPLICATION_PAGE, Integer.toString(currPage + 1));
+				lNext.addParameter(this.PARAMETER_SEARCH, iwc.getParameter(this.PARAMETER_SEARCH));
+				lNext.addParameter(this.PARAMETER_SORT, iwc.getParameter(this.PARAMETER_SORT));
+				lNext.addParameter(this.PARAMETER_SORT_PLACED, iwc.getParameter(this.PARAMETER_SORT_PLACED));
 				navigationTable.add(lNext, 3, 1);
 			}
 			else {
@@ -528,7 +548,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		}
 		table.add(getSmallHeader(localize("school.from_school", "From School")), column++, row);
-		if (showLanguage) table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		if (showLanguage) {
+			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		}
 		table.add(getSmallHeader(localize("school.created", "Created")), column++, row);
 		table.add(Text.getNonBrakingSpace(), column, row); // Empty header for
 		// erase buttons
@@ -538,9 +560,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		Link link;
 
 		// Added for SchoolChoice deletion
-		if (getSchoolClassID() == -1)
-			table.add(new HiddenInput(PARAMETER_METHOD, "0"), column, row);
-		table.add(new HiddenInput(PARAMETER_DELETE_CHOICE_ID, "-1"), column, row);
+		if (getSchoolClassID() == -1) {
+			table.add(new HiddenInput(this.PARAMETER_METHOD, "0"), column, row);
+		}
+		table.add(new HiddenInput(this.PARAMETER_DELETE_CHOICE_ID, "-1"), column, row);
 
 		Date from = null;
 		Date to = null;
@@ -577,15 +600,15 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				created = new IWTimestamp(choice.getCreated());
 				applicant = getUserBusiness(iwc).getUser(choice.getChildId());
 				school = getBusiness().getSchoolBusiness().getSchool(new Integer(choice.getCurrentSchoolId()));
-				checkBox = getCheckBox(PARAMETER_APPLICANT_ID, choice.getPrimaryKey().toString());
+				checkBox = getCheckBox(this.PARAMETER_APPLICANT_ID, choice.getPrimaryKey().toString());
 				address = getUserBusiness(iwc).getUsersMainAddress(applicant);
 				hasComment = choice.getMessage() != null;
 				hasPriority = choice.getPriority();
 
 				if (getBusiness().isAlreadyInSchool(choice.getChildId(), getSession().getSchoolID(), getSession().getSchoolSeasonID())) {
 				hasPlacement = true;
-					if (_group != null && _group.getIsSubGroup()) {
-						if (getBusiness().getSchoolBusiness().hasGroupPlacement(choice.getChildId(), getSchoolClassID(), _group.getIsSubGroup())) {
+					if (this._group != null && this._group.getIsSubGroup()) {
+						if (getBusiness().getSchoolBusiness().hasGroupPlacement(choice.getChildId(), getSchoolClassID(), this._group.getIsSubGroup())) {
 							checkBox.setDisabled(true);
 						}
 					}
@@ -595,25 +618,29 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				else {
 					hasPlacement = false;
-					if (_group != null && _group.getIsSubGroup()) {
+					if (this._group != null && this._group.getIsSubGroup()) {
 						checkBox.setDisabled(true);
 					}
 				}
-				//if(choice.getStatus().matches("FLYT")) 
-				//	checkBox.setDisabled(false);
+				if(choice.getStatus().matches("FLYT")) 
+					checkBox.setDisabled(false);
 				
 				if (useStyleNames()) {
-					if (row % 2 == 0)
+					if (row % 2 == 0) {
 						table.setRowStyleClass(row, getDarkRowClass());
-					else
+					}
+					else {
 						table.setRowStyleClass(row, getLightRowClass());
+					}
 					table.setCellpaddingLeft(1, row, 12);
 					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
 
 				//String name = applicant.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(applicant, true);
-				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = applicant.getName();
+				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) {
+					name = applicant.getName();
+				}
 				try {
 				if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR_THIS_SCHOOL);
@@ -626,10 +653,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				else {
 					if (!useStyleNames()) {
-						if (row % 2 == 0)
+						if (row % 2 == 0) {
 							table.setRowColor(row, getZebraColor1());
-						else
+						}
+						else {
 							table.setRowColor(row, getZebraColor2());
+						}
 					}
 				}
 				}catch(NullPointerException e) {
@@ -673,10 +702,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				column++;
 				if (!useStyleNames()) {
 					try{
-						if (applicant.getGender().isFemaleGender())
+						if (applicant.getGender().isFemaleGender()) {
 							table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-						else
+						}
+						else {
 							table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+						}
 					}  catch(NullPointerException e) {
 						    table.add("", column++, row);
  				       }
@@ -685,25 +716,37 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				
 				if (school != null) {
 					String schoolName = school.getName();
-					if (schoolName.length() > 20) schoolName = schoolName.substring(0, 20) + "...";
+					if (schoolName.length() > 20) {
+						schoolName = schoolName.substring(0, 20) + "...";
+					}
 					table.add(getSmallText(schoolName), column, row);
-					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
+					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
+						table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
+					}
  			    } else{
 					String schoolName=choice.getFromSchool(choice.getChosenSchoolId(),choice.getSchoolSeasonId(),choice.getChildId());
-					if(schoolName==null) schoolName = choice.getChosenSchool().getName();
-					if (schoolName.length() > 20) schoolName = schoolName.substring(0, 20) + "...";
+					if(schoolName==null) {
+						schoolName = choice.getChosenSchool().getName();
+					}
+					if (schoolName.length() > 20) {
+						schoolName = schoolName.substring(0, 20) + "...";
+					}
 					table.add(getSmallText(schoolName), column, row);
-					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
+					if (choice.getStatus().equalsIgnoreCase(SchoolChoiceBMPBean.CASE_STATUS_MOVED)) {
+						table.add(getSmallText(" (" + localize("school.moved", "Moved") + ")"), column, row);
+					}
 									}
 				column++;
 				if (showLanguage) { 
-					if (choice.getLanguageChoice() != null) table.add(getSmallText(localize(choice.getLanguageChoice(), "")), column, row);
+					if (choice.getLanguageChoice() != null) {
+						table.add(getSmallText(localize(choice.getLanguageChoice(), "")), column, row);
+					}
 					column++;
 				}
 				table.add(getSmallText(created.getLocaleDate(iwc.getCurrentLocale(), IWTimestamp.SHORT)), column, row);
 				table.setNoWrap(column, row);
 				column++;
-				if (showStudentTable && getSchoolClassID() != -1) {
+				if (this.showStudentTable && getSchoolClassID() != -1) {
 					table.setWidth(column, "12");
 					table.add(checkBox, column, row);
 					column++;
@@ -714,8 +757,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					int choiceID = ((Integer) choice.getPrimaryKey()).intValue();
 
 					SubmitButton delButt = new SubmitButton(delImg);
-					delButt.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE_SCHOOL_CHOICE));
-					delButt.setValueOnClick(PARAMETER_DELETE_CHOICE_ID, String.valueOf(choiceID));
+					delButt.setValueOnClick(this.PARAMETER_METHOD, String.valueOf(ACTION_DELETE_SCHOOL_CHOICE));
+					delButt.setValueOnClick(this.PARAMETER_DELETE_CHOICE_ID, String.valueOf(choiceID));
 					delButt.setSubmitConfirm(localize("school.confirm_delete_school_choice_msg", "Do you really want to erase this school choice?"));
 					delButt.setToolTip(localize("school.delete_school_choice", "Delete school choice"));
 					table.add(delButt, column, row);
@@ -752,7 +795,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 		}
 
-		if (showStatistics) {
+		if (this.showStatistics) {
 			try {
 				int firstApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 1}, validStatuses, "");
 				int secondApplSize = getSchoolChoiceHome().getCount(getSchoolID(), getSchoolSeasonID(), -1, new int[] { 2}, validStatuses, "");
@@ -836,7 +879,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 		}
 
-		if (showStudentTable && getSchoolClassID() != -1) {
+		if (this.showStudentTable && getSchoolClassID() != -1) {
 
 			GenericButton selectAll = (GenericButton) getStyledInterface(new GenericButton());
 			selectAll.setValue(localize("school.select_all", "Select all"));
@@ -864,7 +907,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		else {
 			table.setRowColor(headerRow, getHeaderColor());
 		}
-		if (headerRow != 1) table.mergeCells(1, 1, table.getColumns(), 1);
+		if (headerRow != 1) {
+			table.mergeCells(1, 1, table.getColumns(), 1);
+		}
 
 		if (!this.multibleSchools) {
 			table.mergeCells(1, 1, table.getColumns(), 1);
@@ -886,9 +931,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.setWidth(getWidth());
 		table.setCellpadding(getCellpadding());
 		table.setCellspacing(getCellspacing());
-		SchoolYear schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(_previousSchoolYearID));
+		SchoolYear schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(this._previousSchoolYearID));
 		int schoolAge = -1;
-		if (schoolYear != null) schoolAge = schoolYear.getSchoolYearAge();
+		if (schoolYear != null) {
+			schoolAge = schoolYear.getSchoolYearAge();
+		}
 
 		int row = 1;
 		int column = 1;
@@ -900,8 +947,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		
 				
-		if (schoolAge >= 12 && schoolAge <= 16) table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
-		if (schoolAge >= 16) table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);
+		if (schoolAge >= 12 && schoolAge <= 16) {
+			table.add(getSmallHeader(localize("school.language", "Language")), column++, row);
+		}
+		if (schoolAge >= 16) {
+			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);
+		}
 		if (useStyleNames()) {
 			table.setCellpaddingLeft(1, row, 12);
 			table.setCellpaddingRight(table.getColumns(), row, 12);
@@ -917,12 +968,14 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		boolean hasPlacement = false;
 		boolean showPlacement = false;
 
-		SchoolSeason season = getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(_previousSchoolSeasonID));
+		SchoolSeason season = getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(this._previousSchoolSeasonID));
 		List formerStudents = new ArrayList();
-		if (_previousSchoolClassID != -1)
-			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(_previousSchoolClassID, _previousSchoolYearID));
-		else
-			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), _previousSchoolSeasonID, _previousSchoolYearID));
+		if (this._previousSchoolClassID != -1) {
+			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(this._previousSchoolClassID, this._previousSchoolYearID));
+		}
+		else {
+			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), this._previousSchoolSeasonID, this._previousSchoolYearID));
+		}
 
 		
 		if (!formerStudents.isEmpty()) {
@@ -930,7 +983,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
 
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSchoolSeasonID());
-			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -939,9 +992,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				address = getUserBusiness(iwc).getUserAddress1(((Integer) student.getPrimaryKey()).intValue());
 				checkBox = getCheckBox(getSession().getParameterStudentID(), String.valueOf(((Integer) student.getPrimaryKey()).intValue()));
 							
-				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), operationalField)) {
+				if (getBusiness().isAlreadyInSchool(studentMember.getClassMemberId(), getSession().getSchoolID(), getSession().getSchoolSeasonID(), this.operationalField)) {
 					hasPlacement = true;
-					if (_group != null && _group.getIsSubGroup()) {
+					if (this._group != null && this._group.getIsSubGroup()) {
 						if (getBusiness().getSchoolBusiness().hasGroupPlacement(studentMember.getClassMemberId(), getSchoolClassID())) {
 							checkBox.setDisabled(true);
 						}
@@ -952,7 +1005,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				else {
 					hasPlacement = false;
-					if (_group != null && _group.getIsSubGroup()) {
+					if (this._group != null && this._group.getIsSubGroup()) {
 						checkBox.setDisabled(true);
 					}
 				}
@@ -968,7 +1021,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				
 				//String name = student.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
-				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
+				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) {
+					name = student.getName();
+				}
 
 				link = getSmallLink(name);
 				link.setWindowToOpen(SchoolAdminWindow.class);
@@ -984,10 +1039,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				boolean hasMoveChoice = getBusiness().hasMoveChoiceToOtherSchool(studentMember.getClassMemberId(), getSchoolID(), getSchoolSeasonID());
 
 				if (useStyleNames()) {
-					if (row % 2 == 0)
+					if (row % 2 == 0) {
 						table.setRowStyleClass(row, getDarkRowClass());
-					else
+					}
+					else {
 						table.setRowStyleClass(row, getLightRowClass());
+					}
 					table.setCellpaddingLeft(1, row, 12);
 					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
@@ -1003,10 +1060,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				else {
 					if (!useStyleNames()) {
-						if (row % 2 == 0)
+						if (row % 2 == 0) {
 							table.setRowColor(row, getZebraColor1());
-						else
+						}
+						else {
 							table.setRowColor(row, getZebraColor2());
+						}
 					}
 				}
 
@@ -1021,22 +1080,28 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				
 				if (!useStyleNames()) {
 					if(student.getGender()!=null){
-						if (student.getGender().isFemaleGender())
+						if (student.getGender().isFemaleGender()) {
 							table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
+						}
 						else{
 							table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
 						}
 			    	}
-					else 	column++;
+					else {
+						column++;
+					}
 			     
 						
 				}
 				
-				if (address != null && address.getStreetAddress() != null) table.add(getSmallText(address.getStreetAddress()), column, row);
+				if (address != null && address.getStreetAddress() != null) {
+					table.add(getSmallText(address.getStreetAddress()), column, row);
+				}
 				column++;
 				if (schoolAge >= 12 && schoolAge <= 16)  {
-					if (studentMember.getLanguage() != null) 
+					if (studentMember.getLanguage() != null) {
 						table.add(getSmallText(localize(studentMember.getLanguage(), "")), column, row);
+					}
 					column++;
 				}
 				
@@ -1047,7 +1112,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					if (studyPathId != -1){
 						try{
 							SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
-							if (course != null)table.add(getSmallText(course.getCode()), column, row);
+							if (course != null) {
+								table.add(getSmallText(course.getCode()), column, row);
+							}
 						} catch (Exception e) {
 						e.printStackTrace();
 						}
@@ -1146,13 +1213,13 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.add(getSmallHeader(localize("school.gender", "Gender")), column++, row);
 		}
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
-		table.add(new HiddenInput(PARAMETER_APPLICANT_ID, "-1"), column++, row);
-		table.add(new HiddenInput(PARAMETER_METHOD, "0"), column++, row);
+		table.add(new HiddenInput(this.PARAMETER_APPLICANT_ID, "-1"), column++, row);
+		table.add(new HiddenInput(this.PARAMETER_METHOD, "0"), column++, row);
 		if (useStyleNames()) {
 			table.setCellpaddingLeft(1, row, 12);
 			table.setCellpaddingRight(table.getColumns(), row, 12);
 		}
-		if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+		if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row++);
 		}
 		else{
@@ -1195,7 +1262,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
-			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -1210,8 +1277,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 				delete = new SubmitButton(getDeleteIcon(localize("school.delete_from_group", "Click to remove student from group")), "delete_student_" + String.valueOf(new Integer(studentMember.getClassMemberId())));
 				delete.setDescription(localize("school.delete_from_group", "Click to remove student from group"));
-				delete.setValueOnClick(PARAMETER_APPLICANT_ID, String.valueOf(studentMember.getClassMemberId()));
-				delete.setValueOnClick(PARAMETER_METHOD, String.valueOf(ACTION_DELETE));
+				delete.setValueOnClick(this.PARAMETER_APPLICANT_ID, String.valueOf(studentMember.getClassMemberId()));
+				delete.setValueOnClick(this.PARAMETER_METHOD, String.valueOf(ACTION_DELETE));
 				delete.setSubmitConfirm(localize("school.confirm_student_delete", "Are you sure you want to remove the student from this class?"));
 				move = new Link(getEditIcon(localize("school.move_to_another_group", "Move this student to another group")));
 				move.setWindowToOpen(SchoolAdminWindow.class);
@@ -1222,13 +1289,17 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 				//String name = student.getNameLastFirst(true);
 				String name = getBusiness().getUserBusiness().getNameLastFirst(student, true);
-				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) name = student.getName();
+				if (iwc.getCurrentLocale().getLanguage().equalsIgnoreCase("is")) {
+					name = student.getName();
+				}
 
 				if (useStyleNames()) {
-					if (row % 2 == 0)
+					if (row % 2 == 0) {
 						table.setRowStyleClass(row, getDarkRowClass());
-					else
+					}
+					else {
 						table.setRowStyleClass(row, getLightRowClass());
+					}
 					table.setCellpaddingLeft(1, row, 12);
 					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
@@ -1245,10 +1316,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				}
 				else {
 					if (!useStyleNames()) {
-						if (row % 2 == 0)
+						if (row % 2 == 0) {
 							table.setRowColor(row, getZebraColor1());
-						else
+						}
+						else {
 							table.setRowColor(row, getZebraColor2());
+						}
 					}
 				}
 
@@ -1267,19 +1340,23 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				table.add(getSmallText(PersonalIDFormatter.format(student.getPersonalID(), iwc.getCurrentLocale())), column++, row);
 
 				if (!useStyleNames()) {
-					if (student.getGender().isFemaleGender())
+					if (student.getGender().isFemaleGender()) {
 						table.add(getSmallText(localize("school.girl", "Girl")), column++, row);
-					else
+					}
+					else {
 						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
+					}
 				}
 				
-				if (address != null && address.getStreetAddress() != null) table.add(getSmallText(address.getStreetAddress()), column, row);
+				if (address != null && address.getStreetAddress() != null) {
+					table.add(getSmallText(address.getStreetAddress()), column, row);
+				}
 				column++;
 				table.add(move, column++, row);
 				table.add(delete, column++, row);
 
 				if (hasChoice) {
-					SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), session.getSchoolID(), session.getSchoolSeasonID());
+					SchoolChoice choice = getBusiness().getSchoolChoiceBusiness().findByStudentAndSchoolAndSeason(studentMember.getClassMemberId(), this.session.getSchoolID(), this.session.getSchoolSeasonID());
 					if (choice != null) {
 						table.setAlignment(7, row, Table.HORIZONTAL_ALIGN_CENTER);
 						table.setAlignment(8, row, Table.HORIZONTAL_ALIGN_CENTER);
@@ -1292,22 +1369,26 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 								table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
 							}
 
-							if (choice.getHasReceivedConfirmationMessage())
+							if (choice.getHasReceivedConfirmationMessage()) {
 								table.add(getSmallText(localize("school_choice.YES", "YES")), column++, row);
-							else
+							}
+							else {
 								table.add(getSmallText(localize("school_choice.NO", "NO")), column++, row);
+							}
 						
 						
 					}
 				}
-				else if (operationalField !=null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+				else if (this.operationalField !=null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 						int studyPathId = studentMember.getStudyPathId();
 						SchoolStudyPathHome scHome = (SchoolStudyPathHome) IDOLookup.getHome(SchoolStudyPath.class);
 						//table.add(getSmallText(studentMember.getStudyPathId()), column++, row);
 						if (studyPathId != -1){
 							try{
 								SchoolStudyPath course = scHome.findByPrimaryKey(new Integer(studyPathId));
-								if (course != null)table.add(getSmallText(course.getCode()), column++, row);
+								if (course != null) {
+									table.add(getSmallText(course.getCode()), column++, row);
+								}
 							} catch (Exception e) {
 							e.printStackTrace();
 							}
@@ -1356,10 +1437,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		back.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_MANAGE));
 
 		String buttonLabel = "";
-		if (isReady)
+		if (isReady) {
 			buttonLabel = localize("school.class_locked", "Class locked"); //in swedish: Skicka definitivt besked
-		else
+		}
+		else {
 			buttonLabel = localize("school.class_ready", "Class ready"); //in swedish: Skicka erbjudande om plats
+		}
 
 		table.add(back, 1, row);
 		if (useStyleNames()) {
@@ -1375,7 +1458,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			groupReady.addParameterToWindow(SchoolAdminOverview.PARAMETER_PAGE_ID, String.valueOf(getParentPage().getPageID()));
 
 			if (isReady) { // button now says: Skicka definitivt besked
-				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !_useForTesting) {
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_locked_date") && !this._useForTesting) {
 					groupReady.setDisabled(true);  
 				}
 				
@@ -1390,7 +1473,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				} 
 			}
 			else {	//button says: Skicka erbjudande om plats			
-				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !_useForTesting) {
+				if (!getBusiness().canMarkSchoolClass(newSchoolClass, "mark_ready_date") && !this._useForTesting) {
 					groupReady.setDisabled(true);
 				}
 			}
@@ -1431,7 +1514,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	}
 
 	protected DropdownMenu getPreviousSchoolClasses(Collection classes) {
-		DropdownMenu menu = new DropdownMenu(PARAMETER_PREVIOUS_CLASS_ID);
+		DropdownMenu menu = new DropdownMenu(this.PARAMETER_PREVIOUS_CLASS_ID);
 		menu.setToSubmit();
 
 		if (!classes.isEmpty()) {
@@ -1446,7 +1529,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			menu.addMenuElement(-1, "");
 		}
 
-		if (_previousSchoolClassID != -1) menu.setSelectedElement(_previousSchoolClassID);
+		if (this._previousSchoolClassID != -1) {
+			menu.setSelectedElement(this._previousSchoolClassID);
+		}
 
 		return (DropdownMenu) getStyledInterface(menu);
 	}
@@ -1458,15 +1543,19 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		table.setWidth("100%");
 
 		SchoolYear schoolYear = null;
-		if (getSchoolYearID() != -1) schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
+		if (getSchoolYearID() != -1) {
+			schoolYear = getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID()));
+		}
 		int yearAge = -1;
-		if (schoolYear != null) yearAge = schoolYear.getSchoolYearAge();
+		if (schoolYear != null) {
+			yearAge = schoolYear.getSchoolYearAge();
+		}
 
-		if (searchEnabled) {
+		if (this.searchEnabled) {
 			table.setAlignment(4, 1, Table.HORIZONTAL_ALIGN_RIGHT);
 			table.add(getSmallHeader(localize("school.search_for", "Search for") + ":" + Text.NON_BREAKING_SPACE), 4, 1);
 
-			TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(PARAMETER_SEARCH, searchString));
+			TextInput tiSearch = (TextInput) getStyledInterface(new TextInput(this.PARAMETER_SEARCH, this.searchString));
 			tiSearch.setLength(16);
 			table.add(tiSearch, 4, 1);
 
@@ -1478,27 +1567,29 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		table.add(getSmallHeader(localize("school.sort_by", "Sort by") + ":" + Text.NON_BREAKING_SPACE), 1, 1);
 
-		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT));
+		DropdownMenu menu = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT));
 		menu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name", "Name"));
 		menu.addMenuElement(SchoolChoiceComparator.PERSONAL_ID_SORT, localize("school.sort_personal_id", "Personal ID"));
 		menu.addMenuElement(SchoolChoiceComparator.ADDRESS_SORT, localize("school.sort_address", "Address"));
 		menu.addMenuElement(SchoolChoiceComparator.GENDER_SORT, localize("school.sort_gender", "Gender"));
 
-		if (action != ACTION_SAVE && yearAge >= 12) menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language", "Language"));
+		if (this.action != ACTION_SAVE && yearAge >= 12) {
+			menu.addMenuElement(SchoolChoiceComparator.LANGUAGE_SORT, localize("school.sort_language", "Language"));
+		}
 		menu.addMenuElement(SchoolChoiceComparator.CREATED_SORT, localize("school.sort_created", "Created"));
-		menu.setSelectedElement(sortChoicesBy);
+		menu.setSelectedElement(this.sortChoicesBy);
 		menu.setToSubmit();
 		table.add(menu, 2, 1);
 		table.add("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", 2, 1);
-		if (action != ACTION_SAVE) {
-			DropdownMenu menuPlaced = (DropdownMenu) getStyledInterface(new DropdownMenu(PARAMETER_SORT_PLACED));
+		if (this.action != ACTION_SAVE) {
+			DropdownMenu menuPlaced = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT_PLACED));
 			menuPlaced.addMenuElement(-1, localize("school.sort_all", "All"));
 			menuPlaced.addMenuElement(SchoolChoiceComparator.PLACED_SORT, localize("school.sort_placed", "Placed"));
 			menuPlaced.addMenuElement(SchoolChoiceComparator.UNPLACED_SORT, localize("school.sort_unplaced", "Unplaced"));
-			menuPlaced.setSelectedElement(sortPlacedUnplacedBy);
+			menuPlaced.setSelectedElement(this.sortPlacedUnplacedBy);
 			menuPlaced.setToSubmit();
 			table.add(menuPlaced, 2, 1);
-			if (showStudentTable && getSchoolClassID() != -1) {
+			if (this.showStudentTable && getSchoolClassID() != -1) {
 				menuPlaced.setDisabled(true);
 				menuPlaced.setSelectedElement(-1);
 			}
@@ -1521,12 +1612,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		link.addParameter(ListOfCoordinatesWriterXLS.prmSchoolId, getSchoolID());
 		link.addParameter(ListOfCoordinatesWriterXLS.prmSeasonId, getSchoolSeasonID());		
 		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SCHOOL_YEAR_ID, getSchoolYearID());		
-		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SEARCH_STRING, searchString);
+		link.addParameter(ListOfCoordinatesWriterXLS.PARAMETER_SEARCH_STRING, this.searchString);
 		return link;
 	}
 	
 	private void saveClass(IWContext iwc) throws RemoteException {
-		String[] applications = iwc.getParameterValues(PARAMETER_APPLICANT_ID);
+		String[] applications = iwc.getParameterValues(this.PARAMETER_APPLICANT_ID);
 		String[] students = iwc.getParameterValues(getSession().getParameterStudentID());
 
 		IWTimestamp stamp = new IWTimestamp();
@@ -1535,18 +1626,20 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		SchoolChoice choice;
 		
 		SchoolSeason season = getBusiness().getSchoolChoiceBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID()));
-		if (iwc.isParameterSet(getSession().getParameterStudyPathID()))
-			studyPathID = new Integer (iwc.getParameter(getSession().getParameterStudyPathID())).intValue();
+		if (iwc.isParameterSet(getSession().getParameterStudyPathID())) {
+			this.studyPathID = new Integer (iwc.getParameter(getSession().getParameterStudyPathID())).intValue();
+		}
 		
 		if (season != null) {
 			stamp = new IWTimestamp(season.getSchoolSeasonStart());
 		}
 		/////// should be removed and changed to the startdate for the sch_school_season of the category
-		if (operationalField != null && operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
+		if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 			IWResourceBundle iwrb = getResourceBundle(iwc);
-			String startDateString = iwrb.getIWBundleParent().getProperty(PROPERTY_START_HIGH_SCHOOL, stamp.getDate().toString());
-			if (startDateString != null)
-				stamp = new IWTimestamp(startDateString);	
+			String startDateString = iwrb.getIWBundleParent().getProperty(this.PROPERTY_START_HIGH_SCHOOL, stamp.getDate().toString());
+			if (startDateString != null) {
+				stamp = new IWTimestamp(startDateString);
+			}	
 		}
 		
 		/////////end
@@ -1571,7 +1664,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 					SchoolStudyPath handicraft = choice.getHandicraft();
 					int handicraftId = handicraft != null ? ((Integer) handicraft.getPrimaryKey()).intValue() : -1;
 					
-					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), session.getStudyPathID(), handicraftId);
+					member = getBusiness().getSchoolBusiness().storeSchoolClassMember(choice.getChildId(), getSchoolClassID(), getSchoolYearID(), schoolTypeID, placementDate.getTimestamp(), null, userID, choice.getMessage(), choice.getLanguageChoice(), this.session.getStudyPathID(), handicraftId);
 					if (member != null) {
 						if (previousSeason != null) {
 							getBusiness().importStudentInformationToNewClass(member, previousSeason);
@@ -1588,19 +1681,19 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				User student;
 				SchoolClassMember scm;
 
-				if (studyPathID == -1) {	
+				if (this.studyPathID == -1) {	
 					try {					
 						student = getUserBusiness(iwc).getUser(Integer.parseInt(students[a]));
 						scm = getBusiness().getSchoolBusiness().getSchoolClassMemberHome().findLatestByUser(student);
 						
-						studyPathID = scm.getStudyPathId();					
+						this.studyPathID = scm.getStudyPathId();					
 					}
 					catch (FinderException fe){
 						log (fe);
 					}
 				}
 				
-				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID, studyPathID);
+				member = getBusiness().getSchoolBusiness().storeSchoolClassMember(Integer.parseInt(students[a]), getSchoolClassID(), getSchoolYearID(), schoolTypeID, stamp.getTimestamp(), userID, this.studyPathID);
 			
 				if (member != null) {
 					getBusiness().importStudentInformationToNewClass(member, previousSeason);
@@ -1620,7 +1713,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	}
 
 	private void delete(IWContext iwc) throws RemoteException {
-		String student = iwc.getParameter(PARAMETER_APPLICANT_ID);
+		String student = iwc.getParameter(this.PARAMETER_APPLICANT_ID);
 		if (student != null && student.length() > 0) {
 			getBusiness().getSchoolBusiness().removeSchoolClassMemberFromClass(Integer.parseInt(student), getSchoolClassID());
 			SchoolClass group = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(getSchoolClassID()));
@@ -1650,8 +1743,10 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	}
 
 	private void validateSchoolClass(Collection previousClasses) throws RemoteException {
-		SchoolClass previousClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(_previousSchoolClassID));
-		if (previousClass != null && !previousClasses.contains(previousClass)) _previousSchoolClassID = -1;
+		SchoolClass previousClass = getBusiness().getSchoolBusiness().findSchoolClass(new Integer(this._previousSchoolClassID));
+		if (previousClass != null && !previousClasses.contains(previousClass)) {
+			this._previousSchoolClassID = -1;
+		}
 	}
 
 	private boolean livesOutsideDefaultCommune(IWContext iwc, User applicant) {
@@ -1760,11 +1855,11 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	}
 	
 	public void setShowMessageTextButton(boolean show) {
-		showMessageTextButton = show;
+		this.showMessageTextButton = show;
 	}
 
 	public boolean getShowPriorityColumnInExcel() {
-		return showPriorityColumnInExcel;
+		return this.showPriorityColumnInExcel;
 	}
 
 	public void setShowPriorityColumnInExcel(boolean showPriorityColumnInExcel) {
@@ -1772,7 +1867,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	}
 	
 	public boolean isShowHandicraftChoiceInExcelAndPdf() {
-		return showHandicraftChoiceInExcelAndPdf;
+		return this.showHandicraftChoiceInExcelAndPdf;
 	}
 	
 	public void setShowHandicraftChoiceInExcelAndPdf(boolean showHandicraftChoiceInExcelAndPdf) {
@@ -1781,7 +1876,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	
 	public boolean isShowListOfCoordinatesButton() {
-		return showListOfCoordinatesButton;
+		return this.showListOfCoordinatesButton;
 	}
 
 	

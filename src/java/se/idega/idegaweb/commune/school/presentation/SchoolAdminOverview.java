@@ -892,10 +892,10 @@ public class SchoolAdminOverview extends CommuneBlock {
 					table.add(replace, 1, row);
 					table.add(Text.getNonBrakingSpace(), 1, row);
 				}
-				if (this._schoolID == pendingSchoolId) {
+				//if (this._schoolID == pendingSchoolId) {    till method findByUser not fixed 
 					table.add(reject, 1, row);
 					table.add(Text.getNonBrakingSpace(), 1, row);
-				}
+				//}
 
 			}
 

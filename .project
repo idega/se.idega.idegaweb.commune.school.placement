@@ -10,6 +10,7 @@
     <project>com.idega.builder</project>
     <project>com.idega.block.school</project>
     <project>com.idega.block.navigation</project>
+    <project>com.idega.user</project>
     <project>is.idega.block.family</project>
     <project>se.idega.util</project>
     <project>se.cubecon.bun24.viewpoint</project>
@@ -20,6 +21,8 @@
     <project>se.idega.idegaweb.commune.school</project>
     <project>se.idega.idegaweb.commune.provider</project>
     <project>se.idega.idegaweb.commune.school.accounting</project>
+    <project>is.idega.idegaweb.egov.application</project>
+    <project>com.idega.block.web2.0</project>
   </projects>
   <buildSpec>
     <buildCommand>

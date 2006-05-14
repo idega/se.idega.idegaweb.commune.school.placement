@@ -105,6 +105,7 @@ application.walks_self=Fer sj\u00E1lft heim
 application.wants_refreshments=S\u00ED\u00F0degishressing
 application.wants_refreshments_help=Ef \u00FE\u00FA vilt a\u00F0 barni\u00F0 f\u00E1i s\u00ED\u00F0degishressingu \u00E1 me\u00F0an \u00E1 dv\u00F6l stendur, veldu \u00FE\u00E1 'J\u00E1'.  Gjald fyrir s\u00ED\u00F0degishressingu er 2.100 kr \u00E1 m\u00E1nu\u00F0i.
 application.year=\u00C1r
+application_error.last_care_provider_empty=\u00DE\u00FA ver\u00F0ur a\u00F0 setja nafn \u00E1 s\u00ED\u00F0asta sk\u00F3la, leiksk\u00F3la e\u00F0a dagforeldri.
 application_error.no_user_selected=Enginn ums\u00E6kjandi valinn
 application_error.schools_empty=\u00DE\u00FA ver\u00F0ur a\u00F0 velja a.m.k. einn sk\u00F3la
 application_errors_occured=Vinsamlega lagf\u00E6r\u00F0u eftirfarandi villu/r

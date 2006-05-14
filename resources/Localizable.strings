@@ -104,6 +104,7 @@ application.walks_self=Walks home
 application.wants_refreshments=Wants refreshments
 application.wants_refreshments_help=If you want to have refreshments, please select 'Yes'.
 application.year=Year
+application_error.last_care_provider_empty=You must enter the last care provider.
 application_error.no_user_selected=No user selected.
 application_error.schools_empty=Please select at least one school
 application_errors_occured=There was a problem with the following items

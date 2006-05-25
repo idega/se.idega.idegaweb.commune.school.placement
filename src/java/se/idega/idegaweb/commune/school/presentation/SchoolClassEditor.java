@@ -115,6 +115,16 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	private boolean showPriorityColumnInExcel = false;	
 	private boolean showHandicraftChoiceInExcelAndPdf = false;	
+	
+	private boolean moveStudentsFunctionalityEnabled = false;
+	
+	private final String PARAMETER_MOVE_STUDENTS_SCHOOL = "sch_choice_move_students_school";
+	private final String PARAMETER_MOVE_STUDENTS_SORT = "sch_choice_move_students_sort";
+	private final String PARAMETER_MOVE_STUDENTS_SORT_PLACED = "sch_choice_move_students_sort_placed";
+	
+	private int moveStudentsSchoolId = -1;
+	private int moveStudentsSort = -1;
+	private int moveStudentsSortPlaced = -1;
 
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
@@ -229,6 +239,31 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (iwc.isParameterSet(this.PARAMETER_DELETE_CHOICE_ID)) {
 			this._choiceForDeletion = Integer.parseInt(iwc.getParameter(this.PARAMETER_DELETE_CHOICE_ID));
 		}
+		
+		
+		// parameters for move student
+		if (iwc.isParameterSet(this.PARAMETER_MOVE_STUDENTS_SCHOOL)) {
+			this.moveStudentsSchoolId = Integer.parseInt(iwc.getParameter(this.PARAMETER_MOVE_STUDENTS_SCHOOL));
+		}
+		else {
+			this.moveStudentsSchoolId = -1;
+		}
+		
+		if (iwc.isParameterSet(this.PARAMETER_MOVE_STUDENTS_SORT)) {
+			this.moveStudentsSort = Integer.parseInt(iwc.getParameter(this.PARAMETER_MOVE_STUDENTS_SORT));
+		}
+		else {
+			this.moveStudentsSort = -1;			
+		}
+		
+		if (iwc.isParameterSet(this.PARAMETER_MOVE_STUDENTS_SORT_PLACED)) {
+			this.moveStudentsSortPlaced = Integer.parseInt(iwc.getParameter(this.PARAMETER_MOVE_STUDENTS_SORT_PLACED));
+		}
+		else {
+			this.moveStudentsSortPlaced = -1;			
+		}		
+		// eof params for move student
+		
 	}
 
 	private void drawForm(IWContext iwc) throws RemoteException {
@@ -269,16 +304,25 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			table.setCellpaddingLeft(1, 9, 12);
 			table.setCellpaddingRight(1, 9, 12);
 		}
-		
+
 		////////////////
-		if (false) {
-			table.add(getMoveStudentsSchoolChoiceTable(), 1, 10); //table.setBorder(1);
+		boolean isAdmin = false;
+		try {
+			isAdmin = isAdministrator(iwc);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if ( isAdmin && this.moveStudentsFunctionalityEnabled ) {
+			table.add(getMoveStudentsSchoolChoiceTable(iwc), 1, 10); //table.setBorder(1);
 		}
 		////////////////
 		
 		if (this.showStudentTable) {
 			if (this._previousSchoolYearID != -1) {
-				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(getSchoolID())), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
+				int schoolId = moveStudentsFunctionalityEnabled ? moveStudentsSchoolId : getSchoolID(); 
+				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(schoolId)), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 				validateSchoolClass(previousClasses);
 
 				table.add(getPreviousHeader(previousClasses), 1, 11);
@@ -968,13 +1012,17 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		boolean hasPlacement = false;
 		boolean showPlacement = false;
 
+
 		SchoolSeason season = getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(this._previousSchoolSeasonID));
-		List formerStudents = new ArrayList();
+		
+		int schoolId = moveStudentsFunctionalityEnabled ? this.moveStudentsSchoolId : getSchoolID();
+		
+		List formerStudents = new ArrayList();		
 		if (this._previousSchoolClassID != -1) {
 			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsInClassAndYear(this._previousSchoolClassID, this._previousSchoolYearID));
 		}
 		else {
-			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(getSchoolID(), this._previousSchoolSeasonID, this._previousSchoolYearID));
+			formerStudents = new ArrayList(getBusiness().getSchoolBusiness().findStudentsBySchoolAndSeasonAndYear(schoolId, this._previousSchoolSeasonID, this._previousSchoolYearID));
 		}
 
 		
@@ -1500,7 +1548,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	
 	protected Table getPreviousHeader(Collection classes) {
-		Table table = new Table(2, 1);
+		Table table = new Table(2, 1); //table.setBorder(7);
 		table.setCellpadding(0);
 		table.setCellspacing(0);
 		table.setWidth(Table.HUNDRED_PERCENT);
@@ -1865,7 +1913,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	public void setShowPriorityColumnInExcel(boolean showPriorityColumnInExcel) {
 		this.showPriorityColumnInExcel = showPriorityColumnInExcel;
 	}
-	
+		
 	public boolean isShowHandicraftChoiceInExcelAndPdf() {
 		return this.showHandicraftChoiceInExcelAndPdf;
 	}
@@ -1889,34 +1937,72 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	 * function has to be implemented
 	 * @return
 	 */
-	private Table getMoveStudentsSchoolChoiceTable() {
+	private Table getMoveStudentsSchoolChoiceTable(IWContext iwc) {
+		
 		Table table = new Table();
-		table.setBorder(1);
+		//table.setBorder(2); //for debug
 		
-		Text skola = new Text("Skola:");
+		Text skola = getSmallHeader(localize("school", "School") + ":"); 
 		
-		DropdownMenu schools = null;
+		DropdownMenu schools = null;		
 		try {
-			schools = getSchools(false, "ELEMENTARY_SCHOOL");
-			schools.setName("zazzzzzzaaaboooooo");
-			schools.setToSubmit(false);
+			schools = getSchools(false, getAccountingSession().getOperationalField());			
+			schools.setName(PARAMETER_MOVE_STUDENTS_SCHOOL);			
+			
+			if ((this.getSchoolID() != -1) && (this.moveStudentsSchoolId == -1)) {				
+				schools.setSelectedElement(this.getSchoolID()); 
+			} else {
+				schools.setSelectedElement(this.moveStudentsSchoolId);
+			}			
+						
+			schools.setToSubmit(false); //o rly?
 		}
 		catch (RemoteException e) {
 			e.printStackTrace();
 		}
 		
-		Text sorteraEfter = new Text("Sortera efter:");		
-		Text namn = new Text("namn");
-		Text allaElever = new Text("Alla elever");
+		Text sorteraEfter = getSmallHeader(localize("school.sort_by", "Sort by") + ":" + Text.NON_BREAKING_SPACE);		
 		
-		table.add(skola, 1, 1);
-		table.add(schools, 2, 1);
-		table.mergeCells(2, 1, 3, 1);		
+		DropdownMenu sorteraEfterMenu = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT)); //TODO fix parameter
+		sorteraEfterMenu.addMenuElement(SchoolChoiceComparator.NAME_SORT, localize("school.sort_name", "Name"));
+		sorteraEfterMenu.addMenuElement(SchoolChoiceComparator.PERSONAL_ID_SORT, localize("school.sort_personal_id", "Personal ID"));
+		sorteraEfterMenu.addMenuElement(SchoolChoiceComparator.ADDRESS_SORT, localize("school.sort_address", "Address"));
+		sorteraEfterMenu.addMenuElement(SchoolChoiceComparator.GENDER_SORT, localize("school.sort_gender", "Gender"));
+		sorteraEfterMenu.addMenuElement(SchoolChoiceComparator.CREATED_SORT, localize("school.sort_created", "Created"));
+		sorteraEfterMenu.setSelectedElement(this.moveStudentsSort);
+		sorteraEfterMenu.setToSubmit();
+		sorteraEfterMenu.setName(PARAMETER_MOVE_STUDENTS_SORT); 
 		
-		table.add(sorteraEfter, 1, 2);
-		table.add(namn, 2, 2);
-		table.add(allaElever, 3, 2);		
+		DropdownMenu menuPlaced = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT_PLACED));
+		menuPlaced.addMenuElement(-1, localize("school.sort_all", "All"));
+		menuPlaced.addMenuElement(SchoolChoiceComparator.PLACED_SORT, localize("school.sort_placed", "Placed"));
+		menuPlaced.addMenuElement(SchoolChoiceComparator.UNPLACED_SORT, localize("school.sort_unplaced", "Unplaced"));
+		menuPlaced.setSelectedElement(this.moveStudentsSortPlaced);
+		menuPlaced.setToSubmit();
+		menuPlaced.setName(PARAMETER_MOVE_STUDENTS_SORT_PLACED);
+		
+		int row = 1;
+		
+		table.add(new Text(Text.NON_BREAKING_SPACE), 1, row++);
+		
+		table.add(skola, 1, row);
+		table.add(schools, 2, row);
+		table.mergeCells(2, row, 3, row++);		
+		
+		table.add(sorteraEfter, 1, row);
+		table.add(sorteraEfterMenu, 2, row);
+		table.add(menuPlaced, 3, row++);		
 		
 		return table;
+	}
+
+	
+	public boolean isMoveStudentsFunctionalityEnabled() {
+		return moveStudentsFunctionalityEnabled;
+	}
+
+	
+	public void setMoveStudentsFunctionalityEnabled(boolean showMoveStudentsForm) {
+		this.moveStudentsFunctionalityEnabled = showMoveStudentsForm;
 	}
 }

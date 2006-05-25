@@ -1031,7 +1031,9 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
 
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSchoolSeasonID());
-			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			
+			int sortBy =  this.moveStudentsFunctionalityEnabled ? this.moveStudentsSort : this.sortStudentsBy;
+			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;

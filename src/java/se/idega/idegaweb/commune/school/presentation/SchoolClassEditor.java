@@ -1030,7 +1030,8 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
 
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSchoolSeasonID());
-			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			int sortBy =  this.moveStudentsFunctionalityEnabled ? this.moveStudentsSort : this.sortStudentsBy;
+			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -1933,14 +1934,12 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	
 	
 	/**
-	 * function has to be implemented
-	 * @return
+	 * This function generates table which contains school dropdown. From this school
+	 * students will be moved. 
 	 */
 	private Table getMoveStudentsSchoolChoiceTable(IWContext iwc) {
 		
-		Table table = new Table();
-		//table.setBorder(2); //for debug
-		
+		Table table = new Table();		
 		Text skola = getSmallHeader(localize("school", "School") + ":"); 
 		
 		DropdownMenu schools = null;		
@@ -1954,7 +1953,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				schools.setSelectedElement(this.moveStudentsSchoolId);
 			}			
 						
-			schools.setToSubmit(false); //o rly?
+			schools.setToSubmit(false); 
 		}
 		catch (RemoteException e) {
 			e.printStackTrace();

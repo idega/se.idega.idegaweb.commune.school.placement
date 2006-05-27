@@ -321,7 +321,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		
 		if (this.showStudentTable) {
 			if (this._previousSchoolYearID != -1) {
-				int schoolId = moveStudentsFunctionalityEnabled ? moveStudentsSchoolId : getSchoolID(); 
+				int schoolId = this.moveStudentsFunctionalityEnabled ? this.moveStudentsSchoolId : getSchoolID(); 
 				Collection previousClasses = getBusiness().getPreviousSchoolClasses(getBusiness().getSchoolBusiness().getSchool(new Integer(schoolId)), getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(getSchoolSeasonID())), getBusiness().getSchoolBusiness().getSchoolYear(new Integer(getSchoolYearID())));
 				validateSchoolClass(previousClasses);
 
@@ -1014,7 +1014,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		SchoolSeason season = getBusiness().getSchoolBusiness().getSchoolSeason(new Integer(this._previousSchoolSeasonID));
 		
-		int schoolId = moveStudentsFunctionalityEnabled ? this.moveStudentsSchoolId : getSchoolID();
+		int schoolId = this.moveStudentsFunctionalityEnabled ? this.moveStudentsSchoolId : getSchoolID();
 		
 		List formerStudents = new ArrayList();		
 		if (this._previousSchoolClassID != -1) {
@@ -1945,7 +1945,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		DropdownMenu schools = null;		
 		try {
 			schools = getSchools(false, getAccountingSession().getOperationalField());			
-			schools.setName(PARAMETER_MOVE_STUDENTS_SCHOOL);			
+			schools.setName(this.PARAMETER_MOVE_STUDENTS_SCHOOL);			
 			
 			if ((this.getSchoolID() != -1) && (this.moveStudentsSchoolId == -1)) {				
 				schools.setSelectedElement(this.getSchoolID()); 
@@ -1969,7 +1969,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		sorteraEfterMenu.addMenuElement(SchoolChoiceComparator.CREATED_SORT, localize("school.sort_created", "Created"));
 		sorteraEfterMenu.setSelectedElement(this.moveStudentsSort);
 		sorteraEfterMenu.setToSubmit();
-		sorteraEfterMenu.setName(PARAMETER_MOVE_STUDENTS_SORT); 
+		sorteraEfterMenu.setName(this.PARAMETER_MOVE_STUDENTS_SORT); 
 		
 		DropdownMenu menuPlaced = (DropdownMenu) getStyledInterface(new DropdownMenu(this.PARAMETER_SORT_PLACED));
 		menuPlaced.addMenuElement(-1, localize("school.sort_all", "All"));
@@ -1977,7 +1977,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		menuPlaced.addMenuElement(SchoolChoiceComparator.UNPLACED_SORT, localize("school.sort_unplaced", "Unplaced"));
 		menuPlaced.setSelectedElement(this.moveStudentsSortPlaced);
 		menuPlaced.setToSubmit();
-		menuPlaced.setName(PARAMETER_MOVE_STUDENTS_SORT_PLACED);
+		menuPlaced.setName(this.PARAMETER_MOVE_STUDENTS_SORT_PLACED);
 		
 		int row = 1;
 		
@@ -1996,7 +1996,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 	
 	public boolean isMoveStudentsFunctionalityEnabled() {
-		return moveStudentsFunctionalityEnabled;
+		return this.moveStudentsFunctionalityEnabled;
 	}
 
 	

@@ -151,6 +151,7 @@ friday=F\u00F6studagur
 has_granted_after_school_care_choice=B\u00FAi\u00F0 er a\u00F0 s\u00E6kja um fyrir ums\u00E6kjandann
 has_granted_after_school_care_choice_text=B\u00FAi\u00F0 er a\u00F0 senda inn ums\u00F3kn og er vi\u00F0komandi kominn me\u00F0 sam\u00FEykkta dv\u00F6l \u00E1 fr\u00EDstundaheimili. \r\n\r\n
 home_phone=Heimas\u00EDmi
+invalid_credit_card_number=Kortan\u00FAmeri\u00F0 er ekki leyfilegt kortan\u00FAmer
 iw.component.se.idega.idegaweb.commune.school.presentation.AfterSchoolCareApplication.name=AfterSchoolCareApplication
 iw.component.se.idega.idegaweb.commune.school.presentation.SchoolApplication.name=SchoolApplication
 mobile_phone=Fars\u00EDmi

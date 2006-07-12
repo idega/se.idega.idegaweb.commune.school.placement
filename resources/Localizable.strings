@@ -150,6 +150,7 @@ friday=Friday
 has_granted_after_school_care_choice=Selected applicant already has a placing.
 has_granted_after_school_care_choice_text=The application already has a granted after school care choice.
 home_phone=Home phone
+invalid_credit_card_number=Invalid credit card number
 iw.component.se.idega.idegaweb.commune.school.presentation.AfterSchoolCareApplication.name=AfterSchoolCareApplication
 iw.component.se.idega.idegaweb.commune.school.presentation.SchoolApplication.name=SchoolApplication
 mobile_phone=Mobile phone

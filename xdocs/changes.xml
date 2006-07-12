@@ -1,0 +1,14 @@
+<document>
+  <properties>
+    <title>School placement changes</title>
+    <author email="laddi@idega.com">Thorhallur "Laddi" Helgason</author>
+  </properties>
+  <body>
+      <release version="1.0.1" date="2006-07-12">
+      <action dev="laddi" type="update">
+      	Declaration of version for working with ePlatform release 3.1
+      </action>         
+    </release>
+
+  </body>
+</document>

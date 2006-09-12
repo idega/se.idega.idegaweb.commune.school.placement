@@ -8,7 +8,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.ejb.FinderException;
+
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.ListOfCoordinatesWriterXLS;
@@ -21,6 +23,7 @@ import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.SchoolClassMemberComparatorForSweden;
+
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
 import com.idega.block.school.data.School;
@@ -315,7 +318,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		}
 		
 		if ( isAdmin && this.moveStudentsFunctionalityEnabled ) {
-			table.add(getMoveStudentsSchoolChoiceTable(iwc), 1, 10); //table.setBorder(1);
+			table.add(getMoveStudentsSchoolChoiceTable(), 1, 10); //table.setBorder(1);
 		}
 		////////////////
 		
@@ -1655,7 +1658,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		return table;
 	}
 
-	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) throws RemoteException {
+	private Link getListOfCoordinatesXLSLink(Class classToUse, Image image) {
 		Link link = new Link(image);
 		link.setWindow(getFileWindow());
 		link.addParameter(MediaWritable.PRM_WRITABLE_CLASS, IWMainApplication.getEncryptedClassName(classToUse));
@@ -1939,7 +1942,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	 * function has to be implemented
 	 * @return
 	 */
-	private Table getMoveStudentsSchoolChoiceTable(IWContext iwc) {
+	private Table getMoveStudentsSchoolChoiceTable() {
 		
 		Table table = new Table();
 		//table.setBorder(2); //for debug

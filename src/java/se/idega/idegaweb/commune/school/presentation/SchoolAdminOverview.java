@@ -560,7 +560,7 @@ public class SchoolAdminOverview extends CommuneBlock {
 
 						if (choice.getChosenSchoolId() != -1) {
 							school = getSchoolCommuneBusiness(iwc).getSchoolBusiness().getSchool(new Integer(choice.getChosenSchoolId()));
-							String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice.getCaseStatus(), iwc.getCurrentLocale()) + ")";
+							String string = String.valueOf(choice.getChoiceOrder()) + ". " + school.getName() + " (" + getSchoolCommuneBusiness(iwc).getLocalizedCaseStatusDescription(choice, choice.getCaseStatus(), iwc.getCurrentLocale()) + ")";
 							
 														
 							if (schClMem == null) {

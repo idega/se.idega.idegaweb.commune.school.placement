@@ -20,9 +20,9 @@ import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceBMPBean;
 import se.idega.idegaweb.commune.school.data.SchoolChoiceHome;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
-import se.idega.util.SchoolClassMemberComparatorForSweden;
 import com.idega.block.process.data.Case;
 import com.idega.block.school.business.SchoolBusiness;
+import com.idega.block.school.business.SchoolClassMemberComparator;
 import com.idega.block.school.data.School;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
@@ -85,7 +85,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 	private int action = 0;
 	private int method = 0;
 	private int sortStudentsBy = SchoolChoiceComparator.NAME_SORT;
-	private int sortChoicesBy = SchoolClassMemberComparatorForSweden.NAME_SORT;
+	private int sortChoicesBy = SchoolClassMemberComparator.NAME_SORT;
 	private int sortPlaced = SchoolChoiceComparator.PLACED_SORT;
 	private int sortPlacedUnplacedBy = -1;
 	private int studyPathID = -1;
@@ -233,6 +233,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				this.searchString = temp;
 			}
 			catch (NumberFormatException nfe) {
+				// empty
 			}
 		}
 
@@ -346,7 +347,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 			}
 
 			if (getSchoolClassID() != -1) {
-				HiddenInput method = new HiddenInput(this.PARAMETER_METHOD, "0");
+				HiddenInput parameterMethod = new HiddenInput(this.PARAMETER_METHOD, "0");
 
 				SubmitButton submit = (SubmitButton) getStyledInterface(new SubmitButton(localize("save", "Save")));
 				submit.setValueOnClick(this.PARAMETER_METHOD, String.valueOf(ACTION_SAVE));
@@ -354,7 +355,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 				form.setToDisableOnSubmit(submit, true);
 				SubmitButton view = (SubmitButton) getStyledInterface(new SubmitButton(localize("school.view_group", "View group")));
 				view.setValueOnClick(PARAMETER_ACTION, String.valueOf(ACTION_SAVE));
-				table.add(method, 1, 17);
+				table.add(parameterMethod, 1, 17);
 				table.add(submit, 1, 17);
 				table.add(Text.getNonBrakingSpace(), 1, 17);
 				table.add(view, 1, 17);
@@ -1031,7 +1032,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 			Map studentChoices = getBusiness().getStudentChoices(formerStudents, getSchoolSeasonID());
 			int sortBy =  this.moveStudentsFunctionalityEnabled ? this.moveStudentsSort : this.sortStudentsBy;
-			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(sortBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, SchoolClassMemberComparator.getComparatorSortBy(sortBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -1310,7 +1311,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 		if (!formerStudents.isEmpty()) {
 			numberOfStudents = formerStudents.size();
 			Map studentMap = getCareBusiness().getStudentList(formerStudents);
-			Collections.sort(formerStudents, SchoolClassMemberComparatorForSweden.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
+			Collections.sort(formerStudents, SchoolClassMemberComparator.getComparatorSortBy(this.sortStudentsBy, iwc.getCurrentLocale(), getUserBusiness(iwc), studentMap));
 			Iterator iter = formerStudents.iterator();
 			while (iter.hasNext()) {
 				column = 1;
@@ -1824,6 +1825,7 @@ public class SchoolClassEditor extends SchoolAccountingCommuneBlock {
 
 		}
 		catch (Exception e) {
+			// empty
 		}
 
 		return showEraseButton;

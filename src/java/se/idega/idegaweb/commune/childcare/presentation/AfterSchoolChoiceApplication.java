@@ -63,11 +63,11 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String PARAM_PROVIDER = "ccas_provider";
 	private final static String PARAM_MESSAGE = "ccas_message";
 	private final static String PARAM_SEND_TO_CHECK = "ccas_send_to_check";
-	
+
 	private static final String EARLIESTSTARTDATE_DEFAULT = "The earliest possible placement date is: ";
 	private static final String EARLIESTSTARTDATE_KEY = "ccas_earlyStartDate";
-	
-	
+
+
 	private final static String PROVIDERS = "ccas_providers";
 	private final static String NAME = "ccas_name";
 	private final static String PID = "ccas_pid";
@@ -77,7 +77,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private final static String APPLICATION_FAILURE = "ccas_application_failed";
 	private final static String SEND_TO_CHECK = "ccas_send_to_check";
 	private final static String CHECK_MESSAGE = "ccas_check_message";
-	
+
 	private final static String LOCALIZE_PREFIX = "after_school.";
 
 	private final static String EMAIL_PROVIDER_SUBJECT = "application_received_subject";
@@ -86,20 +86,21 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	private String prmChildId = CitizenChildren.getChildIDParameterName();
 	private String prmChildUniqueId = CitizenChildren.getChildUniqueIDParameterName();
 
-	private Collection areas;
+	private Collection<SchoolArea> areas;
 	private Map providerMap;
 
 	private boolean isAdmin = false;
 	private boolean _useOngoingSeason = false;
 	private boolean _showCheckOption = false;
-	
+
 	private ICPage _checkPage;
 
-    private boolean isFClassAndPrio = false; 
+    private boolean isFClassAndPrio = false;
 
 	/**
 	 * @see se.idega.idegaweb.commune.childcare.presentation.ChildCareBlock#init(com.idega.presentation.IWContext)
 	 */
+	@Override
 	public void init(IWContext iwc) throws Exception {
 		initChild(iwc);
 		if (hasPermission(iwc)){
@@ -118,7 +119,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			else {
 				add(getHeader(localize("no_student_id_provided", "No student provided")));
 			}
-	
+
 		}
 		else{
 			add(getErrorText(localize("not_permitted", "You do not have permission")));
@@ -127,7 +128,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 	public boolean hasPermission(IWContext iwc) throws Exception {
 		boolean hasPermission = false;
-		
+
 		if (isAdmin(iwc)){
 			hasPermission = true;
 		}
@@ -141,20 +142,20 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					hasPermission = true;
 					break;
 				}
-								
+
 			}
 		}
 		return hasPermission;
 	}
-	
+
 	public void initChild(IWContext iwc) {
 		String ID = iwc.getParameter(this.prmChildId);
 		String childUniqueId = iwc.getParameter(this.prmChildUniqueId);
-		
+
 		if (childUniqueId != null && !childUniqueId.equals("-1")){
 			if (childUniqueId != null){
 				try {
-					this.child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);	
+					this.child = getUserBusiness(iwc).getUserByUniqueId(childUniqueId);
 				}
 				catch (IBOLookupException ibe){
 					log (ibe);
@@ -165,7 +166,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 				catch (RemoteException re){
 					log (re);
 				}
-				
+
 			}
 		}
 		else if (ID != null && !ID.equals("-1")) {
@@ -197,8 +198,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			}
 			catch (Exception e){
 				log(e);
-			}				
-						
+			}
+
 		}
 	}
 
@@ -261,7 +262,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			table.setAlignment(1, row, Table.HORIZONTAL_ALIGN_RIGHT);
 			submit.setOnSubmitFunction("checkApplication", getSubmitCheckScript());
 			form.setToDisableOnSubmit(submit, true);
-		
+
 			if (submit.getDisabled()) {
 				row++;
 				table.setHeight(row++, 6);
@@ -282,7 +283,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		List choices = null;
 		boolean done = false;
 		boolean sendToCheckPage = false;
-		
+
 		try {
 			int numberOfChoices = 3;
 			Integer[] providers = new Integer[numberOfChoices];
@@ -315,7 +316,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 					season = null;
 				}
 			}
-			
+
 			String subject = localize(EMAIL_PROVIDER_SUBJECT, "After school application received");
 			String body = localize(EMAIL_PROVIDER_MESSAGE, "We have received your after school application for {0} to {1}.");
 			choices = getAfterSchoolBusiness(iwc).createAfterSchoolChoices(parent, (Integer) this.child.getPrimaryKey(), providers, message, dates, season, subject, body, this.isFClassAndPrio);
@@ -366,17 +367,17 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			inputTable.setWidth(1, row, Table.HUNDRED_PERCENT);
 			inputTable.add(getSmallHeader(localize(CHECK_MESSAGE, "Please note that if you select a private provider, you have to fill out a check application as well.")), 1, row++);
 			inputTable.setHeight(row++, 6);
-			
+
 			CheckBox sendToCheck = getCheckBox(PARAM_SEND_TO_CHECK, "true");
 			inputTable.mergeCells(1, row, inputTable.getColumns(), row);
 			inputTable.setWidth(1, row, Table.HUNDRED_PERCENT);
 			inputTable.add(sendToCheck, 1, row);
 			inputTable.add(Text.getNonBrakingSpace(), 1, row);
 			inputTable.add(getSmallHeader(localize(SEND_TO_CHECK, "Yes, send me to the check application.")), 1, row++);
-			
+
 			inputTable.setHeight(row++, 12);
 		}
-		
+
 		inputTable.mergeCells(1, row, inputTable.getColumns(), row);
 		inputTable.add(getHeader(localize(PROVIDERS, "Providers")), 1, row++);
 
@@ -457,7 +458,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 			inputTable.add(getSmallHeader(localize("message", "Message")), 1, row);
 			inputTable.setWidth(1, row, 100);
 			inputTable.add(messageArea, 3, row++);
-			
+
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -503,10 +504,10 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t var dropOne = ").append("findObj('").append(PARAM_PROVIDER + "_1").append("');");
 		buffer.append("\n\t var dropTwo = ").append("findObj('").append(PARAM_PROVIDER + "_2").append("');");
 		buffer.append("\n\t var dropThree = ").append("findObj('").append(PARAM_PROVIDER + "_3").append("');");
-		
+
 		buffer.append("\n\t var dateDayOne = ").append("findObj('").append(PARAM_DATE + "_1_day").append("');");
 		buffer.append("\n\t var dateDayTwo = ").append("findObj('").append(PARAM_DATE + "_2_day").append("');");
-		buffer.append("\n\t var dateDayThree = ").append("findObj('").append(PARAM_DATE + "_3_day").append("');");	
+		buffer.append("\n\t var dateDayThree = ").append("findObj('").append(PARAM_DATE + "_3_day").append("');");
 
 		buffer.append("\n\t var one = 0;");
 		buffer.append("\n\t var two = 0;");
@@ -516,7 +517,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\n\t if (dropOne.selectedIndex > 0) {\n\t\t one = dropOne.options[dropOne.selectedIndex].value;\n\t\t length++;\n\t }");
 		buffer.append("\n\t if (dropTwo.selectedIndex > 0) {\n\t\t two = dropTwo.options[dropTwo.selectedIndex].value;\n\t\t length++;\n\t }");
 		buffer.append("\n\t if (dropThree.selectedIndex > 0) {\n\t\t three = dropThree.options[dropThree.selectedIndex].value;\n\t\t length++;\n\t }");
-		
+
 		buffer.append("\n\t if(one > 0 && dateDayOne.selectedIndex <= 0){");
 		String message = localize("must_set_date", "Please set the date.");
 		buffer.append("\n\t\t\t alert('").append(message).append("');");
@@ -532,8 +533,8 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 		buffer.append("\n\t\t\t alert('").append(message).append("');");
 		buffer.append("\n\t\t\t return false;");
 		buffer.append("\n\t\t }");
-		
-		buffer.append("\n\t if(length > 0){");		
+
+		buffer.append("\n\t if(length > 0){");
 		buffer.append("\n\t\t if(one > 0 && (one == two || one == three)){");
 		message = localize("must_not_be_the_same", "Please do not choose the same provider more than once.");
 		buffer.append("\n\t\t\t alert('").append(message).append("');");
@@ -571,7 +572,7 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 
 		try {
 			if (this.areas == null) {
-				this.areas = getBusiness().getSchoolBusiness().findAllSchoolAreas();
+				this.areas = getBusiness().getSchoolBusiness().getAllSchoolAreas();
 			}
 			if (this.providerMap == null) {
 				this.providerMap = getBusiness().getProviderAreaMap(this.areas, locale, emptyString, true);
@@ -603,28 +604,29 @@ public class AfterSchoolChoiceApplication extends ChildCareBlock {
 	/* (non-Javadoc)
 	 * @see se.idega.idegaweb.commune.presentation.CommuneBlock#localize(java.lang.String, java.lang.String)
 	 */
+	@Override
 	public String localize(String textKey, String defaultText) {
 		return super.localize(LOCALIZE_PREFIX + textKey, defaultText);
 	}
-	
+
 	public void setUseOngoingSeason(boolean useOngoingSeason) {
 		this._useOngoingSeason = useOngoingSeason;
 	}
-	
+
 	/**
 	 * @param showCheckOption The showCheckOption to set.
 	 */
 	public void setShowCheckOption(boolean showCheckOption) {
 		this._showCheckOption = showCheckOption;
 	}
-	
+
 	/**
 	 * @param checkPage The checkPage to set.
 	 */
 	public void setCheckPage(ICPage checkPage) {
 		this._checkPage = checkPage;
 	}
-	
+
 	/**
 	 * @return Returns the checkPage.
 	 */

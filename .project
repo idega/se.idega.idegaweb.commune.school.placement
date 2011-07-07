@@ -1,37 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <projectDescription>
-  <name>se.idega.idegaweb.commune.school.placement</name>
-  <comment>
+	<name>se.idega.idegaweb.commune.school.placement</name>
+	<comment>
   </comment>
-  <projects>
-    <project>com.idega.core</project>
-    <project>com.idega.block.process</project>
-    <project>com.idega.builder</project>
-    <project>com.idega.block.school</project>
-    <project>com.idega.block.navigation</project>
-    <project>com.idega.user</project>
-    <project>is.idega.block.family</project>
-    <project>se.idega.util</project>
-    <project>se.cubecon.bun24.viewpoint</project>
-    <project>se.idega.idegaweb.commune</project>
-    <project>se.idega.idegaweb.commune.care</project>
-    <project>se.idega.idegaweb.commune.accounting</project>
-    <project>se.idega.idegaweb.commune.childcare</project>
-    <project>se.idega.idegaweb.commune.school</project>
-    <project>se.idega.idegaweb.commune.provider</project>
-    <project>se.idega.idegaweb.commune.school.accounting</project>
-    <project>is.idega.idegaweb.egov.application</project>
-    <project>com.idega.block.web2.0</project>
-  </projects>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-      <arguments>
-      </arguments>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>

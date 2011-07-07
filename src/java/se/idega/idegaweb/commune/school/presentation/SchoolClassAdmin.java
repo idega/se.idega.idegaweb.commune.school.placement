@@ -9,12 +9,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import se.idega.idegaweb.commune.care.business.AccountingSession;
 import se.idega.idegaweb.commune.school.accounting.presentation.SchoolAccountingCommuneBlock;
 import se.idega.idegaweb.commune.school.business.SchoolChoiceComparator;
 import se.idega.idegaweb.commune.school.data.SchoolChoice;
 import se.idega.idegaweb.commune.school.event.SchoolEventListener;
 import se.idega.util.PIDChecker;
+
 import com.idega.block.school.business.SchoolClassMemberComparator;
 import com.idega.block.school.data.SchoolClass;
 import com.idega.block.school.data.SchoolClassMember;
@@ -59,18 +61,19 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	private boolean showBunRadioButtons = false;
 	private SchoolClass _group;
 	private String operationalField = null;
-	
+
 	/**
 	 * @see se.idega.idegaweb.commune.school.presentation.SchoolCommuneBlock#init(com.idega.presentation.IWContext)
 	 */
+	@Override
 	public void init(IWContext iwc) throws RemoteException {
 		if (iwc.isLoggedOn()) {
 			parseAction(iwc);
 
 			AccountingSession acs = getAccountingSession();
-			
+
 			this.operationalField = acs.getOperationalField();
-			
+
 			switch (this.method) {
 				case ACTION_SAVE :
 					//saveClass(iwc);
@@ -178,9 +181,9 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		table.add(getSmallHeader(localize("school.address", "Address")), column++, row);
 		table.add(getSmallHeader(localize("school.class", "Class")), column++, row);
 		if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
-			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);	
+			table.add(getSmallHeader(localize("school.study_path", "Study path")), column++, row);
 		}
-		
+
 		table.add(new HiddenInput(this.PARAMETER_STUDENT_ID, "-1"), column, row);
 		table.add(new HiddenInput(this.PARAMETER_METHOD, "0"), column, row);
 		if (useStyleNames()) {
@@ -200,7 +203,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 		Link move;
 		Link link;
 		int numberOfStudents = 0;
-		
+
 		boolean hasChoice = false;
 		boolean hasMoveChoice = false;
 		boolean hasSpecialPlacement = false;
@@ -240,7 +243,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 				notStarted = false;
 				hasTerminationDate = false;
 				int studyPathId = -1;
-				
+
 				if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 					studyPathId = studentMember.getStudyPathId();
 				}
@@ -294,7 +297,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 					table.setCellpaddingLeft(1, row, 12);
 					table.setCellpaddingRight(table.getColumns(), row, 12);
 				}
-				
+
 				if (hasMoveChoice) {
 					table.setRowColor(row, HAS_MOVE_CHOICE_COLOR);
 				}
@@ -355,7 +358,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 						table.add(getSmallText(localize("school.boy", "Boy")), column++, row);
 					}
 				}
-				
+
 				if (address != null && address.getStreetAddress() != null) {
 					table.add(getSmallText(address.getStreetAddress()), column, row);
 				}
@@ -364,7 +367,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 					table.add(getSmallText(schoolClass.getName()), column, row);
 				}
 				column++;
-				
+
 				if (this.operationalField != null && this.operationalField.equalsIgnoreCase(getSchoolBusiness().getHighSchoolSchoolCategory())){
 					if (studyPathId != -1){
 						try{
@@ -376,13 +379,13 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 						} catch (Exception e) {
 						e.printStackTrace();
 						}
-						
-					}		
+
+					}
 					column++;
 				}
-						
-				
-				
+
+
+
 				table.add(move, column, row);
 				//table.add(delete, 7, row);
 				row++;
@@ -487,7 +490,7 @@ public class SchoolClassAdmin extends SchoolAccountingCommuneBlock {
 	/**
 	 * Turns on/off view of radiobuttons for showing BUN administrated shools or
 	 * not
-	 * 
+	 *
 	 * @param show
 	 */
 	public void setShowBunRadioButtons(boolean show) {
